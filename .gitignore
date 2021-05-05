@@ -87,3 +87,5 @@ lint/tmp/
 .project
 .name
 org.eclipse.buildship.core.prefs
+/BlockIDSDK-release/build/
+/.idea/

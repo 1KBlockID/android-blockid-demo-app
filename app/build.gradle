@@ -1,13 +1,11 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.example.blockidsdkdemo"
+        applicationId "com.blockid.blockidsdkdemo"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
@@ -26,14 +24,87 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+        exclude 'lib/x86_64/darwin/libscrypt.dylib'
+        exclude 'lib/x86_64/freebsd/libscrypt.so'
+        exclude 'lib/x86_64/linux/libscrypt.so'
+        exclude 'AndroidManifest.xml'
+    }
 }
 
 dependencies {
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.+'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.navigation:navigation-fragment:2.3.0'
+    implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation project(path: ':BlockIDSDK-release')
+    testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    // Secure  Shared preference
+    implementation 'androidx.security:security-crypto:1.0.0-rc04'
+
+    //lifecycle-extensions
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
+
+    //Qrcode scan
+    implementation 'com.google.android.gms:play-services-vision:20.1.2'
+    // wallet
+    implementation 'org.web3j:core:3.3.1-android'
+    //generate mnemonics
+    implementation('org.bitcoinj:bitcoinj-core:0.15.4') {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    }
+
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'org.jetbrains:annotations:16.0.1'
+    // For Base32 encode/decode
+    implementation 'commons-codec:commons-codec:1.10'
+
+    // RecyclerView
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+
+    // Network Call
+    implementation "com.amitshekhar.android:android-networking:1.0.2"
+
+    // firebase messaging dependency
+    implementation 'com.google.firebase:firebase-messaging:21.0.0'
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+
+    // passport scan
+    implementation 'com.rmtheis:tess-two:9.0.0'
+    implementation('org.jmrtd:jmrtd:0.7.18') {
+        exclude module: 'bcprov-jdk15on'
+        exclude module: 'bctls-jdk15on'
+    }
+
+    implementation 'org.innovatrics.mrz:mrz-java:0.4'
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+
+    // Declare the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
+    implementation 'com.google.zxing:core:3.2.1'
+
+    //Location
+    implementation 'com.google.android.gms:play-services-gcm:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    // nfc scanner
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'net.sf.scuba:scuba-sc-android:0.0.20'
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+    implementation 'com.github.mhshams:jnbis:1.1.0'
+    implementation 'com.gemalto.jp2:jp2-android:1.0'
 }
