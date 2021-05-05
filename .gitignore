@@ -89,3 +89,4 @@ lint/tmp/
 org.eclipse.buildship.core.prefs
 /BlockIDSDK-release/build/
 /.idea/
+/BlockIDSDK-release/build/.transforms/
