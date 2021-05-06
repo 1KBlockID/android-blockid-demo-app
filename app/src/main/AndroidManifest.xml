@@ -36,25 +36,36 @@
             android:name="com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.LiveIDScanningActivity"
+            android:name="com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.passport.EPassportChipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.qrAuth.AuthenticatorActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.qrAuth.ScanQRCodeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

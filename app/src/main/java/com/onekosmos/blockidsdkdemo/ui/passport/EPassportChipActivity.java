@@ -22,8 +22,8 @@ import com.blockid.sdk.document.BIDDocumentProvider;
 import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppVault;
-import com.onekosmos.blockidsdkdemo.ui.utils.ErrorDialog;
-import com.onekosmos.blockidsdkdemo.ui.utils.ProgressDialog;
+import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
+import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
 import java.util.Arrays;
 
@@ -174,7 +174,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             return;
                         }
                         AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
-                        Toast.makeText(this, "Passport register successfully", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
                         finish();
                     });
         }

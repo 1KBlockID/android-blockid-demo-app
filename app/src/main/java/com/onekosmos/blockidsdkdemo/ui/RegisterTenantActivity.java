@@ -10,8 +10,8 @@ import com.blockid.sdk.BlockIDSDK;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppConstant;
 import com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity;
-import com.onekosmos.blockidsdkdemo.ui.utils.ErrorDialog;
-import com.onekosmos.blockidsdkdemo.ui.utils.ProgressDialog;
+import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
+import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
 public class RegisterTenantActivity extends AppCompatActivity {
 

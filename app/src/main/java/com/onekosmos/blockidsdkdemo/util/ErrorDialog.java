@@ -1,10 +1,8 @@
-package com.onekosmos.blockidsdkdemo.ui.utils;
+package com.onekosmos.blockidsdkdemo.util;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;

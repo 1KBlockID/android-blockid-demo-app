@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsdkdemo.ui;
+package com.onekosmos.blockidsdkdemo.ui.liveID;
 
 import android.Manifest;
 import android.graphics.Bitmap;
@@ -22,10 +22,10 @@ import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppVault;
-import com.onekosmos.blockidsdkdemo.ui.utils.ErrorDialog;
-import com.onekosmos.blockidsdkdemo.ui.utils.ProgressDialog;
 import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
+import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ImageProcessingUtil;
+import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
 /**
  * Created by Pankti Mistry on 30-04-2021.
@@ -157,7 +157,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     });
             return;
         }
-        Toast.makeText(this, getString(R.string.label_liveid_scanned_successfully), Toast.LENGTH_LONG).show();
         registerLiveID(bitmap);
     }
 
@@ -202,7 +201,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 }
             } else {
                 AppVault.getInstance().setLiveID(ImageProcessingUtil.getBitMapToBase64(bitmap));
-                Toast.makeText(this, getString(R.string.label_success), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
                 finish();
             }
         });

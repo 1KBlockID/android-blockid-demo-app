@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsdkdemo.ui.utils;
+package com.onekosmos.blockidsdkdemo.util;
 
 import android.app.Dialog;
 import android.content.Context;
