@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 class DefaultMovementMethod implements MovementMethod {
-
     public static DefaultMovementMethod sInstance;
 
     public static MovementMethod getInstance() {

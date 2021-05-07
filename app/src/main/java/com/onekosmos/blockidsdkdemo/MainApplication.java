@@ -13,7 +13,6 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         SharedPreferenceUtil.initialize(this);
         BlockIDSDK.initialize(this);
         BlockIDSDK.getInstance().setLicenseKey(AppConstant.licenseKey);

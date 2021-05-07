@@ -2,10 +2,8 @@ package com.onekosmos.blockidsdkdemo.util;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
 
 import com.example.blockidsdkdemo.R;
 
@@ -16,15 +14,10 @@ import java.util.Objects;
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class ProgressDialog extends Dialog {
-    private AppCompatTextView mTxtPleaseWait;
-    private ProgressBar mProgressBar;
-
     public ProgressDialog(@NonNull Context context) {
         super(context);
         setCancelable(false);
         setContentView(R.layout.dialog_loading);
-        mTxtPleaseWait = findViewById(R.id.txt_please_wait);
-        mProgressBar = findViewById(R.id.progress_bar_enroll);
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
     }
 }

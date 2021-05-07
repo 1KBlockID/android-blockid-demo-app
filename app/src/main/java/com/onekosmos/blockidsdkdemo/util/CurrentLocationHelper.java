@@ -29,7 +29,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /**
- * Created by Gaurav Rane on 18-03-2021.
+ * Created by Pankti Mistry on 03-05-2021.
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class CurrentLocationHelper implements

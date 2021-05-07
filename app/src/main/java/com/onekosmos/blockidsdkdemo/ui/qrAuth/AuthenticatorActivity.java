@@ -14,10 +14,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
+import com.blockid.sdk.cameramodule.camera.dlModule.model.DriverLicenseData;
+import com.blockid.sdk.cameramodule.camera.passportModule.model.PassportData;
 import com.blockid.sdk.datamodel.BIDGenericResponse;
+import com.blockid.sdk.document.BIDDocumentProvider;
+import com.blockid.sdk.scopeprovider.BIDScopesProvider;
 import com.example.blockidsdkdemo.BuildConfig;
 import com.example.blockidsdkdemo.R;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,6 +33,7 @@ import com.onekosmos.blockidsdkdemo.util.CurrentLocationHelper;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
@@ -47,12 +54,13 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
     private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0, mLongitude = 0;
-    private AppCompatTextView mTxtScope;
     private AppCompatButton mBtnQRSession1, mBtnQRSession2, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
     private AuthRequestModel mAuthRequestModel = new AuthRequestModel();
     private String mUserId;
-    private LinkedHashMap<String, Object> mDisplayScopes = null;
+    private LinkedHashMap<String, Object> mDisplayScopes = new LinkedHashMap<>();
+    private RecyclerView mRvUserScope;
+    private UserScopeAdapter mUserScopeAdapter;
     private boolean mScanQRWithScope = false;
 
     @Override
@@ -112,12 +120,13 @@ public class AuthenticatorActivity extends AppCompatActivity {
                             String.valueOf(mLongitude));
 
             if (response != null) {
-                mDisplayScopes = response.getDataObject();
+                mDisplayScopes = changeDisplayName(response.getDataObject());
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String s : mDisplayScopes.keySet()) {
                     stringBuilder.append(s + " : " + mDisplayScopes.get(s) + "\n");
                 }
-                mTxtScope.setText(stringBuilder);
+                mUserScopeAdapter = new UserScopeAdapter(this, mDisplayScopes);
+                mRvUserScope.setAdapter(mUserScopeAdapter);
             }
         } else if (requestCode == K_USER_CONSENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             AuthRequestModel authRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL), AuthRequestModel.class);
@@ -132,7 +141,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mTxtScope = findViewById(R.id.txt_scope);
         mBtnQRSession1 = findViewById(R.id.btn_qr_session1);
         mBtnQRSession1.setOnClickListener(view -> {
             mScanQRWithScope = true;
@@ -146,6 +154,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
         mBtnAuthenticate = findViewById(R.id.btn_authenticate);
         mBtnAuthenticate.setOnClickListener(view -> authenticate());
         mEtPresetData = findViewById(R.id.et_qr_preset_data);
+
+        mRvUserScope = findViewById(R.id.rv_user_scope);
+        mRvUserScope.setNestedScrollingEnabled(false);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mRvUserScope.setLayoutManager(layoutManager);
     }
 
     private void setLocation() {
@@ -163,10 +176,10 @@ public class AuthenticatorActivity extends AppCompatActivity {
         mBtnQRSession2.setVisibility(View.GONE);
         mBtnAuthenticate.setVisibility(View.VISIBLE);
         if (mScanQRWithScope) {
-            mTxtScope.setVisibility(View.VISIBLE);
+            mRvUserScope.setVisibility(View.VISIBLE);
             mEtPresetData.setVisibility(View.GONE);
         } else {
-            mTxtScope.setVisibility(View.GONE);
+            mRvUserScope.setVisibility(View.GONE);
             mEtPresetData.setVisibility(View.VISIBLE);
         }
     }
@@ -233,5 +246,52 @@ public class AuthenticatorActivity extends AppCompatActivity {
                         });
             }
         }
+    }
+
+    private LinkedHashMap<String, Object> changeDisplayName(HashMap<String, Object> scopesMap) {
+        LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<String, Object>();
+        if (isAnyDocumentEnrolled()) {
+            if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
+                pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
+
+            else if (scopesMap.containsKey("firstname"))
+                pScopesMap.put("Name : ", scopesMap.get("firstname"));
+
+            else if (scopesMap.containsKey("lastname"))
+                pScopesMap.put("Name : ", scopesMap.get("lastname"));
+        }
+        if (scopesMap.containsKey("did"))
+            pScopesMap.put("DID : ", scopesMap.get("did"));
+
+        if (scopesMap.containsKey("userid"))
+            pScopesMap.put("User ID : ", scopesMap.get("userid"));
+
+        if (scopesMap.containsKey("ppt")) {
+            pScopesMap.put("Passport # : ", ((PassportData) scopesMap.get("ppt")).getDocumentId());
+        }
+
+        if (scopesMap.containsKey("nationalid")) {
+            pScopesMap.put("National ID # : ", ((BIDScopesProvider.NationalIDScope) scopesMap.get("nationalid")).getDocumentId());
+        }
+
+        if (scopesMap.containsKey("dl"))
+            pScopesMap.put("Drivers license # : ", ((DriverLicenseData) scopesMap.get("dl")).getDocumentId());
+
+        if (scopesMap.containsKey("scep_creds"))
+            pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
+
+        if (scopesMap.containsKey("creds"))
+            pScopesMap.put("Creds : ", scopesMap.get("creds"));
+
+        return pScopesMap;
+    }
+
+    private boolean isAnyDocumentEnrolled() {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.driverLicense) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.passport) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.nationalID
+                ))
+            return true;
+        else return false;
     }
 }

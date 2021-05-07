@@ -2,6 +2,7 @@ package com.onekosmos.blockidsdkdemo.ui.passport;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -26,12 +27,13 @@ import com.blockid.sdk.document.BIDDocumentProvider;
 import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppVault;
+import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
+import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
-import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
 
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_ABOUT_TO_EXPIRE;
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_ALREADY_EXPIRED;
+import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 /**
  * Created by Pankti Mistry on 03-05-2021.
@@ -47,7 +49,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private LinearLayout mLayoutMessage;
     private PassportScannerHelper mPassportScannerHelper;
     private int mScannerOverlayMargin = 30;
-    private BIDPassport mBIDPassport;
+    private BIDPassport mPassportData;
     private String mSigToken;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
 
@@ -59,34 +61,13 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         initView();
     }
 
-    private void initView() {
-        mBIDScannerView = findViewById(R.id.view_bid_scanner);
-        mScannerOverlay = findViewById(R.id.view_overlay);
-        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, null);
-
-        if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-        }
-
-        mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(this);
-
-        mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(this);
-
-        mImgSuccess = findViewById(R.id.iv_success);
-        mTxtMessage = findViewById(R.id.txt_msg);
-        mLayoutMessage = findViewById(R.id.layout_msg);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
-        else {
+        else
             startScan();
-        }
     }
 
     @Override
@@ -122,49 +103,61 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        mPassportScannerHelper.stopScanning();
+    }
+
+    @Override
     public void onPassportResponse(BIDPassport bidPassport, String signatureToken, ErrorManager.ErrorResponse error) {
         stopScan();
-        mBIDPassport = bidPassport;
-        mSigToken = signatureToken;
-
-        ErrorDialog errorDialog = new ErrorDialog(PassportScanningActivity.this);
-        if (error != null && error.getCode() == K_PP_ALREADY_EXPIRED.getCode()) {
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage()
-                            + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")"
-                    , dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
-            return;
-        } else if (error != null && error.getCode() == K_PP_ABOUT_TO_EXPIRE.getCode()) {
-            showAboutToExpireDialog(error.getCode());
-            return;
-        } else if (error != null) {
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage()
-                            + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")"
-                    , dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+        if (bidPassport != null) {
+            mPassportData = bidPassport;
+            mSigToken = signatureToken;
+            if (isDeviceHasNfc) {
+                openEPassportChipActivity();
+            } else {
+                registerPassport();
+            }
             return;
         }
 
-        if (bidPassport == null) {
-            errorDialog.show(null, getString(R.string.label_error), getString(R.string.label_passport_fail_to_scan), dialog -> {
-                errorDialog.dismiss();
-                finish();
-            });
+        if (error == null)
+            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
-        if (isDeviceHasNfc) {
-            openEPassportChipActivity();
-            return;
-        }
-        registerPassport();
+        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+    }
+
+    private void initView() {
+        mBIDScannerView = findViewById(R.id.view_bid_scanner);
+        mScannerOverlay = findViewById(R.id.view_overlay);
+        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, null);
+
+        if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
+            mBIDScannerView.setVisibility(View.VISIBLE);
+
+        mImgBack = findViewById(R.id.img_back);
+        mImgBack.setOnClickListener(this);
+
+        mTxtBack = findViewById(R.id.txt_back);
+        mTxtBack.setOnClickListener(this);
+
+        mImgSuccess = findViewById(R.id.iv_success);
+        mTxtMessage = findViewById(R.id.txt_msg);
+        mLayoutMessage = findViewById(R.id.layout_msg);
     }
 
     private void openEPassportChipActivity() {
-        AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mBIDPassport, true));
+        AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.putExtra("S_TOKEN", mSigToken);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -176,51 +169,39 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
-        if (mBIDPassport != null) {
-            BlockIDSDK.getInstance().registerDocument(this, mBIDPassport, BIDDocumentProvider.BIDDocumentType.passport,
-                    "", (status, errorResponse) -> {
+        if (mPassportData != null) {
+            BlockIDSDK.getInstance().registerDocument(this, mPassportData, BIDDocumentProvider.BIDDocumentType.passport,
+                    "", (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
-                        if (!status) {
-                            ErrorDialog errorDialog = new ErrorDialog(this);
-                            errorDialog.show(null,
-                                    getString(R.string.label_error),
-                                    errorResponse.getMessage(), dialog -> {
-                                        errorDialog.dismiss();
-                                    });
+                        if (status) {
+                            AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
+                            Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
+                            finish();
                             return;
                         }
-                        AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mBIDPassport, true));
-                        Toast.makeText(this,R.string.label_passport_enrolled_successfully , Toast.LENGTH_LONG).show();
-                        finish();
+
+                        if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
+                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, "");
+                            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+                            intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            startActivity(intent);
+                            finish();
+                            return;
+                        }
+
+                        ErrorDialog errorDialog = new ErrorDialog(this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                            errorDialog.showNoInternetDialog(onDismissListener);
+                            return;
+                        }
+                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
                     });
         }
-    }
-
-    public void onStop() {
-        super.onStop();
-        mPassportScannerHelper.stopScanning();
-    }
-
-    private void showAboutToExpireDialog(int errorCode) {
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.showWithTwoButton(null, "",
-                getString(R.string.label_doc_about_to_expire_1) + " " + K_PASSPORT_EXPIRY_GRACE_DAYS + " "
-                        + getString(R.string.label_doc_about_to_expire_2)
-                        + "\n(" + getString(R.string.label_error_code) + errorCode + ")",
-                getString(R.string.label_yes),
-                getString(R.string.label_no),
-                (dialogInterface, i) -> {
-                    errorDialog.dismiss();
-                    finish();
-                },
-                dialog -> {
-                    if (isDeviceHasNfc) {
-                        openEPassportChipActivity();
-                        return;
-                    }
-                    registerPassport();
-                });
     }
 
     private void startScan() {

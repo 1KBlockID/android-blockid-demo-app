@@ -23,6 +23,8 @@
     <string name="label_success">Success</string>
     <string name="label_liveid_enrolled_successfully">LiveId enrolled successfully</string>
     <string name="label_passport_enrolled_successfully">Passport enrolled successfully</string>
+    <string name="label_document_enrolled_successfully">Document enrolled successfully</string>
+    <string name="label_dl_enrolled_successfully">Driver License enrolled successfully</string>
     <string name="label_scan_passport">Scan Passport</string>
     <string name="label_passport_camera_permission_alert">Please note that you will not be able to scan any of your documents with Jefferies and verify your identity unless you permit access to the camera.</string>
     <string name="label_error_code">Error code:</string>
@@ -57,4 +59,9 @@
     <string name="error_incorrect_pin">Incorrect PIN</string>
     <string name="label_pin_enrollment_success">PIN enrollment successful.</string>
     <string name="label_pin_registration_failed">PIN registration failed</string>
+    <string name="label_enable_foll_method">Please enable the following \n method for future login</string>
+    <string name="label_touch_id_face_id">TouchID / FaceID</string>
+    <string name="label_your_are_offline">You are offline!</string>
+    <string name="label_please_check_your_internet_connection">Please check your internet Connection.</string>
+    <string name="label_enroll_device_uth_to_unlock_sdk">Enroll device auth to unlock sdk</string>
 </resources>

@@ -2,6 +2,7 @@ package com.onekosmos.blockidsdkdemo.ui.pin.pinview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -17,17 +18,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 
 import java.util.Objects;
 
+import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+
 public class EnrollPinActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
-    public static final String K_BID_TENANT = "K_BID_TENANT";
-    public static final String K_CODE = "code";
-    private AppCompatTextView  mTxtEnterPin, mTxtBack, mTxtPinError, mTxtPlsWait;
+    private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError, mTxtPlsWait;
     private AppCompatImageView mImgShowHidePsw, mImgBack;
     private PinView mPvEnterPin;
     private boolean mShowPivValue;
@@ -36,19 +38,11 @@ public class EnrollPinActivity extends AppCompatActivity {
     private TextWatcher textWatcherEnterPin;
     private boolean isEnteredPin = false;
     private ProgressBar mProgressBar;
-    public static String K_FLOW = "K_FLOW";
-    private WORKFLOW flow;
-
-    public enum WORKFLOW {
-        ENROLL_FRAG
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enroll_pin);
-        if (getIntent().hasExtra(K_FLOW))
-            flow = (WORKFLOW) getIntent().getExtras().get(K_FLOW);
         initView();
     }
 
@@ -56,11 +50,6 @@ public class EnrollPinActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (!onBackPress()) {
             super.onBackPressed();
-            if (flow != null && flow.equals(WORKFLOW.ENROLL_FRAG)) {
-                finish();
-                return;
-            }
-            setResult(RESULT_CANCELED);
         }
     }
 
@@ -147,9 +136,9 @@ public class EnrollPinActivity extends AppCompatActivity {
     }
 
     private void setPinViewColor() {
-//        mPvEnterPin.setCursorColor(Color.parseColor(Brand.getInstance().getColor().getPrimary3()));
-//        mPvEnterPin.setTextColor(Color.parseColor(Brand.getInstance().getColor().getPrimary3()));
-//        mPvEnterPin.setLineColor(Color.parseColor(Brand.getInstance().getColor().getSecondary3()));
+        mPvEnterPin.setCursorColor(getColor(R.color.black));
+        mPvEnterPin.setTextColor(getColor(R.color.black));
+        mPvEnterPin.setLineColor(getColor(android.R.color.darker_gray));
     }
 
     private boolean onBackPress() {
@@ -195,9 +184,9 @@ public class EnrollPinActivity extends AppCompatActivity {
     }
 
     private void inCorrectPin() {
-//        mPvEnterPin.setCursorColor(Color.parseColor(Brand.getInstance().getColor().getPrimary2()));
-//        mPvEnterPin.setTextColor(Color.parseColor(Brand.getInstance().getColor().getPrimary2()));
-//        mPvEnterPin.setLineColor(Color.parseColor(Brand.getInstance().getColor().getPrimary2()));
+        mPvEnterPin.setCursorColor(getColor(R.color.misc2));
+        mPvEnterPin.setTextColor(getColor(R.color.misc2));
+        mPvEnterPin.setLineColor(getColor(R.color.misc2));
         mConfirmPin = null;
         mTxtPinError.setVisibility(View.VISIBLE);
     }
@@ -212,29 +201,27 @@ public class EnrollPinActivity extends AppCompatActivity {
             mTxtPlsWait.setVisibility(View.GONE);
             if (enroll_status) {
                 afterSuccess();
-                if (flow != null && flow.equals(WORKFLOW.ENROLL_FRAG)) {
-                    Toast.makeText(this, R.string.label_pin_enrollment_success, Toast.LENGTH_SHORT).show();
-                    finish();
-                    return;
-                }
-                setResult(RESULT_OK);
+                Toast.makeText(this, R.string.label_pin_enrollment_success, Toast.LENGTH_SHORT).show();
                 finish();
             } else {
+                if (error == null)
+                    error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), getString(R.string.label_pin_registration_failed));
+
                 ErrorDialog errorDialog = new ErrorDialog(this);
-                String message = error.getMessage();
-                if (message == null) {
-                    message = getString(R.string.label_pin_registration_failed);
+                DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                    errorDialog.dismiss();
+                    finish();
+                };
+                if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                    errorDialog.showNoInternetDialog(onDismissListener);
+                    return;
                 }
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        message, dialog -> {
-                            errorDialog.dismiss();
-                        });
+                errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
             }
         });
     }
 
-    public void hideKeyboard(Activity activity) {
+    private void hideKeyboard(Activity activity) {
         try {
             InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
             if (inputMethodManager.isActive())

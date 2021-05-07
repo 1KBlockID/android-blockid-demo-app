@@ -20,8 +20,8 @@ import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.example.blockidsdkdemo.R;
 import com.google.gson.Gson;
-import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
+import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 
 /**
  * Created by Gaurav Rane on 30-09-2020.
@@ -48,6 +48,47 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         initView();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
+            AppPermissionUtils.requestPermission(this, K_QR_CODE_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+        else if (!(mProgressBar.getVisibility() == View.VISIBLE)) {
+            mBIDScannerView.setVisibility(View.VISIBLE);
+            mScannerOverlay.setVisibility(View.VISIBLE);
+            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
+            mQRScannerHelper.startQRScanning();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION, this)) {
+            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
+            mQRScannerHelper.startQRScanning();
+            mBIDScannerView.setVisibility(View.VISIBLE);
+            mScannerOverlay.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @Override
+    public void onQRScanResultResponse(String qrCodeData) {
+        if (mQRScannerHelper.isRunning()) {
+            mQRScannerHelper.stopQRScanning();
+            runOnUiThread(() -> onQRCodeScanResponse(qrCodeData));
+        }
+    }
+
     private void initView() {
         mScannerView = findViewById(R.id.scanner_view);
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
@@ -64,19 +105,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mImgBack = findViewById(R.id.img_back);
         mTxtBack.setOnClickListener(view -> onBackPressed());
         mImgBack.setOnClickListener(view -> onBackPressed());
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_QR_CODE_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
-        else if (!(mProgressBar.getVisibility() == View.VISIBLE)) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
-            mQRScannerHelper.startQRScanning();
-        }
     }
 
     private void onQRCodeScanResponse(String qrResponseB64String) {
@@ -106,33 +134,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
                         setResult(RESULT_CANCELED);
                         finish();
                     });
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION, this)) {
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
-            mQRScannerHelper.startQRScanning();
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
-    @Override
-    public void onQRScanResultResponse(String qrCodeData) {
-        if (mQRScannerHelper.isRunning()) {
-            mQRScannerHelper.stopQRScanning();
-            runOnUiThread(() -> onQRCodeScanResponse(qrCodeData));
         }
     }
 }

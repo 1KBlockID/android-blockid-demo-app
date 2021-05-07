@@ -134,5 +134,21 @@ public class ErrorDialog extends Dialog {
         }
         this.show();
     }
+
+    public void showNoInternetDialog(Dialog.OnDismissListener dismissListener) {
+        mDismissListener = dismissListener;
+        mBtn1.setVisibility(View.VISIBLE);
+        try {
+            mImgDialogIcon.setVisibility(View.GONE);
+            mTxtTitle.setVisibility(View.VISIBLE);
+            mTxtTitle.setText(R.string.label_your_are_offline);
+            mTxtMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setText(R.string.label_please_check_your_internet_connection);
+        } catch (
+                Exception e) {
+            e.printStackTrace();
+        }
+        this.show();
+    }
 }
 

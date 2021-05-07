@@ -1,11 +1,11 @@
 package com.onekosmos.blockidsdkdemo.ui.liveID;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,39 +20,41 @@ import com.blockid.sdk.cameramodule.BIDScannerView;
 import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
+import com.blockid.sdk.datamodel.BIDDocumentData;
+import com.blockid.sdk.document.BIDDocumentProvider;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
+import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ImageProcessingUtil;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
+
+import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 /**
  * Created by Pankti Mistry on 30-04-2021.
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener, ILiveIDResponseListener {
-    private final String[] K_CAMERA_PERMISSION = new String[]{
-            Manifest.permission.CAMERA};
+    public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
+    private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
-    private AppCompatImageView mImgBack, mIvSuccess;
-    private AppCompatTextView mTxtBack, mTxtPlsWait, mTxtMessage;
+    private AppCompatImageView mImgBack;
+    private AppCompatTextView mTxtBack, mTxtMessage;
     private AppCompatButton mBtnCancel;
     private BIDScannerView mBIDScannerView;
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private AppCompatImageView mScannerOverlay;
     private int mScannerOverlayMargin = 30;
-    private ProgressBar mProgressBar;
     private LinearLayout mLayoutMessage;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liveid_scan);
-
         initViews();
     }
 
-    @Override
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
@@ -66,29 +68,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         }
     }
 
-    private void initViews() {
-        mBIDScannerView = findViewById(R.id.view_bid_scanner);
-        mScannerOverlay = findViewById(R.id.view_overlay);
-        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
-
-        if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-        }
-
-        mTxtMessage = findViewById(R.id.txt_msg);
-        mLayoutMessage = findViewById(R.id.layout_msg);
-        mIvSuccess = findViewById(R.id.iv_success);
-        mProgressBar = findViewById(R.id.progress_bar);
-        mTxtPlsWait = findViewById(R.id.txt_please_wait);
-
-        mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(this);
-
-        mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(this);
-
-        mBtnCancel = findViewById(R.id.btn_cancel);
-        mBtnCancel.setOnClickListener(this);
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -126,8 +108,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             showFaceFocusedViews();
             mLayoutMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(getMessgaeForExpression(expression));
-            mIvSuccess.setVisibility(View.GONE);
+            mTxtMessage.setText(getMessgeForExpression(expression));
         } else
             showFaceNotFocusedViews();
     }
@@ -137,16 +118,14 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mTxtMessage.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.GONE);
         mLiveIDScannerHelper.stopLiveIDScanning();
-        mProgressBar.setVisibility(View.VISIBLE);
-        mTxtPlsWait.setVisibility(View.VISIBLE);
         mBtnCancel.setClickable(false);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
         mBIDScannerView.setVisibility(View.GONE);
         mScannerOverlay.setVisibility(View.GONE);
         mBtnCancel.setVisibility(View.GONE);
-        // call enrollLiveID func here
 
+        // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
         if (bitmap == null) {
             errorDialog.show(null,
@@ -157,7 +136,32 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     });
             return;
         }
+        if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
+            registerLiveIDWithDocument(bitmap);
+            return;
+        }
         registerLiveID(bitmap);
+    }
+
+    private void initViews() {
+        mBIDScannerView = findViewById(R.id.view_bid_scanner);
+        mScannerOverlay = findViewById(R.id.view_overlay);
+        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
+
+        if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
+            mBIDScannerView.setVisibility(View.VISIBLE);
+        }
+
+        mTxtMessage = findViewById(R.id.txt_msg);
+        mLayoutMessage = findViewById(R.id.layout_msg);
+        mImgBack = findViewById(R.id.img_back);
+        mImgBack.setOnClickListener(this);
+
+        mTxtBack = findViewById(R.id.txt_back);
+        mTxtBack.setOnClickListener(this);
+
+        mBtnCancel = findViewById(R.id.btn_cancel);
+        mBtnCancel.setOnClickListener(this);
     }
 
     private void showFaceNotFocusedViews() {
@@ -170,11 +174,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc1));
     }
 
-    public void onStop() {
-        super.onStop();
-    }
-
-    private String getMessgaeForExpression(String expression) {
+    private String getMessgeForExpression(String expression) {
         switch (expression) {
             case "Blink":
                 return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
@@ -187,23 +187,58 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private void registerLiveID(Bitmap bitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(bitmap, "", (enroll_status, msg, errorResponse) -> {
+        BlockIDSDK.getInstance().setLiveID(bitmap, "", (status, msg, error) -> {
             progressDialog.dismiss();
-            if (!enroll_status) {
-                if (errorResponse != null) {
-                    ErrorDialog errorDialog = new ErrorDialog(this);
-                    errorDialog.show(null,
-                            getString(R.string.label_error),
-                            errorResponse.getMessage(), dialog -> {
-                                dialog.dismiss();
-                                finish();
-                            });
-                }
-            } else {
+            if (status) {
                 AppVault.getInstance().setLiveID(ImageProcessingUtil.getBitMapToBase64(bitmap));
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
                 finish();
+                return;
             }
+            if (error == null)
+                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+                finish();
+            };
+            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+        });
+    }
+
+    private void registerLiveIDWithDocument(Bitmap bitmap) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BIDDocumentData documentData = DocumentHolder.getData();
+        BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
+        BlockIDSDK.getInstance().registerDocument(this, documentData, bitmap, type, "", "", (status, error) -> {
+            progressDialog.dismiss();
+            DocumentHolder.clearData();
+            if (status) {
+                AppVault.getInstance().setLiveID(ImageProcessingUtil.getBitMapToBase64(bitmap));
+                Toast.makeText(this, getString(R.string.label_document_enrolled_successfully), Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+
+            if (error == null)
+                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+                finish();
+            };
+            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
         });
     }
 }

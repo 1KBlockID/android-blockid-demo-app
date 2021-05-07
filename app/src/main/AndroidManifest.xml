@@ -45,6 +45,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.driverLicense.DriverLicenseScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.passport.EPassportChipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -60,12 +64,9 @@
             android:name="com.onekosmos.blockidsdkdemo.ui.qrAuth.ScanQRCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
     </application>
-
 </manifest>

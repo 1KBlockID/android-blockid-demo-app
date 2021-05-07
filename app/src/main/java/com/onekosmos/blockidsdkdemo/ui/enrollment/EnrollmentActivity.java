@@ -1,11 +1,11 @@
 package com.onekosmos.blockidsdkdemo.ui.enrollment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -15,16 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
-import com.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
-import com.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
-import com.blockid.sdk.datamodel.BIDDriverLicense;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppConstant;
-import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsdkdemo.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity;
@@ -36,16 +31,12 @@ import com.onekosmos.blockidsdkdemo.util.SharedPreferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_DL_SCAN_CANCEL;
-
 /**
  * Created by Pankti Mistry on 30-04-2021.
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends AppCompatActivity implements IDriverLicenseListener, EnrollmentAdapter.EnrollmentClickListener {
-    private ErrorManager.ErrorResponse mErrorResponse;
+public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private RecyclerView mRvEnrollmentAssets;
-    private BIDDriverLicense mDriverLicense;
     private List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
 
@@ -56,41 +47,13 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
         initView();
 
         if (!BIDAuthProvider.getInstance().isSdkLocked())
-            deviceAuthLogin();
+            onUnlockSdkClick();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         refreshEnrollmentRecyclerView();
-    }
-
-    @Override
-    public void onDriverLicenseResponse(BIDDriverLicense bidDriverLicense, String s, ErrorManager.ErrorResponse errorResponse) {
-        if (bidDriverLicense == null) {
-            if (errorResponse.getCode() != ErrorManager.CustomErrors.K_DL_SCAN_CANCEL.getCode()) {
-                ErrorDialog errorDialog = new ErrorDialog(EnrollmentActivity.this);
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        errorResponse.getMessage(), dialog -> {
-                            errorDialog.dismiss();
-                        });
-            }
-            return;
-        }
-        mDriverLicense = bidDriverLicense;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1111 && resultCode == RESULT_OK) {
-            if (mErrorResponse != null && mErrorResponse.getCode() == K_DL_SCAN_CANCEL.getCode()) {
-                finish();
-                return;
-            }
-            registerDL(mDriverLicense);
-        }
     }
 
     @Override
@@ -109,11 +72,11 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
-            resetAppNSdk();
+            onResetAppClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_unlock_sdk))) {
-            deviceAuthLogin();
+            onUnlockSdkClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_login_with_qr))) {
-            qrLoginClicked();
+            onQrLoginClicked();
         }
     }
 
@@ -137,6 +100,10 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
         }
         if (mEnrollmentAdapter != null)
             mEnrollmentAdapter.notifyDataSetChanged();
+    }
+
+    private void refreshEnrollmentRecyclerView() {
+        populateEnrollmentAssetsData();
     }
 
     private void onLiveIdClicked() {
@@ -170,19 +137,38 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
                     getString(R.string.label_remove_pin),
                     getString(R.string.label_yes), getString(R.string.label_no),
                     (dialogInterface, i) -> {
-                        BlockIDSDK.getInstance().unenrollPin((enroll_status, errorResponse) -> {
-                            if (enroll_status) {
-                                refreshEnrollmentRecyclerView();
-                            }
-                        });
+                        errorDialog.dismiss();
+
                     },
                     dialog -> {
                         errorDialog.dismiss();
+                        unEnrollPin();
                     });
             return;
         }
         Intent intent = new Intent(this, EnrollPinActivity.class);
         startActivity(intent);
+    }
+
+    private void unEnrollPin() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().unenrollPin((status, error) -> {
+            if (status) {
+                progressDialog.dismiss();
+                refreshEnrollmentRecyclerView();
+                return;
+            }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+            };
+            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+        });
     }
 
     private void onDLClicked() {
@@ -199,44 +185,8 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
                     });
             return;
         }
-        DLScannerHelper.getInstance().setDLScanningOrder(DLScanningOrder.FIRST_BACK_THEN_FRONT);
-        Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, 90, this::onDriverLicenseResponse);
-        startActivityForResult(intent, 1111);
-    }
-
-    private void removeDocument(BIDDocumentProvider.BIDDocumentType documentType) {
-        ProgressDialog dialog = new ProgressDialog(this);
-        dialog.show();
-        BlockIDSDK.getInstance().unRegisterDocument(this, documentType, (success, errorResponse) -> {
-            dialog.dismiss();
-            if (success) {
-                refreshEnrollmentRecyclerView();
-            } else {
-                Toast.makeText(this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void registerDL(BIDDriverLicense documentData) {
-        ProgressDialog progressDialog = new ProgressDialog(EnrollmentActivity.this);
-        progressDialog.show();
-        if (documentData != null) {
-            BlockIDSDK.getInstance().registerDocument(this, documentData, BIDDocumentProvider.BIDDocumentType.driverLicense,
-                    "", (status, errorResponse) -> {
-                        progressDialog.dismiss();
-                        if (!status) {
-                            ErrorDialog errorDialog = new ErrorDialog(EnrollmentActivity.this);
-                            errorDialog.show(null,
-                                    getString(R.string.label_error),
-                                    errorResponse.getMessage(), dialog -> {
-                                        errorDialog.dismiss();
-                                    });
-                            return;
-                        }
-                        AppVault.getInstance().setDLData(BIDUtil.objectToJSONString(documentData, true));
-                        Toast.makeText(this, "Driver License register successfully", Toast.LENGTH_LONG).show();
-                    });
-        }
+        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+        startActivity(intent);
     }
 
     private void onPPClicked() {
@@ -257,10 +207,32 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
         startActivity(intent);
     }
 
+    //FIXME will implement later
     private void onNationalIDClick() {
     }
 
-    private void resetAppNSdk() {
+    private void removeDocument(BIDDocumentProvider.BIDDocumentType documentType) {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.show();
+        BlockIDSDK.getInstance().unRegisterDocument(this, documentType, (status, error) -> {
+            dialog.dismiss();
+            if (status) {
+                refreshEnrollmentRecyclerView();
+                return;
+            }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+            };
+            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+        });
+    }
+
+    private void onResetAppClick() {
         SharedPreferenceUtil.getInstance().clear();
         BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
         Intent intent = new Intent(this, RegisterTenantActivity.class);
@@ -268,7 +240,7 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
         finish();
     }
 
-    private void deviceAuthLogin() {
+    private void onUnlockSdkClick() {
         if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
             String title = getResources().getString(R.string.label_biometric_auth);
             String desc = getResources().getString(R.string.label_biometric_auth_req);
@@ -277,16 +249,12 @@ public class EnrollmentActivity extends AppCompatActivity implements IDriverLice
                     Toast.makeText(EnrollmentActivity.this, R.string.label_sdk_unlock_successfully, Toast.LENGTH_SHORT).show();
             });
         } else {
-            Toast.makeText(this, "Enroll device auth to unlock", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.label_enroll_device_uth_to_unlock_sdk, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void qrLoginClicked() {
+    private void onQrLoginClicked() {
         Intent intent = new Intent(this, AuthenticatorActivity.class);
         startActivity(intent);
-    }
-
-    private void refreshEnrollmentRecyclerView() {
-        populateEnrollmentAssetsData();
     }
 }
