@@ -20,9 +20,7 @@ import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListe
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
-import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
@@ -52,8 +50,8 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e_passport_chip_scan);
         mPassportScannerHelper = new PassportScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
-        mPassportData = BIDUtil.JSONStringToObject(AppVault.getInstance().getPPData(), BIDPassport.class);
-        mSigToken = getIntent().getStringExtra("S_TOKEN");
+        mPassportData = PassportDataHolder.getData();
+        mSigToken = PassportDataHolder.getToken();
         initView();
     }
 
@@ -170,7 +168,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                     "", (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
-                            AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
+                            PassportDataHolder.clearData();
                             Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
                             finish();
                             return;

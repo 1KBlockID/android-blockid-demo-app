@@ -27,7 +27,6 @@ import com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsdkdemo.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
-import com.onekosmos.blockidsdkdemo.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -249,7 +248,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onResetAppClick() {
-
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(
                 null,
@@ -258,7 +256,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 getString(R.string.label_cancel), getString(R.string.label_ok),
                 (dialogInterface, i) -> {
                     errorDialog.dismiss();
-                    SharedPreferenceUtil.getInstance().clear();
                     BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
                     Intent intent = new Intent(this, RegisterTenantActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

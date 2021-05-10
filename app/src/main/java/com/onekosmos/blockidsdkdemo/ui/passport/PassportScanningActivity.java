@@ -24,9 +24,7 @@ import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListe
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
-import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
 import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
@@ -157,9 +155,8 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     }
 
     private void openEPassportChipActivity() {
-        AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
+        PassportDataHolder.setData(mPassportData, mSigToken);
         Intent intent = new Intent(this, EPassportChipActivity.class);
-        intent.putExtra("S_TOKEN", mSigToken);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
         finish();
@@ -175,7 +172,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
-                            AppVault.getInstance().setPPData(BIDUtil.objectToJSONString(mPassportData, true));
                             Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
                             finish();
                             return;

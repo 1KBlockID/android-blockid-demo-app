@@ -18,13 +18,10 @@ import java.util.LinkedHashMap;
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class UserScopeAdapter extends RecyclerView.Adapter<UserScopeAdapter.UserScopeViewHolder> {
-
-    private Context mContext;
     private LinkedHashMap<String, Object> mScopes = null;
     private String[] tiltleList;
 
-    public UserScopeAdapter(Context context, LinkedHashMap<String, Object> scopes) {
-        mContext = context;
+    public UserScopeAdapter(LinkedHashMap<String, Object> scopes) {
         mScopes = scopes;
         tiltleList = mScopes.keySet().toArray(new String[0]);
     }
@@ -59,4 +56,3 @@ public class UserScopeAdapter extends RecyclerView.Adapter<UserScopeAdapter.User
         }
     }
 }
-

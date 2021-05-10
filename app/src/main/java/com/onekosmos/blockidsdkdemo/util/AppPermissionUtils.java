@@ -19,7 +19,6 @@ import com.example.blockidsdkdemo.R;
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class AppPermissionUtils {
-
     public static void requestPermission(Activity activity, int requestCode, String[] requestPermission) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             activity.requestPermissions(requestPermission, requestCode);

@@ -151,4 +151,3 @@ public class ErrorDialog extends Dialog {
         this.show();
     }
 }
-

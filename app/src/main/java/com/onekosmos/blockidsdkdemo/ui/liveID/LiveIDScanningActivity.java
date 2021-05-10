@@ -23,11 +23,9 @@ import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.example.blockidsdkdemo.R;
-import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
 import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
-import com.onekosmos.blockidsdkdemo.util.ImageProcessingUtil;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;

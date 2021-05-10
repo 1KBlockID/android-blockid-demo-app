@@ -12,7 +12,6 @@ import java.util.ArrayList;
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class EnrollmentsDataSource {
-
     public static EnrollmentsDataSource sharedInstance = new EnrollmentsDataSource();
 
     public enum EnrollmentAssetEnum {

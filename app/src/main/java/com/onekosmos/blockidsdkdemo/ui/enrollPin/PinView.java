@@ -36,7 +36,6 @@ import androidx.core.view.ViewCompat;
 import com.example.blockidsdkdemo.R;
 
 public class PinView extends AppCompatEditText {
-
     private static final boolean DBG = false;
     private static final int BLINK = 500;
     private static final int DEFAULT_COUNT = 8;

@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -125,7 +124,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 for (String s : mDisplayScopes.keySet()) {
                     stringBuilder.append(s + " : " + mDisplayScopes.get(s) + "\n");
                 }
-                mUserScopeAdapter = new UserScopeAdapter(this, mDisplayScopes);
+                mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
                 mRvUserScope.setAdapter(mUserScopeAdapter);
             }
         } else if (requestCode == K_USER_CONSENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
