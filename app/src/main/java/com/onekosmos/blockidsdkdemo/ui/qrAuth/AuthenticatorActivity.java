@@ -38,7 +38,7 @@ import java.util.LinkedHashMap;
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 /**
- * Created by Gaurav Rane on 08-10-2020.
+ * Created by Pankti Mistry on 04-04-2021.
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class AuthenticatorActivity extends AppCompatActivity {
@@ -190,15 +190,14 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void authenticate() {
-        double lat = mLatitude;
-        double lon = mLongitude;
+        mBtnAuthenticate.setClickable(false);
         if (mScanQRWithScope) {
-            callAuthenticateService(mUserId, mAuthRequestModel, lat, lon);
+            callAuthenticateService(mUserId, mAuthRequestModel, mLatitude, mLongitude);
         } else {
             String presetData = mEtPresetData.getText().toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
-            callAuthenticateService(mUserId, mAuthRequestModel, dataObject, lat, lon);
+            callAuthenticateService(mUserId, mAuthRequestModel, dataObject, mLatitude, mLongitude);
         }
     }
 
@@ -207,16 +206,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(userID, authRequestModel.session, authRequestModel.scopes, authRequestModel.creds,
                 authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, error) -> {
+                    mBtnAuthenticate.setClickable(true);
+                    progressDialog.dismiss();
                     onUserAuthenticated(status, error);
                 });
     }
 
     private void callAuthenticateService(String userID, AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(userID, authRequestModel.session, dataObject, authRequestModel.creds,
                 authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, error) -> {
-                    progressDialog.dismiss();
                     onUserAuthenticated(status, error);
                 });
     }

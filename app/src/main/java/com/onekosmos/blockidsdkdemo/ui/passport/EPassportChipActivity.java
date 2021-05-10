@@ -44,6 +44,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     private PassportScannerHelper mPassportScannerHelper;
     private BIDPassport mPassportData;
     private String mSigToken;
+    private boolean mIsRegInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +89,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onBackPressed() {
-        if (mProgressBar.getVisibility() != View.VISIBLE)
+        if (!mIsRegInProgress)
             super.onBackPressed();
     }
 
@@ -160,6 +161,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     }
 
     private void registerPassport() {
+        mIsRegInProgress = true;
         mPassportScannerHelper.stopRFIDScanning();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();

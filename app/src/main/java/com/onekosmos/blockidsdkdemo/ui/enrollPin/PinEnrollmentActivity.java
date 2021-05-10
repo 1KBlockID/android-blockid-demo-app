@@ -11,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +21,7 @@ import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
+import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
 
 import java.util.Objects;
 
@@ -29,7 +29,7 @@ import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOM
 
 public class PinEnrollmentActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
-    private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError, mTxtPlsWait;
+    private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError;
     private AppCompatImageView mImgShowHidePsw, mImgBack;
     private PinView mPvEnterPin;
     private boolean mShowPivValue;
@@ -37,7 +37,6 @@ public class PinEnrollmentActivity extends AppCompatActivity {
     private String mConfirmPin;
     private TextWatcher textWatcherEnterPin;
     private boolean isEnteredPin = false;
-    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +61,8 @@ public class PinEnrollmentActivity extends AppCompatActivity {
         mPvEnterPin = findViewById(R.id.edt_enter_pin);
 
         setPinViewColor();
-        mProgressBar = findViewById(R.id.progress_bar);
-        mTxtPlsWait = findViewById(R.id.txt_please_wait);
-
         mTxtBack.setOnClickListener(v -> onBackPress());
-
         mImgBack.setOnClickListener(v -> onBackPress());
-
         mImgShowHidePsw.setOnClickListener(v -> showHidePassWord());
 
         textWatcherEnterPin = new TextWatcher() {
@@ -192,13 +186,12 @@ public class PinEnrollmentActivity extends AppCompatActivity {
     }
 
     private void setPin() {
-        mProgressBar.setVisibility(View.VISIBLE);
-        mTxtPlsWait.setVisibility(View.VISIBLE);
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
         hideKeyboard(this);
 
         BlockIDSDK.getInstance().enrollPin(mConfirmPin, (enroll_status, error) -> {
-            mProgressBar.setVisibility(View.GONE);
-            mTxtPlsWait.setVisibility(View.GONE);
+            progressDialog.dismiss();
             if (enroll_status) {
                 afterSuccess();
                 Toast.makeText(this, R.string.label_pin_enrollment_success, Toast.LENGTH_SHORT).show();

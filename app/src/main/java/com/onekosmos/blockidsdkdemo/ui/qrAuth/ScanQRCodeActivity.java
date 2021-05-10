@@ -24,7 +24,7 @@ import com.onekosmos.blockidsdkdemo.util.AppPermissionUtils;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 
 /**
- * Created by Gaurav Rane on 30-09-2020.
+ * Created by Pankti Mistry on 04-04-2021.
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanResponseListener {
