@@ -213,8 +213,12 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void callAuthenticateService(String userID, AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(userID, authRequestModel.session, dataObject, authRequestModel.creds,
                 authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, error) -> {
+                    mBtnAuthenticate.setClickable(true);
+                    progressDialog.dismiss();
                     onUserAuthenticated(status, error);
                 });
     }
