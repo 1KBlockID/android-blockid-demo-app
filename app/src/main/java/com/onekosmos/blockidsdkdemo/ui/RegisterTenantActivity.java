@@ -38,19 +38,27 @@ public class RegisterTenantActivity extends AppCompatActivity {
         mLayoutAuth = findViewById(R.id.layout_auth);
         mBtnDeviceAuth = findViewById(R.id.btn_device_auth);
         mBtnDeviceAuth.setOnClickListener(view -> enrollDeviceAuth());
+        if (BlockIDSDK.getInstance().isReady() && !BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
+            updateAuthUi();
+        }
+    }
+
+    private void updateAuthUi() {
+        mLayoutAuth.setVisibility(View.VISIBLE);
+        mBtnRegisterTenant.setVisibility(View.GONE);
     }
 
     private void registerTenant() {
         BlockIDSDK.getInstance().initiateWallet();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-
+        mBtnRegisterTenant.setClickable(false);
         BlockIDSDK.getInstance().registerTenant(AppConstant.defaultTenant, (status, error, bidTenant) -> {
             progressDialog.dismiss();
+            mBtnRegisterTenant.setClickable(true);
             if (status) {
                 BlockIDSDK.getInstance().commitApplicationWallet();
-                mLayoutAuth.setVisibility(View.VISIBLE);
-                mBtnRegisterTenant.setVisibility(View.GONE);
+                updateAuthUi();
                 return;
             }
             if (error == null)
@@ -78,6 +86,7 @@ public class RegisterTenantActivity extends AppCompatActivity {
                         if (success) {
                             Toast.makeText(this, R.string.label_device_auth_enrolled, Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(this, EnrollmentActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);
                             finish();
                         } else {

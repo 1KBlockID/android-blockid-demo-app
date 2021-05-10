@@ -3,7 +3,6 @@ package com.onekosmos.blockidsdkdemo.ui.enrollment;
 import android.content.Context;
 
 import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.license.Enrollments;
 import com.example.blockidsdkdemo.R;
 
 import java.util.ArrayList;
@@ -37,49 +36,17 @@ public class EnrollmentsDataSource {
 
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
-        arr.add(EnrollmentAssetEnum.ASSET_UNLOCK_SDK);
-        arr.addAll(prepareDigitalAssetsList());
-        arr.addAll(prepareBiometricAssetsList());
+
+        arr.add(EnrollmentAssetEnum.ASSET_DL);
+        arr.add(EnrollmentAssetEnum.ASSET_PP);
+        arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
+
+        arr.add(EnrollmentAssetEnum.ASSET_PIN);
+        arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
+        arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
+
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
-        return arr;
-    }
-
-    private ArrayList<EnrollmentAssetEnum> prepareDigitalAssetsList() {
-        ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
-        Enrollments.DigitalAssets enrollments = BlockIDSDK.getInstance().getDigitalAssetEnrollments();
-
-        if (enrollments.EnrollDL) {
-            arr.add(EnrollmentAssetEnum.ASSET_DL);
-        }
-
-        if (enrollments.EnrollPP) {
-            arr.add(EnrollmentAssetEnum.ASSET_PP);
-        }
-
-        if (enrollments.EnrollNationalID) {
-            arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
-        }
-        return arr;
-    }
-
-
-    private ArrayList<EnrollmentAssetEnum> prepareBiometricAssetsList() {
-        ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
-        Enrollments.BiometricAssets enrollments = BlockIDSDK.getInstance().getBiometricAssetEnrollments();
-
-        if (enrollments.EnrollPin) {
-            arr.add(EnrollmentAssetEnum.ASSET_PIN);
-        }
-
-        if (enrollments.EnrollBiometric) {
-            arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
-        }
-
-        if (enrollments.EnrollLiveID) {
-            arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
-        }
-
         return arr;
     }
 

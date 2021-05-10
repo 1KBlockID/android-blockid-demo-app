@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.blockid.sdk.BlockIDSDK;
 import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity;
+import com.onekosmos.blockidsdkdemo.ui.login.LoginActivity;
 
 /**
  * Created by Pankti Mistry on 30-04-2021.
@@ -16,6 +17,7 @@ import com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity;
  */
 public class SplashActivity extends AppCompatActivity {
     private static int K_SPLASH_SCREEN_TIME_OUT = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,11 +29,12 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkTenantRegistered() {
         Intent intent;
-        if (BlockIDSDK.getInstance().isReady()) {
-            intent = new Intent(this, EnrollmentActivity.class);
+        if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
+            intent = new Intent(this, LoginActivity.class);
         } else {
             intent = new Intent(this, RegisterTenantActivity.class);
         }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
         finish();
     }

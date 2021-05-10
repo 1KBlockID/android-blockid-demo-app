@@ -183,6 +183,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, "");
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);
                             finish();
                             return;

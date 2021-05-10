@@ -20,9 +20,10 @@ import com.example.blockidsdkdemo.R;
 import com.onekosmos.blockidsdkdemo.AppConstant;
 import com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsdkdemo.ui.driverLicense.DriverLicenseScanActivity;
+import com.onekosmos.blockidsdkdemo.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsdkdemo.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity;
-import com.onekosmos.blockidsdkdemo.ui.enrollPin.EnrollPinActivity;
 import com.onekosmos.blockidsdkdemo.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;
@@ -45,9 +46,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
         initView();
-
-        if (!BIDAuthProvider.getInstance().isSdkLocked())
-            onUnlockSdkClick();
     }
 
     @Override
@@ -73,8 +71,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
             onResetAppClick();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_unlock_sdk))) {
-            onUnlockSdkClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_login_with_qr))) {
             onQrLoginClicked();
         }
@@ -108,6 +104,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void onLiveIdClicked() {
         Intent intent = new Intent(this, LiveIDScanningActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
@@ -136,17 +133,16 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     getString(R.string.label_remove_pin_title),
                     getString(R.string.label_remove_pin),
                     getString(R.string.label_yes), getString(R.string.label_no),
-                    (dialogInterface, i) -> {
-                        errorDialog.dismiss();
-
-                    },
+                    (dialogInterface, i) ->
+                            errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
                         unEnrollPin();
                     });
             return;
         }
-        Intent intent = new Intent(this, EnrollPinActivity.class);
+        Intent intent = new Intent(this, PinEnrollmentActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
@@ -179,13 +175,15 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     getString(R.string.label_remove_dl_title),
                     getString(R.string.label_remove_dl),
                     getString(R.string.label_yes), getString(R.string.label_no),
-                    (dialogInterface, i) -> removeDocument(BIDDocumentProvider.BIDDocumentType.driverLicense),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
+                        removeDocument(BIDDocumentProvider.BIDDocumentType.driverLicense);
                     });
             return;
         }
         Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
@@ -197,18 +195,36 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     getString(R.string.label_remove_pp_title),
                     getString(R.string.label_remove_pp),
                     getString(R.string.label_yes), getString(R.string.label_no),
-                    (dialogInterface, i) -> removeDocument(BIDDocumentProvider.BIDDocumentType.passport),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
+                        removeDocument(BIDDocumentProvider.BIDDocumentType.passport);
                     });
             return;
         }
         Intent intent = new Intent(this, PassportScanningActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
-    //FIXME will implement later
     private void onNationalIDClick() {
+        if (BlockIDSDK.getInstance().isNationalIDEnrolled()) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithTwoButton(
+                    null,
+                    getString(R.string.label_remove_nid_title),
+                    getString(R.string.label_remove_nid),
+                    getString(R.string.label_yes), getString(R.string.label_no),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        removeDocument(BIDDocumentProvider.BIDDocumentType.nationalID);
+                    });
+            return;
+        }
+        Intent intent = new Intent(this, NationalIDScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void removeDocument(BIDDocumentProvider.BIDDocumentType documentType) {
@@ -233,28 +249,28 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onResetAppClick() {
-        SharedPreferenceUtil.getInstance().clear();
-        BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
-        Intent intent = new Intent(this, RegisterTenantActivity.class);
-        startActivity(intent);
-        finish();
-    }
 
-    private void onUnlockSdkClick() {
-        if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
-            String title = getResources().getString(R.string.label_biometric_auth);
-            String desc = getResources().getString(R.string.label_biometric_auth_req);
-            BIDAuthProvider.getInstance().verifyDeviceAuth(this, title, desc, false, (b, errorResponse) -> {
-                if (b)
-                    Toast.makeText(EnrollmentActivity.this, R.string.label_sdk_unlock_successfully, Toast.LENGTH_SHORT).show();
-            });
-        } else {
-            Toast.makeText(this, R.string.label_enroll_device_uth_to_unlock_sdk, Toast.LENGTH_SHORT).show();
-        }
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(
+                null,
+                getString(R.string.label_warning),
+                getString(R.string.label_do_you_want_reset_app),
+                getString(R.string.label_cancel), getString(R.string.label_ok),
+                (dialogInterface, i) -> {
+                    errorDialog.dismiss();
+                    SharedPreferenceUtil.getInstance().clear();
+                    BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
+                    Intent intent = new Intent(this, RegisterTenantActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                },
+                dialog -> errorDialog.dismiss());
     }
 
     private void onQrLoginClicked() {
         Intent intent = new Intent(this, AuthenticatorActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 }

@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
@@ -15,9 +16,7 @@ import com.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
 import com.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
 import com.blockid.sdk.datamodel.BIDDriverLicense;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.utils.BIDUtil;
 import com.example.blockidsdkdemo.R;
-import com.onekosmos.blockidsdkdemo.AppVault;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsdkdemo.util.DocumentHolder;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
@@ -40,6 +39,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
         DLScannerHelper.getInstance().setDLScanningOrder(DLScanningOrder.FIRST_BACK_THEN_FRONT);
+        DLScannerHelper.getInstance().setBackButtonColorHex("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
+        DLScannerHelper.getInstance().setTitleColorHex("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
         Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, K_DL_EXPIRY_GRACE_DAYS, this);
         startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
     }
@@ -81,7 +82,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                     "", (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
-                            AppVault.getInstance().setDLData(BIDUtil.objectToJSONString(documentData, true));
                             Toast.makeText(this, getString(R.string.label_dl_enrolled_successfully), Toast.LENGTH_LONG).show();
                             finish();
                             return;
@@ -94,6 +94,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                             DocumentHolder.setData(documentData, BIDDocumentProvider.BIDDocumentType.driverLicense, "");
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);
                             finish();
                             return;

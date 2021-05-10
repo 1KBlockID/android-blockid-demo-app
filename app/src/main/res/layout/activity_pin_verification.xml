@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraint_verify_pin_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_back"
+        android:layout_width="@dimen/dimen_25dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:padding="@dimen/dimen_5dp"
+        android:tint="@color/black"
+        android:src="@drawable/icon_backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_5dp"
+        android:text="@string/label_back"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/img_back"
+        app:layout_constraintStart_toEndOf="@+id/img_back"
+        app:layout_constraintTop_toTopOf="@+id/img_back" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_verify_pin_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:textColor="@color/black"
+        android:layout_marginTop="@dimen/dimen_45dp"
+        android:text="@string/label_verify_pin_id"
+        android:textSize="@dimen/dimen_28sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_enter_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_54dp"
+        android:text="@string/label_enter_your_pin"
+        android:textSize="@dimen/dimen_16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/edt_enter_pin"
+        app:layout_constraintTop_toBottomOf="@+id/txt_verify_pin_title" />
+
+    <com.onekosmos.blockidsdkdemo.ui.enrollPin.PinView
+        android:id="@+id/edt_enter_pin"
+        style="@style/PinWidget.PinView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_24dp"
+        android:cursorVisible="true"
+        android:inputType="numberPassword"
+        android:singleLine="true"
+        android:textSize="@dimen/dimen_24sp"
+        android:textStyle="bold"
+        app:cursorWidth="@dimen/dimen_2dp"
+        app:forceKeyboard="true"
+        app:hideLineWhenFilled="false"
+        app:itemHeight="@dimen/dimen_40dp"
+        app:itemSpacing="@dimen/dimen_8dp"
+        app:itemWidth="@dimen/dimen_28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_enter_pin"
+        app:lineWidth="@dimen/dimen_2dp"
+        app:viewType="line" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_show_hide_psw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:padding="@dimen/dimen_5dp"
+        android:src="@drawable/icon_deactive"
+        app:layout_constraintEnd_toEndOf="@+id/edt_enter_pin"
+        app:layout_constraintTop_toBottomOf="@+id/edt_enter_pin" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_pin_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_12dp"
+        android:layout_marginTop="@dimen/dimen_12dp"
+        android:layout_marginEnd="@dimen/dimen_12dp"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/dimen_44dp"
+        android:text="@string/error_incorrect_pin"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_show_hide_psw" />
+</androidx.constraintlayout.widget.ConstraintLayout>

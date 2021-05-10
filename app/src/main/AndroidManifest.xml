@@ -37,6 +37,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.login.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.login.PinVerificationActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name="com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -65,8 +73,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.enrollPin.EnrollPinActivity"
+            android:name="com.onekosmos.blockidsdkdemo.ui.enrollPin.PinEnrollmentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.onekosmos.blockidsdkdemo.ui.nationalID.NationalIDScanActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
+
 </manifest>

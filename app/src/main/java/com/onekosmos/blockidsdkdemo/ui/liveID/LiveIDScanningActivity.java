@@ -190,7 +190,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         BlockIDSDK.getInstance().setLiveID(bitmap, "", (status, msg, error) -> {
             progressDialog.dismiss();
             if (status) {
-                AppVault.getInstance().setLiveID(ImageProcessingUtil.getBitMapToBase64(bitmap));
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
                 finish();
                 return;
@@ -220,7 +219,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             progressDialog.dismiss();
             DocumentHolder.clearData();
             if (status) {
-                AppVault.getInstance().setLiveID(ImageProcessingUtil.getBitMapToBase64(bitmap));
                 Toast.makeText(this, getString(R.string.label_document_enrolled_successfully), Toast.LENGTH_LONG).show();
                 finish();
                 return;

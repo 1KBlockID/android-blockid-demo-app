@@ -27,7 +27,7 @@ import java.util.Objects;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
-public class EnrollPinActivity extends AppCompatActivity {
+public class PinEnrollmentActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
     private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError, mTxtPlsWait;
     private AppCompatImageView mImgShowHidePsw, mImgBack;
@@ -42,7 +42,7 @@ public class EnrollPinActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_enroll_pin);
+        setContentView(R.layout.activity_pin_enrollment);
         initView();
     }
 
