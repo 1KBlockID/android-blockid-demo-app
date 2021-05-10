@@ -40,7 +40,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     private AppCompatTextView mTxtSkip;
     private AppCompatButton mBtnScan, mBtnCancel;
     private ConstraintLayout mLayoutNFC, mLayoutScanRFId;
-    private ProgressBar mProgressBar;
     private PassportScannerHelper mPassportScannerHelper;
     private BIDPassport mPassportData;
     private String mSigToken;
@@ -106,7 +105,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mBtnScan.setOnClickListener(this);
         mBtnCancel = findViewById(R.id.btn_cancel);
         mBtnCancel.setOnClickListener(this::onClick);
-        mProgressBar = findViewById(R.id.progress_bar);
         mLayoutNFC = findViewById(R.id.layout_nfc);
         mLayoutScanRFId = findViewById(R.id.layout_scan_rfid);
     }
