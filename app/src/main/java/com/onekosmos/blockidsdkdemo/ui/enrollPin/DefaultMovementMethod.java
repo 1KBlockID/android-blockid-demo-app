@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsdkdemo.ui.pin.pinview;
+package com.onekosmos.blockidsdkdemo.ui.enrollPin;
 
 import android.text.Selection;
 import android.text.Spannable;

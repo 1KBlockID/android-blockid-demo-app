@@ -22,7 +22,7 @@ import com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsdkdemo.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity;
-import com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity;
+import com.onekosmos.blockidsdkdemo.ui.enrollPin.EnrollPinActivity;
 import com.onekosmos.blockidsdkdemo.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsdkdemo.util.ErrorDialog;
 import com.onekosmos.blockidsdkdemo.util.ProgressDialog;

@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsdkdemo.ui.pin.pinview;
+package com.onekosmos.blockidsdkdemo.ui.enrollPin;
 
 import android.app.Activity;
 import android.content.Context;

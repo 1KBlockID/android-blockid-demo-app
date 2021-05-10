@@ -65,7 +65,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity"
+            android:name="com.onekosmos.blockidsdkdemo.ui.enrollPin.EnrollPinActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

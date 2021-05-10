@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.onekosmos.blockidsdkdemo.ui.pin.pinview.EnrollPinActivity">
+    tools:context="com.onekosmos.blockidsdkdemo.ui.enrollPin.EnrollPinActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_back"
@@ -54,7 +54,7 @@
         app:layout_constraintStart_toStartOf="@+id/edt_enter_pin"
         app:layout_constraintTop_toBottomOf="@+id/txt_register_pin_title" />
 
-    <com.onekosmos.blockidsdkdemo.ui.pin.pinview.PinView
+    <com.onekosmos.blockidsdkdemo.ui.enrollPin.PinView
         android:id="@+id/edt_enter_pin"
         style="@style/PinWidget.PinView"
         android:layout_width="wrap_content"
