@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:padding="@dimen/dimen_10dp"
-    tools:context="com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity">
+    tools:context="com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_logo"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BlockIDTestApp</string>
+    <string name="app_name">BlockID Sample</string>
     <string name="label_register_default_tenant">Register Default Tenant</string>
     <string name="label_device_auth">Device Auth</string>
     <string name="label_device_auth_enrolled">Device auth enrolled</string>

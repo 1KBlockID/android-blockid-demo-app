@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.blockid.blockidsdkdemo"
+        applicationId "com.blockid.blockidsample"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1

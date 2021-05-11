@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.NFC" />
 
     <application
-        android:name="com.onekosmos.blockidsdkdemo.MainApplication"
+        android:name="com.onekosmos.blockidsample.MainApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -23,7 +23,7 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label,android:theme">
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.SplashActivity"
+            android:name="com.onekosmos.blockidsample.ui.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -33,51 +33,51 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.enrollment.EnrollmentActivity"
+            android:name="com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.login.LoginActivity"
+            android:name="com.onekosmos.blockidsample.ui.login.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.login.PinVerificationActivity"
+            android:name="com.onekosmos.blockidsample.ui.login.PinVerificationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.RegisterTenantActivity"
+            android:name="com.onekosmos.blockidsample.ui.RegisterTenantActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.liveID.LiveIDScanningActivity"
+            android:name="com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.driverLicense.DriverLicenseScanActivity"
+            android:name="com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.passport.EPassportChipActivity"
+            android:name="com.onekosmos.blockidsample.ui.passport.EPassportChipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.passport.PassportScanningActivity"
+            android:name="com.onekosmos.blockidsample.ui.passport.PassportScanningActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.qrAuth.AuthenticatorActivity"
+            android:name="com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.qrAuth.ScanQRCodeActivity"
+            android:name="com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.enrollPin.PinEnrollmentActivity"
+            android:name="com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.onekosmos.blockidsdkdemo.ui.nationalID.NationalIDScanActivity"
+            android:name="com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
