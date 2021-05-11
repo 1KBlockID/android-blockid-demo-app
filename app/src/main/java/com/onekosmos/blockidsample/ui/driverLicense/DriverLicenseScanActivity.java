@@ -1,10 +1,12 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -17,8 +19,8 @@ import com.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
 import com.blockid.sdk.datamodel.BIDDriverLicense;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -30,6 +32,8 @@ import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOM
  * Copyright © 2020 1Kosmos. All rights reserved.
  */
 public class DriverLicenseScanActivity extends AppCompatActivity implements IDriverLicenseListener {
+    private static final int K_DL_PERMISSION_REQUEST_CODE = 1012;
+    private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     public static final int K_DL_SCAN_REQUEST_CODE = 1011;
     private BIDDriverLicense mDriverLicense;
@@ -39,13 +43,27 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
-        DLScannerHelper.getInstance().setDLScanningOrder(DLScanningOrder.FIRST_BACK_THEN_FRONT);
-        DLScannerHelper.getInstance().setBackButtonColorHex("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
-        DLScannerHelper.getInstance().setTitleColorHex("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
-        DLScannerHelper.getInstance().setErrorDialogButtonColorHex("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
-        DLScannerHelper.getInstance().setmErrorDialogMessageColor2("#" + Integer.toHexString(ContextCompat.getColor(this,R.color.black)));
-        Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, K_DL_EXPIRY_GRACE_DAYS, this);
-        startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
+        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
+            AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+        else
+            startDLIntent();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
+            startDLIntent();
+        } else {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.show(null,
+                    "",
+                    getString(R.string.label_passport_camera_permission_alert), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+        }
     }
 
     @Override
@@ -75,6 +93,16 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
             else
                 finish();
         }
+    }
+
+    private void startDLIntent() {
+        DLScannerHelper.getInstance().setDLScanningOrder(DLScanningOrder.FIRST_BACK_THEN_FRONT);
+        DLScannerHelper.getInstance().setBackButtonColorHex("#" + Integer.toHexString(ContextCompat.getColor(this, R.color.black)));
+        DLScannerHelper.getInstance().setTitleColorHex("#" + Integer.toHexString(ContextCompat.getColor(this, R.color.black)));
+        DLScannerHelper.getInstance().setErrorDialogButtonColorHex("#" + Integer.toHexString(ContextCompat.getColor(this, R.color.black)));
+        DLScannerHelper.getInstance().setmErrorDialogMessageColor2("#" + Integer.toHexString(ContextCompat.getColor(this, R.color.black)));
+        Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, K_DL_EXPIRY_GRACE_DAYS, this);
+        startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
     }
 
     private void registerDL(BIDDriverLicense documentData) {
