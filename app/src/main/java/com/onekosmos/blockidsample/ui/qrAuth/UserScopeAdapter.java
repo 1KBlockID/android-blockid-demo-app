@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 import java.util.LinkedHashMap;
 

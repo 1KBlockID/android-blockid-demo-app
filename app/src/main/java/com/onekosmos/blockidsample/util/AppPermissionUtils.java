@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 /**
  * Created by Pankti Mistry on 30-04-2021.

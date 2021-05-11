@@ -22,7 +22,7 @@ import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDNationalID;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.google.gson.Gson;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;

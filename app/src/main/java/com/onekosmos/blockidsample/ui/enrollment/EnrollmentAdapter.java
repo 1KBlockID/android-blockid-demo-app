@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.onekosmos.blockidsample.ui.enrollment;
 import android.content.Context;
 
 import com.blockid.sdk.BlockIDSDK;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 import java.util.ArrayList;
 

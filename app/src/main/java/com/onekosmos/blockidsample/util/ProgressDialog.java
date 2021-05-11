@@ -5,7 +5,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 import java.util.Objects;
 

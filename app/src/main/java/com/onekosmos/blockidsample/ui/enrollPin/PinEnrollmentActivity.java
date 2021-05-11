@@ -19,7 +19,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 

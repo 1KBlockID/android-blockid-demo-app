@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 import java.util.Objects;
 

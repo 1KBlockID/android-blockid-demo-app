@@ -18,7 +18,7 @@ import com.blockid.sdk.cameramodule.BIDScannerView;
 import com.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
 import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.google.gson.Gson;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;

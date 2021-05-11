@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatButton;
 
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 
 /**

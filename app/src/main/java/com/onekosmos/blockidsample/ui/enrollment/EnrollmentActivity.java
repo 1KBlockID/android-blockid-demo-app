@@ -16,7 +16,7 @@ import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;

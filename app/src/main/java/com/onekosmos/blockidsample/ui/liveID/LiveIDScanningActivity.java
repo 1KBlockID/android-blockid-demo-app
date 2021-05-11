@@ -22,7 +22,7 @@ import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;

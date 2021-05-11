@@ -33,7 +33,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 
 public class PinView extends AppCompatEditText {
     private static final boolean DBG = false;

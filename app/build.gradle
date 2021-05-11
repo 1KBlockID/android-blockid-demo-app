@@ -9,8 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
-
+        versionName "1.0.0" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -31,6 +30,15 @@ android {
         exclude 'lib/x86_64/linux/libscrypt.so'
         exclude 'AndroidManifest.xml'
     }
+}
+
+def String getCurrentTimestampHexValue() {
+    //get current date of build as hex of (current time in seconds)
+    Date date = new Date();
+    long timestamp = (date.getTime() / 1000);
+    String hexVal = Long.toHexString(timestamp);
+    println("HEX VALUE--" + hexVal.toUpperCase());
+    return hexVal.toUpperCase();
 }
 
 dependencies {
@@ -56,8 +64,10 @@ dependencies {
 
     //Qrcode scan
     implementation 'com.google.android.gms:play-services-vision:20.1.2'
+
     // wallet
     implementation 'org.web3j:core:3.3.1-android'
+
     //generate mnemonics
     implementation('org.bitcoinj:bitcoinj-core:0.15.4') {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
@@ -74,10 +84,6 @@ dependencies {
     // Network Call
     implementation "com.amitshekhar.android:android-networking:1.0.2"
 
-    // firebase messaging dependency
-    implementation 'com.google.firebase:firebase-messaging:21.0.0'
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
-
     // passport scan
     implementation 'com.rmtheis:tess-two:9.0.0'
     implementation('org.jmrtd:jmrtd:0.7.18') {
@@ -86,14 +92,6 @@ dependencies {
     }
 
     implementation 'org.innovatrics.mrz:mrz-java:0.4'
-
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.2.0')
-
-    // Declare the dependencies for the Crashlytics and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-analytics'
 
     implementation 'com.google.zxing:core:3.2.1'
 

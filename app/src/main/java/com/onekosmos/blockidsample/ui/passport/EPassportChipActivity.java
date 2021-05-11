@@ -19,7 +19,7 @@ import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListe
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.example.blockidsdkdemo.R;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
