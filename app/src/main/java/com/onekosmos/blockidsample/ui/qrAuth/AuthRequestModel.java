@@ -4,8 +4,8 @@ import com.blockid.sdk.datamodel.AccountAuthConstants;
 import com.blockid.sdk.datamodel.BIDOrigin;
 
 /**
- * Created by Gaurav Rane on 22-09-2020.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class AuthRequestModel {
     public String authtype;

@@ -11,8 +11,8 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.login.LoginActivity;
 
 /**
- * Created by Pankti Mistry on 30-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class SplashActivity extends AppCompatActivity {
     private static int K_SPLASH_SCREEN_TIME_OUT = 1000;

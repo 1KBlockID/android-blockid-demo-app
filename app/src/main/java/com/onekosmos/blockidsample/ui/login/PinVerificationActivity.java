@@ -18,8 +18,8 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollPin.PinView;
 
 /**
- * Created by Pankti Mistry on 10-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class PinVerificationActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;

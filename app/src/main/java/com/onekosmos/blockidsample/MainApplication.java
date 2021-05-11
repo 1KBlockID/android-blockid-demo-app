@@ -5,8 +5,8 @@ import android.app.Application;
 import com.blockid.sdk.BlockIDSDK;
 
 /**
- * Created by Pankti Mistry on 30-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class MainApplication extends Application {
     @Override

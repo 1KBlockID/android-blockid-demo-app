@@ -1,8 +1,8 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
 /**
- * Created by Pankti Mistry on 10-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class NationalIDTempData {
     private String mNationalIDFirstSideDataB64;

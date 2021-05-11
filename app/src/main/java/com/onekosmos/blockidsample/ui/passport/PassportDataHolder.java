@@ -3,8 +3,8 @@ package com.onekosmos.blockidsample.ui.passport;
 import com.blockid.sdk.datamodel.BIDPassport;
 
 /**
- * Created by Pankti Mistry on 10-05-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 enum PassportDataHolder {
     INSTANCE;

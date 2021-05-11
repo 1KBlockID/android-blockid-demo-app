@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Pankti Mistry on 30-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private RecyclerView mRvEnrollmentAssets;

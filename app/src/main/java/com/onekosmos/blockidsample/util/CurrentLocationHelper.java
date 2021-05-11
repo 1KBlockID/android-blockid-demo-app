@@ -29,8 +29,8 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /**
- * Created by Pankti Mistry on 03-05-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class CurrentLocationHelper implements
         LocationListener,

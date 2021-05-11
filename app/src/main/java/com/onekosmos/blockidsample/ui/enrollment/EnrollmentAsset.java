@@ -1,8 +1,8 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
 /**
- * Created by Pankti Mistry on 05-05-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EnrollmentAsset {
     private boolean mAssetStatus;

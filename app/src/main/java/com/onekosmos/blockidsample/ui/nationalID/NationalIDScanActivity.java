@@ -33,8 +33,8 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 /**
- * Created by Pankti Mistry on 10-04-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class NationalIDScanActivity extends AppCompatActivity implements View.OnClickListener, INationalIDResponseListener {
     private static final int K_CAMERA_PERMISSION_REQUEST_CODE = 1011;

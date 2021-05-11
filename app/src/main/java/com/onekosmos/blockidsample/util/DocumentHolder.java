@@ -4,8 +4,8 @@ import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
 
 /**
- * Created by Pankti Mistry on 07-05-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public enum DocumentHolder {
     INSTANCE;

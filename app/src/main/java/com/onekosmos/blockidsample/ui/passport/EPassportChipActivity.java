@@ -31,8 +31,8 @@ import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 /**
- * Created by Pankti Mistry on 03-05-2021.
- * Copyright © 2020 1Kosmos. All rights reserved.
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IPassportResponseListener {
     private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
