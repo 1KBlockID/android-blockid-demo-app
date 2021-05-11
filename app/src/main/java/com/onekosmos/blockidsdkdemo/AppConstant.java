@@ -8,5 +8,5 @@ import com.blockid.sdk.datamodel.BIDTenant;
  */
 public class AppConstant {
     public static final String licenseKey = "afeb1c93-2265-43e1-a7b1-5049bb4f3c8b";
-    public static final BIDTenant defaultTenant = new BIDTenant("1kosmos", "default", "https://1k-dev.1kosmos.net");
+    public static final BIDTenant defaultTenant = new BIDTenant("1kosmos", "default", "https://1k-prod-us.1kosmos.net");
 }
