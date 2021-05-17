@@ -23,12 +23,14 @@ import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.doument.DocumentHolder;
+import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
-import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -213,7 +215,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         progressDialog.show();
         BIDDocumentData documentData = DocumentHolder.getData();
         BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
-        BlockIDSDK.getInstance().registerDocument(this, documentData, bitmap, type, "", "", (status, error) -> {
+        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, DocumentMapUtil.DocumentCategory.identity_document), bitmap, type, "", "", (status, error) -> {
             progressDialog.dismiss();
             DocumentHolder.clearData();
             if (status) {

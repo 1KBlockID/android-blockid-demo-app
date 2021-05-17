@@ -22,15 +22,17 @@ import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDNationalID;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockidsample.R;
 import com.google.gson.Gson;
+import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.doument.DocumentHolder;
+import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
-import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -46,7 +48,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
     private int mScannerOverlayMargin = 30;
-    private BIDNationalID mBIDNationalID;
+    private BIDNationalID mNationalID;
     private String mSigToken, mNationalIDData;
     private NationalIDScanOrder mNationalIDScanOrder;
     private boolean isRegistrationInProgress;
@@ -72,8 +74,8 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                 mSigToken = NationalIDTempData.getInstance().getmSignatureToken();
                 NationalIDTempData.getInstance().clearNationalIDData();
 
-                mBIDNationalID = new Gson().fromJson(mNationalIDData, BIDNationalID.class);
-                mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE, mBIDNationalID, mSigToken,
+                mNationalID = new Gson().fromJson(mNationalIDData, BIDNationalID.class);
+                mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE, mNationalID, mSigToken,
                         mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
                 mNationalIdScannerHelper.startNationalIDScanning();
             }
@@ -133,7 +135,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         stopScan();
 
         if (bidNationalID != null) {
-            mBIDNationalID = bidNationalID;
+            mNationalID = bidNationalID;
             mSigToken = signatureToken;
             registerNationalID();
             return;
@@ -196,7 +198,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mLayoutMessage.setVisibility(View.GONE);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        BlockIDSDK.getInstance().registerDocument(this, mBIDNationalID, BIDDocumentProvider.BIDDocumentType.nationalID, mSigToken, (status, error) -> {
+        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mNationalID, DocumentMapUtil.DocumentCategory.identity_document), BIDDocumentProvider.BIDDocumentType.nationalID, mSigToken, (status, error) -> {
             progressDialog.dismiss();
             isRegistrationInProgress = false;
             if (status) {
@@ -205,7 +207,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                 return;
             }
             if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                DocumentHolder.setData(mBIDNationalID, BIDDocumentProvider.BIDDocumentType.nationalID, "");
+                DocumentHolder.setData(mNationalID, BIDDocumentProvider.BIDDocumentType.nationalID, "");
                 Intent intent = new Intent(this, LiveIDScanningActivity.class);
                 intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

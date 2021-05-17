@@ -23,10 +23,10 @@ import com.blockid.sdk.cameramodule.camera.passportModule.model.PassportData;
 import com.blockid.sdk.datamodel.BIDGenericResponse;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.blockid.sdk.scopeprovider.BIDScopesProvider;
-import com.onekosmos.blockidsample.BuildConfig;
-import com.onekosmos.blockidsample.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
+import com.onekosmos.blockidsample.BuildConfig;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -288,10 +288,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.driverLicense) ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.passport) ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled(BIDDocumentProvider.BIDDocumentType.nationalID
-                ))
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled() ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled() ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled())
             return true;
         else return false;
     }

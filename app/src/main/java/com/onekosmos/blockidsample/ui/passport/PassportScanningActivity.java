@@ -25,13 +25,15 @@ import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.doument.DocumentHolder;
+import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
-import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -167,7 +169,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         progressDialog.show();
         isRegistrationInProgress = true;
         if (mPassportData != null) {
-            BlockIDSDK.getInstance().registerDocument(this, mPassportData, BIDDocumentProvider.BIDDocumentType.passport,
+            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mPassportData, DocumentMapUtil.DocumentCategory.identity_document), BIDDocumentProvider.BIDDocumentType.passport,
                     "", (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;

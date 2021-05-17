@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.util;
+package com.onekosmos.blockidsample.doument;
 
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
