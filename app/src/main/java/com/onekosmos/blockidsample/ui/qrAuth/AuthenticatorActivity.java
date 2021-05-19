@@ -251,40 +251,42 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private LinkedHashMap<String, Object> changeDisplayName(HashMap<String, Object> scopesMap) {
         LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<String, Object>();
         try {
-            if (isAnyDocumentEnrolled()) {
-                if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
-                    pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
+            if (scopesMap != null) {
+                if (isAnyDocumentEnrolled()) {
+                    if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
+                        pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
 
-                else if (scopesMap.containsKey("firstname"))
-                    pScopesMap.put("Name : ", scopesMap.get("firstname"));
+                    else if (scopesMap.containsKey("firstname"))
+                        pScopesMap.put("Name : ", scopesMap.get("firstname"));
 
-                else if (scopesMap.containsKey("lastname"))
-                    pScopesMap.put("Name : ", scopesMap.get("lastname"));
+                    else if (scopesMap.containsKey("lastname"))
+                        pScopesMap.put("Name : ", scopesMap.get("lastname"));
+                }
+                if (scopesMap.containsKey("did"))
+                    pScopesMap.put("DID : ", scopesMap.get("did"));
+
+                if (scopesMap.containsKey("userid"))
+                    pScopesMap.put("User ID : ", scopesMap.get("userid"));
+
+                if (scopesMap.containsKey("ppt")) {
+
+                    pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
+                }
+
+                if (scopesMap.containsKey("nationalid")) {
+                    pScopesMap.put("National ID # : ", ((JSONObject) scopesMap.get("nationalid")).get("documentId"));
+                }
+
+                if (scopesMap.containsKey("dl")) {
+                    pScopesMap.put("Drivers license # : ", ((JSONObject) scopesMap.get("dl")).get("documentId"));
+                }
+
+                if (scopesMap.containsKey("scep_creds"))
+                    pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
+
+                if (scopesMap.containsKey("creds"))
+                    pScopesMap.put("Creds : ", scopesMap.get("creds"));
             }
-            if (scopesMap.containsKey("did"))
-                pScopesMap.put("DID : ", scopesMap.get("did"));
-
-            if (scopesMap.containsKey("userid"))
-                pScopesMap.put("User ID : ", scopesMap.get("userid"));
-
-            if (scopesMap.containsKey("ppt")) {
-
-                pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
-            }
-
-            if (scopesMap.containsKey("nationalid")) {
-                pScopesMap.put("National ID # : ", ((JSONObject) scopesMap.get("nationalid")).get("documentId"));
-            }
-
-            if (scopesMap.containsKey("dl")) {
-                pScopesMap.put("Drivers license # : ", ((JSONObject) scopesMap.get("dl")).get("documentId"));
-            }
-
-            if (scopesMap.containsKey("scep_creds"))
-                pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
-
-            if (scopesMap.containsKey("creds"))
-                pScopesMap.put("Creds : ", scopesMap.get("creds"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
