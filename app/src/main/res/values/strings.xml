@@ -6,7 +6,8 @@
     <string name="label_unlock_sdk">Unlock SDK</string>
     <string name="label_login_successfully">Login Successfully</string>
     <string name="label_driver_license">Driver License</string>
-    <string name="label_passport">Passport</string>
+    <string name="label_passport1">Passport 1</string>
+    <string name="label_passport2">Passport 2</string>
     <string name="label_app_pin">App Pin</string>
     <string name="label_national_id">National ID</string>
     <string name="label_reset_app">Reset App</string>

@@ -21,7 +21,6 @@ import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.cameramodule.camera.dlModule.model.DriverLicenseData;
 import com.blockid.sdk.cameramodule.camera.passportModule.model.PassportData;
 import com.blockid.sdk.datamodel.BIDGenericResponse;
-import com.blockid.sdk.document.BIDDocumentProvider;
 import com.blockid.sdk.scopeprovider.BIDScopesProvider;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
@@ -267,16 +266,16 @@ public class AuthenticatorActivity extends AppCompatActivity {
         if (scopesMap.containsKey("userid"))
             pScopesMap.put("User ID : ", scopesMap.get("userid"));
 
-        if (scopesMap.containsKey("ppt")) {
-            pScopesMap.put("Passport # : ", ((PassportData) scopesMap.get("ppt")).getDocumentId());
-        }
+//        if (scopesMap.containsKey("ppt")) {
+//            pScopesMap.put("Passport # : ", ((PassportData) scopesMap.get("ppt")).getDocumentId());
+//        }
+//
+//        if (scopesMap.containsKey("nationalid")) {
+//            pScopesMap.put("National ID # : ", ((BIDScopesProvider.NationalIDScope) scopesMap.get("nationalid")).getDocumentId());
+//        }
 
-        if (scopesMap.containsKey("nationalid")) {
-            pScopesMap.put("National ID # : ", ((BIDScopesProvider.NationalIDScope) scopesMap.get("nationalid")).getDocumentId());
-        }
-
-        if (scopesMap.containsKey("dl"))
-            pScopesMap.put("Drivers license # : ", ((DriverLicenseData) scopesMap.get("dl")).getDocumentId());
+//        if (scopesMap.containsKey("dl"))
+//            pScopesMap.put("Drivers license # : ", ((DriverLicenseData) scopesMap.get("dl")).getDocumentId());
 
         if (scopesMap.containsKey("scep_creds"))
             pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
@@ -288,9 +287,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        if (BIDDocumentProvider.getInstance().isDocumentEnrolled() ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled() ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled())
+        if (BlockIDSDK.getInstance().isPassportEnrolled() ||
+                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ||
+                BlockIDSDK.getInstance().isNationalIDEnrolled())
             return true;
         else return false;
     }

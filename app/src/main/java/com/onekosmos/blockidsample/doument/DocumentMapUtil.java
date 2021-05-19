@@ -13,11 +13,11 @@ import java.util.LinkedHashMap;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class DocumentMapUtil {
-    private static final String K_ID = "id";
-    private static final String K_TYPE = "type";
-    private static final String K_CATEGORY = "category";
-    private static final String K_PROOFEDBY = "proofedBy";
-    private static final String K_UUID = "uuid";
+    public static final String K_ID = "id";
+    public static final String K_TYPE = "type";
+    public static final String K_CATEGORY = "category";
+    public static final String K_PROOFEDBY = "proofedBy";
+    public static final String K_UUID = "uuid";
 
     private static final String K_PROOFEDBY_BLOCK_ID = "blockid";
 

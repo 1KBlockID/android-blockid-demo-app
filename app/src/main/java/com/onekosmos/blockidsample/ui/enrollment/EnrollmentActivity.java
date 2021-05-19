@@ -16,8 +16,9 @@ import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -28,8 +29,18 @@ import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_CATEGORY;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_ID;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_PROOFEDBY;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_TYPE;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -64,8 +75,10 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onPinClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_driver_license))) {
             onDLClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_passport))) {
-            onPPClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_passport1))) {
+            onPPClicked1();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_passport2))) {
+            onPPClicked2();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
@@ -186,8 +199,28 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void onPPClicked() {
-        if (BlockIDSDK.getInstance().isPassportEnrolled()) {
+    private void onPPClicked1() {
+        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > 0) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithTwoButton(
+                    null,
+                    getString(R.string.label_remove_pp_title),
+                    getString(R.string.label_remove_pp),
+                    getString(R.string.label_yes), getString(R.string.label_no),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        removeDocument(BIDDocumentProvider.BIDDocumentType.passport);
+                    });
+            return;
+        }
+        Intent intent = new Intent(this, PassportScanningActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onPPClicked2() {
+        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > 1) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -248,6 +281,10 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onResetAppClick() {
+        String list1 = BIDDocumentProvider.getInstance().getEnrolledDocumentList();
+        JSONArray list2 = BIDDocumentProvider.getInstance().getDocument("", "", DocumentMapUtil.DocumentCategory.identity_document.name());
+//        JSONArray list3 = BIDDocumentProvider.getInstance().getDocument("", "", DocumentMapUtil.DocumentCategory.misc_document.name());
+//        JSONArray list4 = BIDDocumentProvider.getInstance().getDocument("", "PPT", DocumentMapUtil.DocumentCategory.identity_document.name());
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(
                 null,
@@ -266,8 +303,28 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onQrLoginClicked() {
+//        setMics();
         Intent intent = new Intent(this, AuthenticatorActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+    }
+
+    // FIXME need to remove
+    private void setMics() {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("fname", "pankti");
+            j.put("lname", "mistry");
+            j.put("dob", "291194");
+            LinkedHashMap<String, Object> dlMap = new LinkedHashMap<String, Object>();
+            dlMap.put(K_ID, "1234");
+            dlMap.put(K_TYPE, "test");
+            dlMap.put(K_CATEGORY, DocumentMapUtil.DocumentCategory.misc_document);
+            dlMap.put(K_PROOFEDBY, "BlockID");
+            dlMap.put(K_UUID, j);
+            BIDDocumentProvider.getInstance().setDocument(dlMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -3,7 +3,11 @@ package com.onekosmos.blockidsample.ui.enrollment;
 import android.content.Context;
 
 import com.blockid.sdk.BlockIDSDK;
+import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.doument.DocumentMapUtil;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -20,7 +24,8 @@ public class EnrollmentsDataSource {
         ASSET_PIN,
         ASSET_DEVICE_AUTH,
         ASSET_DL,
-        ASSET_PP,
+        ASSET_PP1,
+        ASSET_PP2,
         ASSET_NATIONAL_ID,
         ASSET_RESET_SDK,
         ASSET_LOGIN_WITH_QR
@@ -37,7 +42,8 @@ public class EnrollmentsDataSource {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
-        arr.add(EnrollmentAssetEnum.ASSET_PP);
+        arr.add(EnrollmentAssetEnum.ASSET_PP1);
+        arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
 
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
@@ -57,9 +63,14 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_driver_license));
                 break;
 
-            case ASSET_PP:
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPassportEnrolled(),
-                        context.getResources().getString(R.string.label_passport));
+            case ASSET_PP1:
+                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 0,
+                        context.getResources().getString(R.string.label_passport1));
+                break;
+
+            case ASSET_PP2:
+                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 1,
+                        context.getResources().getString(R.string.label_passport2));
                 break;
 
             case ASSET_LIVE_ID:
@@ -96,5 +107,12 @@ public class EnrollmentsDataSource {
                 break;
         }
         return enrollmentAsset;
+    }
+
+    public int isPassportEnrolled() {
+        JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", "PPT", DocumentMapUtil.DocumentCategory.identity_document.name());
+        if (ppDoc != null)
+            return ppDoc.length();
+        return 0;
     }
 }
