@@ -18,10 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.cameramodule.camera.dlModule.model.DriverLicenseData;
-import com.blockid.sdk.cameramodule.camera.passportModule.model.PassportData;
 import com.blockid.sdk.datamodel.BIDGenericResponse;
-import com.blockid.sdk.scopeprovider.BIDScopesProvider;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.onekosmos.blockidsample.BuildConfig;
@@ -30,6 +27,9 @@ import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -250,39 +250,44 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     private LinkedHashMap<String, Object> changeDisplayName(HashMap<String, Object> scopesMap) {
         LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<String, Object>();
-        if (isAnyDocumentEnrolled()) {
-            if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
-                pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
+        try {
+            if (isAnyDocumentEnrolled()) {
+                if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
+                    pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
 
-            else if (scopesMap.containsKey("firstname"))
-                pScopesMap.put("Name : ", scopesMap.get("firstname"));
+                else if (scopesMap.containsKey("firstname"))
+                    pScopesMap.put("Name : ", scopesMap.get("firstname"));
 
-            else if (scopesMap.containsKey("lastname"))
-                pScopesMap.put("Name : ", scopesMap.get("lastname"));
+                else if (scopesMap.containsKey("lastname"))
+                    pScopesMap.put("Name : ", scopesMap.get("lastname"));
+            }
+            if (scopesMap.containsKey("did"))
+                pScopesMap.put("DID : ", scopesMap.get("did"));
+
+            if (scopesMap.containsKey("userid"))
+                pScopesMap.put("User ID : ", scopesMap.get("userid"));
+
+            if (scopesMap.containsKey("ppt")) {
+
+                pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
+            }
+
+            if (scopesMap.containsKey("nationalid")) {
+                pScopesMap.put("National ID # : ", ((JSONObject) scopesMap.get("nationalid")).get("documentId"));
+            }
+
+            if (scopesMap.containsKey("dl")) {
+                pScopesMap.put("Drivers license # : ", ((JSONObject) scopesMap.get("dl")).get("documentId"));
+            }
+
+            if (scopesMap.containsKey("scep_creds"))
+                pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
+
+            if (scopesMap.containsKey("creds"))
+                pScopesMap.put("Creds : ", scopesMap.get("creds"));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        if (scopesMap.containsKey("did"))
-            pScopesMap.put("DID : ", scopesMap.get("did"));
-
-        if (scopesMap.containsKey("userid"))
-            pScopesMap.put("User ID : ", scopesMap.get("userid"));
-
-//        if (scopesMap.containsKey("ppt")) {
-//            pScopesMap.put("Passport # : ", ((PassportData) scopesMap.get("ppt")).getDocumentId());
-//        }
-//
-//        if (scopesMap.containsKey("nationalid")) {
-//            pScopesMap.put("National ID # : ", ((BIDScopesProvider.NationalIDScope) scopesMap.get("nationalid")).getDocumentId());
-//        }
-
-//        if (scopesMap.containsKey("dl"))
-//            pScopesMap.put("Drivers license # : ", ((DriverLicenseData) scopesMap.get("dl")).getDocumentId());
-
-        if (scopesMap.containsKey("scep_creds"))
-            pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
-
-        if (scopesMap.containsKey("creds"))
-            pScopesMap.put("Creds : ", scopesMap.get("creds"));
-
         return pScopesMap;
     }
 
