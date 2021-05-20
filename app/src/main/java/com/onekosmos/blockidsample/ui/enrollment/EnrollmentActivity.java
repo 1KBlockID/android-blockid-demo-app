@@ -31,6 +31,7 @@ import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -267,32 +268,35 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void removeDocument(String id, String type, String category, BIDDocumentProvider.BIDDocumentType documentType) {
         try {
-            BIDDocumentData documentData = BIDUtil.JSONStringToObject(BIDDocumentProvider.getInstance().getDocument(id, type, category).getString(0), BIDDocumentData.class);
-            LinkedHashMap<String, Object> removeDocMap = new LinkedHashMap<>();
-            removeDocMap.put(K_ID, documentData.id);
-            removeDocMap.put(K_TYPE, documentData.type);
-            removeDocMap.put(K_CATEGORY, documentData.category);
-            removeDocMap.put(K_PROOFEDBY, documentData.proofedBy);
-            removeDocMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
+            JSONArray docArray = BIDDocumentProvider.getInstance().getDocument(id, type, category);
+            if (docArray != null && docArray.length() > 0) {
+                BIDDocumentData documentData = BIDUtil.JSONStringToObject(docArray.getString(0), BIDDocumentData.class);
+                LinkedHashMap<String, Object> removeDocMap = new LinkedHashMap<>();
+                removeDocMap.put(K_ID, documentData.id);
+                removeDocMap.put(K_TYPE, documentData.type);
+                removeDocMap.put(K_CATEGORY, documentData.category);
+                removeDocMap.put(K_PROOFEDBY, documentData.proofedBy);
+                removeDocMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
 
-            ProgressDialog dialog = new ProgressDialog(this);
-            dialog.show();
-            BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
-                dialog.dismiss();
-                if (status) {
-                    refreshEnrollmentRecyclerView();
-                    return;
-                }
-                ErrorDialog errorDialog = new ErrorDialog(this);
-                DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                    errorDialog.dismiss();
-                };
-                if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                    errorDialog.showNoInternetDialog(onDismissListener);
-                    return;
-                }
-                errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-            });
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.show();
+                BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
+                    dialog.dismiss();
+                    if (status) {
+                        refreshEnrollmentRecyclerView();
+                        return;
+                    }
+                    ErrorDialog errorDialog = new ErrorDialog(this);
+                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                        errorDialog.dismiss();
+                    };
+                    if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        errorDialog.showNoInternetDialog(onDismissListener);
+                        return;
+                    }
+                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                });
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -317,8 +321,10 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onQrLoginClicked() {
-        Intent intent = new Intent(this, AuthenticatorActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+        String s = BIDDocumentProvider.getInstance().getEnrolledDocumentList();
+        JSONArray s1 = BIDDocumentProvider.getInstance().getDocument("","","");
+//        Intent intent = new Intent(this, AuthenticatorActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        startActivity(intent);
     }
 }

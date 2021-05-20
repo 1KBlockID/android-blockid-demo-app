@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.document.BIDDocumentProvider;
@@ -68,13 +69,17 @@ public class EnrollmentsDataSource {
                 break;
 
             case ASSET_PP1:
+                String ppID1 = getPassportID(1);
+                ppID1 = TextUtils.isEmpty(ppID1) ? "" : " (# " + ppID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 0,
-                        context.getResources().getString(R.string.label_passport1) + getPassportID(1));
+                        context.getResources().getString(R.string.label_passport1) + ppID1);
                 break;
 
             case ASSET_PP2:
+                String ppID2 = getPassportID(2);
+                ppID2 = TextUtils.isEmpty(ppID2) ? "" : " (# " + ppID2 + ")";
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 1,
-                        context.getResources().getString(R.string.label_passport2) + getPassportID(2));
+                        context.getResources().getString(R.string.label_passport2) + ppID2);
                 break;
 
             case ASSET_LIVE_ID:
@@ -124,7 +129,7 @@ public class EnrollmentsDataSource {
         try {
             JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
             if (ppDoc != null && ppDoc.length() >= count) {
-                return " (# " + ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id") + ")";
+                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
             }
         } catch (JSONException e) {
             e.printStackTrace();
