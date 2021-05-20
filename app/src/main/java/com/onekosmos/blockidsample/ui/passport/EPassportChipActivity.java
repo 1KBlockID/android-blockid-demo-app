@@ -30,6 +30,7 @@ import java.util.Arrays;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
@@ -165,7 +166,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (mPassportData != null) {
-            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mPassportData, DocumentMapUtil.DocumentCategory.identity_document), BIDDocumentProvider.BIDDocumentType.passport,
+            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mPassportData,identity_document), BIDDocumentProvider.BIDDocumentType.passport,
                     "", (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {

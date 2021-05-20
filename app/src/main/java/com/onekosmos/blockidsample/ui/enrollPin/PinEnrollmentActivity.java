@@ -190,7 +190,7 @@ public class PinEnrollmentActivity extends AppCompatActivity {
         progressDialog.show();
         hideKeyboard(this);
 
-        BlockIDSDK.getInstance().enrollPin(mConfirmPin, (enroll_status, error) -> {
+        BlockIDSDK.getInstance().enrollPin(mConfirmPin, "",(enroll_status, error) -> {
             progressDialog.dismiss();
             if (enroll_status) {
                 afterSuccess();

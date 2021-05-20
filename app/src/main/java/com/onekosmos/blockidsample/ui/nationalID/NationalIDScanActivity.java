@@ -32,6 +32,7 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
@@ -198,7 +199,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mLayoutMessage.setVisibility(View.GONE);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mNationalID, DocumentMapUtil.DocumentCategory.identity_document), BIDDocumentProvider.BIDDocumentType.nationalID, mSigToken, (status, error) -> {
+        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mNationalID, identity_document), BIDDocumentProvider.BIDDocumentType.nationalID, mSigToken, (status, error) -> {
             progressDialog.dismiss();
             isRegistrationInProgress = false;
             if (status) {

@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.doument;
 
 import com.blockid.sdk.datamodel.BIDDocumentData;
+import com.blockid.sdk.document.BIDDocumentProvider;
 import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
@@ -18,20 +19,15 @@ public class DocumentMapUtil {
     public static final String K_CATEGORY = "category";
     public static final String K_PROOFEDBY = "proofedBy";
     public static final String K_UUID = "uuid";
+    public static final String K_FACE = "face";
 
-    private static final String K_PROOFEDBY_BLOCK_ID = "blockid";
-
-    public enum DocumentCategory {
-        identity_document, misc_document
-    }
-
-    public static LinkedHashMap<String, Object> getDocumentMap(BIDDocumentData documentData, DocumentMapUtil.DocumentCategory documentCategory) {
+    public static LinkedHashMap<String, Object> getDocumentMap(BIDDocumentData documentData, BIDDocumentProvider.RegisterDocCategory category) {
         try {
             LinkedHashMap<String, Object> dlMap = new LinkedHashMap<String, Object>();
             dlMap.put(K_ID, documentData.id);
             dlMap.put(K_TYPE, documentData.type);
-            dlMap.put(K_CATEGORY, documentCategory.name());
-            dlMap.put(K_PROOFEDBY, K_PROOFEDBY_BLOCK_ID);
+            dlMap.put(K_CATEGORY, category.name());
+            dlMap.put(K_PROOFEDBY, documentData.proofedBy);
             dlMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
             return dlMap;
         } catch (JSONException e) {

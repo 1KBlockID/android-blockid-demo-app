@@ -20,13 +20,13 @@ import com.blockid.sdk.datamodel.BIDDriverLicense;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.doument.DocumentHolder;
-import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
 
 /**
@@ -112,7 +112,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (documentData != null) {
-            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, DocumentMapUtil.DocumentCategory.identity_document), BIDDocumentProvider.BIDDocumentType.driverLicense,
+            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, identity_document), BIDDocumentProvider.BIDDocumentType.driverLicense,
                     "", (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {

@@ -4,12 +4,16 @@ import android.content.Context;
 
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.document.BIDDocumentProvider;
+import com.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.doument.DocumentMapUtil;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
+
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -65,12 +69,12 @@ public class EnrollmentsDataSource {
 
             case ASSET_PP1:
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 0,
-                        context.getResources().getString(R.string.label_passport1));
+                        context.getResources().getString(R.string.label_passport1) + getPassportID(1));
                 break;
 
             case ASSET_PP2:
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 1,
-                        context.getResources().getString(R.string.label_passport2));
+                        context.getResources().getString(R.string.label_passport2) + getPassportID(2));
                 break;
 
             case ASSET_LIVE_ID:
@@ -110,9 +114,21 @@ public class EnrollmentsDataSource {
     }
 
     public int isPassportEnrolled() {
-        JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", "PPT", DocumentMapUtil.DocumentCategory.identity_document.name());
+        JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
         if (ppDoc != null)
             return ppDoc.length();
         return 0;
+    }
+
+    public String getPassportID(int count) {
+        try {
+            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
+            if (ppDoc != null && ppDoc.length() >= count) {
+                return " (# " + ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id") + ")";
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
