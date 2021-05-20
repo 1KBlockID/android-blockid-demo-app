@@ -27,6 +27,10 @@ import java.util.Objects;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class PinEnrollmentActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
     private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError;
