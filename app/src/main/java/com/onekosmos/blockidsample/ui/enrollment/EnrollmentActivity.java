@@ -122,9 +122,11 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onLiveIdClicked() {
-        Intent intent = new Intent(this, LiveIDScanningActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+        if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
+            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        }
     }
 
     private void onDeviceAuthClicked() {
@@ -321,10 +323,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onQrLoginClicked() {
-        String s = BIDDocumentProvider.getInstance().getEnrolledDocumentList();
-        JSONArray s1 = BIDDocumentProvider.getInstance().getDocument("","","");
-//        Intent intent = new Intent(this, AuthenticatorActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//        startActivity(intent);
+        Intent intent = new Intent(this, AuthenticatorActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 }
