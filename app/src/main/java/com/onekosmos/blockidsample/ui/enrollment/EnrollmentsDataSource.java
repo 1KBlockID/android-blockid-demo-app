@@ -65,9 +65,9 @@ public class EnrollmentsDataSource {
         switch (type) {
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
-                dlID1 = TextUtils.isEmpty(dlID1) ? "" : "(# " + dlID1 + ")";
+                dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
-                        context.getResources().getString(R.string.label_driver_license_1) + "\n" + dlID1);
+                        context.getResources().getString(R.string.label_driver_license_1) + dlID1);
                 break;
 
             case ASSET_PP1:
