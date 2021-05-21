@@ -80,13 +80,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
             onPinClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_driver_license_1))) {
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_driver_license_1))) {
             onDLClicked();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport1))) {
             onPPClicked1();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport2))) {
             onPPClicked2();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id_1))) {
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_national_id_1))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
             onResetAppClick();
@@ -199,7 +199,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument("", DL.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.driverLicense);
+                        removeDocument(EnrollmentsDataSource.getInstance().getDriverLicenseID(1), DL.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.driverLicense);
                     });
             return;
         }
@@ -259,7 +259,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument("", NATIONAL_ID.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.nationalID);
+                        removeDocument(EnrollmentsDataSource.getInstance().getNationalID(1), NATIONAL_ID.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.nationalID);
                     });
             return;
         }
