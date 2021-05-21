@@ -80,13 +80,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
             onPinClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_driver_license))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_driver_license_1))) {
             onDLClicked();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport1))) {
             onPPClicked1();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport2))) {
             onPPClicked2();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id_1))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
             onResetAppClick();

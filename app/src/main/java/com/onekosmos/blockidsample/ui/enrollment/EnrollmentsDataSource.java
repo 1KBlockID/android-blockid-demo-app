@@ -64,8 +64,10 @@ public class EnrollmentsDataSource {
         EnrollmentAsset enrollmentAsset = null;
         switch (type) {
             case ASSET_DL:
+                String dlID1 = getDriverLicenseID(1);
+                dlID1 = TextUtils.isEmpty(dlID1) ? "" : "(# " + dlID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
-                        context.getResources().getString(R.string.label_driver_license));
+                        context.getResources().getString(R.string.label_driver_license_1) + "\n" + dlID1);
                 break;
 
             case ASSET_PP1:
@@ -95,13 +97,15 @@ public class EnrollmentsDataSource {
             case ASSET_PIN:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPinRegistered(),
                         context.getResources().getString(R.string.label_app_pin));
-
                 break;
 
             case ASSET_NATIONAL_ID:
+                String nID1 = getNationalID(1);
+                nID1 = TextUtils.isEmpty(nID1) ? "" : " (# " + nID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isNationalIDEnrolled(),
-                        context.getResources().getString(R.string.label_national_id));
+                        context.getResources().getString(R.string.label_national_id_1) + nID1);
                 break;
+
             case ASSET_RESET_SDK:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_reset_app));
@@ -128,6 +132,30 @@ public class EnrollmentsDataSource {
     public String getPassportID(int count) {
         try {
             JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
+            if (ppDoc != null && ppDoc.length() >= count) {
+                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String getDriverLicenseID(int count) {
+        try {
+            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.DL.getValue(), identity_document.name());
+            if (ppDoc != null && ppDoc.length() >= count) {
+                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String getNationalID(int count) {
+        try {
+            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.NATIONAL_ID.getValue(), identity_document.name());
             if (ppDoc != null && ppDoc.length() >= count) {
                 return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
             }
