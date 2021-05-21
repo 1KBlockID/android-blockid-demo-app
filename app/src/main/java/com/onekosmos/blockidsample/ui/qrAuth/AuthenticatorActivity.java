@@ -262,6 +262,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     else if (scopesMap.containsKey("lastname"))
                         pScopesMap.put("Name : ", scopesMap.get("lastname"));
                 }
+
                 if (scopesMap.containsKey("did"))
                     pScopesMap.put("DID : ", scopesMap.get("did"));
 
@@ -288,7 +289,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     pScopesMap.put("Creds : ", scopesMap.get("creds"));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
         }
         return pScopesMap;
     }
