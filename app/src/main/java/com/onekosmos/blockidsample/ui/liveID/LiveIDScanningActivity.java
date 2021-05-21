@@ -22,7 +22,7 @@ import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.doument.DocumentHolder;
+import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -31,12 +31,12 @@ import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_CATEGORY;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_FACE;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_ID;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_PROOFEDBY;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_TYPE;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.getDocumentMap;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_FACE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering

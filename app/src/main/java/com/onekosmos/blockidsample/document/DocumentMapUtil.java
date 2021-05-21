@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.doument;
+package com.onekosmos.blockidsample.document;
 
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
@@ -31,7 +31,6 @@ public class DocumentMapUtil {
             dlMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
             return dlMap;
         } catch (JSONException e) {
-            e.printStackTrace();
             return null;
         }
     }

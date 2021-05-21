@@ -14,7 +14,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_UUID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering

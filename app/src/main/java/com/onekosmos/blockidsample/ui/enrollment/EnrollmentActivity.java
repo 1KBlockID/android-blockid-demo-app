@@ -43,11 +43,11 @@ import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.i
 import static com.blockid.sdk.document.RegisterDocType.DL;
 import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.blockid.sdk.document.RegisterDocType.PPT;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_CATEGORY;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_ID;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_PROOFEDBY;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_TYPE;
-import static com.onekosmos.blockidsample.doument.DocumentMapUtil.K_UUID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering
