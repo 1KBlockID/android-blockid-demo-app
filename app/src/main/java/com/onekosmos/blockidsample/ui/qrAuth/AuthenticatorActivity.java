@@ -294,10 +294,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        if (BlockIDSDK.getInstance().isPassportEnrolled() ||
+        return BlockIDSDK.getInstance().isPassportEnrolled() ||
                 BlockIDSDK.getInstance().isDriversLicenseEnrolled() ||
-                BlockIDSDK.getInstance().isNationalIDEnrolled())
-            return true;
-        else return false;
+                BlockIDSDK.getInstance().isNationalIDEnrolled();
     }
 }
