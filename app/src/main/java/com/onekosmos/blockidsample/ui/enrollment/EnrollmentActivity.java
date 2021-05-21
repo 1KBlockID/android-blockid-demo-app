@@ -83,9 +83,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_driver_license_1))) {
             onDLClicked();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport1))) {
-            onPPClicked1();
+            onPPClicked(1);
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport2))) {
-            onPPClicked2();
+            onPPClicked(2);
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_national_id_1))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
@@ -208,8 +208,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void onPPClicked1() {
-        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > 0) {
+    private void onPPClicked(int count) {
+        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > count - 1) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -219,27 +219,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(EnrollmentsDataSource.getInstance().getPassportID(1), PPT.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.passport);
-                    });
-            return;
-        }
-        Intent intent = new Intent(this, PassportScanningActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onPPClicked2() {
-        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > 1) {
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.showWithTwoButton(
-                    null,
-                    getString(R.string.label_remove_pp_title),
-                    getString(R.string.label_remove_pp),
-                    getString(R.string.label_yes), getString(R.string.label_no),
-                    (dialogInterface, i) -> errorDialog.dismiss(),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        removeDocument(EnrollmentsDataSource.getInstance().getPassportID(2), PPT.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.passport);
+                        removeDocument(EnrollmentsDataSource.getInstance().getPassportID(count), PPT.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.passport);
                     });
             return;
         }

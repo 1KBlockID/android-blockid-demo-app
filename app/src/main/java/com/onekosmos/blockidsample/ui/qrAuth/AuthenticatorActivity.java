@@ -270,7 +270,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     pScopesMap.put("User ID : ", scopesMap.get("userid"));
 
                 if (scopesMap.containsKey("ppt")) {
-
                     pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
                 }
 
