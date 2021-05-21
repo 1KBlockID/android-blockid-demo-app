@@ -8,13 +8,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_asset_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dimen_20dp"
+        android:layout_marginHorizontal="@dimen/dimen_20dp"
         android:padding="@dimen/dimen_5dp"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/img_enrollment_status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,5 +28,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

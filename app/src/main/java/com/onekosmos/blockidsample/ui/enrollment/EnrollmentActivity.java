@@ -15,9 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
+import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockidsample.R;
+import com.blockid.sdk.utils.BIDUtil;
+import com.google.gson.GsonBuilder;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -28,8 +31,23 @@ import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.blockid.sdk.document.RegisterDocType.DL;
+import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -62,11 +80,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
             onPinClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_driver_license))) {
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_driver_license_1))) {
             onDLClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_passport))) {
-            onPPClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_national_id))) {
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport1))) {
+            onPPClicked(1);
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport2))) {
+            onPPClicked(2);
+        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_national_id_1))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
             onResetAppClick();
@@ -102,9 +122,11 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onLiveIdClicked() {
-        Intent intent = new Intent(this, LiveIDScanningActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+        if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
+            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        }
     }
 
     private void onDeviceAuthClicked() {
@@ -177,7 +199,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(BIDDocumentProvider.BIDDocumentType.driverLicense);
+                        removeDocument(EnrollmentsDataSource.getInstance().getDriverLicenseID(1), DL.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.driverLicense);
                     });
             return;
         }
@@ -186,8 +208,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void onPPClicked() {
-        if (BlockIDSDK.getInstance().isPassportEnrolled()) {
+    private void onPPClicked(int count) {
+        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > count - 1) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -197,7 +219,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(BIDDocumentProvider.BIDDocumentType.passport);
+                        removeDocument(EnrollmentsDataSource.getInstance().getPassportID(count), PPT.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.passport);
                     });
             return;
         }
@@ -217,7 +239,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(BIDDocumentProvider.BIDDocumentType.nationalID);
+                        removeDocument(EnrollmentsDataSource.getInstance().getNationalID(1), NATIONAL_ID.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.nationalID);
                     });
             return;
         }
@@ -226,25 +248,40 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void removeDocument(BIDDocumentProvider.BIDDocumentType documentType) {
-        ProgressDialog dialog = new ProgressDialog(this);
-        dialog.show();
-        BlockIDSDK.getInstance().unRegisterDocument(this, documentType, (status, error) -> {
-            dialog.dismiss();
-            if (status) {
-                refreshEnrollmentRecyclerView();
-                return;
+    private void removeDocument(String id, String type, String category, BIDDocumentProvider.BIDDocumentType documentType) {
+        try {
+            JSONArray docArray = BIDDocumentProvider.getInstance().getDocument(id, type, category);
+            if (docArray != null && docArray.length() > 0) {
+                BIDDocumentData documentData = BIDUtil.JSONStringToObject(docArray.getString(0), BIDDocumentData.class);
+                LinkedHashMap<String, Object> removeDocMap = new LinkedHashMap<>();
+                removeDocMap.put(K_ID, documentData.id);
+                removeDocMap.put(K_TYPE, documentData.type);
+                removeDocMap.put(K_CATEGORY, documentData.category);
+                removeDocMap.put(K_PROOFEDBY, documentData.proofedBy);
+                removeDocMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
+
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.show();
+                BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
+                    dialog.dismiss();
+                    if (status) {
+                        refreshEnrollmentRecyclerView();
+                        return;
+                    }
+                    ErrorDialog errorDialog = new ErrorDialog(this);
+                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                        errorDialog.dismiss();
+                    };
+                    if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        errorDialog.showNoInternetDialog(onDismissListener);
+                        return;
+                    }
+                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                });
             }
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-        });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void onResetAppClick() {

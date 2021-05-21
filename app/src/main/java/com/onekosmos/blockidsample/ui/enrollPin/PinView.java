@@ -35,6 +35,10 @@ import androidx.core.view.ViewCompat;
 
 import com.onekosmos.blockidsample.R;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class PinView extends AppCompatEditText {
     private static final boolean DBG = false;
     private static final int BLINK = 500;

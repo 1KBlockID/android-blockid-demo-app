@@ -27,6 +27,10 @@ import java.util.Objects;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class PinEnrollmentActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
     private AppCompatTextView mTxtEnterPin, mTxtBack, mTxtPinError;
@@ -190,7 +194,8 @@ public class PinEnrollmentActivity extends AppCompatActivity {
         progressDialog.show();
         hideKeyboard(this);
 
-        BlockIDSDK.getInstance().enrollPin(mConfirmPin, (enroll_status, error) -> {
+        // proofed by can be empty string or null. sdk by default set it as "blockid"
+        BlockIDSDK.getInstance().enrollPin(mConfirmPin, null, (enroll_status, error) -> {
             progressDialog.dismiss();
             if (enroll_status) {
                 afterSuccess();
