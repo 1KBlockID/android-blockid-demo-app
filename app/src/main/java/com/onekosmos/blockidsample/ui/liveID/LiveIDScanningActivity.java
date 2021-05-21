@@ -2,7 +2,6 @@ package com.onekosmos.blockidsample.ui.liveID;
 
 import android.Manifest;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -23,12 +22,21 @@ import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
-import com.onekosmos.blockidsample.util.DocumentHolder;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import java.util.LinkedHashMap;
+
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_FACE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
+import static com.onekosmos.blockidsample.document.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -112,7 +120,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onLiveIDCaptured(Bitmap bitmap, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onLiveIDCaptured(BIDDocumentData liveIDData, String signatureToken, ErrorManager.ErrorResponse error) {
         mTxtMessage.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.GONE);
         mLiveIDScannerHelper.stopLiveIDScanning();
@@ -125,7 +133,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (bitmap == null) {
+        if (liveIDData == null) {
             errorDialog.show(null,
                     getString(R.string.label_error),
                     error.getMessage(), dialog -> {
@@ -135,10 +143,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             return;
         }
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
-            registerLiveIDWithDocument(bitmap);
+            registerLiveIDWithDocument(liveIDData);
             return;
         }
-        registerLiveID(bitmap);
+        registerLiveID(liveIDData);
     }
 
     private void initViews() {
@@ -182,10 +190,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         return "";
     }
 
-    private void registerLiveID(Bitmap bitmap) {
+    private void registerLiveID(BIDDocumentData liveIDData) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(bitmap, "", (status, msg, error) -> {
+        BlockIDSDK.getInstance().setLiveID(createLiveIDMap(liveIDData), "", (status, msg, error) -> {
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
@@ -208,33 +216,44 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         });
     }
 
-    private void registerLiveIDWithDocument(Bitmap bitmap) {
+    private void registerLiveIDWithDocument(BIDDocumentData livIDData) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BIDDocumentData documentData = DocumentHolder.getData();
         BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
-        BlockIDSDK.getInstance().registerDocument(this, documentData, bitmap, type, "", "", (status, error) -> {
-            progressDialog.dismiss();
-            DocumentHolder.clearData();
-            if (status) {
-                Toast.makeText(this, getString(R.string.label_document_enrolled_successfully), Toast.LENGTH_LONG).show();
-                finish();
-                return;
-            }
+        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, identity_document),
+                createLiveIDMap(livIDData), type, "", "", (status, error) -> {
+                    progressDialog.dismiss();
+                    DocumentHolder.clearData();
+                    if (status) {
+                        Toast.makeText(this, getString(R.string.label_document_enrolled_successfully), Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
 
-            if (error == null)
-                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+                    if (error == null)
+                        error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-                finish();
-            };
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-        });
+                    ErrorDialog errorDialog = new ErrorDialog(this);
+                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                        errorDialog.dismiss();
+                        finish();
+                    };
+                    if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        errorDialog.showNoInternetDialog(onDismissListener);
+                        return;
+                    }
+                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                });
+    }
+
+    public static LinkedHashMap<String, Object> createLiveIDMap(BIDDocumentData documentData) {
+        LinkedHashMap<String, Object> dlMap = new LinkedHashMap<String, Object>();
+        dlMap.put(K_ID, documentData.id);
+        dlMap.put(K_TYPE, documentData.type);
+        dlMap.put(K_CATEGORY, documentData.category);
+        dlMap.put(K_PROOFEDBY, documentData.proofedBy);
+        dlMap.put(K_FACE, documentData.face);
+        return dlMap;
     }
 }

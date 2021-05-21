@@ -7,6 +7,10 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 class DefaultMovementMethod implements MovementMethod {
     public static DefaultMovementMethod sInstance;
 
