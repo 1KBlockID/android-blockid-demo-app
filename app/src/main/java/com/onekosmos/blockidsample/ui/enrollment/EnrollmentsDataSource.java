@@ -14,7 +14,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -133,10 +132,10 @@ public class EnrollmentsDataSource {
         try {
             JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
             if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+                return ppDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return "";
         }
         return "";
     }
@@ -145,10 +144,10 @@ public class EnrollmentsDataSource {
         try {
             JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.DL.getValue(), identity_document.name());
             if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+                return ppDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return "";
         }
         return "";
     }
@@ -157,10 +156,10 @@ public class EnrollmentsDataSource {
         try {
             JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.NATIONAL_ID.getValue(), identity_document.name());
             if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+                return ppDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return "";
         }
         return "";
     }

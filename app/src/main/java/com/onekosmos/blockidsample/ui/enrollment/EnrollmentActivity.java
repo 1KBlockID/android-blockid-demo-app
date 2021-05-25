@@ -15,10 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.utils.BIDUtil;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
@@ -33,21 +32,14 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.DL;
-import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.blockid.sdk.document.RegisterDocType.PPT;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
+import static com.blockid.sdk.document.RegisterDocType.*;
+
 
 /**
  * Created by 1Kosmos Engineering
@@ -199,7 +191,15 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(EnrollmentsDataSource.getInstance().getDriverLicenseID(1), DL.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.driverLicense);
+                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", DL.getValue(), identity_document.name());
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        try {
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
+                            }.getType());
+                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.driverLicense);
+                        } catch (JSONException e) {
+                            // do nothing
+                        }
                     });
             return;
         }
@@ -219,7 +219,15 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(EnrollmentsDataSource.getInstance().getPassportID(count), PPT.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.passport);
+                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", PPT.getValue(), identity_document.name());
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        try {
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(count - 1), new TypeToken<LinkedHashMap<String, Object>>() {
+                            }.getType());
+                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.passport);
+                        } catch (JSONException e) {
+                            // do nothing
+                        }
                     });
             return;
         }
@@ -239,7 +247,15 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        removeDocument(EnrollmentsDataSource.getInstance().getNationalID(1), NATIONAL_ID.getValue(), identity_document.name(), BIDDocumentProvider.BIDDocumentType.nationalID);
+                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", NATIONAL_ID.getValue(), identity_document.name());
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        try {
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
+                            }.getType());
+                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.nationalID);
+                        } catch (JSONException e) {
+                            // do nothing
+                        }
                     });
             return;
         }
@@ -248,40 +264,25 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void removeDocument(String id, String type, String category, BIDDocumentProvider.BIDDocumentType documentType) {
-        try {
-            JSONArray docArray = BIDDocumentProvider.getInstance().getDocument(id, type, category);
-            if (docArray != null && docArray.length() > 0) {
-                BIDDocumentData documentData = BIDUtil.JSONStringToObject(docArray.getString(0), BIDDocumentData.class);
-                LinkedHashMap<String, Object> removeDocMap = new LinkedHashMap<>();
-                removeDocMap.put(K_ID, documentData.id);
-                removeDocMap.put(K_TYPE, documentData.type);
-                removeDocMap.put(K_CATEGORY, documentData.category);
-                removeDocMap.put(K_PROOFEDBY, documentData.proofedBy);
-                removeDocMap.put(K_UUID, new JSONObject(new GsonBuilder().disableHtmlEscaping().create().toJson(documentData)));
-
-                ProgressDialog dialog = new ProgressDialog(this);
-                dialog.show();
-                BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
-                    dialog.dismiss();
-                    if (status) {
-                        refreshEnrollmentRecyclerView();
-                        return;
-                    }
-                    ErrorDialog errorDialog = new ErrorDialog(this);
-                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                        errorDialog.dismiss();
-                    };
-                    if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                        errorDialog.showNoInternetDialog(onDismissListener);
-                        return;
-                    }
-                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-                });
+    private void removeDocument(LinkedHashMap<String, Object> removeDocMap, BIDDocumentProvider.BIDDocumentType documentType) {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.show();
+        BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
+            dialog.dismiss();
+            if (status) {
+                refreshEnrollmentRecyclerView();
+                return;
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+            };
+            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+        });
     }
 
     private void onResetAppClick() {
