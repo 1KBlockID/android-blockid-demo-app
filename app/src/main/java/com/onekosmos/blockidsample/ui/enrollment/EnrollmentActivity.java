@@ -16,7 +16,8 @@ import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
@@ -38,7 +39,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.*;
+import static com.blockid.sdk.document.RegisterDocType.DL;
+import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.blockid.sdk.document.RegisterDocType.PPT;
 
 
 /**
@@ -191,9 +194,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", DL.getValue(), identity_document.name());
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         try {
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
+                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
                             removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.driverLicense);
@@ -209,7 +212,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onPPClicked(int count) {
-        if (EnrollmentsDataSource.getInstance().isPassportEnrolled() > count - 1) {
+        if (EnrollmentsDataSource.getInstance().isPassportEnrolled(count)) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -219,9 +222,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", PPT.getValue(), identity_document.name());
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         try {
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name()));
+                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(count - 1), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
                             removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.passport);
@@ -247,9 +250,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     (dialogInterface, i) -> errorDialog.dismiss(),
                     dialog -> {
                         errorDialog.dismiss();
-                        JSONArray jsonArray = BIDDocumentProvider.getInstance().getDocument("", NATIONAL_ID.getValue(), identity_document.name());
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         try {
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", NATIONAL_ID.getValue(), identity_document.name()));
+                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
                             removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.nationalID);
