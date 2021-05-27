@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.R;
 
 import org.json.JSONArray;
@@ -14,7 +13,9 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_UUID;
+import static com.blockid.sdk.document.RegisterDocType.DL;
+import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.blockid.sdk.document.RegisterDocType.PPT;
 
 /**
  * Created by 1Kosmos Engineering
@@ -73,14 +74,14 @@ public class EnrollmentsDataSource {
             case ASSET_PP1:
                 String ppID1 = getPassportID(1);
                 ppID1 = TextUtils.isEmpty(ppID1) ? "" : " (# " + ppID1 + ")";
-                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 0,
+                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled(1),
                         context.getResources().getString(R.string.label_passport1) + ppID1);
                 break;
 
             case ASSET_PP2:
                 String ppID2 = getPassportID(2);
                 ppID2 = TextUtils.isEmpty(ppID2) ? "" : " (# " + ppID2 + ")";
-                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled() > 1,
+                enrollmentAsset = new EnrollmentAsset(isPassportEnrolled(2),
                         context.getResources().getString(R.string.label_passport2) + ppID2);
                 break;
 
@@ -122,46 +123,64 @@ public class EnrollmentsDataSource {
         return enrollmentAsset;
     }
 
-    public int isPassportEnrolled() {
-        JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
-        if (ppDoc != null)
-            return ppDoc.length();
-        return 0;
+    public boolean isPassportEnrolled(int count) {
+        try {
+            String ppArrayList = BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name());
+            if (TextUtils.isEmpty(ppArrayList)) {
+                return false;
+            }
+            JSONArray ppDoc = new JSONArray(ppArrayList);
+            return (ppDoc != null && ppDoc.length() >= count);
+        } catch (JSONException e) {
+            return false;
+        }
     }
 
     public String getPassportID(int count) {
+        String ppArrayList = BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name());
+        if (TextUtils.isEmpty(ppArrayList)) {
+            return null;
+        }
         try {
-            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.PPT.getValue(), identity_document.name());
+            JSONArray ppDoc = new JSONArray(ppArrayList);
             if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+                return ppDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
         }
-        return "";
+        return null;
     }
 
     public String getDriverLicenseID(int count) {
+        String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name());
+        if (TextUtils.isEmpty(dlArrayList)) {
+            return null;
+        }
         try {
-            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.DL.getValue(), identity_document.name());
-            if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+            JSONArray dlDoc = new JSONArray(dlArrayList);
+            if (dlDoc != null && dlDoc.length() >= count) {
+                return dlDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
         }
-        return "";
+        return null;
     }
 
     public String getNationalID(int count) {
+        String nidArrayList = BIDDocumentProvider.getInstance().getUserDocument("", NATIONAL_ID.getValue(), identity_document.name());
+        if (TextUtils.isEmpty(nidArrayList)) {
+            return null;
+        }
         try {
-            JSONArray ppDoc = BIDDocumentProvider.getInstance().getDocument("", RegisterDocType.NATIONAL_ID.getValue(), identity_document.name());
-            if (ppDoc != null && ppDoc.length() >= count) {
-                return ppDoc.getJSONObject(count - 1).getJSONObject(K_UUID).getString("id");
+            JSONArray nidDoc = new JSONArray(nidArrayList);
+            if (nidDoc != null && nidDoc.length() >= count) {
+                return nidDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
         }
-        return "";
+        return null;
     }
 }

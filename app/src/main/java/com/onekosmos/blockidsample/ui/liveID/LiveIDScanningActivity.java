@@ -21,6 +21,8 @@ import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -31,12 +33,7 @@ import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_FACE;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.getDocumentMap;
+import static com.blockid.sdk.document.RegisterDocType.LIVE_ID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -193,7 +190,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private void registerLiveID(BIDDocumentData liveIDData) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(createLiveIDMap(liveIDData), "", (status, msg, error) -> {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        LinkedHashMap<String, Object> liveIDMap = gson.fromJson(gson.toJson(liveIDData), new TypeToken<LinkedHashMap<String, Object>>() {
+        }.getType());
+        liveIDMap.put("category", identity_document.name());
+        liveIDMap.put("type", LIVE_ID.getValue());
+        liveIDMap.put("id", liveIDData.id);
+        BlockIDSDK.getInstance().setLiveID(liveIDMap, "", (status, msg, error) -> {
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
@@ -221,8 +224,22 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         progressDialog.show();
         BIDDocumentData documentData = DocumentHolder.getData();
         BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
-        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, identity_document),
-                createLiveIDMap(livIDData), type, "", "", (status, error) -> {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        LinkedHashMap<String, Object> liveIDMap = gson.fromJson(gson.toJson(livIDData), new TypeToken<LinkedHashMap<String, Object>>() {
+        }.getType());
+        liveIDMap.put("category", identity_document.name());
+        liveIDMap.put("type", LIVE_ID.getValue());
+        liveIDMap.put("id", livIDData.id);
+
+        LinkedHashMap<String, Object> documentMap = gson.fromJson(gson.toJson(documentData), new TypeToken<LinkedHashMap<String, Object>>() {
+        }.getType());
+
+        documentMap.put("category", identity_document.name());
+        documentMap.put("type", documentData.type);
+        documentMap.put("id", documentData.id);
+
+        BlockIDSDK.getInstance().registerDocument(this, documentMap,
+                liveIDMap, type, "", "", (status, error) -> {
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
@@ -245,15 +262,5 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     }
                     errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
                 });
-    }
-
-    public static LinkedHashMap<String, Object> createLiveIDMap(BIDDocumentData documentData) {
-        LinkedHashMap<String, Object> dlMap = new LinkedHashMap<String, Object>();
-        dlMap.put(K_ID, documentData.id);
-        dlMap.put(K_TYPE, documentData.type);
-        dlMap.put(K_CATEGORY, documentData.category);
-        dlMap.put(K_PROOFEDBY, documentData.proofedBy);
-        dlMap.put(K_FACE, documentData.face);
-        return dlMap;
     }
 }
