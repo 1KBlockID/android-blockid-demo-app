@@ -124,7 +124,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
             dlMap.put("id", documentData.id);
 
             BlockIDSDK.getInstance().registerDocument(this, dlMap, BIDDocumentProvider.BIDDocumentType.driverLicense,
-                    "", (status, error) -> {
+                    null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             Toast.makeText(this, getString(R.string.label_dl_enrolled_successfully), Toast.LENGTH_LONG).show();
@@ -136,7 +136,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(documentData, BIDDocumentProvider.BIDDocumentType.driverLicense, "");
+                            DocumentHolder.setData(documentData, BIDDocumentProvider.BIDDocumentType.driverLicense, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

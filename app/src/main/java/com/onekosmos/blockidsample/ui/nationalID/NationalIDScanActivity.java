@@ -22,7 +22,8 @@ import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDNationalID;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -207,35 +208,36 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         nationalIDMap.put("category", identity_document.name());
         nationalIDMap.put("type", NATIONAL_ID.getValue());
         nationalIDMap.put("id", mNationalIDData.id);
-        BlockIDSDK.getInstance().registerDocument(this, nationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, mSigToken, (status, error) -> {
-            progressDialog.dismiss();
-            isRegistrationInProgress = false;
-            if (status) {
-                Toast.makeText(this, R.string.label_nid_enrolled_successfully, Toast.LENGTH_LONG).show();
-                finish();
-                return;
-            }
-            if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                DocumentHolder.setData(mNationalIDData, BIDDocumentProvider.BIDDocumentType.nationalID, "");
-                Intent intent = new Intent(this, LiveIDScanningActivity.class);
-                intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
-                finish();
-                return;
-            }
+        BlockIDSDK.getInstance().registerDocument(this, nationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null,
+                (status, error) -> {
+                    progressDialog.dismiss();
+                    isRegistrationInProgress = false;
+                    if (status) {
+                        Toast.makeText(this, R.string.label_nid_enrolled_successfully, Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                    if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
+                        DocumentHolder.setData(mNationalIDData, BIDDocumentProvider.BIDDocumentType.nationalID, null);
+                        Intent intent = new Intent(this, LiveIDScanningActivity.class);
+                        intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(intent);
+                        finish();
+                        return;
+                    }
 
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-                finish();
-            };
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-        });
+                    ErrorDialog errorDialog = new ErrorDialog(this);
+                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                        errorDialog.dismiss();
+                        finish();
+                    };
+                    if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        errorDialog.showNoInternetDialog(onDismissListener);
+                        return;
+                    }
+                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                });
     }
 
     private void startFirstSideScan() {
