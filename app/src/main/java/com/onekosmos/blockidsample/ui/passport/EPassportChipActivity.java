@@ -19,6 +19,8 @@ import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListe
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -26,11 +28,12 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.getDocumentMap;
+import static com.blockid.sdk.document.RegisterDocType.PPT;
 
 /**
  * Created by 1Kosmos Engineering
@@ -165,8 +168,14 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (mPassportData != null) {
-            BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(mPassportData,identity_document), BIDDocumentProvider.BIDDocumentType.passport,
-                    "", (status, error) -> {
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            LinkedHashMap<String, Object> passportMap = gson.fromJson(gson.toJson(mPassportData), new TypeToken<LinkedHashMap<String, Object>>() {
+            }.getType());
+            passportMap.put("category", identity_document.name());
+            passportMap.put("type", PPT.getValue());
+            passportMap.put("id", mPassportData.id);
+            BlockIDSDK.getInstance().registerDocument(this, passportMap, BIDDocumentProvider.BIDDocumentType.passport,
+                    null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             PassportDataHolder.clearData();
@@ -179,7 +188,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, "");
+                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

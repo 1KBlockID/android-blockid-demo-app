@@ -124,9 +124,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
             i.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authRequestModel));
             setResult(RESULT_OK, i);
             this.finish();
-
         } catch (Exception e) {
-            e.printStackTrace();
             mProgressBar.setVisibility(View.GONE);
             errorDialog.show(null,
                     getString(R.string.label_invalid_code),

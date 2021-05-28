@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.liveID;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,6 +22,9 @@ import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -31,12 +35,6 @@ import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_CATEGORY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_FACE;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_ID;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_PROOFEDBY;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.K_TYPE;
-import static com.onekosmos.blockidsample.document.DocumentMapUtil.getDocumentMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -114,13 +112,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             showFaceFocusedViews();
             mLayoutMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(getMessgeForExpression(expression));
+            mTxtMessage.setText(getMessageForExpression(expression));
         } else
             showFaceNotFocusedViews();
     }
 
     @Override
-    public void onLiveIDCaptured(BIDDocumentData liveIDData, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, ErrorManager.ErrorResponse error) {
         mTxtMessage.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.GONE);
         mLiveIDScannerHelper.stopLiveIDScanning();
@@ -133,7 +131,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (liveIDData == null) {
+        if (liveIDBitmap == null) {
             errorDialog.show(null,
                     getString(R.string.label_error),
                     error.getMessage(), dialog -> {
@@ -143,10 +141,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             return;
         }
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
-            registerLiveIDWithDocument(liveIDData);
+            registerLiveIDWithDocument(liveIDBitmap);
             return;
         }
-        registerLiveID(liveIDData);
+        registerLiveID(liveIDBitmap);
     }
 
     private void initViews() {
@@ -180,7 +178,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc1));
     }
 
-    private String getMessgeForExpression(String expression) {
+    private String getMessageForExpression(String expression) {
         switch (expression) {
             case "Blink":
                 return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
@@ -190,10 +188,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         return "";
     }
 
-    private void registerLiveID(BIDDocumentData liveIDData) {
+    private void registerLiveID(Bitmap livIdBitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(createLiveIDMap(liveIDData), "", (status, msg, error) -> {
+        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
@@ -216,13 +214,21 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         });
     }
 
-    private void registerLiveIDWithDocument(BIDDocumentData livIDData) {
+    private void registerLiveIDWithDocument(Bitmap livIdBitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BIDDocumentData documentData = DocumentHolder.getData();
         BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
-        BlockIDSDK.getInstance().registerDocument(this, getDocumentMap(documentData, identity_document),
-                createLiveIDMap(livIDData), type, "", "", (status, error) -> {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        LinkedHashMap<String, Object> documentMap = gson.fromJson(gson.toJson(documentData), new TypeToken<LinkedHashMap<String, Object>>() {
+        }.getType());
+
+        documentMap.put("category", identity_document.name());
+        documentMap.put("type", documentData.type);
+        documentMap.put("id", documentData.id);
+
+        BlockIDSDK.getInstance().registerDocument(this, documentMap,
+                livIdBitmap, null, type, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
@@ -245,15 +251,5 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     }
                     errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
                 });
-    }
-
-    public static LinkedHashMap<String, Object> createLiveIDMap(BIDDocumentData documentData) {
-        LinkedHashMap<String, Object> dlMap = new LinkedHashMap<String, Object>();
-        dlMap.put(K_ID, documentData.id);
-        dlMap.put(K_TYPE, documentData.type);
-        dlMap.put(K_CATEGORY, documentData.category);
-        dlMap.put(K_PROOFEDBY, documentData.proofedBy);
-        dlMap.put(K_FACE, documentData.face);
-        return dlMap;
     }
 }
