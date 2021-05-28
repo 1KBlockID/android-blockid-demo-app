@@ -107,7 +107,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
         DLScannerHelper.getInstance().setBackButtonColorHex(blackColor);
         DLScannerHelper.getInstance().setTitleColorHex(blackColor);
         DLScannerHelper.getInstance().setErrorDialogButtonColorHex(blackColor);
-        DLScannerHelper.getInstance().setmErrorDialogMessageColor2(blackColor);
+        DLScannerHelper.getInstance().setErrorDialogMessageColor2(blackColor);
         Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, K_DL_EXPIRY_GRACE_DAYS, this);
         startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
     }
