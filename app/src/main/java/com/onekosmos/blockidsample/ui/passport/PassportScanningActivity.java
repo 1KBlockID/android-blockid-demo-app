@@ -180,7 +180,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
             passportMap.put("type", PPT.getValue());
             passportMap.put("id", mPassportData.id);
             BlockIDSDK.getInstance().registerDocument(this, passportMap, BIDDocumentProvider.BIDDocumentType.passport,
-                    "", (status, error) -> {
+                    null, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
@@ -190,7 +190,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
                         }
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, "");
+                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.liveID;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,7 +22,8 @@ import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.blockid.sdk.datamodel.BIDDocumentData;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -33,7 +35,6 @@ import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.LIVE_ID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -111,13 +112,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             showFaceFocusedViews();
             mLayoutMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(getMessgeForExpression(expression));
+            mTxtMessage.setText(getMessageForExpression(expression));
         } else
             showFaceNotFocusedViews();
     }
 
     @Override
-    public void onLiveIDCaptured(BIDDocumentData liveIDData, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, ErrorManager.ErrorResponse error) {
         mTxtMessage.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.GONE);
         mLiveIDScannerHelper.stopLiveIDScanning();
@@ -130,7 +131,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (liveIDData == null) {
+        if (liveIDBitmap == null) {
             errorDialog.show(null,
                     getString(R.string.label_error),
                     error.getMessage(), dialog -> {
@@ -140,10 +141,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             return;
         }
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
-            registerLiveIDWithDocument(liveIDData);
+            registerLiveIDWithDocument(liveIDBitmap);
             return;
         }
-        registerLiveID(liveIDData);
+        registerLiveID(liveIDBitmap);
     }
 
     private void initViews() {
@@ -177,7 +178,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc1));
     }
 
-    private String getMessgeForExpression(String expression) {
+    private String getMessageForExpression(String expression) {
         switch (expression) {
             case "Blink":
                 return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
@@ -187,16 +188,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         return "";
     }
 
-    private void registerLiveID(BIDDocumentData liveIDData) {
+    private void registerLiveID(Bitmap livIdBitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        LinkedHashMap<String, Object> liveIDMap = gson.fromJson(gson.toJson(liveIDData), new TypeToken<LinkedHashMap<String, Object>>() {
-        }.getType());
-        liveIDMap.put("category", identity_document.name());
-        liveIDMap.put("type", LIVE_ID.getValue());
-        liveIDMap.put("id", liveIDData.id);
-        BlockIDSDK.getInstance().setLiveID(liveIDMap, "", (status, msg, error) -> {
+        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
@@ -219,18 +214,12 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         });
     }
 
-    private void registerLiveIDWithDocument(BIDDocumentData livIDData) {
+    private void registerLiveIDWithDocument(Bitmap livIdBitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BIDDocumentData documentData = DocumentHolder.getData();
         BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        LinkedHashMap<String, Object> liveIDMap = gson.fromJson(gson.toJson(livIDData), new TypeToken<LinkedHashMap<String, Object>>() {
-        }.getType());
-        liveIDMap.put("category", identity_document.name());
-        liveIDMap.put("type", LIVE_ID.getValue());
-        liveIDMap.put("id", livIDData.id);
-
         LinkedHashMap<String, Object> documentMap = gson.fromJson(gson.toJson(documentData), new TypeToken<LinkedHashMap<String, Object>>() {
         }.getType());
 
@@ -239,7 +228,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         documentMap.put("id", documentData.id);
 
         BlockIDSDK.getInstance().registerDocument(this, documentMap,
-                liveIDMap, type, "", "", (status, error) -> {
+                livIdBitmap, null, type, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
