@@ -17,10 +17,7 @@ import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
-import com.blockid.sdk.datamodel.BIDPassport;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -45,7 +42,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     private AppCompatButton mBtnScan, mBtnCancel;
     private ConstraintLayout mLayoutNFC, mLayoutScanRFId;
     private PassportScannerHelper mPassportScannerHelper;
-    private BIDPassport mPassportData;
+    private LinkedHashMap<String, Object> mPassportMap;
     private String mSigToken;
     private boolean mIsRegInProgress;
 
@@ -54,7 +51,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e_passport_chip_scan);
         mPassportScannerHelper = new PassportScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
-        mPassportData = PassportDataHolder.getData();
+        mPassportMap = PassportDataHolder.getData();
         mSigToken = PassportDataHolder.getToken();
         initView();
     }
@@ -70,7 +67,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
-                mPassportScannerHelper.startRFIDScanning(mPassportData, mSigToken);
+                mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                 break;
             case R.id.txt_skip:
             case R.id.btn_cancel:
@@ -130,10 +127,10 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     }
 
     @Override
-    public void onPassportResponse(BIDPassport bidPassport, String s, ErrorManager.ErrorResponse error) {
+    public void onPassportResponse(LinkedHashMap<String, Object> passportMap, String s, ErrorManager.ErrorResponse error) {
         mPassportScannerHelper.stopRFIDScanning();
-        if (bidPassport != null) {
-            mPassportData = bidPassport;
+        if (passportMap != null) {
+            mPassportMap = passportMap;
             registerPassport();
             return;
         }
@@ -149,7 +146,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                     getString(R.string.label_scan_again),
                     dialog -> {
                         errorDialog.dismiss();
-                        mPassportScannerHelper.startRFIDScanning(mPassportData, mSigToken);
+                        mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                     });
             return;
         }
@@ -167,14 +164,11 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mPassportScannerHelper.stopRFIDScanning();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        if (mPassportData != null) {
-            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-            LinkedHashMap<String, Object> passportMap = gson.fromJson(gson.toJson(mPassportData), new TypeToken<LinkedHashMap<String, Object>>() {
-            }.getType());
-            passportMap.put("category", identity_document.name());
-            passportMap.put("type", PPT.getValue());
-            passportMap.put("id", mPassportData.id);
-            BlockIDSDK.getInstance().registerDocument(this, passportMap, BIDDocumentProvider.BIDDocumentType.passport,
+        if (mPassportMap != null) {
+            mPassportMap.put("category", identity_document.name());
+            mPassportMap.put("type", PPT.getValue());
+            mPassportMap.put("id", mPassportMap.get("id"));
+            BlockIDSDK.getInstance().registerDocument(this, mPassportMap, BIDDocumentProvider.BIDDocumentType.passport,
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
@@ -188,7 +182,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportData, BIDDocumentProvider.BIDDocumentType.passport, null);
+                            DocumentHolder.setData(mPassportMap, BIDDocumentProvider.BIDDocumentType.passport, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

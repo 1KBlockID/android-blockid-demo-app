@@ -20,11 +20,7 @@ import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
-import com.blockid.sdk.datamodel.BIDNationalID;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -52,8 +48,8 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
     private int mScannerOverlayMargin = 30;
-    private BIDNationalID mNationalIDData;
-    private String mSigToken, mNationalIDFirstSideData;
+    private LinkedHashMap<String, Object> mNationalIDMap, mNationalIDFirstSideData;
+    private String mSigToken;
     private NationalIDScanOrder mNationalIDScanOrder;
     private boolean isRegistrationInProgress;
 
@@ -70,16 +66,16 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
         else {
-            if (NationalIDTempData.getInstance().getNationalIDFirstSideDataB64() == null)
+            if (NationalIDTempData.getInstance().getNationalIDFirstSideData() == null)
                 startFirstSideScan();
 
-            if (NationalIDTempData.getInstance().getNationalIDFirstSideDataB64() != null && NationalIDTempData.getInstance().getmSignatureToken() != null) {
-                mNationalIDFirstSideData = NationalIDTempData.getInstance().getNationalIDFirstSideDataB64();
+            if (NationalIDTempData.getInstance().getNationalIDFirstSideData() != null && NationalIDTempData.getInstance().getmSignatureToken() != null) {
+                mNationalIDFirstSideData = NationalIDTempData.getInstance().getNationalIDFirstSideData();
                 mSigToken = NationalIDTempData.getInstance().getmSignatureToken();
                 NationalIDTempData.getInstance().clearNationalIDData();
-
-                mNationalIDData = new Gson().fromJson(mNationalIDFirstSideData, BIDNationalID.class);
-                mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE, mNationalIDData, mSigToken,
+                mNationalIDMap = mNationalIDFirstSideData;
+                mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
+                        mNationalIDMap, mSigToken,
                         mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
                 mNationalIdScannerHelper.startNationalIDScanning();
             }
@@ -135,11 +131,11 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onNationalIDScanResponse(BIDNationalID bidNationalID, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onNationalIDScanResponse(LinkedHashMap<String, Object> nationalIdMap, String signatureToken, ErrorManager.ErrorResponse error) {
         stopScan();
 
-        if (bidNationalID != null) {
-            mNationalIDData = bidNationalID;
+        if (nationalIdMap != null) {
+            mNationalIDMap = nationalIdMap;
             mSigToken = signatureToken;
             registerNationalID();
             return;
@@ -161,8 +157,8 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onFirstSideScanResponse(BIDNationalID bidNationalID, String signatureToken, ErrorManager.ErrorResponse error) {
-        NationalIDTempData.getInstance().setNationalIDFirstSideDataB64(new Gson().toJson(bidNationalID));
+    public void onFirstSideScanResponse(LinkedHashMap<String, Object> nationalIdMap, String signatureToken, ErrorManager.ErrorResponse error) {
+        NationalIDTempData.getInstance().setNationalIDFirstSideData(nationalIdMap);
         NationalIDTempData.getInstance().setmSignatureToken(signatureToken);
         Intent intent = new Intent(this, NationalIDScanActivity.class);
         startActivity(intent);
@@ -202,13 +198,10 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mLayoutMessage.setVisibility(View.GONE);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        LinkedHashMap<String, Object> nationalIDMap = gson.fromJson(gson.toJson(mNationalIDData), new TypeToken<LinkedHashMap<String, Object>>() {
-        }.getType());
-        nationalIDMap.put("category", identity_document.name());
-        nationalIDMap.put("type", NATIONAL_ID.getValue());
-        nationalIDMap.put("id", mNationalIDData.id);
-        BlockIDSDK.getInstance().registerDocument(this, nationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null,
+        mNationalIDMap.put("category", identity_document.name());
+        mNationalIDMap.put("type", NATIONAL_ID.getValue());
+        mNationalIDMap.put("id", mNationalIDMap.get("id"));
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
@@ -218,7 +211,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                         return;
                     }
                     if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                        DocumentHolder.setData(mNationalIDData, BIDDocumentProvider.BIDDocumentType.nationalID, null);
+                        DocumentHolder.setData(mNationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null);
                         Intent intent = new Intent(this, LiveIDScanningActivity.class);
                         intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

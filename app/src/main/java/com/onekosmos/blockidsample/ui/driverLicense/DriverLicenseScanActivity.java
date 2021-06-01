@@ -16,10 +16,7 @@ import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
 import com.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
 import com.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
-import com.blockid.sdk.datamodel.BIDDriverLicense;
 import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -42,7 +39,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     public static final int K_DL_SCAN_REQUEST_CODE = 1011;
-    private BIDDriverLicense mDriverLicense;
+    private LinkedHashMap<String, Object> mDriverLicense;
     private String token;
 
     @Override
@@ -73,8 +70,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     }
 
     @Override
-    public void onDriverLicenseResponse(BIDDriverLicense bidDriverLicense, String signatureToken, ErrorManager.ErrorResponse errorResponse) {
-        if (bidDriverLicense == null) {
+    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap, String signatureToken, ErrorManager.ErrorResponse errorResponse) {
+        if (driverLicenseMap == null) {
             if (errorResponse.getCode() != ErrorManager.CustomErrors.K_DL_SCAN_CANCEL.getCode()) {
                 ErrorDialog errorDialog = new ErrorDialog(this);
                 errorDialog.show(null,
@@ -86,7 +83,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
             }
             return;
         }
-        mDriverLicense = bidDriverLicense;
+        mDriverLicense = driverLicenseMap;
         token = signatureToken;
     }
 
@@ -112,16 +109,13 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
         startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
     }
 
-    private void registerDL(BIDDriverLicense documentData) {
+    private void registerDL(LinkedHashMap<String, Object> dlMap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        if (documentData != null) {
-            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-            LinkedHashMap<String, Object> dlMap = gson.fromJson(gson.toJson(documentData), new TypeToken<LinkedHashMap<String, Object>>() {
-            }.getType());
+        if (dlMap != null) {
             dlMap.put("category", identity_document.name());
             dlMap.put("type", DL.getValue());
-            dlMap.put("id", documentData.id);
+            dlMap.put("id", dlMap.get("id"));
 
             BlockIDSDK.getInstance().registerDocument(this, dlMap, BIDDocumentProvider.BIDDocumentType.driverLicense,
                     null, (status, error) -> {
@@ -136,7 +130,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(documentData, BIDDocumentProvider.BIDDocumentType.driverLicense, null);
+                            DocumentHolder.setData(dlMap, BIDDocumentProvider.BIDDocumentType.driverLicense, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
