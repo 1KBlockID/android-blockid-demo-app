@@ -20,7 +20,6 @@ import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
-import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -201,7 +200,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mNationalIDMap.put("category", identity_document.name());
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null,
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
@@ -211,7 +210,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                         return;
                     }
                     if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                        DocumentHolder.setData(mNationalIDMap, BIDDocumentProvider.BIDDocumentType.nationalID, null);
+                        DocumentHolder.setData(mNationalIDMap, null);
                         Intent intent = new Intent(this, LiveIDScanningActivity.class);
                         intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

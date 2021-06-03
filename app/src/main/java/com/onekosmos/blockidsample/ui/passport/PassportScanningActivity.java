@@ -22,7 +22,6 @@ import com.blockid.sdk.cameramodule.BIDScannerView;
 import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
 import com.blockid.sdk.cameramodule.passport.PassportScannerHelper;
-import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -173,7 +172,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
-            BlockIDSDK.getInstance().registerDocument(this, mPassportMap, BIDDocumentProvider.BIDDocumentType.passport,
+            BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
@@ -184,7 +183,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
                         }
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, BIDDocumentProvider.BIDDocumentType.passport, null);
+                            DocumentHolder.setData(mPassportMap, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

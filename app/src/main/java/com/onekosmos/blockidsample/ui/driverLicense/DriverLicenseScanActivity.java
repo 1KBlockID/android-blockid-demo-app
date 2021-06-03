@@ -16,7 +16,6 @@ import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
 import com.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
 import com.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
-import com.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -106,7 +105,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
         DLScannerHelper.getInstance().setErrorDialogButtonColorHex(blackColor);
         DLScannerHelper.getInstance().setErrorDialogMessageColor2(blackColor);
         Intent intent = DLScannerHelper.getInstance().getDLScanIntent(this, K_DL_EXPIRY_GRACE_DAYS, this);
-        startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
+        if (intent != null)
+            startActivityForResult(intent, K_DL_SCAN_REQUEST_CODE);
     }
 
     private void registerDL(LinkedHashMap<String, Object> dlMap) {
@@ -117,7 +117,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
             dlMap.put("type", DL.getValue());
             dlMap.put("id", dlMap.get("id"));
 
-            BlockIDSDK.getInstance().registerDocument(this, dlMap, BIDDocumentProvider.BIDDocumentType.driverLicense,
+            BlockIDSDK.getInstance().registerDocument(this, dlMap,
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
@@ -130,7 +130,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(dlMap, BIDDocumentProvider.BIDDocumentType.driverLicense, null);
+                            DocumentHolder.setData(dlMap, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
