@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -33,8 +34,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 /**
  * Created by 1Kosmos Engineering
@@ -228,12 +227,13 @@ public class AuthenticatorActivity extends AppCompatActivity {
             finish();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        error.getMessage(), dialog -> {
-                            finish();
-                        });
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+                finish();
+            };
+            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
             } else {
                 String message = error.getMessage();
                 if (message == null) {
@@ -241,9 +241,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 }
                 errorDialog.show(null,
                         getString(R.string.label_error),
-                        message, dialog -> {
-                            finish();
-                        });
+                        message, onDismissListener);
             }
         }
     }

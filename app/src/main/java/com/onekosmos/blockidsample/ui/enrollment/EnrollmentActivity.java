@@ -199,7 +199,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
-                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.driverLicense);
+                            removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
                         }
@@ -227,7 +227,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(count - 1), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
-                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.passport);
+                            removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
                         }
@@ -255,7 +255,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
-                            removeDocument(removeDLMap, BIDDocumentProvider.BIDDocumentType.nationalID);
+                            removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
                         }
@@ -267,10 +267,10 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         startActivity(intent);
     }
 
-    private void removeDocument(LinkedHashMap<String, Object> removeDocMap, BIDDocumentProvider.BIDDocumentType documentType) {
+    private void removeDocument(LinkedHashMap<String, Object> removeDocMap) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.show();
-        BlockIDSDK.getInstance().unRegisterDocument(this, documentType, removeDocMap, (status, error) -> {
+        BlockIDSDK.getInstance().unRegisterDocument(this, removeDocMap, (status, error) -> {
             dialog.dismiss();
             if (status) {
                 refreshEnrollmentRecyclerView();

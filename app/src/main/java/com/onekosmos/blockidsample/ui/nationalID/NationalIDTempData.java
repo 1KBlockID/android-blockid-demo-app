@@ -1,11 +1,13 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
+import java.util.LinkedHashMap;
+
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class NationalIDTempData {
-    private String mNationalIDFirstSideDataB64;
+    private LinkedHashMap<String,Object> mNationalIDFirstSideDataB64;
     private String mSignatureToken;
 
     private static final NationalIDTempData ourInstance = new NationalIDTempData();
@@ -17,11 +19,11 @@ public class NationalIDTempData {
     private NationalIDTempData() {
     }
 
-    public void setNationalIDFirstSideDataB64(String editValue) {
+    public void setNationalIDFirstSideData(LinkedHashMap<String,Object> editValue) {
         this.mNationalIDFirstSideDataB64 = editValue;
     }
 
-    public String getNationalIDFirstSideDataB64() {
+    public LinkedHashMap<String,Object> getNationalIDFirstSideData() {
         return mNationalIDFirstSideDataB64;
     }
 

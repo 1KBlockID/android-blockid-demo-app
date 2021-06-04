@@ -1,6 +1,6 @@
 package com.onekosmos.blockidsample.ui.passport;
 
-import com.blockid.sdk.datamodel.BIDPassport;
+import java.util.LinkedHashMap;
 
 /**
  * Created by 1Kosmos Engineering
@@ -8,20 +8,20 @@ import com.blockid.sdk.datamodel.BIDPassport;
  */
 enum PassportDataHolder {
     INSTANCE;
-    private BIDPassport passportData;
+    private LinkedHashMap<String, Object> passportMap;
     private String token;
 
     public static boolean hasData() {
-        return INSTANCE.passportData != null;
+        return INSTANCE.passportMap != null;
     }
 
-    public static void setData(final BIDPassport bidDocumentData, final String token) {
-        INSTANCE.passportData = bidDocumentData;
+    public static void setData(final LinkedHashMap<String, Object> passportMap, final String token) {
+        INSTANCE.passportMap = passportMap;
         INSTANCE.token = token;
     }
 
-    public static BIDPassport getData() {
-        return INSTANCE.passportData;
+    public static LinkedHashMap<String, Object> getData() {
+        return INSTANCE.passportMap;
     }
 
     public static String getToken() {
@@ -29,7 +29,7 @@ enum PassportDataHolder {
     }
 
     public static void clearData() {
-        INSTANCE.passportData = null;
+        INSTANCE.passportMap = null;
         INSTANCE.token = null;
     }
 }
