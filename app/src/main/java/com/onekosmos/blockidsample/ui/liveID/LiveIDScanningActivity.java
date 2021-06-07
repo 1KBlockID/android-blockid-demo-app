@@ -20,11 +20,6 @@ import com.blockid.sdk.cameramodule.BIDScannerView;
 import com.blockid.sdk.cameramodule.ScanningMode;
 import com.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
-import com.blockid.sdk.datamodel.BIDDocumentData;
-import com.blockid.sdk.document.BIDDocumentProvider;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -217,18 +212,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private void registerLiveIDWithDocument(Bitmap livIdBitmap) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BIDDocumentData documentData = DocumentHolder.getData();
-        BIDDocumentProvider.BIDDocumentType type = DocumentHolder.getType();
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        LinkedHashMap<String, Object> documentMap = gson.fromJson(gson.toJson(documentData), new TypeToken<LinkedHashMap<String, Object>>() {
-        }.getType());
-
+        LinkedHashMap<String, Object> documentMap = DocumentHolder.getData();
         documentMap.put("category", identity_document.name());
-        documentMap.put("type", documentData.type);
-        documentMap.put("id", documentData.id);
+        documentMap.put("type", documentMap.get("type"));
+        documentMap.put("id", documentMap.get("id"));
 
         BlockIDSDK.getInstance().registerDocument(this, documentMap,
-                livIdBitmap, null, type, null, null, (status, error) -> {
+                livIdBitmap, null, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
