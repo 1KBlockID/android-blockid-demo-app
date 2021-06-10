@@ -2,11 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.blockid.blockidsample"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0.0" + "." + getCurrentTimestampHexValue()
@@ -108,4 +107,8 @@ dependencies {
 
     //for json array filters
     implementation 'com.annimon:stream:1.2.2'
+
+    //for dl scaning
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
 }
