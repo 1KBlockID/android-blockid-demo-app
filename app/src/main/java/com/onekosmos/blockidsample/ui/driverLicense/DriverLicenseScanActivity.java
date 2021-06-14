@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,8 @@ import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -110,6 +113,9 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     }
 
     private void registerDL(LinkedHashMap<String, Object> dlMap) {
+        if(dlMap != null){
+            Log.e("dl","===" + dlMap.get("barcodeInfo"));
+        }
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (dlMap != null) {
