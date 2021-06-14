@@ -114,7 +114,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
 
     private void registerDL(LinkedHashMap<String, Object> dlMap) {
         if(dlMap != null){
-            Log.d("Driver Barcode","===" + dlMap.get("barcodeInfo"));
+            Log.d("Driver City","===>" + dlMap.get("city"));
         }
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
