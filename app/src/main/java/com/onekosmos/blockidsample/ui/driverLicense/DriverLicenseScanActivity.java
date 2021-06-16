@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
 import com.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
@@ -23,8 +23,6 @@ import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-
-import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -42,6 +40,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     public static final int K_DL_SCAN_REQUEST_CODE = 1011;
     private LinkedHashMap<String, Object> mDriverLicense;
+    private ErrorResponse mErrorResponse;
     private String token;
 
     @Override
@@ -74,15 +73,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     @Override
     public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap, String signatureToken, ErrorManager.ErrorResponse errorResponse) {
         if (driverLicenseMap == null) {
-            if (errorResponse.getCode() != ErrorManager.CustomErrors.K_DL_SCAN_CANCEL.getCode()) {
-                ErrorDialog errorDialog = new ErrorDialog(this);
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        errorResponse.getMessage(), dialog -> {
-                            errorDialog.dismiss();
-                            finish();
-                        });
-            }
+            mErrorResponse = errorResponse;
             return;
         }
         mDriverLicense = driverLicenseMap;
@@ -93,10 +84,26 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == K_DL_SCAN_REQUEST_CODE) {
-            if (resultCode == RESULT_OK)
+            if (mDriverLicense != null) {
                 registerDL(mDriverLicense);
-            else
-                finish();
+                return;
+            }
+
+            if (mErrorResponse != null) {
+                if (mErrorResponse.getCode() == ErrorManager.CustomErrors.K_DL_SCAN_CANCEL.getCode()) {
+                    finish();
+                    return;
+                }
+
+                ErrorDialog errorDialog = new ErrorDialog(this);
+                errorDialog.show(null,
+                        getString(R.string.label_error),
+                        mErrorResponse.getMessage(), dialog -> {
+                            errorDialog.dismiss();
+                            finish();
+                        });
+
+            }
         }
     }
 
@@ -113,9 +120,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     }
 
     private void registerDL(LinkedHashMap<String, Object> dlMap) {
-        if(dlMap != null){
-            Log.d("Driver City","===>" + dlMap.get("city"));
-        }
+        if (dlMap == null)
+            return;
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (dlMap != null) {
