@@ -102,7 +102,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
                             errorDialog.dismiss();
                             finish();
                         });
-
             }
         }
     }
