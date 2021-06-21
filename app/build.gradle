@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.blockid.blockidsample"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0.0" + "." + getCurrentTimestampHexValue()
@@ -108,4 +108,7 @@ dependencies {
 
     //for json array filters
     implementation 'com.annimon:stream:1.2.2'
+
+    //driver license scan
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
 }
