@@ -199,22 +199,24 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
+    // authenticate user with scope
     private void callAuthenticateService(String userID, AuthRequestModel authRequestModel, double lat, double lon) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(userID, authRequestModel.session, authRequestModel.scopes, authRequestModel.creds,
-                authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, error) -> {
+                authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
                 });
     }
 
+    // authenticate user with pre-set data
     private void callAuthenticateService(String userID, AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(userID, authRequestModel.session, dataObject, authRequestModel.creds,
-                authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, error) -> {
+                authRequestModel.getOrigin(), String.valueOf(lat), String.valueOf(lon), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
