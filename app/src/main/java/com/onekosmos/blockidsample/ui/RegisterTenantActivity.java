@@ -11,10 +11,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.onekosmos.blockidsample.R;
+import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -82,15 +84,22 @@ public class RegisterTenantActivity extends AppCompatActivity {
             String desc = getResources().getString(R.string.label_biometric_auth_enroll);
             BIDAuthProvider
                     .getInstance()
-                    .enrollDeviceAuth(this, title, desc, false, (success, errorResponse) -> {
-                        if (success) {
-                            Toast.makeText(this, R.string.label_device_auth_enrolled, Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(this, EnrollmentActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                    .enrollDeviceAuth(this, title, desc, false, new IBiometricResponseListener() {
+                        @Override
+                        public void onBiometricAuthResult(boolean success, ErrorResponse errorResponse) {
+                            if (success) {
+                                Toast.makeText(RegisterTenantActivity.this, R.string.label_device_auth_enrolled, Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(RegisterTenantActivity.this, EnrollmentActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(RegisterTenantActivity.this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onNonBiometricAuth(boolean b) {
+                            // do nothing
                         }
                     });
         }

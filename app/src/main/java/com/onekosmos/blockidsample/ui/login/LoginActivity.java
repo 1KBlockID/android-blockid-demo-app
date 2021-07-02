@@ -8,8 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
+import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 
@@ -54,9 +56,17 @@ public class LoginActivity extends AppCompatActivity {
         if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
             String title = getResources().getString(R.string.label_biometric_auth);
             String desc = getResources().getString(R.string.label_biometric_auth_req);
-            BIDAuthProvider.getInstance().verifyDeviceAuth(this, title, desc, false, (status, errorResponse) -> {
-                if (status)
-                    onLoginSuccess();
+            BIDAuthProvider.getInstance().verifyDeviceAuth(this, title, desc, false, new IBiometricResponseListener() {
+                @Override
+                public void onBiometricAuthResult(boolean status, ErrorResponse errorResponse) {
+                    if (status)
+                        onLoginSuccess();
+                }
+
+                @Override
+                public void onNonBiometricAuth(boolean b) {
+                    // do nothing
+                }
             });
         }
     }
