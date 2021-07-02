@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.blockid.sdk.BlockIDSDK;
 import com.blockid.sdk.authentication.BIDAuthProvider;
+import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.blockid.sdk.document.BIDDocumentProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -130,12 +132,20 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             String desc = getResources().getString(R.string.label_biometric_auth_enroll);
             BIDAuthProvider
                     .getInstance()
-                    .enrollDeviceAuth(this, title, desc, false, (success, errorResponse) -> {
-                        if (success) {
-                            refreshEnrollmentRecyclerView();
-                            Toast.makeText(this, R.string.label_device_auth_enrolled, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                    .enrollDeviceAuth(this, title, desc, false, new IBiometricResponseListener() {
+                        @Override
+                        public void onBiometricAuthResult(boolean success, ErrorResponse errorResponse) {
+                            if (success) {
+                                refreshEnrollmentRecyclerView();
+                                Toast.makeText(EnrollmentActivity.this, R.string.label_device_auth_enrolled, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(EnrollmentActivity.this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onNonBiometricAuth(boolean b) {
+                            // do nothing
                         }
                     });
         }
