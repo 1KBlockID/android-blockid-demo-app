@@ -18,7 +18,9 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'http://www.baka.sk/maven2' }
-
+        maven {
+            url 'https://www.myget.org/F/idscan-public/maven/'
+        }
     }
 }
 
