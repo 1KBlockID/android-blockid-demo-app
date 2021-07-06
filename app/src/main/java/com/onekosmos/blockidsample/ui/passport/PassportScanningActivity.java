@@ -139,7 +139,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private void initView() {
         mBIDScannerView = findViewById(R.id.view_bid_scanner);
         mScannerOverlay = findViewById(R.id.view_overlay);
-//        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, null);
 
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             mBIDScannerView.setVisibility(View.VISIBLE);

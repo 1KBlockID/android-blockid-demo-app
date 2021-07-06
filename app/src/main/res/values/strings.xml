@@ -79,4 +79,5 @@
     <string name="label_verify_pin_id">Verify PIN</string>
     <string name="label_enter_your_pin">Enter your PIN</string>
     <string name="label_enter_preset_qr_data">Enter preset qr data</string>
+    <string name="label_scan_back">Scan Back</string>
 </resources>
