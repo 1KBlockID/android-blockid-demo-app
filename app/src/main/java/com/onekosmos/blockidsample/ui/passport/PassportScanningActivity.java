@@ -48,7 +48,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
     private PassportScannerHelper mPassportScannerHelper;
-    private int mScannerOverlayMargin = 30;
     private LinkedHashMap<String, Object> mPassportMap;
     private String mSigToken;
     private boolean isDeviceHasNfc, isRegistrationInProgress;

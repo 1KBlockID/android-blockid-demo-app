@@ -28,11 +28,11 @@
         app:layout_constraintTop_toTopOf="@id/img_back" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
         android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_20dp"
-        android:text="@string/label_scan_passport"
+        android:text="@string/label_enroll_passport"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_28sp"
         app:layout_constraintBottom_toBottomOf="@id/txt_back"
@@ -45,8 +45,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_55dp"
         android:layout_marginBottom="@dimen/dimen_15dp"
-        android:text="@string/label_scan_front"
+        android:text="@string/label_scan_passport"
         android:textAlignment="center"
+        android:textColor="@color/black"
         android:textSize="@dimen/dimen_16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
