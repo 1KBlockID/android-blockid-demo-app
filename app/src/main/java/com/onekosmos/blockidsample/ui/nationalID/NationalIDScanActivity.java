@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 
 import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_BACK_THEN_FRONT;
-import static com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_FRONT_THEN_BACK;
 import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.ScanOrder.BACK_SIDE;
@@ -50,7 +49,6 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
-    private int mScannerOverlayMargin = 30;
     private LinkedHashMap<String, Object> mNationalIDMap, mNationalIDFirstSideData;
     private String mSigToken;
     private NationalIDScanOrder mNationalIDScanOrder = FIRST_BACK_THEN_FRONT;
@@ -104,8 +102,8 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
 
     private void updateScanOrderText(ScanOrder order) {
         if (order == BACK_SIDE)
-            mTxtScanMsg.setText("Scan Back");
-        else mTxtScanMsg.setText("Scan Front");
+            mTxtScanMsg.setText(R.string.label_scan_back);
+        else mTxtScanMsg.setText(R.string.label_scan_front);
     }
 
     @Override
@@ -188,7 +186,6 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private void initView() {
         mBIDScannerView = findViewById(R.id.view_bid_scanner);
         mScannerOverlay = findViewById(R.id.view_overlay);
-        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, null);
 
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
@@ -260,6 +257,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     private void stopScan() {
+        mTxtScanMsg.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scan_complete);

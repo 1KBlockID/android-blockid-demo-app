@@ -48,7 +48,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
     private PassportScannerHelper mPassportScannerHelper;
-    private int mScannerOverlayMargin = 30;
     private LinkedHashMap<String, Object> mPassportMap;
     private String mSigToken;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
@@ -140,7 +139,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private void initView() {
         mBIDScannerView = findViewById(R.id.view_bid_scanner);
         mScannerOverlay = findViewById(R.id.view_overlay);
-        mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, null);
 
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             mBIDScannerView.setVisibility(View.VISIBLE);

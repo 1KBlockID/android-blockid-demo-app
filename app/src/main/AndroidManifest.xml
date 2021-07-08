@@ -61,7 +61,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.passport.PassportScanningActivity"
-            android:screenOrientation="landscape"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.qrAuth.AuthenticatorActivity"
@@ -77,7 +77,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.nationalID.NationalIDScanActivity"
-            android:screenOrientation="landscape"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
