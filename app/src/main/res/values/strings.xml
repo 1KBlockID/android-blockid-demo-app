@@ -28,7 +28,8 @@
     <string name="label_nid_enrolled_successfully">National ID enrolled successfully</string>
     <string name="label_document_enrolled_successfully">Document enrolled successfully</string>
     <string name="label_dl_enrolled_successfully">Driver License enrolled successfully</string>
-    <string name="label_scan_passport">Enroll Passport</string>
+    <string name="label_enroll_passport">Enroll Passport</string>
+    <string name="label_scan_passport">Scan photo page of passport</string>
     <string name="label_passport_camera_permission_alert">Please note that you will not be able to scan any of your documents with BlockID Sample and verify your identity unless you permit access to the camera.</string>
     <string name="label_error_code">Error code:</string>
     <string name="label_passport_fail_to_scan">Passport fail to scan.</string>
@@ -78,4 +79,5 @@
     <string name="label_verify_pin_id">Verify PIN</string>
     <string name="label_enter_your_pin">Enter your PIN</string>
     <string name="label_enter_preset_qr_data">Enter preset qr data</string>
+    <string name="label_scan_back">Scan Back</string>
 </resources>
