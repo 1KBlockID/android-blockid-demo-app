@@ -200,7 +200,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private void callAuthenticateService(AuthRequestModel authRequestModel, double lat, double lon) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(authRequestModel.session, authRequestModel.scopes
+        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, authRequestModel.scopes
                 , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
                 , String.valueOf(lon), BuildConfig.VERSION_NAME
                 , (status, sessionId, error) -> {
@@ -214,7 +214,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private void callAuthenticateService(AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(authRequestModel.session, dataObject
+        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, dataObject
                 , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
                 , String.valueOf(lon), BuildConfig.VERSION_NAME
                 , (status, sessionId, error) -> {
