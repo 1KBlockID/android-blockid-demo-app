@@ -8,10 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
-import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
+import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 
@@ -28,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initView();
+        BlockIDSDK.getInstance().getMnemonic();
     }
 
     @Override

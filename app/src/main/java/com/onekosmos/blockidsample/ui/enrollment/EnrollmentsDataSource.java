@@ -3,8 +3,8 @@ package com.onekosmos.blockidsample.ui.enrollment;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 
 import org.json.JSONArray;
@@ -12,10 +12,10 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
-import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.DL;
-import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 /**
  * Created by 1Kosmos Engineering

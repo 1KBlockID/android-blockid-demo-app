@@ -13,13 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
-import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.cameramodule.BIDScannerView;
-import com.blockid.sdk.cameramodule.ScanningMode;
-import com.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
-import com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
-import com.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
+import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
+import com.onekosmos.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
+import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
+import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -29,10 +29,10 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.LinkedHashMap;
 
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_BACK_THEN_FRONT;
-import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.ScanOrder.BACK_SIDE;
 import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.ScanOrder.FRONT_SIDE;
 

@@ -1,7 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
-import com.blockid.sdk.datamodel.AccountAuthConstants;
-import com.blockid.sdk.datamodel.BIDOrigin;
+import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
+import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 
 /**
  * Created by 1Kosmos Engineering

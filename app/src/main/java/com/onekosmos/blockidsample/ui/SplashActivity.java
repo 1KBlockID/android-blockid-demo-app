@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.login.LoginActivity;
 

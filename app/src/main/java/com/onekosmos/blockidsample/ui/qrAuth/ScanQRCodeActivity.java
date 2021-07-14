@@ -14,10 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.blockid.sdk.cameramodule.BIDScannerView;
-import com.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
-import com.blockid.sdk.cameramodule.ScanningMode;
-import com.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
+import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
+import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
+import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.google.gson.Gson;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
