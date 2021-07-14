@@ -10,18 +10,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
-import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
+import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
-import static com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 /**
  * Created by 1Kosmos Engineering

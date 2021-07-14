@@ -1,6 +1,6 @@
 package com.onekosmos.blockidsample;
 
-import com.blockid.sdk.datamodel.BIDTenant;
+import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 
 /**
  * Created by 1Kosmos Engineering

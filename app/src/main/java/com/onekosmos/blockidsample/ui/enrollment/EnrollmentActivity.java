@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
-import com.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
-import com.blockid.sdk.BlockIDSDK;
-import com.blockid.sdk.authentication.BIDAuthProvider;
-import com.blockid.sdk.authentication.biometric.IBiometricResponseListener;
-import com.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
+import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -40,10 +40,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static com.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.blockid.sdk.document.RegisterDocType.DL;
-import static com.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 
 /**

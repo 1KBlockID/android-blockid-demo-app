@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.blockid.sdk.cameramodule.BIDScannerView
+            <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
                 android:id="@+id/view_bid_scanner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
