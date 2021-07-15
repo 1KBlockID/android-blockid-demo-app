@@ -115,7 +115,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
                     "",
-                    getString(R.string.label_passport_camera_permission_alert), dialog -> {
+                    getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         setResult(RESULT_CANCELED);
                         finish();

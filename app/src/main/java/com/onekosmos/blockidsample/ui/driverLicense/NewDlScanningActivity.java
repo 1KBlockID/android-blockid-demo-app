@@ -1,11 +1,8 @@
-package com.onekosmos.blockidsample.ui.passport;
+package com.onekosmos.blockidsample.ui.driverLicense;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -19,9 +16,10 @@ import androidx.appcompat.widget.AppCompatTextView;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
+import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
+import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DriverLicenseScannerHelper;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
-import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -33,30 +31,31 @@ import java.util.LinkedHashMap;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+
 
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class PassportScanningActivity extends AppCompatActivity implements View.OnClickListener, IPassportResponseListener {
-    private static final int K_PASSPORT_PERMISSION_REQUEST_CODE = 1011;
-    private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
+public class NewDlScanningActivity extends AppCompatActivity implements View.OnClickListener,
+        IDriverLicenseResponseListener {
+    private static final int K_DL_PERMISSION_REQUEST_CODE = 1011;
+    private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private AppCompatImageView mImgBack, mScannerOverlay, mImgSuccess;
-    private AppCompatTextView mTxtBack, mTxtMessage;
+    private AppCompatTextView mTxtBack, mTxtMessage, mTxtScanSide;
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
-    private PassportScannerHelper mPassportScannerHelper;
-    private LinkedHashMap<String, Object> mPassportMap;
+    private DriverLicenseScannerHelper mDriverLicenseScannerHelper;
+    private LinkedHashMap<String, Object> mDriverLicenseMap;
     private String mSigToken;
-    private boolean isDeviceHasNfc, isRegistrationInProgress;
+    private boolean isRegistrationInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passport_scanning);
-        isDeviceHasNfc = isDeviceHasNFC();
         initView();
     }
 
@@ -64,7 +63,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
         else
             startScan();
     }
@@ -104,20 +103,16 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     @Override
     public void onStop() {
         super.onStop();
-        mPassportScannerHelper.stopScanning();
+        mDriverLicenseScannerHelper.stopScanning();
     }
 
     @Override
-    public void onPassportResponse(LinkedHashMap<String, Object> passportMap, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap, String signatureToken, ErrorManager.ErrorResponse error) {
         stopScan();
-        if (passportMap != null) {
-            mPassportMap = passportMap;
+        if (driverLicenseMap != null) {
+            mDriverLicenseMap = driverLicenseMap;
             mSigToken = signatureToken;
-            if (isDeviceHasNfc) {
-                openEPassportChipActivity();
-            } else {
-                registerPassport();
-            }
+            registerDriverLicense();
             return;
         }
 
@@ -136,6 +131,16 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
     }
 
+    @Override
+    public void scanFrontSide() {
+        mTxtScanSide.setText(R.string.label_scan_front);
+    }
+
+    @Override
+    public void scanBackSide() {
+        mTxtScanSide.setText(R.string.label_scan_back);
+    }
+
     private void initView() {
         mBIDScannerView = findViewById(R.id.view_bid_scanner);
         mScannerOverlay = findViewById(R.id.view_overlay);
@@ -152,36 +157,29 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         mImgSuccess = findViewById(R.id.iv_success);
         mTxtMessage = findViewById(R.id.txt_msg);
         mLayoutMessage = findViewById(R.id.layout_msg);
+        mTxtScanSide = findViewById(R.id.tv_info);
     }
 
-    private void openEPassportChipActivity() {
-        PassportDataHolder.setData(mPassportMap, mSigToken);
-        Intent intent = new Intent(this, EPassportChipActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-        finish();
-    }
-
-    private void registerPassport() {
+    private void registerDriverLicense() {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
-        if (mPassportMap != null) {
-            mPassportMap.put("category", identity_document.name());
-            mPassportMap.put("type", PPT.getValue());
-            mPassportMap.put("id", mPassportMap.get("id"));
-            BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
+        if (mDriverLicenseMap != null) {
+            mDriverLicenseMap.put("category", identity_document.name());
+            mDriverLicenseMap.put("type", DL.getValue());
+            mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
+            BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
-                            Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, R.string.label_dl_enrolled_successfully, Toast.LENGTH_LONG).show();
                             finish();
                             return;
                         }
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, null);
+                            DocumentHolder.setData(mDriverLicenseMap, null);
                             Intent intent = new Intent(this, LiveIDScanningActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -207,8 +205,10 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private void startScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mPassportScannerHelper = new PassportScannerHelper(this, ScanningMode.SCAN_LIVE, mBIDScannerView, mScannerOverlay, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
-        mPassportScannerHelper.startPassportScanning();
+        mDriverLicenseScannerHelper = new DriverLicenseScannerHelper(this,
+                ScanningMode.SCAN_LIVE, DLScanningOrder.FIRST_BACK_THEN_FRONT, mBIDScannerView,
+                mScannerOverlay, K_DL_EXPIRY_GRACE_DAYS, this);
+        mDriverLicenseScannerHelper.startScanning();
         mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scanning);
@@ -219,7 +219,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scan_complete);
         mImgSuccess.setVisibility(View.VISIBLE);
-        mPassportScannerHelper.stopScanning();
+        mDriverLicenseScannerHelper.stopScanning();
     }
 
     private void onCancelEnrollment() {
@@ -233,15 +233,9 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
                     errorDialog.dismiss();
                 },
                 dialog -> {
-                    mPassportScannerHelper.stopScanning();
+                    mDriverLicenseScannerHelper.stopScanning();
                     errorDialog.dismiss();
                     finish();
                 });
-    }
-
-    private boolean isDeviceHasNFC() {
-        NfcManager manager = (NfcManager) getSystemService(Context.NFC_SERVICE);
-        NfcAdapter adapter = manager.getDefaultAdapter();
-        return adapter != null;
     }
 }

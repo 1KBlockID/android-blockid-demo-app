@@ -16,7 +16,7 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
 import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
-import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseListener;
+import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -34,7 +34,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class DriverLicenseScanActivity extends AppCompatActivity implements IDriverLicenseListener {
+public class DriverLicenseScanActivity extends AppCompatActivity implements IDriverLicenseResponseListener {
     private static final int K_DL_PERMISSION_REQUEST_CODE = 1012;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
@@ -63,7 +63,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
                     "",
-                    getString(R.string.label_passport_camera_permission_alert), dialog -> {
+                    getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
                     });
@@ -71,13 +71,24 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements IDri
     }
 
     @Override
-    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap, String signatureToken, ErrorManager.ErrorResponse errorResponse) {
+    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap,
+                                        String signatureToken, ErrorManager.ErrorResponse errorResponse) {
         if (driverLicenseMap == null) {
             mErrorResponse = errorResponse;
             return;
         }
         mDriverLicense = driverLicenseMap;
         token = signatureToken;
+    }
+
+    @Override
+    public void scanFrontSide() {
+
+    }
+
+    @Override
+    public void scanBackSide() {
+
     }
 
     @Override
