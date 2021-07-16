@@ -2,7 +2,7 @@ package com.onekosmos.blockidsample;
 
 import android.app.Application;
 
-import com.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
 
 /**
  * Created by 1Kosmos Engineering

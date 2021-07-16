@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollPin.PinView;
 
