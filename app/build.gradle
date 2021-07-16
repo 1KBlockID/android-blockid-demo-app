@@ -5,11 +5,11 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.blockid.blockidsample"
+        applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0.0" + "." + getCurrentTimestampHexValue()
+        versionName "1.4.z.4" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
