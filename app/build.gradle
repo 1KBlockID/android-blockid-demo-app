@@ -111,8 +111,4 @@ dependencies {
 
     //driver license scan
     implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
-
-    //firebase
-    implementation platform('com.google.firebase:firebase-bom:28.2.0')
-    implementation 'com.google.firebase:firebase-analytics'
 }
