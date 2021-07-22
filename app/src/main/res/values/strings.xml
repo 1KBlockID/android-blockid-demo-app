@@ -81,4 +81,14 @@
     <string name="label_enter_your_pin">Enter your PIN</string>
     <string name="label_enter_preset_qr_data">Enter preset qr data</string>
     <string name="label_scan_back">Scan Back</string>
+    <string name="label_back">Back</string>
+    <string name="label_authenticating_please_wait">Authenticating, please wait...</string>
+    <string name="label_scanning">Scanning...</string>
+    <string name="label_scan_complete">Scan complete</string>
+    <string name="cancellation_warning">Cancellation Warning</string>
+    <string name="label_do_you_want_to_cancel_the_registration_process">Do you want to cancel the registration process?</string>
+    <string name="label_scan_front">Scan Front</string>
+    <string name="label_permission_alert">Permission Alert</string>
+    <string name="label_you_have_denied">You have denied the permission, please allow permission</string>
+
 </resources>

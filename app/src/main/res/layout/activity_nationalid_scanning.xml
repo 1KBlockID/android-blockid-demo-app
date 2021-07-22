@@ -95,7 +95,7 @@
                 android:visibility="visible">
 
                 <include
-                    layout="@layout/layout_msg"
+                    layout="@layout/layout_message"
                     android:visibility="visible" />
             </LinearLayout>
         </FrameLayout>
