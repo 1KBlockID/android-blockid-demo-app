@@ -24,7 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
-import com.onekosmos.blockidsample.ui.driverLicense.NewDlScanningActivity;
+import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
@@ -216,7 +216,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     });
             return;
         }
-        Intent intent = new Intent(this, NewDlScanningActivity.class);
+        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
