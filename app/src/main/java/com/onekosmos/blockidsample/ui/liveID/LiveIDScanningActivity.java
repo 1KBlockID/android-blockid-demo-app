@@ -143,7 +143,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void initViews() {
-        mBIDScannerView = findViewById(R.id.view_bid_scanner);
+        mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
         mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
 
@@ -151,8 +151,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mBIDScannerView.setVisibility(View.VISIBLE);
         }
 
-        mTxtMessage = findViewById(R.id.txt_msg);
-        mLayoutMessage = findViewById(R.id.layout_msg);
+        mTxtMessage = findViewById(R.id.txt_message);
+        mLayoutMessage = findViewById(R.id.layout_message);
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(this);
 

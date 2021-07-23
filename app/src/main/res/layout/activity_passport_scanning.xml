@@ -40,7 +40,7 @@
         app:layout_constraintTop_toTopOf="@id/txt_back" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_info"
+        android:id="@+id/txt_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_55dp"
@@ -60,14 +60,14 @@
         android:layout_marginTop="@dimen/dimen_15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_info">
+        app:layout_constraintTop_toBottomOf="@id/txt_info">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
-                android:id="@+id/view_bid_scanner"
+                android:id="@+id/bid_scanner_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -85,7 +85,7 @@
             </FrameLayout>
 
             <LinearLayout
-                android:id="@+id/layout_msg"
+                android:id="@+id/layout_message"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/dimen_10dp"
@@ -94,7 +94,7 @@
                 android:visibility="visible">
 
                 <include
-                    layout="@layout/layout_msg"
+                    layout="@layout/layout_message"
                     android:visibility="visible" />
             </LinearLayout>
         </FrameLayout>

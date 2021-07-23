@@ -19,7 +19,7 @@
             android:layout_height="match_parent">
 
             <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
-                android:id="@+id/view_bid_scanner"
+                android:id="@+id/bid_scanner_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -37,7 +37,7 @@
                     android:visibility="gone" />
 
                 <LinearLayout
-                    android:id="@+id/layout_msg"
+                    android:id="@+id/layout_message"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="@dimen/dimen_20dp"
@@ -52,7 +52,7 @@
                         android:background="@drawable/rounded_white_btn">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/txt_msg"
+                            android:id="@+id/txt_message"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
