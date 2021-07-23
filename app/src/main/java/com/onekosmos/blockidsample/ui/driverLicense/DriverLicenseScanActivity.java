@@ -14,19 +14,11 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
-
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
-
-import static com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScanningOrder.FIRST_FRONT_THEN_BACK;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-
-import com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -35,6 +27,11 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.LinkedHashMap;
+
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 
 /**
@@ -50,7 +47,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtScanSide;
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
-    private DriverLicenseScannerHelper mDriverLicenseScannerHelper;
+    private DLScannerHelper mDriverLicenseScannerHelper;
     private LinkedHashMap<String, Object> mDriverLicenseMap;
     private String mSigToken;
     private boolean isRegistrationInProgress;
@@ -221,8 +218,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         if (!isRegistrationInProgress) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mDriverLicenseScannerHelper = new DriverLicenseScannerHelper(this,
-                    ScanningMode.SCAN_LIVE, FIRST_FRONT_THEN_BACK, mBIDScannerView,
+            mDriverLicenseScannerHelper = new DLScannerHelper(this,
+                    ScanningMode.SCAN_LIVE, FIRST_BACK_THEN_FRONT, mBIDScannerView,
                     mScannerOverlay, K_DL_EXPIRY_GRACE_DAYS, this);
             mDriverLicenseScannerHelper.startScanning();
             mLayoutMessage.setVisibility(View.VISIBLE);
