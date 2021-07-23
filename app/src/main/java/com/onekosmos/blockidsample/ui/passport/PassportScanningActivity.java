@@ -78,7 +78,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
                     "",
-                    getString(R.string.label_passport_camera_permission_alert), dialog -> {
+                    getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
                     });
@@ -137,7 +137,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     }
 
     private void initView() {
-        mBIDScannerView = findViewById(R.id.view_bid_scanner);
+        mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
 
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
@@ -149,9 +149,9 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         mTxtBack = findViewById(R.id.txt_back);
         mTxtBack.setOnClickListener(this);
 
-        mImgSuccess = findViewById(R.id.iv_success);
-        mTxtMessage = findViewById(R.id.txt_msg);
-        mLayoutMessage = findViewById(R.id.layout_msg);
+        mImgSuccess = findViewById(R.id.img_success);
+        mTxtMessage = findViewById(R.id.txt_message);
+        mLayoutMessage = findViewById(R.id.layout_message);
     }
 
     private void openEPassportChipActivity() {

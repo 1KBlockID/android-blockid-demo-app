@@ -9,4 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="misc2">#cd040b</color>
     <color name="misc1">#61b144</color>
+    <color name="primary1">#e9413a</color>
+    <color name="primary2">#cd040b</color>
+    <color name="primary3">#333333</color>
+    <color name="secondary4">#ffffff</color>
 </resources>
