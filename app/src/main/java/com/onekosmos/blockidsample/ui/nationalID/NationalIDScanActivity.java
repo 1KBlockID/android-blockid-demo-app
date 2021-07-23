@@ -201,7 +201,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mTxtScanMsg.setOnClickListener(this);
 
         mImgSuccess = findViewById(R.id.iv_success);
-        mTxtMessage = findViewById(R.id.txt_msg);
+        mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_msg);
     }
 

@@ -52,7 +52,7 @@
                         android:background="@drawable/rounded_white_btn">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/txt_msg"
+                            android:id="@+id/txt_message"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"

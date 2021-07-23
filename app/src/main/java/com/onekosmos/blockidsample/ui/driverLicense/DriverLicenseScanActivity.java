@@ -7,26 +7,34 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DLScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.DLScanner.DLScanningOrder;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
+
+import static com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScanningOrder.FIRST_FRONT_THEN_BACK;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+
+import com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScanningOrder;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
 import java.util.LinkedHashMap;
 
 
@@ -43,7 +51,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtScanSide;
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
-    private DLScannerHelper mDriverLicenseScannerHelper;
+    private DriverLicenseScannerHelper mDriverLicenseScannerHelper;
     private LinkedHashMap<String, Object> mDriverLicenseMap;
     private String mSigToken;
     private boolean isRegistrationInProgress;
@@ -59,15 +67,18 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
         else
             startScan();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_CAMERA_PERMISSION)) {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
@@ -103,7 +114,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     }
 
     @Override
-    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap,
+                                        String signatureToken, ErrorManager.ErrorResponse error) {
         stopScan();
         if (driverLicenseMap != null) {
             mDriverLicenseMap = driverLicenseMap;
@@ -113,7 +125,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         }
 
         if (error == null)
-            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage());
 
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
@@ -151,7 +164,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtBack.setOnClickListener(this);
 
         mImgSuccess = findViewById(R.id.iv_success);
-        mTxtMessage = findViewById(R.id.txt_msg);
+        mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_msg);
         mTxtScanSide = findViewById(R.id.tv_info);
     }
@@ -175,7 +188,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
-                            Toast.makeText(this, R.string.label_dl_enrolled_successfully, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                    Toast.LENGTH_LONG).show();
                             finish();
                             return;
                         }
@@ -205,11 +219,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     }
 
     private void startScan() {
-        if(!isRegistrationInProgress) {
+        if (!isRegistrationInProgress) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mDriverLicenseScannerHelper = new DLScannerHelper(this,
-                    ScanningMode.SCAN_LIVE, DLScanningOrder.FIRST_FRONT_THEN_BACK, mBIDScannerView,
+            mDriverLicenseScannerHelper = new DriverLicenseScannerHelper(this,
+                    ScanningMode.SCAN_LIVE, FIRST_FRONT_THEN_BACK, mBIDScannerView,
                     mScannerOverlay, K_DL_EXPIRY_GRACE_DAYS, this);
             mDriverLicenseScannerHelper.startScanning();
             mLayoutMessage.setVisibility(View.VISIBLE);

@@ -151,7 +151,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mBIDScannerView.setVisibility(View.VISIBLE);
         }
 
-        mTxtMessage = findViewById(R.id.txt_msg);
+        mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_msg);
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(this);
