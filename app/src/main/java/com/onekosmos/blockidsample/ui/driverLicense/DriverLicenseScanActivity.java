@@ -27,7 +27,6 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 import com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.driverLicense.DriverLicenseScanningOrder;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -151,7 +150,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     }
 
     private void initView() {
-        mBIDScannerView = findViewById(R.id.view_bid_scanner);
+        mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
 
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
@@ -163,10 +162,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtBack = findViewById(R.id.txt_back);
         mTxtBack.setOnClickListener(this);
 
-        mImgSuccess = findViewById(R.id.iv_success);
+        mImgSuccess = findViewById(R.id.img_success);
         mTxtMessage = findViewById(R.id.txt_message);
-        mLayoutMessage = findViewById(R.id.layout_msg);
-        mTxtScanSide = findViewById(R.id.tv_info);
+        mLayoutMessage = findViewById(R.id.layout_message);
+        mTxtScanSide = findViewById(R.id.txt_info);
     }
 
     private void registerDriverLicense() {

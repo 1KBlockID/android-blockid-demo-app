@@ -20,12 +20,12 @@
         android:textAllCaps="false"
         android:textSize="@dimen/dimen_14sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/iv_success"
+        app:layout_constraintEnd_toStartOf="@+id/img_success"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_success"
+        android:id="@+id/img_success"
         android:layout_width="@dimen/dimen_28dp"
         android:layout_height="@dimen/dimen_28dp"
         android:layout_marginEnd="@dimen/dimen_3dp"
