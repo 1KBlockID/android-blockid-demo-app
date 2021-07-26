@@ -16,7 +16,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -218,9 +217,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         if (!isRegistrationInProgress) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mDriverLicenseScannerHelper = new DLScannerHelper(this,
-                    ScanningMode.SCAN_LIVE, FIRST_BACK_THEN_FRONT, mBIDScannerView,
-                    mScannerOverlay, K_DL_EXPIRY_GRACE_DAYS, this);
+            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
+                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
             mDriverLicenseScannerHelper.startScanning();
             mLayoutMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setVisibility(View.VISIBLE);
