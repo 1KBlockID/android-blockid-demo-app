@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
+import androidx.annotation.Keep;
+
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 
@@ -7,6 +9,7 @@ import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
+@Keep
 public class AuthRequestModel {
     public String authtype;
     public String scopes;
