@@ -90,5 +90,7 @@
     <string name="label_scan_front">Scan Front</string>
     <string name="label_permission_alert">Permission Alert</string>
     <string name="label_you_have_denied">You have denied the permission, please allow permission</string>
-
+    <string name="label_recover_mnemonic">Recover Mnemonic</string>
+    <string name="label_copy_phrases">Copy phrases</string>
+    <string name="label_mnemonic_copy_success">Mnemonic phrase has been copied</string>
 </resources>
