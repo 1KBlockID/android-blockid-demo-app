@@ -23,6 +23,10 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class RestoreAccountActivity extends AppCompatActivity {
 
     private AppCompatImageView mImgBack;
@@ -83,7 +87,6 @@ public class RestoreAccountActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-
                 }
             };
             mTextViews[index].addTextChangedListener(mTextWatchers[index]);

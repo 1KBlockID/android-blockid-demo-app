@@ -16,6 +16,10 @@ import com.onekosmos.blockidsample.R;
 
 import java.util.List;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class RecoverMnemonicActivity extends AppCompatActivity {
 
     private AppCompatImageView mImgBack;
