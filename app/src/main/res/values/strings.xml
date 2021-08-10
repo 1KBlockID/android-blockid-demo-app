@@ -90,7 +90,12 @@
     <string name="label_scan_front">Scan Front</string>
     <string name="label_permission_alert">Permission Alert</string>
     <string name="label_you_have_denied">You have denied the permission, please allow permission</string>
+    <string name="label_restore_account">Restore Account</string>
+    <string name="label_restore_acc">Restore Account</string>
     <string name="label_recover_mnemonic">Recover Mnemonic</string>
     <string name="label_copy_phrases">Copy phrases</string>
     <string name="label_mnemonic_copy_success">Mnemonic phrase has been copied</string>
+    <string name="label_enter_12_phrase">Please enter all 12 mnemonic phrase</string>
+    <string name="label_security_phrase_error">Security phrase error. Try again.</string>
+    <string name="label_account_restoration_failed">Account restoration failed</string>
 </resources>

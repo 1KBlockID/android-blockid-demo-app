@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.restore.RestoreAccountActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_restore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_16dp"
+        android:layout_marginBottom="@dimen/dimen_18dp"
+        android:background="@color/black"
+        android:paddingHorizontal="@dimen/dimen_20dp"
+        android:text="@string/label_restore_acc"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_back"
+        android:layout_width="@dimen/dimen_25dp"
+        android:layout_height="@dimen/dimen_25dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:padding="@dimen/dimen_5dp"
+        android:src="@drawable/icon_backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:text="@string/label_back"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintBottom_toBottomOf="@id/img_back"
+        app:layout_constraintStart_toEndOf="@id/img_back"
+        app:layout_constraintTop_toTopOf="@id/img_back" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text="@string/label_restore_account"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/txt_back"
+        app:layout_constraintStart_toEndOf="@id/txt_back"
+        app:layout_constraintTop_toTopOf="@id/txt_back" />
+
+    <ScrollView
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_0dp"
+        android:isScrollContainer="false"
+        app:layout_constraintBottom_toTopOf="@id/btn_restore"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txt_title">
+
+        <TableLayout
+            android:id="@+id/tablelayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dimen_15dp"
+            android:stretchColumns="1,2">
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_01"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_07"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_02"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_08"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_03"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_09"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_04"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_10"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_05"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_11"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_15dp"
+                android:layout_marginBottom="@dimen/dimen_18dp">
+
+                <include
+                    android:id="@+id/phrase_06"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/dimen_8dp" />
+
+                <include
+                    android:id="@+id/phrase_12"
+                    layout="@layout/layout_restore_wallet_row"
+                    android:layout_width="@dimen/dimen_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_marginStart="@dimen/dimen_8dp" />
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

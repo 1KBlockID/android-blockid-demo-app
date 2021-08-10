@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +16,7 @@ import com.onekosmos.blockidsample.R;
 
 import java.util.List;
 
-public class RecoverMnemonicActivity extends AppCompatActivity implements View.OnClickListener {
+public class RecoverMnemonicActivity extends AppCompatActivity {
 
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
@@ -35,13 +34,23 @@ public class RecoverMnemonicActivity extends AppCompatActivity implements View.O
 
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(this);
+        mImgBack.setOnClickListener(view -> onBackPressed());
 
         mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(this);
+        mTxtBack.setOnClickListener(view -> onBackPressed());
 
         mBtnCopyPhrase = findViewById(R.id.btn_copy_phrases);
-        mBtnCopyPhrase.setOnClickListener(this);
+        mBtnCopyPhrase.setOnClickListener(view -> {
+            String mPhrases = mnemonicPhrases.toString();
+            mPhrases = mPhrases.replace(",", "");
+            boolean isCopied = copyToClipboard(RecoverMnemonicActivity.this,
+                    mPhrases.substring(1, mPhrases.length() - 1));
+            if (isCopied) {
+                Toast.makeText(RecoverMnemonicActivity.this,
+                        getResources().getString(R.string.label_mnemonic_copy_success),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
 
         for (int index = 0; index < mTvPhrases.length; index++) {
             String number;
@@ -59,26 +68,6 @@ public class RecoverMnemonicActivity extends AppCompatActivity implements View.O
 
             mTvPhrases[index] = findViewById(resID).findViewById(R.id.text_phrase);
             mTvPhrases[index].setText(mnemonicPhrases.get(index));
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.img_back:
-            case R.id.txt_back:
-                onBackPressed();
-                break;
-            case R.id.btn_copy_phrases:
-                String mPhrases = mnemonicPhrases.toString();
-                mPhrases = mPhrases.replace(",", "");
-                boolean isCopied = copyToClipboard(this, mPhrases.substring
-                        (1, mPhrases.length() - 1));
-                if (isCopied) {
-                    Toast.makeText(this, getResources().getString(R.string.label_mnemonic_copy_success),
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
         }
     }
 
