@@ -25,14 +25,14 @@ public class RecoverMnemonicActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
     private AppCompatButton mBtnCopyPhrase;
-    private List<String> mnemonicPhrases;
+    private List<String> mMnemonicPhrases;
     private AppCompatTextView[] mTvPhrases = new AppCompatTextView[12];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recover_mnemonic_account);
-        mnemonicPhrases = BlockIDSDK.getInstance().getMnemonic();
+        mMnemonicPhrases = BlockIDSDK.getInstance().getMnemonic();
         initView();
     }
 
@@ -45,7 +45,7 @@ public class RecoverMnemonicActivity extends AppCompatActivity {
 
         mBtnCopyPhrase = findViewById(R.id.btn_copy_phrases);
         mBtnCopyPhrase.setOnClickListener(view -> {
-            String mPhrases = mnemonicPhrases.toString();
+            String mPhrases = mMnemonicPhrases.toString();
             mPhrases = mPhrases.replace(",", "");
             boolean isCopied = copyToClipboard(RecoverMnemonicActivity.this,
                     mPhrases.substring(1, mPhrases.length() - 1));
@@ -71,15 +71,15 @@ public class RecoverMnemonicActivity extends AppCompatActivity {
             mTvPhrases[index].setText(number + ". ");
 
             mTvPhrases[index] = findViewById(resID).findViewById(R.id.text_phrase);
-            mTvPhrases[index].setText(mnemonicPhrases.get(index));
+            mTvPhrases[index].setText(mMnemonicPhrases.get(index));
         }
     }
 
-    private boolean copyToClipboard(Context context, String text) {
-        ClipboardManager clipboard = (android.content.ClipboardManager) context
-                .getSystemService(context.CLIPBOARD_SERVICE);
+    private boolean copyToClipboard(Context argContext, String argText) {
+        ClipboardManager clipboard = (android.content.ClipboardManager) argContext
+                .getSystemService(argContext.CLIPBOARD_SERVICE);
         ClipData clip = android.content.ClipData
-                .newPlainText("message", text);
+                .newPlainText("message", argText);
         clipboard.setPrimaryClip(clip);
         return true;
     }

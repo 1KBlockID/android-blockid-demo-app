@@ -32,10 +32,9 @@ public class RestoreAccountActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
     private AppCompatButton mBtnRestore;
-    private AppCompatEditText[] mTextViews = new AppCompatEditText[12];
+    private AppCompatEditText[] mEtPhrases = new AppCompatEditText[12];
     private TextWatcher[] mTextWatchers = new TextWatcher[12];
-    private ProgressDialog progressDialog;
-    private String separator = " ";
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +60,8 @@ public class RestoreAccountActivity extends AppCompatActivity {
         mBtnRestore = findViewById(R.id.btn_restore);
         mBtnRestore.setOnClickListener(view -> onClickRestore());
 
-        progressDialog = new ProgressDialog(this);
-        for (int index = 0; index < mTextViews.length; index++) {
+        mProgressDialog = new ProgressDialog(this);
+        for (int index = 0; index < mEtPhrases.length; index++) {
             String number;
             String layoutName;
             if (index < 9) {
@@ -72,61 +71,62 @@ public class RestoreAccountActivity extends AppCompatActivity {
             }
             layoutName = "phrase_" + number;
             int resID = getResources().getIdentifier(layoutName, "id", getPackageName());
-            mTextViews[index] = findViewById(resID).findViewById(R.id.edt_phrase);
-            mTextViews[index].setHint(number);
+            mEtPhrases[index] = findViewById(resID).findViewById(R.id.edt_phrase);
+            mEtPhrases[index].setHint(number);
 
             mTextWatchers[index] = new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                public void beforeTextChanged(CharSequence sequence, int start, int count, int after) {
                 }
 
                 @Override
-                public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                    analyseTextViews(charSequence.toString().substring(start, start + count));
+                public void onTextChanged(CharSequence sequence, int start, int before, int count) {
+                    analyseTextViews(sequence.toString().substring(start, start + count));
                 }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
                 }
             };
-            mTextViews[index].addTextChangedListener(mTextWatchers[index]);
+            mEtPhrases[index].addTextChangedListener(mTextWatchers[index]);
         }
     }
 
     private void analyseTextViews(String argText) {
+        String separator = " ";
         if (argText.contains(separator)) {
             String[] arrPhrases = argText.split(separator);
-            if (arrPhrases.length == mTextViews.length) {
+            if (arrPhrases.length == mEtPhrases.length) {
                 pastePhrases(arrPhrases);
             }
         }
     }
 
     private void pastePhrases(String[] argPhrases) {
-        for (int index = 0; index < mTextViews.length; index++) {
+        for (int index = 0; index < mEtPhrases.length; index++) {
             removeAllTextWatchers();
         }
-        for (int index = 0; index < mTextViews.length; index++) {
-            mTextViews[index].setText(argPhrases[index].trim());
+        for (int index = 0; index < mEtPhrases.length; index++) {
+            mEtPhrases[index].setText(argPhrases[index].trim());
         }
         addAllTextWatchers();
     }
 
     private void addAllTextWatchers() {
-        for (int index = 0; index < mTextViews.length; index++) {
-            mTextViews[index].addTextChangedListener(mTextWatchers[index]);
+        for (int index = 0; index < mEtPhrases.length; index++) {
+            mEtPhrases[index].addTextChangedListener(mTextWatchers[index]);
         }
     }
 
     private void removeAllTextWatchers() {
-        for (int index = 0; index < mTextViews.length; index++) {
-            mTextViews[index].removeTextChangedListener(mTextWatchers[index]);
+        for (int index = 0; index < mEtPhrases.length; index++) {
+            mEtPhrases[index].removeTextChangedListener(mTextWatchers[index]);
         }
     }
 
     private List<String> getMnemonicPhrasesList() {
         List<String> listPhrases = new ArrayList<>();
-        for (AppCompatEditText mTextView : mTextViews) {
+        for (AppCompatEditText mTextView : mEtPhrases) {
             listPhrases.add(mTextView.getText().toString().trim());
         }
         return listPhrases;
@@ -134,7 +134,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
 
     private void onClickRestore() {
         boolean isAnyFieldEmpty = false;
-        for (AppCompatEditText mTextView : mTextViews) {
+        for (AppCompatEditText mTextView : mEtPhrases) {
             String text = mTextView.getText().toString();
             if (TextUtils.isEmpty(text)) {
                 isAnyFieldEmpty = true;
@@ -148,7 +148,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
         } else {
             boolean isWalletCreated = BlockIDSDK.getInstance().restoreWallet(getMnemonicPhrasesList());
             if (isWalletCreated) {
-                progressDialog.show();
+                mProgressDialog.show();
                 mBtnRestore.setEnabled(false);
                 BlockIDSDK.getInstance().setRestoreMode();
                 registerTenant();
@@ -173,7 +173,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
     private void restoreAccount() {
         BlockIDSDK.getInstance().restoreUserDataFromWallet((status, error, message) -> {
             if (status) {
-                progressDialog.dismiss();
+                mProgressDialog.dismiss();
                 BlockIDSDK.getInstance().commitRestorationData();
                 setResult(RESULT_OK);
                 finish();
@@ -188,17 +188,17 @@ public class RestoreAccountActivity extends AppCompatActivity {
         });
     }
 
-    private void showErrorDialog(String message) {
+    private void showErrorDialog(String argMessage) {
         mBtnRestore.setEnabled(true);
         BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
-        progressDialog.dismiss();
+        mProgressDialog.dismiss();
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
             setResult(RESULT_CANCELED);
             finish();
         };
-        errorDialog.show(null, getString(R.string.label_error), message,
+        errorDialog.show(null, getString(R.string.label_error), argMessage,
                 onDismissListener);
     }
 }
