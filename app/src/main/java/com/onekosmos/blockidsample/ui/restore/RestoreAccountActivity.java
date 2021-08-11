@@ -133,7 +133,6 @@ public class RestoreAccountActivity extends AppCompatActivity {
     }
 
     private void onClickRestore() {
-        mBtnRestore.setEnabled(false);
         boolean isAnyFieldEmpty = false;
         for (AppCompatEditText mTextView : mTextViews) {
             String text = mTextView.getText().toString();
@@ -147,9 +146,10 @@ public class RestoreAccountActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.label_enter_12_phrase,
                     Toast.LENGTH_SHORT).show();
         } else {
-            progressDialog.show();
             boolean isWalletCreated = BlockIDSDK.getInstance().restoreWallet(getMnemonicPhrasesList());
             if (isWalletCreated) {
+                progressDialog.show();
+                mBtnRestore.setEnabled(false);
                 BlockIDSDK.getInstance().setRestoreMode();
                 registerTenant();
             } else {
