@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -15,10 +16,10 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
-import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
+import com.onekosmos.blockidsample.ui.restore.RestoreAccountActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -29,13 +30,16 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class RegisterTenantActivity extends AppCompatActivity {
+    private static int RESTORE_REQUEST_CODE = 1001;
     private ConstraintLayout mLayoutAuth;
-    private AppCompatButton mBtnRegisterTenant, mBtnDeviceAuth;
+    private AppCompatButton mBtnRegisterTenant, mBtnRestore, mBtnDeviceAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_tenant);
+        mBtnRestore = findViewById(R.id.btn_restore_account);
+        mBtnRestore.setOnClickListener(view -> restoreAccount());
         mBtnRegisterTenant = findViewById(R.id.btn_register);
         mBtnRegisterTenant.setOnClickListener(view -> registerTenant());
         mLayoutAuth = findViewById(R.id.layout_auth);
@@ -49,12 +53,13 @@ public class RegisterTenantActivity extends AppCompatActivity {
     private void updateAuthUi() {
         mLayoutAuth.setVisibility(View.VISIBLE);
         mBtnRegisterTenant.setVisibility(View.GONE);
+        mBtnRestore.setVisibility(View.GONE);
     }
 
     private void registerTenant() {
-        BlockIDSDK.getInstance().initiateWallet();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
+        BlockIDSDK.getInstance().initiateWallet();
         mBtnRegisterTenant.setClickable(false);
         BlockIDSDK.getInstance().registerTenant(AppConstant.defaultTenant, (status, error, bidTenant) -> {
             progressDialog.dismiss();
@@ -98,11 +103,28 @@ public class RegisterTenantActivity extends AppCompatActivity {
                                 Toast.makeText(RegisterTenantActivity.this, errorResponse.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
+
                         @Override
                         public void onNonBiometricAuth(boolean b) {
                             // do nothing
                         }
                     });
+        }
+    }
+
+    private void restoreAccount() {
+        Intent restoreIntent = new Intent(this, RestoreAccountActivity.class);
+        startActivityForResult(restoreIntent, RESTORE_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESTORE_REQUEST_CODE && resultCode == RESULT_OK) {
+            updateAuthUi();
+        } else {
+            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
         }
     }
 }

@@ -25,7 +25,6 @@ public class EnrollmentsDataSource {
     public static EnrollmentsDataSource sharedInstance = new EnrollmentsDataSource();
 
     public enum EnrollmentAssetEnum {
-        ASSET_UNLOCK_SDK,
         ASSET_LIVE_ID,
         ASSET_PIN,
         ASSET_DEVICE_AUTH,
@@ -33,8 +32,9 @@ public class EnrollmentsDataSource {
         ASSET_PP1,
         ASSET_PP2,
         ASSET_NATIONAL_ID,
-        ASSET_RESET_SDK,
-        ASSET_LOGIN_WITH_QR
+        ASSET_LOGIN_WITH_QR,
+        ASSET_RECOVER_MNEMONIC,
+        ASSET_RESET_SDK
     }
 
     private EnrollmentsDataSource() {
@@ -57,6 +57,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
 
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
+        arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
     }
@@ -115,9 +116,9 @@ public class EnrollmentsDataSource {
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_login_with_qr));
                 break;
-            case ASSET_UNLOCK_SDK:
+            case ASSET_RECOVER_MNEMONIC:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_unlock_sdk));
+                        context.getResources().getString(R.string.label_recover_mnemonic));
                 break;
         }
         return enrollmentAsset;
