@@ -13,11 +13,13 @@
 
     <!--dimensions in DP-->
     <dimen name="dimen_0dp">0dp</dimen>
+    <dimen name="dimen_0_5dp">0.5dp</dimen>
     <dimen name="dimen_1dp">1dp</dimen>
     <dimen name="dimen_2dp">2dp</dimen>
     <dimen name="dimen_3dp">3dp</dimen>
     <dimen name="dimen_4dp">4dp</dimen>
     <dimen name="dimen_5dp">5dp</dimen>
+    <dimen name="dimen_6dp">6dp</dimen>
     <dimen name="dimen_8dp">8dp</dimen>
     <dimen name="dimen_7dp">7dp</dimen>
     <dimen name="dimen_9dp">9dp</dimen>
@@ -38,6 +40,7 @@
     <dimen name="dimen_32dp">32dp</dimen>
     <dimen name="dimen_35dp">35dp</dimen>
     <dimen name="dimen_40dp">40dp</dimen>
+    <dimen name="dimen_42dp">42dp</dimen>
     <dimen name="dimen_44dp">44dp</dimen>
     <dimen name="dimen_45dp">45dp</dimen>
     <dimen name="dimen_48dp">48dp</dimen>

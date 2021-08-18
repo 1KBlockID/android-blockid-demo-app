@@ -21,6 +21,7 @@
         android:theme="@style/Theme.BlockIDSdkDemo"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label,android:theme">
+
         <activity
             android:name=".ui.SplashActivity"
             android:screenOrientation="portrait"
@@ -77,6 +78,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.driverLicense.DriverLicenseScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.restore.RecoverMnemonicActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.restore.RestoreAccountActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
