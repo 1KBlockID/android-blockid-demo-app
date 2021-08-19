@@ -63,7 +63,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mScannerOverlay.setVisibility(View.VISIBLE);
 
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            mLiveIDScannerHelper.startLiveIDScanning();
+            //mLiveIDScannerHelper.startLiveIDScanning();
         }
     }
 
@@ -90,7 +90,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            mLiveIDScannerHelper.startLiveIDScanning();
+            //mLiveIDScannerHelper.startLiveIDScanning();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
@@ -179,6 +179,12 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
             case "Smile":
                 return getResources().getString(R.string.label_liveid_please_smile);
+            case "LookRight":
+                return getResources().getString(R.string.label_liveid_look_right);
+            case "LookLeft":
+                return getResources().getString(R.string.label_liveid_look_left);
+            case "Scanning Complete":
+                return "Scanning Complete";
         }
         return "";
     }
