@@ -109,7 +109,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mTxtMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setText(getMessageForExpression(expression));
         } else
-            showFaceNotFocusedViews();
+            showFaceNotFocusedViews(expression);
     }
 
     @Override
@@ -163,9 +163,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mBtnCancel.setOnClickListener(this);
     }
 
-    private void showFaceNotFocusedViews() {
+    private void showFaceNotFocusedViews(String expression) {
         mScannerOverlay.setImageResource(R.drawable.group_3);
         mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc2));
+        mTxtMessage.setText(getMessageForExpression(expression));
     }
 
     private void showFaceFocusedViews() {
@@ -185,6 +186,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 return getResources().getString(R.string.label_liveid_look_left);
             case "Scanning Complete":
                 return "Scanning Complete";
+            case "Reset Expression":
+                return "Resetting the Expression";
         }
         return "";
     }
