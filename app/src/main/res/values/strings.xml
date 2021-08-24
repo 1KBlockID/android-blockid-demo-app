@@ -98,4 +98,5 @@
     <string name="label_enter_12_phrase">Please enter all 12 mnemonic phrase</string>
     <string name="label_security_phrase_error">Security phrase error. Try again.</string>
     <string name="label_account_restoration_failed">Account restoration failed</string>
+    <string name="label_many_faces">Many faces</string>
 </resources>

@@ -1,8 +1,11 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -50,9 +54,25 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
     private LinkedHashMap<String, Object> mNationalIDMap, mNationalIDFirstSideData;
-    private String mSigToken;
+    private String mSigToken, mScanSide;
     private NationalIDScanOrder mNationalIDScanOrder = FIRST_BACK_THEN_FRONT;
     private boolean isRegistrationInProgress;
+    private String K_NO_FACE_FOUND = "BlockIDFaceDetectionNotification";
+    private String K_FACE_COUNT = "numberOfFaces";
+
+    private BroadcastReceiver mPPScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int count = intent.getIntExtra(K_FACE_COUNT, 0);
+
+            runOnUiThread(() -> {
+                if (count > 1)
+                    mTxtScanMsg.setText(R.string.label_many_faces);
+                else
+                    mTxtScanMsg.setText(mScanSide);
+            });
+        }
+    };
 
     enum ScanOrder {
         FRONT_SIDE,
@@ -64,6 +84,13 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mPPScanReceiver,
+                new IntentFilter(K_NO_FACE_FOUND));
     }
 
     @Override
@@ -101,9 +128,13 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     private void updateScanOrderText(ScanOrder order) {
-        if (order == BACK_SIDE)
+        if (order == BACK_SIDE) {
             mTxtScanMsg.setText(R.string.label_scan_back);
-        else mTxtScanMsg.setText(R.string.label_scan_front);
+            mScanSide = getString(R.string.label_scan_back);
+        } else {
+            mTxtScanMsg.setText(R.string.label_scan_front);
+            mScanSide = getString(R.string.label_scan_front);
+        }
     }
 
     @Override
@@ -144,6 +175,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         super.onStop();
         if (mNationalIdScannerHelper != null)
             mNationalIdScannerHelper.stopScanning();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mPPScanReceiver);
     }
 
     @Override
