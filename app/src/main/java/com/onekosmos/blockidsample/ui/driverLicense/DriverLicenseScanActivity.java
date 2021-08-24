@@ -179,7 +179,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
             mDriverLicenseMap.put("type", DL.getValue());
             mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
             BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
-                    null, (status, error) -> {
+                    null, false, false, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {

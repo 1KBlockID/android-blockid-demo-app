@@ -168,7 +168,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, (status, error) -> {
+                    null, false, false,(status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             PassportDataHolder.clearData();

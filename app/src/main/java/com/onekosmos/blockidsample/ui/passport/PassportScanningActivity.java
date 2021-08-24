@@ -171,7 +171,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, (status, error) -> {
+                    null, false, false, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {

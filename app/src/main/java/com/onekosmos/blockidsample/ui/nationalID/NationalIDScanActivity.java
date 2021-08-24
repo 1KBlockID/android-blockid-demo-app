@@ -216,7 +216,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mNationalIDMap.put("category", identity_document.name());
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,false, false,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;

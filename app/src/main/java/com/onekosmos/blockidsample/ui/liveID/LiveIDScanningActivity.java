@@ -218,7 +218,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         documentMap.put("id", documentMap.get("id"));
 
         BlockIDSDK.getInstance().registerDocument(this, documentMap,
-                livIdBitmap, null, null, null, (status, error) -> {
+                livIdBitmap, null, null, null, false, false, (status, error) -> {
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
