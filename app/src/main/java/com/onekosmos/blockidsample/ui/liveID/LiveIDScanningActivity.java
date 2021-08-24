@@ -187,7 +187,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             case "Scanning Complete":
                 return "Scanning Complete";
             case "Reset Expression":
-                return "Resetting the Expression";
+                return "Wrong expression Restarting";
         }
         return "";
     }
