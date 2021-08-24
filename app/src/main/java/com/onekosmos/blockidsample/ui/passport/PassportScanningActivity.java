@@ -1,9 +1,15 @@
 package com.onekosmos.blockidsample.ui.passport;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
@@ -15,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -30,10 +37,6 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.LinkedHashMap;
-
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 /**
  * Created by 1Kosmos Engineering
@@ -51,6 +54,19 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private LinkedHashMap<String, Object> mPassportMap;
     private String mSigToken;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
+    private String K_NO_FACE_FOUND = "BlockIDFaceDetectionNotification";
+    private String K_FACE_COUNT = "numberOfFaces";
+
+    private BroadcastReceiver mPPScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int count = intent.getIntExtra(K_FACE_COUNT, 0);
+            if (count > 1)
+                mTxtScanMsg.setText(R.string.label_many_faces);
+            else
+                mTxtScanMsg.setText(R.string.label_scan_passport);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +74,13 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         setContentView(R.layout.activity_passport_scanning);
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mPPScanReceiver,
+                new IntentFilter(K_NO_FACE_FOUND));
     }
 
     @Override
@@ -105,6 +128,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     public void onStop() {
         super.onStop();
         mPassportScannerHelper.stopScanning();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mPPScanReceiver);
     }
 
     @Override
@@ -134,16 +158,6 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
             return;
         }
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-    }
-
-    @Override
-    public void multipleFacesDetected(boolean detected) {
-        runOnUiThread(() -> {
-            if (detected)
-                mTxtScanMsg.setText(R.string.label_many_faces);
-            else
-                mTxtScanMsg.setText(R.string.label_scan_passport);
-        });
     }
 
     private void initView() {

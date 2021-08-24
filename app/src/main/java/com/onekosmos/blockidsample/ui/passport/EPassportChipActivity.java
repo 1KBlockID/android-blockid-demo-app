@@ -158,10 +158,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                 });
     }
 
-    @Override
-    public void multipleFacesDetected(boolean detected) {
-    }
-
     private void registerPassport() {
         mIsRegInProgress = true;
         mPassportScannerHelper.stopRFIDScanning();
