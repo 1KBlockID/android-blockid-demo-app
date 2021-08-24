@@ -50,7 +50,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
     private LinkedHashMap<String, Object> mNationalIDMap, mNationalIDFirstSideData;
-    private String mSigToken;
+    private String mSigToken, mScanSide;
     private NationalIDScanOrder mNationalIDScanOrder = FIRST_BACK_THEN_FRONT;
     private boolean isRegistrationInProgress;
 
@@ -101,9 +101,13 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     private void updateScanOrderText(ScanOrder order) {
-        if (order == BACK_SIDE)
+        if (order == BACK_SIDE) {
             mTxtScanMsg.setText(R.string.label_scan_back);
-        else mTxtScanMsg.setText(R.string.label_scan_front);
+            mScanSide = getString(R.string.label_scan_back);
+        } else {
+            mTxtScanMsg.setText(R.string.label_scan_front);
+            mScanSide = getString(R.string.label_scan_front);
+        }
     }
 
     @Override
@@ -181,6 +185,16 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         getIntent().setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         finish();
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void multipleFacesDetected(boolean detected) {
+        runOnUiThread(() -> {
+            if (detected)
+                mTxtScanMsg.setText(R.string.label_many_faces);
+            else
+                mTxtScanMsg.setText(mScanSide);
+        });
     }
 
     private void initView() {

@@ -44,7 +44,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private AppCompatImageView mImgBack, mScannerOverlay, mImgSuccess;
-    private AppCompatTextView mTxtBack, mTxtMessage;
+    private AppCompatTextView mTxtBack, mTxtMessage, mTxtScanMsg;
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
     private PassportScannerHelper mPassportScannerHelper;
@@ -136,6 +136,16 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
     }
 
+    @Override
+    public void multipleFacesDetected(boolean detected) {
+        runOnUiThread(() -> {
+            if (detected)
+                mTxtScanMsg.setText(R.string.label_many_faces);
+            else
+                mTxtScanMsg.setText(R.string.label_scan_passport);
+        });
+    }
+
     private void initView() {
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
@@ -152,6 +162,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
         mImgSuccess = findViewById(R.id.img_success);
         mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_message);
+        mTxtScanMsg = findViewById(R.id.txt_info);
     }
 
     private void openEPassportChipActivity() {

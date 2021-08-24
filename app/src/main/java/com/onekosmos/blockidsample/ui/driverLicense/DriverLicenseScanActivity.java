@@ -48,7 +48,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     private LinearLayout mLayoutMessage;
     private DLScannerHelper mDriverLicenseScannerHelper;
     private LinkedHashMap<String, Object> mDriverLicenseMap;
-    private String mSigToken;
+    private String mSigToken,mScanSide;
     private boolean isRegistrationInProgress;
 
     @Override
@@ -137,12 +137,25 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
 
     @Override
     public void scanFrontSide() {
-        mTxtScanSide.setText(R.string.label_scan_front);
+        mScanSide = getString(R.string.label_scan_front);
+        mTxtScanSide.setText(mScanSide);
     }
 
     @Override
     public void scanBackSide() {
-        mTxtScanSide.setText(R.string.label_scan_back);
+        mScanSide = getString(R.string.label_scan_back);
+        mTxtScanSide.setText(mScanSide);
+    }
+
+    @Override
+    public void multipleFacesDetected(boolean detected) {
+        runOnUiThread(() -> {
+            if (detected)
+                mTxtScanSide.setText(R.string.label_many_faces);
+            else
+                mTxtScanSide.setText(mScanSide);
+
+        });
     }
 
     private void initView() {
