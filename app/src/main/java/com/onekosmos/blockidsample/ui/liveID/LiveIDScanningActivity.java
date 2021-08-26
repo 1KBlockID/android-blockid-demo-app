@@ -63,7 +63,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mScannerOverlay.setVisibility(View.VISIBLE);
 
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            //mLiveIDScannerHelper.startLiveIDScanning();
+            mLiveIDScannerHelper.startLiveIDScanning();
         }
     }
 
@@ -90,7 +90,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            //mLiveIDScannerHelper.startLiveIDScanning();
+            mLiveIDScannerHelper.startLiveIDScanning();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
@@ -187,7 +187,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             case "Scanning Complete":
                 return "Scanning Complete";
             case "Reset Expression":
-                return "Wrong expression Restarting";
+                return "Wrong expression resetting";
+            case "Face out of bounds":
+                return "Please align face properly";
         }
         return "";
     }
