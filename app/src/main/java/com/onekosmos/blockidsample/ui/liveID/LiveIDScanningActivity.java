@@ -109,7 +109,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mTxtMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setText(getMessageForExpression(expression));
         } else
-            showFaceNotFocusedViews(expression);
+            showFaceNotFocusedViews("");
     }
 
     @Override
@@ -140,6 +140,11 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             return;
         }
         registerLiveID(liveIDBitmap);
+    }
+
+    @Override
+    public void expressionDidReset(String message) {
+        showFaceNotFocusedViews(message);
     }
 
     private void initViews() {
