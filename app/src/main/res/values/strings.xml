@@ -21,6 +21,8 @@
     <string name="label_liveid_please_smile">Please smile</string>
     <string name="label_liveid_look_right">Please turn right</string>
     <string name="label_liveid_look_left">Please turn left</string>
+    <string name="label_liveid_look_up">Please look up</string>
+    <string name="label_liveid_look_bottom">Please look bottom</string>
     <string name="label_scanning_complete">Scanning Complete</string>
     <string name="label_reset_expression">Wrong expression resetting</string>
     <string name="label_face_out_of_bounds">Please align face properly</string>
