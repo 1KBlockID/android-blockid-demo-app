@@ -189,16 +189,12 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 return getResources().getString(R.string.label_liveid_look_right);
             case "LookLeft":
                 return getResources().getString(R.string.label_liveid_look_left);
-            case "LOOKUP":
-                return getResources().getString(R.string.label_liveid_look_up);
-            case "LOOKDOWN":
-                return getResources().getString(R.string.label_liveid_look_down);
             case "Scanning Complete":
-                return "Scanning Complete";
+                return getResources().getString(R.string.label_scanning_complete);
             case "Reset Expression":
-                return "Wrong expression resetting";
+                return getResources().getString(R.string.label_reset_expression);
             case "Face out of bounds":
-                return "Please align face properly";
+                return getResources().getString(R.string.label_face_out_of_bounds);
         }
         return "";
     }
