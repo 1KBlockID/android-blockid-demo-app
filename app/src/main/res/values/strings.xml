@@ -21,6 +21,8 @@
     <string name="label_liveid_please_smile">Please smile</string>
     <string name="label_liveid_look_right">Please turn right</string>
     <string name="label_liveid_look_left">Please turn left</string>
+    <string name="label_liveid_look_up">Please look up</string>
+    <string name="label_liveid_look_down">Please look down</string>
     <string name="label_biometric_auth">Biometric authentication</string>
     <string name="label_biometric_auth_enroll">Do you want to allow this app to use biometric authentication?</string>
     <string name="label_biometric_auth_req">Biometric authentication required to proceed</string>
