@@ -109,7 +109,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mTxtMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setText(getMessageForExpression(expression));
         } else
-            showFaceNotFocusedViews();
+            showFaceNotFocusedViews("");
     }
 
     @Override
@@ -142,6 +142,11 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         registerLiveID(liveIDBitmap);
     }
 
+    @Override
+    public void expressionDidReset(String message) {
+        showFaceNotFocusedViews(message);
+    }
+
     private void initViews() {
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
@@ -163,9 +168,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mBtnCancel.setOnClickListener(this);
     }
 
-    private void showFaceNotFocusedViews() {
+    private void showFaceNotFocusedViews(String expression) {
         mScannerOverlay.setImageResource(R.drawable.group_3);
         mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc2));
+        mTxtMessage.setText(getMessageForExpression(expression));
     }
 
     private void showFaceFocusedViews() {
@@ -179,6 +185,16 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
             case "Smile":
                 return getResources().getString(R.string.label_liveid_please_smile);
+            case "LookRight":
+                return getResources().getString(R.string.label_liveid_look_right);
+            case "LookLeft":
+                return getResources().getString(R.string.label_liveid_look_left);
+            case "Scanning Complete":
+                return "Scanning Complete";
+            case "Reset Expression":
+                return "Wrong expression resetting";
+            case "Face out of bounds":
+                return "Please align face properly";
         }
         return "";
     }
