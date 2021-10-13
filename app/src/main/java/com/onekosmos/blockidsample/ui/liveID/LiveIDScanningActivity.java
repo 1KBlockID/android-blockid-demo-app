@@ -79,7 +79,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             case R.id.img_back:
             case R.id.txt_back:
             case R.id.btn_cancel:
-                mLiveIDScannerHelper.stopLiveIDScanning();
                 finish();
                 break;
         }
