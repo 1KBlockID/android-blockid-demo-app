@@ -70,6 +70,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     @Override
     public void onStop() {
         super.onStop();
+        mLiveIDScannerHelper.stopLiveIDScanning();
     }
 
     @Override
