@@ -53,6 +53,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation project(path: ':BlockIDSDK-release')
+    api(name: 'sdk-release', ext: 'aar')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -118,4 +119,7 @@ dependencies {
     //liveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
     implementation 'com.google.guava:guava:27.1-android'
+
+    //barcode scanning
+    implementation 'com.google.mlkit:barcode-scanning:17.0.0'
 }

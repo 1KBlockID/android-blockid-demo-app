@@ -18,6 +18,9 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'http://www.baka.sk/maven2' }
+        flatDir {
+            dirs 'libs' //this way we can find the .aar file in libs folder
+        }
     }
 }
 
