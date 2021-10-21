@@ -53,7 +53,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation project(path: ':BlockIDSDK-release')
-    api(name: 'sdk-release', ext: 'aar')
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -122,4 +122,7 @@ dependencies {
 
     //barcode scanning
     implementation 'com.google.mlkit:barcode-scanning:17.0.0'
+
+    // opencv
+    implementation 'com.quickbirdstudios:opencv:4.5.3.0'
 }
