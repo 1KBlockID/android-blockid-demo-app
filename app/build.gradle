@@ -89,15 +89,12 @@ dependencies {
     implementation "com.amitshekhar.android:android-networking:1.0.2"
 
     // passport scan
-    implementation 'com.rmtheis:tess-two:9.1.0'
     implementation('org.jmrtd:jmrtd:0.7.19') {
         exclude module: 'bcprov-jdk15on'
         exclude module: 'bctls-jdk15on'
     }
 
     implementation 'org.innovatrics.mrz:mrz-java:0.4'
-
-    implementation 'com.google.zxing:core:3.2.1'
 
     //Location
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
@@ -123,9 +120,6 @@ dependencies {
     //liveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
     implementation 'com.google.guava:guava:27.1-android'
-
-    // opencv
-    implementation 'com.quickbirdstudios:opencv:4.5.3.0'
 
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
 }
