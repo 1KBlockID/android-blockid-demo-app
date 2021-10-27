@@ -22,6 +22,11 @@ android {
             minifyEnabled false
         }
     }
+
+    lintOptions{
+        checkReleaseBuilds false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -121,4 +126,6 @@ dependencies {
 
     // opencv
     implementation 'com.quickbirdstudios:opencv:4.5.3.0'
+
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
 }
