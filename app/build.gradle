@@ -113,16 +113,16 @@ dependencies {
     implementation 'androidx.camera:camera-lifecycle:1.1.0-alpha10'
     implementation 'androidx.camera:camera-view:1.0.0-alpha30'
 
-    //liveID
+    // LiveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
     implementation 'com.google.guava:guava:27.1-android'
 
     // Text recognition
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
 
-    //barcode scanning
+    // Barcode scanning
     implementation 'com.google.mlkit:barcode-scanning:17.0.0'
 
-    // opencv
+    // Opencv
     implementation 'com.quickbirdstudios:opencv:4.5.3.0'
 }
