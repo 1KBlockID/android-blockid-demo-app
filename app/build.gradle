@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4.85" + "." + getCurrentTimestampHexValue()
+        versionName "1.4.87" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,10 +22,12 @@ android {
             minifyEnabled false
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
         exclude 'lib/x86_64/darwin/libscrypt.dylib'
@@ -45,6 +47,8 @@ def String getCurrentTimestampHexValue() {
 }
 
 dependencies {
+    implementation project(path: ':BlockIDSDK-release')
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -52,7 +56,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation project(path: ':BlockIDSDK-release')
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -84,15 +88,12 @@ dependencies {
     implementation "com.amitshekhar.android:android-networking:1.0.2"
 
     // passport scan
-    implementation 'com.rmtheis:tess-two:9.0.0'
-    implementation('org.jmrtd:jmrtd:0.7.18') {
+    implementation('org.jmrtd:jmrtd:0.7.19') {
         exclude module: 'bcprov-jdk15on'
         exclude module: 'bctls-jdk15on'
     }
 
     implementation 'org.innovatrics.mrz:mrz-java:0.4'
-
-    implementation 'com.google.zxing:core:3.2.1'
 
     //Location
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
@@ -109,13 +110,20 @@ dependencies {
     implementation 'com.annimon:stream:1.2.2'
 
     // CameraX
-    implementation 'androidx.camera:camera-core:1.0.0-rc05'
-    implementation "androidx.camera:camera-camera2:1.1.0-alpha07"
-    implementation "androidx.camera:camera-lifecycle:1.1.0-alpha07"
-    implementation "androidx.camera:camera-view:1.0.0-alpha27"
-    implementation "androidx.camera:camera-view:1.0.0-SNAPSHOT"
+    implementation 'androidx.camera:camera-camera2:1.1.0-alpha10'
+    implementation 'androidx.camera:camera-lifecycle:1.1.0-alpha10'
+    implementation 'androidx.camera:camera-view:1.0.0-alpha30'
 
-    //liveID
+    // LiveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
     implementation 'com.google.guava:guava:27.1-android'
+
+    // Text recognition
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
+
+    // Barcode scanning
+    implementation 'com.google.mlkit:barcode-scanning:17.0.0'
+
+    // Opencv
+    implementation 'com.quickbirdstudios:opencv:4.5.3.0'
 }
