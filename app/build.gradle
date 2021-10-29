@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4.86" + "." + getCurrentTimestampHexValue()
+        versionName "1.4.87" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -23,14 +23,11 @@ android {
         }
     }
 
-    lintOptions{
-        checkReleaseBuilds false
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
         exclude 'lib/x86_64/darwin/libscrypt.dylib'
@@ -121,5 +118,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
     implementation 'com.google.guava:guava:27.1-android'
 
+    // Text recognition
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.0'
 }
