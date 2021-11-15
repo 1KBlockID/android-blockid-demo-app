@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.nationalID.NationalIDManualCaptureActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_back"
+        android:layout_width="@dimen/dimen_25dp"
+        android:layout_height="@dimen/dimen_25dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:padding="@dimen/dimen_5dp"
+        android:src="@drawable/icon_backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:text="@string/label_back"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintBottom_toBottomOf="@id/img_back"
+        app:layout_constraintStart_toEndOf="@id/img_back"
+        app:layout_constraintTop_toTopOf="@id/img_back" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text="@string/label_enroll_national_id"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/txt_back"
+        app:layout_constraintStart_toEndOf="@id/txt_back"
+        app:layout_constraintTop_toTopOf="@id/txt_back" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_title">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/img_document_back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dimen_20dp"
+                android:adjustViewBounds="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_capture_back"
+                android:layout_width="@dimen/dimen_200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_20dp"
+                android:text="Capture Back Image"
+                android:textAllCaps="false"
+                android:textSize="@dimen/dimen_18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/img_document_back" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_back_document_data"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_20dp"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dimen_18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_capture_back" />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/img_document_front"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dimen_20dp"
+                android:adjustViewBounds="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_capture_back" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_capture_front"
+                android:layout_width="@dimen/dimen_200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_20dp"
+                android:text="Capture Front Image"
+                android:textAllCaps="false"
+                android:textSize="@dimen/dimen_18sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/img_document_front" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

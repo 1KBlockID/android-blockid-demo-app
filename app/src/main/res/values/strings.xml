@@ -10,6 +10,7 @@
     <string name="label_passport2">Passport 2</string>
     <string name="label_app_pin">App Pin</string>
     <string name="label_national_id_1">National ID 1</string>
+    <string name="label_national_id_manual_capture">National ID Manual Capture</string>
     <string name="label_reset_app">Reset App</string>
     <string name="label_please_wait">Please wait...</string>
     <string name="label_error">Error</string>

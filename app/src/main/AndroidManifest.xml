@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.onekosmos.blockidsample">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -12,6 +14,7 @@
     <uses-permission android:name="android.permission.NFC" />
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:name=".MainApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +24,6 @@
         android:theme="@style/Theme.BlockIDSdkDemo"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label,android:theme">
-
         <activity
             android:name=".ui.SplashActivity"
             android:screenOrientation="portrait"
@@ -74,6 +76,14 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.nationalID.NationalIDScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.nationalID.NationalIDLiveScanActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.nationalID.NationalIDManualCaptureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
