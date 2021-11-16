@@ -85,7 +85,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_capture_back" />
 
-
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/img_document_front"
                 android:layout_width="match_parent"
@@ -93,7 +92,7 @@
                 android:layout_margin="@dimen/dimen_20dp"
                 android:adjustViewBounds="true"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_capture_back" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_back_document_data" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_capture_front"
@@ -106,6 +105,30 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/img_document_front" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/img_face"
+                android:layout_width="@dimen/dimen_100dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dimen_20dp"
+                android:adjustViewBounds="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_capture_front" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_front_document_data"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_20dp"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:layout_marginBottom="@dimen/dimen_20dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dimen_18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/img_face" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

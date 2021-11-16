@@ -27,7 +27,7 @@ import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
-import com.onekosmos.blockidsample.ui.nationalID.NationalIDManualCaptureActivity;
+import com.onekosmos.blockidsample.ui.nationalID.NationalIDLiveScanActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
@@ -277,7 +277,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     });
             return;
         }
-        Intent intent = new Intent(this, NationalIDManualCaptureActivity.class);
+        Intent intent = new Intent(this, NationalIDScanActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

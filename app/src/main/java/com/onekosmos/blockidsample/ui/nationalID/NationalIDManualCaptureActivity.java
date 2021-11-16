@@ -10,8 +10,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -22,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDManualScanHelper;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.util.AppUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -29,11 +33,11 @@ import java.util.List;
 
 public class NationalIDManualCaptureActivity extends AppCompatActivity {
     private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1001;
-    private AppCompatImageView mImgDocumentBack, mImgDocumentFront;
+    private AppCompatImageView mImgDocumentBack, mImgDocumentFront, mImgFace;
     private AppCompatButton mBtnCaptureBack, mBtnCaptureFront;
     private boolean isBackCaptured = false;
     private NationalIDManualScanHelper mNationalIDHelper;
-    private AppCompatTextView mTxtBackData;
+    private AppCompatTextView mTxtBackData, mTxtFrontData;
     private LinkedHashMap<String, Object> mNationalIdMap = new LinkedHashMap<>();
 
     @Override
@@ -48,6 +52,7 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
         findViewById(R.id.img_back).setOnClickListener(v -> onBackPressed());
         findViewById(R.id.txt_back).setOnClickListener(v -> onBackPressed());
         mTxtBackData = findViewById(R.id.txt_back_document_data);
+        mTxtFrontData = findViewById(R.id.txt_front_document_data);
         mBtnCaptureBack = findViewById(R.id.btn_capture_back);
         mBtnCaptureFront = findViewById(R.id.btn_capture_front);
         mBtnCaptureBack.setOnClickListener(v -> {
@@ -64,6 +69,7 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
 
         mImgDocumentBack = findViewById(R.id.img_document_back);
         mImgDocumentFront = findViewById(R.id.img_document_front);
+        mImgFace = findViewById(R.id.img_face);
     }
 
     public static boolean checkAndRequestPermissions(Activity activity) {
@@ -81,7 +87,7 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
         }
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(activity, listPermissionsNeeded
-                            .toArray(new String[listPermissionsNeeded.size()]),
+                            .toArray(new String[0]),
                     REQUEST_ID_MULTIPLE_PERMISSIONS);
             return false;
         }
@@ -89,30 +95,30 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_ID_MULTIPLE_PERMISSIONS:
-                if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                            "Requires Access to Camara.", Toast.LENGTH_SHORT)
-                            .show();
-                } else if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(),
-                            "FlagUp Requires Access to Your Storage.",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    chooseImage(this);
-                }
-                break;
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_ID_MULTIPLE_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(),
+                        "Requires Access to Camara.", Toast.LENGTH_SHORT)
+                        .show();
+            } else if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(),
+                        "FlagUp Requires Access to Your Storage.",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                chooseImage(this);
+            }
         }
     }
 
-
     // function to let's the user to choose image from camera or gallery
     private void chooseImage(Activity context) {
-        final CharSequence[] optionsMenu = {"Take Photo", "Choose from Gallery", "Exit"}; // create a menuOption Array
+        final CharSequence[] optionsMenu = {"Take Photo", "Choose from Gallery", "Exit"};
+        // create a menuOption Array
         // create a dialog for showing the optionsMenu
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         // set the items in builder
@@ -123,7 +129,8 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
                 startActivityForResult(takePicture, 0);
             } else if (optionsMenu[i].equals("Choose from Gallery")) {
                 // choose from  external storage
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickPhoto, 1);
             } else if (optionsMenu[i].equals("Exit")) {
                 dialogInterface.dismiss();
@@ -148,7 +155,8 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
                         Uri selectedImage = data.getData();
                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
                         if (selectedImage != null) {
-                            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                            Cursor cursor = getContentResolver().query(selectedImage,
+                                    filePathColumn, null, null, null);
                             if (cursor != null) {
                                 cursor.moveToFirst();
                                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -169,20 +177,41 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
             mImgDocumentBack.setImageBitmap(bitmap);
             isBackCaptured = true;
             mBtnCaptureBack.setText("Process Back Image");
-            mBtnCaptureBack.setClickable(false);
-            mBtnCaptureBack.setOnClickListener(v -> mNationalIDHelper.processBackImage(bitmap, (response, error) -> {
-                mNationalIdMap = response;
-
-                if (mNationalIdMap != null) {
-                    mTxtBackData.setText("" + "Document ID: " + mNationalIdMap.get("id") + "\nMRZ: \n" +
-                            mNationalIdMap.get("mrzResult") + "\nQR Code: " + mNationalIdMap.get("qrCodeData"));
-                } else {
-                    mTxtBackData.setText("Error :" + error.getMessage());
-                }
-            }));
+            mBtnCaptureBack.setOnClickListener(v -> {
+                mBtnCaptureBack.setEnabled(false);
+                mNationalIDHelper.processBackImage(bitmap, (response, error) -> {
+                    mNationalIdMap = response;
+                    if (mNationalIdMap != null) {
+                        String documentDetails = "" +
+                                "Document ID: " + mNationalIdMap.get("id") +
+                                "\nMRZ: \n" + mNationalIdMap.get("mrzResult") +
+                                "\nQR Code: " + mNationalIdMap.get("qrCodeData");
+                        mTxtBackData.setText(documentDetails);
+                    } else {
+                        String errorData = "Error :" + error.getMessage();
+                        mTxtBackData.setText(errorData);
+                    }
+                    mBtnCaptureFront.setVisibility(View.VISIBLE);
+                });
+            });
         } else {
             mImgDocumentFront.setImageBitmap(bitmap);
             mBtnCaptureFront.setText("Process Front Image");
+            mBtnCaptureFront.setOnClickListener(v -> {
+                mBtnCaptureFront.setEnabled(false);
+                mNationalIDHelper.processFrontImage(bitmap, (nationalIDMap, error) -> {
+                    if (nationalIDMap != null) {
+                        mTxtFrontData.setText("OCR: \n" + nationalIDMap.get("ocr"));
+                        String base64Face = nationalIDMap.get("face").toString();
+                        if (!TextUtils.isEmpty(base64Face)) {
+                            mImgFace.setImageBitmap(AppUtil.imageBase64ToBitmap(base64Face));
+                        }
+                    } else {
+                        String errorData = "Error :" + error.getMessage();
+                        mTxtFrontData.setText(errorData);
+                    }
+                });
+            });
         }
     }
 }
