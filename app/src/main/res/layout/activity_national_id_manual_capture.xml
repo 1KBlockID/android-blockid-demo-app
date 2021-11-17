@@ -59,7 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dimen_20dp"
                 android:adjustViewBounds="true"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:scaleType="fitXY"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -91,7 +92,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dimen_20dp"
                 android:adjustViewBounds="true"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:scaleType="fitXY"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txt_back_document_data" />
 
             <androidx.appcompat.widget.AppCompatButton

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,12 +23,17 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDManualScanHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -39,6 +45,7 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
     private NationalIDManualScanHelper mNationalIDHelper;
     private AppCompatTextView mTxtBackData, mTxtFrontData;
     private LinkedHashMap<String, Object> mNationalIdMap = new LinkedHashMap<>();
+    private String currentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,18 +122,12 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
         }
     }
 
-    // function to let's the user to choose image from camera or gallery
     private void chooseImage(Activity context) {
         final CharSequence[] optionsMenu = {"Take Photo", "Choose from Gallery", "Exit"};
-        // create a menuOption Array
-        // create a dialog for showing the optionsMenu
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        // set the items in builder
         builder.setItems(optionsMenu, (dialogInterface, i) -> {
             if (optionsMenu[i].equals("Take Photo")) {
-                // Open the camera and get the photo
-                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(takePicture, 0);
+                takePicture();
             } else if (optionsMenu[i].equals("Choose from Gallery")) {
                 // choose from  external storage
                 Intent pickPhoto = new Intent(Intent.ACTION_PICK,
@@ -145,10 +146,8 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
         if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {
                 case 0:
-                    if (resultCode == RESULT_OK && data != null) {
-                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
-                        upDateBackCapturedUi(selectedImage);
-                    }
+                    if (resultCode == RESULT_OK)
+                        upDateBackCapturedUi(getTakePicBitmap());
                     break;
                 case 1:
                     if (resultCode == RESULT_OK && data != null) {
@@ -172,6 +171,37 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
         }
     }
 
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void takePicture() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                return;
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, getPackageName(), photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, 0);
+            }
+        }
+    }
+
+    private Bitmap getTakePicBitmap() {
+        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+        return bitmap;
+    }
+
     private void upDateBackCapturedUi(Bitmap bitmap) {
         if (!isBackCaptured) {
             mImgDocumentBack.setImageBitmap(bitmap);
@@ -183,9 +213,18 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
                     mNationalIdMap = response;
                     if (mNationalIdMap != null) {
                         String documentDetails = "" +
-                                "Document ID: " + mNationalIdMap.get("id") +
-                                "\nMRZ: \n" + mNationalIdMap.get("mrzResult") +
-                                "\nQR Code: " + mNationalIdMap.get("qrCodeData");
+                                "Document ID: " + (mNationalIdMap.containsKey("id") ?
+                                mNationalIdMap.get("id") : null) +
+
+                                "\n\nOCR Back: \n" + (mNationalIdMap.containsKey("ocrBack") ?
+                                mNationalIdMap.get("ocrBack") : null) +
+
+                                "\n\nMRZ: \n" + (mNationalIdMap.containsKey("mrzResult") ?
+                                mNationalIdMap.get("mrzResult") : null) +
+
+                                "\n\nQR Code: " + (mNationalIdMap.containsKey("qrCodeData") ?
+                                mNationalIdMap.get("qrCodeData") : null);
+
                         mTxtBackData.setText(documentDetails);
                     } else {
                         String errorData = "Error :" + error.getMessage();
@@ -199,10 +238,16 @@ public class NationalIDManualCaptureActivity extends AppCompatActivity {
             mBtnCaptureFront.setText("Process Front Image");
             mBtnCaptureFront.setOnClickListener(v -> {
                 mBtnCaptureFront.setEnabled(false);
-                mNationalIDHelper.processFrontImage(bitmap, (nationalIDMap, error) -> {
-                    if (nationalIDMap != null) {
-                        mTxtFrontData.setText("OCR: \n" + nationalIDMap.get("ocr"));
-                        String base64Face = nationalIDMap.get("face").toString();
+                mNationalIDHelper.processFrontImage(bitmap, (response, error) -> {
+                    if (response != null) {
+                        mNationalIdMap.putAll(response);
+                        String documentDetails = "OCR: \n" + (mNationalIdMap.containsKey("ocr") ?
+                                mNationalIdMap.get("ocr") : null);
+                        mTxtFrontData.setText(documentDetails);
+
+                        String base64Face = mNationalIdMap.containsKey("face") ?
+                                mNationalIdMap.get("face").toString() : null;
+
                         if (!TextUtils.isEmpty(base64Face)) {
                             mImgFace.setImageBitmap(AppUtil.imageBase64ToBitmap(base64Face));
                         }
