@@ -27,6 +27,7 @@ import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningV2Activity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
@@ -73,7 +74,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
         if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
-            onLiveIdClicked();
+            onLiveIdClicked(1);
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_v2))) {
+            onLiveIdClicked(2);
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
@@ -122,9 +125,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         populateEnrollmentAssetsData();
     }
 
-    private void onLiveIdClicked() {
+    private void onLiveIdClicked(int version) {
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
-            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            Intent intent;
+            if (version == 2) {
+                intent = new Intent(this, LiveIDScanningV2Activity.class);
+            } else {
+                intent = new Intent(this, LiveIDScanningActivity.class);
+            }
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
         }

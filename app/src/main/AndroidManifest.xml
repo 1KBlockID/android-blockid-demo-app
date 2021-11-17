@@ -53,6 +53,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".ui.liveID.LiveIDScanningV2Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ui.passport.EPassportChipActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
