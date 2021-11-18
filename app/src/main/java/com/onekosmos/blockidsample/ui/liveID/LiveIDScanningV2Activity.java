@@ -25,6 +25,7 @@ import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
@@ -128,9 +129,12 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
         if (liveIDBitmap == null) {
+            HashMap<String, Object> map = (HashMap<String, Object>) error.getObject();
             errorDialog.show(null,
                     getString(R.string.label_error),
-                    error.getMessage(), dialog -> {
+                    error.getMessage() + "\n" +
+                            map.toString()
+                    , dialog -> {
                         errorDialog.dismiss();
                         finish();
                     });
@@ -155,7 +159,7 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
     }
 
     private void initViews() {
-        progressDialog = new ProgressDialog(this, "Verifying Live ID");
+        progressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
         mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
