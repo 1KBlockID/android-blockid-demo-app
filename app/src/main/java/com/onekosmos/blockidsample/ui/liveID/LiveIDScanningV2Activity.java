@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -40,6 +39,7 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
+    private static final double mProbability = 0.7, mQuality = 0.5;
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtTitle;
     private AppCompatButton mBtnCancel;
@@ -72,7 +72,8 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
 
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE,
+                    mBIDScannerView, mScannerOverlay, mProbability, mQuality, this);
             mLiveIDScannerHelper.startLiveIDScanning();
         }
     }
@@ -100,7 +101,8 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE,
+                    mBIDScannerView, mScannerOverlay, mProbability, mQuality, this);
             mLiveIDScannerHelper.startLiveIDScanning();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
@@ -156,7 +158,6 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
             return;
         }
 
-        Log.e("onLiveIDCaptured", "Success");
         mProgressDialog.dismiss();
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
@@ -240,7 +241,6 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
-            Log.e("registerLiveID", "Success");
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();

@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4.88" + "." + getCurrentTimestampHexValue()
+        versionName "1.4.89" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -47,8 +47,7 @@ def String getCurrentTimestampHexValue() {
 }
 
 dependencies {
-    implementation project(':android-kernel-sdk')
-//    implementation project(path: ':BlockIDSDK-release')
+    implementation project(path: ':BlockIDSDK-release')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
