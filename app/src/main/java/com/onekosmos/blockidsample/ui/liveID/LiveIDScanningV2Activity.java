@@ -56,6 +56,14 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         initViews();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.cancel();
+        }
+    }
+
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
@@ -164,7 +172,9 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
 
     @Override
     public void onLivenessCheckStarted() {
-        mProgressDialog.show();
+        if (!isFinishing()) {
+            mProgressDialog.show();
+        }
     }
 
     private void initViews() {
