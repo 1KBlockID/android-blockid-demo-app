@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -47,7 +48,7 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
     private AppCompatImageView mScannerOverlay;
     private int mScannerOverlayMargin = 30;
     private LinearLayout mLayoutMessage;
-    private ProgressDialog progressDialog;
+    private ProgressDialog mProgressDialog;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +126,7 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         mBIDScannerView.setVisibility(View.GONE);
         mScannerOverlay.setVisibility(View.GONE);
         mBtnCancel.setVisibility(View.GONE);
-        // call enrollLiveID func here
+
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
@@ -147,7 +148,8 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
             return;
         }
 
-        progressDialog.dismiss();
+        Log.e("onLiveIDCaptured", "Success");
+        mProgressDialog.dismiss();
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
             return;
@@ -162,11 +164,11 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
 
     @Override
     public void onLivenessCheckStarted() {
-        progressDialog.show();
+        mProgressDialog.show();
     }
 
     private void initViews() {
-        progressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
+        mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
         mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
@@ -228,6 +230,7 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
+            Log.e("registerLiveID", "Success");
             progressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
