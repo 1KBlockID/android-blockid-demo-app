@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -128,21 +127,27 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         mBtnCancel.setVisibility(View.GONE);
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
         if (liveIDBitmap == null) {
-            Log.e("onLiveIDCaptured", "error");
+            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+
             HashMap<String, Object> map = (HashMap<String, Object>) error.getObject();
             String stringMapData = (map != null && !map.isEmpty()) ? map.toString() : "";
             errorDialog.show(null,
                     getString(R.string.label_error),
                     error.getMessage() + "\n" + stringMapData
-                    , dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+                    , onDismissListener);
             return;
         }
+
         progressDialog.dismiss();
-        Log.e("onLiveIDCaptured", "success");
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
             return;
