@@ -130,10 +130,10 @@ public class LiveIDScanningV2Activity extends AppCompatActivity implements View.
         ErrorDialog errorDialog = new ErrorDialog(this);
         if (liveIDBitmap == null) {
             HashMap<String, Object> map = (HashMap<String, Object>) error.getObject();
+            String stringMapData = (map != null && !map.isEmpty()) ? map.toString() : "";
             errorDialog.show(null,
                     getString(R.string.label_error),
-                    error.getMessage() + "\n" +
-                            map.toString()
+                    error.getMessage() + "\n" + stringMapData
                     , dialog -> {
                         errorDialog.dismiss();
                         finish();
