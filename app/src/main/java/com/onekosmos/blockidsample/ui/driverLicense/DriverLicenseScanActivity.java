@@ -1,10 +1,5 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -27,6 +23,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
+import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -35,6 +32,11 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.LinkedHashMap;
+
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 
 /**
@@ -140,7 +142,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         if (driverLicenseMap != null) {
             mDriverLicenseMap = driverLicenseMap;
             mSigToken = signatureToken;
-            registerDriverLicense();
+            verifyDriverLicenseDialog();
             return;
         }
 
@@ -198,7 +200,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtScanSide.setVisibility(View.GONE);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        ProgressDialog progressDialog = new ProgressDialog(this);
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_registering_driver_license));
         progressDialog.show();
         isRegistrationInProgress = true;
         if (mDriverLicenseMap != null) {
@@ -275,6 +278,38 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                     mDriverLicenseScannerHelper.stopScanning();
                     errorDialog.dismiss();
                     finish();
+                });
+    }
+
+    private void verifyDriverLicenseDialog() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null,
+                getString(R.string.label_verify_driver_license),
+                getString(R.string.label_do_you_want_to_verify_driver_license),
+                getString(R.string.label_yes),
+                getString(R.string.label_no),
+                (dialogInterface, i) -> registerDriverLicense(),
+                dialog -> verifyDriverLicense());
+    }
+
+    private void verifyDriverLicense() {
+        ProgressDialog progressDialog = new ProgressDialog(this, getString(
+                R.string.label_verifying_driver_license));
+        progressDialog.show();
+
+        BlockIDSDK.getInstance().documentVerification(AppConstant.dvcID, mDriverLicenseMap,
+                new BlockIDSDK.IDocumentVerificationListener() {
+                    @Override
+                    public void onDocumentVerify(boolean status,
+                                                 LinkedHashMap<String, Object> documentVerificationMap,
+                                                 ErrorManager.ErrorResponse error) {
+                        if (status) {
+                            registerDriverLicense();
+                        } else {
+                            //FIXME need to handle response
+                            Log.e("API", "FAIL");
+                        }
+                    }
                 });
     }
 }
