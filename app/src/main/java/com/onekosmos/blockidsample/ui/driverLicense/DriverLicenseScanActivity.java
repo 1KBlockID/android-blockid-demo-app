@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -303,11 +302,17 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                     public void onDocumentVerify(boolean status,
                                                  LinkedHashMap<String, Object> documentVerificationMap,
                                                  ErrorManager.ErrorResponse error) {
+                        progressDialog.dismiss();
                         if (status) {
                             registerDriverLicense();
                         } else {
-                            //FIXME need to handle response
-                            Log.e("API", "FAIL");
+                            ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
+                            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                                errorDialog.dismiss();
+                                finish();
+                            };
+                            errorDialog.show(null, getString(R.string.label_error),
+                                    error.getMessage(), onDismissListener);
                         }
                     }
                 });

@@ -108,7 +108,7 @@
     <string name="label_account_restoration_failed">Account restoration failed</string>
     <string name="label_many_faces">Many faces</string>
     <string name="label_verify_driver_license">Verify Driver License</string>
-    <string name="label_do_you_want_to_verify_driver_license">Do you want verify scanned Driver License?</string>
+    <string name="label_do_you_want_to_verify_driver_license">Do you want to verify scanned Driver License?</string>
     <string name="label_verifying_driver_license">"Verifying Driver License</string>
     <string name="label_registering_driver_license">"Registering Driver License</string>
 </resources>
