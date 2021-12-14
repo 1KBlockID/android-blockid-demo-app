@@ -312,7 +312,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                                 finish();
                             };
                             errorDialog.show(null, getString(R.string.label_error),
-                                    error.getMessage(), onDismissListener);
+                                    error.getMessage() + " (" + error.getCode() + ")",
+                                    onDismissListener);
                         }
                     }
                 });
