@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -300,10 +301,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                 new BlockIDSDK.IDocumentVerificationListener() {
                     @Override
                     public void onDocumentVerify(boolean status,
-                                                 LinkedHashMap<String, Object> documentVerificationMap,
+                                                 String documentVerification,
                                                  ErrorManager.ErrorResponse error) {
                         progressDialog.dismiss();
                         if (status) {
+                            Log.e("result", "-->" + documentVerification);
                             registerDriverLicense();
                         } else {
                             ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
