@@ -298,25 +298,20 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         progressDialog.show();
 
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mDriverLicenseMap,
-                new BlockIDSDK.IDocumentVerificationListener() {
-                    @Override
-                    public void onDocumentVerify(boolean status,
-                                                 String documentVerification,
-                                                 ErrorManager.ErrorResponse error) {
-                        progressDialog.dismiss();
-                        if (status) {
-                            Log.e("result", "-->" + documentVerification);
-                            registerDriverLicense();
-                        } else {
-                            ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
-                            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                                errorDialog.dismiss();
-                                finish();
-                            };
-                            errorDialog.show(null, getString(R.string.label_error),
-                                    error.getMessage() + " (" + error.getCode() + ")",
-                                    onDismissListener);
-                        }
+                (status, documentVerification, error) -> {
+                    progressDialog.dismiss();
+                    if (status) {
+                        Log.e("result", "-->" + documentVerification);
+                        registerDriverLicense();
+                    } else {
+                        ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage() + " (" + error.getCode() + ")",
+                                onDismissListener);
                     }
                 });
     }
