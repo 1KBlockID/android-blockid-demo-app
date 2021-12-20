@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -30,6 +29,9 @@ import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -301,7 +303,23 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                 (status, documentVerification, error) -> {
                     progressDialog.dismiss();
                     if (status) {
-                        Log.e("result", "-->" + documentVerification);
+                        //Verification success, call documentRegistration API
+
+                        // - Recommended for future use -
+                        // Update DL dictionary to include array of token received
+                        // from verifyDocument API response.
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            JSONArray certificates = jsonObject.getJSONArray("certifications");
+                            String[] tokens = new String[certificates.length()];
+                            for (int index = 0; index < certificates.length(); index++) {
+                                tokens[index] = certificates.getJSONObject(index).getString("token");
+                            }
+                            mDriverLicenseMap.put("tokens", tokens);
+                        } catch (Exception e) {
+                            // do nothing
+                        }
                         registerDriverLicense();
                     } else {
                         ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
