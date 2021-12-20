@@ -6,6 +6,7 @@
     <string name="label_unlock_sdk">Unlock SDK</string>
     <string name="label_login_successfully">Login Successfully</string>
     <string name="label_driver_license_1">Driver License 1</string>
+    <string name="label_driver_license_with_verification">Driver License with Verication</string>
     <string name="label_passport1">Passport 1</string>
     <string name="label_passport2">Passport 2</string>
     <string name="label_app_pin">App Pin</string>
@@ -106,4 +107,8 @@
     <string name="label_security_phrase_error">Security phrase error. Try again.</string>
     <string name="label_account_restoration_failed">Account restoration failed</string>
     <string name="label_many_faces">Many faces</string>
+    <string name="label_verify_driver_license">Verify Driver License</string>
+    <string name="label_do_you_want_to_verify_driver_license">Do you want to verify Driver License?</string>
+    <string name="label_verifying_driver_license">"Verifying Driver License</string>
+    <string name="label_registering_driver_license">"Registering Driver License</string>
 </resources>

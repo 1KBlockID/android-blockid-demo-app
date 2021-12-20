@@ -9,10 +9,13 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class MainApplication extends Application {
+
     @Override
     public void onCreate() {
         super.onCreate();
         BlockIDSDK.initialize(this);
+        // To set any proxy uncomment below line
+        //  BlockIDSDK.getInstance().setProxy("45.95.99.20", 7580, "vautvdmg", "ag2idbos8oo6");
         BlockIDSDK.getInstance().setLicenseKey(AppConstant.licenseKey);
     }
 
