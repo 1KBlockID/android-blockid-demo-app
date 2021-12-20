@@ -62,7 +62,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
 
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay, false);
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay, true);
             mLiveIDScannerHelper.startLiveIDScanning();
         }
     }
@@ -90,7 +90,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay, false);
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay, true);
             mLiveIDScannerHelper.startLiveIDScanning();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
