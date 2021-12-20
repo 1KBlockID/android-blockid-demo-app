@@ -8,6 +8,6 @@ import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
  */
 public class AppConstant {
     public static final String licenseKey = "5809b7b7-886f-4c88-9061-59a2baf485be";
-    public static final String dvcID = "61a3f09647005c00132b6439";
+    public static final String dvcID = "default_config";
     public static final BIDTenant defaultTenant = new BIDTenant("1kosmos", "default", "https://1k-dev.1kosmos.net");
 }
