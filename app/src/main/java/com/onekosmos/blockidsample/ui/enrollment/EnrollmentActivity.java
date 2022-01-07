@@ -26,6 +26,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
+import com.onekosmos.blockidsample.ui.enrollSSN.EnrollSSNActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
@@ -45,6 +46,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 
 /**
@@ -93,8 +95,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_recover_mnemonic))) {
             onRecoverMnemonicClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
+                getString(R.string.label_enroll_ssn))) {
+            onEnrollSSNClicked();
         }
     }
+
+
 
     private void initView() {
         populateEnrollmentAssetsData();
@@ -277,6 +284,12 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             return;
         }
         Intent intent = new Intent(this, NationalIDScanActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onEnrollSSNClicked() {
+        Intent intent = new Intent(this, EnrollSSNActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
