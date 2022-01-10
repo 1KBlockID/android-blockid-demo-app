@@ -1,6 +1,9 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -123,7 +126,8 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_recover_mnemonic));
                 break;
             case ASSET_SSN:
-                enrollmentAsset = new EnrollmentAsset(false,
+                SharedPreferences prefs = context.getSharedPreferences("blockIdDemo", MODE_PRIVATE);
+                enrollmentAsset = new EnrollmentAsset(prefs.getBoolean("isSSNVerified",false),
                         context.getResources().getString(R.string.label_enroll_ssn));
                 break;
         }

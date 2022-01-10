@@ -1,7 +1,9 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -324,6 +326,10 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 getString(R.string.label_cancel), getString(R.string.label_ok),
                 (dialogInterface, i) -> {
                     errorDialog.dismiss();
+                    SharedPreferences preferences =getSharedPreferences("blockIdDemo", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.clear();
+                    editor.apply();
                     BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
                     Intent intent = new Intent(this, RegisterTenantActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
