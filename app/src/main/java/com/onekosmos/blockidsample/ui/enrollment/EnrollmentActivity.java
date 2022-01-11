@@ -1,9 +1,7 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -102,8 +100,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onVerifySSNClicked();
         }
     }
-
-
 
     private void initView() {
         populateEnrollmentAssetsData();
