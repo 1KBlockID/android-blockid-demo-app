@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.enrollSSN;
+package com.onekosmos.blockidsample.ui.verifySSN;
 
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
@@ -21,12 +21,15 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +43,10 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 /**
- * Created by Sarthak Mishra
+ * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class EnrollSSNActivity extends AppCompatActivity {
+public class VerifySSNActivity extends AppCompatActivity {
 
     private ImageView mBackBtn;
     private EditText mSSN, mFirstName, mMiddleName, mLastName, mBirthDate, mStreet, mCity, mState,
@@ -58,7 +61,7 @@ public class EnrollSSNActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_enroll_ssn);
+        setContentView(R.layout.activity_verify_ssn);
 
         mBackBtn = findViewById(R.id.bckBtn);
         mSSN = findViewById(R.id.ssn_text);
@@ -76,6 +79,37 @@ public class EnrollSSNActivity extends AppCompatActivity {
         mConsentCB = findViewById(R.id.consent_cb);
         mContinueBtn = findViewById(R.id.btn_continue);
 
+        populateDLData();
+
+        DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
+            mCalendar.set(Calendar.YEAR, year);
+            mCalendar.set(Calendar.MONTH, month);
+            mCalendar.set(Calendar.DAY_OF_MONTH, day);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(displayDateFormat, Locale.US);
+            mBirthDate.setText(dateFormat.format(mCalendar.getTime()));
+        };
+        mBirthDate.setOnClickListener(view -> {
+            DatePickerDialog dpDialog = new DatePickerDialog(VerifySSNActivity.this, date, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
+            dpDialog.getDatePicker().setMaxDate(new Date().getTime());
+            dpDialog.show();
+        });
+
+        mConsentCB.setOnClickListener(v -> {
+            if (!mConsentCB.isChecked()) {
+                mContinueBtn.setBackgroundColor(getColor(android.R.color.darker_gray));
+                mContinueBtn.setEnabled(false);
+            } else {
+                mContinueBtn.setBackgroundColor(getColor(R.color.black));
+                mContinueBtn.setEnabled(true);
+            }
+        });
+
+        mContinueBtn.setOnClickListener(v -> validateAndVerifySSN());
+
+        mBackBtn.setOnClickListener(v -> onBackPressed());
+    }
+
+    private void populateDLData() {
         if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
             String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name());
             try {
@@ -118,53 +152,9 @@ public class EnrollSSNActivity extends AppCompatActivity {
                     }
                 }
             } catch (JSONException e) {
-
+                return;
             }
         }
-
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                mCalendar.set(Calendar.YEAR, year);
-                mCalendar.set(Calendar.MONTH, month);
-                mCalendar.set(Calendar.DAY_OF_MONTH, day);
-                SimpleDateFormat dateFormat = new SimpleDateFormat(displayDateFormat, Locale.US);
-                mBirthDate.setText(dateFormat.format(mCalendar.getTime()));
-            }
-        };
-        mBirthDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DatePickerDialog(EnrollSSNActivity.this, date, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-        mConsentCB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mConsentCB.isChecked()) {
-                    mContinueBtn.setBackground(getDrawable(R.drawable.button_primary_solid_btn_default));
-                    mContinueBtn.setEnabled(false);
-                } else {
-                    mContinueBtn.setBackground(getDrawable(R.drawable.btn_default));
-                    mContinueBtn.setEnabled(true);
-                }
-            }
-        });
-
-        mContinueBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validateAndVerifySSN();
-            }
-        });
-
-        mBackBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
     }
 
     @Override
@@ -207,10 +197,10 @@ public class EnrollSSNActivity extends AppCompatActivity {
 
         try {
             date = inputFormat.parse(time);
-            str = outputFormat.format(date);
+            return outputFormat.format(date);
         } catch (ParseException e) {
+            return null;
         }
-        return str;
     }
 
     private void verifySSN() {
@@ -264,14 +254,14 @@ public class EnrollSSNActivity extends AppCompatActivity {
                             isVerified = true;
                         } else {
                             isVerified = false;
-                            setDataInSharedPreferences(false);
+                            SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED,false);
                             handleFailedSSNVerification();
                             break;
                         }
                     }
 
                     if (isVerified) {
-                        setDataInSharedPreferences(true);
+                        SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED,true);
                         handleSuccessSSNVerification();
                     }
 
@@ -279,35 +269,26 @@ public class EnrollSSNActivity extends AppCompatActivity {
                 }
             } else {
                 progressDialog.dismiss();
-                ErrorDialog errorDialog = new ErrorDialog(EnrollSSNActivity.this);
+                ErrorDialog errorDialog = new ErrorDialog(this);
                 DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
                     errorDialog.dismiss();
+                    finish();
                 };
-
-                errorDialog.showWithOneButton(null,
-                        getString(R.string.label_error),
-                        error.getMessage(),
-                        getString(R.string.label_ok),
-                        dialog -> {
-                            errorDialog.dismiss();
-                        });
+                if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                    errorDialog.showNoInternetDialog(onDismissListener);
+                    return;
+                }
+                errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
             }
         });
     }
 
-    private void setDataInSharedPreferences(boolean value) {
-        SharedPreferences.Editor editor = getSharedPreferences("blockIdDemo", MODE_PRIVATE).edit();
-        editor.putBoolean("isSSNVerified", value);
-        editor.apply();
-    }
-
     private void handleFailedSSNVerification() {
-
-        ErrorDialog errorDialog = new ErrorDialog(EnrollSSNActivity.this);
+        ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
 
         errorDialog.showWithOneButton(null,
                 getString(R.string.label_error),
-                "The information you provided does not match the records. Please try again.",
+                getString(R.string.ssn_verification_failed_no_match),
                 getString(R.string.label_retry),
                 dialog -> {
                     errorDialog.dismiss();
@@ -315,11 +296,11 @@ public class EnrollSSNActivity extends AppCompatActivity {
     }
 
     private void handleSuccessSSNVerification() {
-        ErrorDialog errorDialog = new ErrorDialog(EnrollSSNActivity.this);
+        ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
 
         errorDialog.showWithOneButton(null,
                 getString(R.string.label_success),
-                "Your Social Security Number has been verified.",
+                getString(R.string.ssn_verification_success),
                 getString(R.string.label_ok),
                 dialog -> {
                     errorDialog.dismiss();
@@ -328,14 +309,14 @@ public class EnrollSSNActivity extends AppCompatActivity {
     }
 
     private void handleInvalidData() {
-        ErrorDialog errorDialog = new ErrorDialog(EnrollSSNActivity.this);
+        ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
         };
 
         errorDialog.showWithOneButton(null,
                 getString(R.string.label_error),
-                "There is some error in the request data.",
+                getString(R.string.bad_data),
                 getString(R.string.label_retry),
                 dialog -> {
                     errorDialog.dismiss();

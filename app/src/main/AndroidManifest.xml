@@ -89,7 +89,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.enrollSSN.EnrollSSNActivity"
+            android:name=".ui.verifySSN.VerifySSNActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
