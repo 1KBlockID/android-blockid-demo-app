@@ -36,10 +36,10 @@ public class EnrollmentsDataSource {
         ASSET_PP1,
         ASSET_PP2,
         ASSET_NATIONAL_ID,
+        ASSET_SSN,
         ASSET_LOGIN_WITH_QR,
         ASSET_RECOVER_MNEMONIC,
         ASSET_RESET_SDK,
-        ASSET_SSN
     }
 
     private EnrollmentsDataSource() {

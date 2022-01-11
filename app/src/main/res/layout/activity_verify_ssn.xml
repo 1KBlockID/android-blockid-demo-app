@@ -177,14 +177,15 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_continue"
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_marginBottom="@dimen/dimen_24dp"
                     android:background="@android:color/darker_gray"
-                    android:paddingHorizontal="@dimen/dimen_20dp"
-                    android:text="@string/continue_text"                    android:textAllCaps="false"
                     android:enabled="false"
+                    android:paddingHorizontal="@dimen/dimen_20dp"
+                    android:text="@string/continue_text"
+                    android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/dimen_16sp" />
 

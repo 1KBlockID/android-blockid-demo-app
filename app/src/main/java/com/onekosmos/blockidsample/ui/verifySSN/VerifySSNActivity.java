@@ -7,13 +7,10 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -26,7 +23,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
@@ -193,7 +189,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         SimpleDateFormat outputFormat = new SimpleDateFormat(outputPattern);
 
         Date date = null;
-        String str = null;
 
         try {
             date = inputFormat.parse(time);
@@ -254,21 +249,22 @@ public class VerifySSNActivity extends AppCompatActivity {
                             isVerified = true;
                         } else {
                             isVerified = false;
-                            SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED,false);
+                            SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, false);
                             handleFailedSSNVerification();
                             break;
                         }
                     }
 
                     if (isVerified) {
-                        SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED,true);
+                        SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, true);
                         handleSuccessSSNVerification();
                     }
-
                 } catch (JSONException e) {
+                    return;
                 }
             } else {
                 progressDialog.dismiss();
+                SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, false);
                 ErrorDialog errorDialog = new ErrorDialog(this);
                 DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
                     errorDialog.dismiss();
