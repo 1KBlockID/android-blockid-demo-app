@@ -32,9 +32,10 @@ public class EnrollmentsDataSource {
         ASSET_PP1,
         ASSET_PP2,
         ASSET_NATIONAL_ID,
+        ASSET_SSN,
         ASSET_LOGIN_WITH_QR,
         ASSET_RECOVER_MNEMONIC,
-        ASSET_RESET_SDK
+        ASSET_RESET_SDK,
     }
 
     private EnrollmentsDataSource() {
@@ -51,6 +52,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_PP1);
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
+        arr.add(EnrollmentAssetEnum.ASSET_SSN);
 
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
@@ -119,6 +121,10 @@ public class EnrollmentsDataSource {
             case ASSET_RECOVER_MNEMONIC:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_recover_mnemonic));
+                break;
+            case ASSET_SSN:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_enroll_ssn));
                 break;
         }
         return enrollmentAsset;
