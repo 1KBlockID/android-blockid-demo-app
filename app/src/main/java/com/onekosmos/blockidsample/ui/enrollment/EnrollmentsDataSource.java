@@ -1,6 +1,5 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
-
 import android.content.Context;
 import android.text.TextUtils;
 

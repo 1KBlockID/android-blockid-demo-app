@@ -111,40 +111,43 @@ public class VerifySSNActivity extends AppCompatActivity {
             try {
                 JSONArray dlDoc = new JSONArray(dlArrayList);
                 if (dlDoc != null && dlDoc.length() >= 0) {
-                    if (dlDoc.getJSONObject(0).has("firstName")) {
-                        mFirstName.setText(dlDoc.getJSONObject(0).getString("firstName"));
+
+                    JSONObject dlObject = dlDoc.getJSONObject(0);
+
+                    if (dlObject.has("firstName")) {
+                        mFirstName.setText(dlObject.getString("firstName"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("middleName")) {
-                        mMiddleName.setText(dlDoc.getJSONObject(0).getString("middleName"));
+                    if (dlObject.has("middleName")) {
+                        mMiddleName.setText(dlObject.getString("middleName"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("lastName")) {
-                        mLastName.setText(dlDoc.getJSONObject(0).getString("lastName"));
+                    if (dlObject.has("lastName")) {
+                        mLastName.setText(dlObject.getString("lastName"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("dob")) {
-                        mBirthDate.setText(changeDateFormat(dlDoc.getJSONObject(0).getString("dob"), "yyyymmdd", displayDateFormat));
+                    if (dlObject.has("dob")) {
+                        mBirthDate.setText(changeDateFormat(dlObject.getString("dob"), "yyyymmdd", displayDateFormat));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("street")) {
-                        mStreet.setText(dlDoc.getJSONObject(0).getString("street"));
+                    if (dlObject.has("street")) {
+                        mStreet.setText(dlObject.getString("street"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("city")) {
-                        mCity.setText(dlDoc.getJSONObject(0).getString("city"));
+                    if (dlObject.has("city")) {
+                        mCity.setText(dlObject.getString("city"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("state")) {
-                        mState.setText(dlDoc.getJSONObject(0).getString("state"));
+                    if (dlObject.has("state")) {
+                        mState.setText(dlObject.getString("state"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("zipCode")) {
-                        mZipCode.setText(dlDoc.getJSONObject(0).getString("zipCode"));
+                    if (dlObject.has("zipCode")) {
+                        mZipCode.setText(dlObject.getString("zipCode"));
                     }
 
-                    if (dlDoc.getJSONObject(0).has("country")) {
-                        mCountry.setText(dlDoc.getJSONObject(0).getString("country"));
+                    if (dlObject.has("country")) {
+                        mCountry.setText(dlObject.getString("country"));
                     }
                 }
             } catch (JSONException e) {
