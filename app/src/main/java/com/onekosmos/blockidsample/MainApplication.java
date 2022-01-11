@@ -3,7 +3,6 @@ package com.onekosmos.blockidsample;
 import android.app.Application;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 
 /**
  * Created by 1Kosmos Engineering
@@ -14,7 +13,6 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferenceUtil.initialize(this);
         BlockIDSDK.initialize(this);
         // To set any proxy uncomment below line
         //  BlockIDSDK.getInstance().setProxy("45.95.99.20", 7580, "vautvdmg", "ag2idbos8oo6");

@@ -26,7 +26,6 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -257,14 +256,12 @@ public class VerifySSNActivity extends AppCompatActivity {
                             isVerified = true;
                         } else {
                             isVerified = false;
-                            SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, false);
                             handleFailedSSNVerification();
                             break;
                         }
                     }
 
                     if (isVerified) {
-                        SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, true);
                         handleSuccessSSNVerification();
                     }
                 } catch (JSONException e) {
@@ -272,7 +269,6 @@ public class VerifySSNActivity extends AppCompatActivity {
                 }
             } else {
                 progressDialog.dismiss();
-                SharedPreferenceUtil.getInstance().setBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED, false);
                 ErrorDialog errorDialog = new ErrorDialog(this);
                 DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
                     errorDialog.dismiss();
@@ -314,9 +310,6 @@ public class VerifySSNActivity extends AppCompatActivity {
 
     private void handleInvalidData() {
         ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
-        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-            errorDialog.dismiss();
-        };
 
         errorDialog.showWithOneButton(null,
                 getString(R.string.label_error),

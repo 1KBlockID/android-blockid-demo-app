@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,7 +123,7 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_recover_mnemonic));
                 break;
             case ASSET_SSN:
-                enrollmentAsset = new EnrollmentAsset(SharedPreferenceUtil.getInstance().getBool(SharedPreferenceUtil.PREFS_KEY_IS_SSN_VERIFIED),
+                enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_enroll_ssn));
                 break;
         }

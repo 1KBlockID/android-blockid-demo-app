@@ -34,7 +34,6 @@ import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -322,7 +321,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 getString(R.string.label_cancel), getString(R.string.label_ok),
                 (dialogInterface, i) -> {
                     errorDialog.dismiss();
-                    SharedPreferenceUtil.getInstance().clear();
                     BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
                     Intent intent = new Intent(this, RegisterTenantActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
