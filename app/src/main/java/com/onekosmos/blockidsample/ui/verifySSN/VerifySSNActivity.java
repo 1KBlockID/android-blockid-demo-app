@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -47,6 +48,7 @@ public class VerifySSNActivity extends AppCompatActivity {
     private ImageView mBackBtn;
     private EditText mSSN, mFirstName, mMiddleName, mLastName, mBirthDate, mStreet, mCity, mState,
             mZipCode, mPhone, mEmail, mCountry;
+    private TextView mBackText;
     private CheckBox mConsentCB;
     private Button mContinueBtn;
     private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
@@ -74,6 +76,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mEmail = findViewById(R.id.email_text);
         mConsentCB = findViewById(R.id.consent_cb);
         mContinueBtn = findViewById(R.id.btn_continue);
+        mBackText = findViewById(R.id.txt_back);
 
         populateDLData();
 
@@ -103,6 +106,8 @@ public class VerifySSNActivity extends AppCompatActivity {
         mContinueBtn.setOnClickListener(v -> validateAndVerifySSN());
 
         mBackBtn.setOnClickListener(v -> onBackPressed());
+
+        mBackText.setOnClickListener(v -> onBackPressed());
     }
 
     private void populateDLData() {
