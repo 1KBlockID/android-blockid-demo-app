@@ -43,7 +43,6 @@ import java.util.Locale;
  * Created by Sarthak Mishra
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-
 public class EnrollSSNActivity extends AppCompatActivity {
 
     private ImageView mBackBtn;
@@ -53,7 +52,6 @@ public class EnrollSSNActivity extends AppCompatActivity {
     private Button mContinueBtn;
     private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
     final Calendar mCalendar = Calendar.getInstance();
-    private int daysToAdd = 150;
     private String requiredDateFormat = "yyyy/MM/dd";
     private String displayDateFormat = "MM-dd-yyyy";
 
@@ -169,6 +167,11 @@ public class EnrollSSNActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     private void validateAndVerifySSN() {
         if (TextUtils.isEmpty(mSSN.getText().toString().trim())) {
             Toast.makeText(this, "Enter SSN", Toast.LENGTH_SHORT).show();
@@ -217,8 +220,6 @@ public class EnrollSSNActivity extends AppCompatActivity {
 
         mSSNMap.put("id", mSSN.getText().toString().trim());
         mSSNMap.put("type", SSN.getValue());
-        mSSNMap.put("documentId", mSSN.getText().toString().trim());
-        mSSNMap.put("documentType", SSN.getValue());
         mSSNMap.put("category", misc_document.name());
         mSSNMap.put("userConsent", mConsentCB.isChecked());
         mSSNMap.put("ssn", mSSN.getText().toString().trim());
@@ -278,6 +279,18 @@ public class EnrollSSNActivity extends AppCompatActivity {
                 }
             } else {
                 progressDialog.dismiss();
+                ErrorDialog errorDialog = new ErrorDialog(EnrollSSNActivity.this);
+                DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                    errorDialog.dismiss();
+                };
+
+                errorDialog.showWithOneButton(null,
+                        getString(R.string.label_error),
+                        error.getMessage(),
+                        getString(R.string.label_ok),
+                        dialog -> {
+                            errorDialog.dismiss();
+                        });
             }
         });
     }
@@ -327,10 +340,5 @@ public class EnrollSSNActivity extends AppCompatActivity {
                 dialog -> {
                     errorDialog.dismiss();
                 });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 }

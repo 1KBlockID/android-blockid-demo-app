@@ -14,6 +14,7 @@
     <string name="label_reset_app">Reset App</string>
     <string name="label_please_wait">Please wait...</string>
     <string name="label_error">Error</string>
+    <string name="label_retry">Retry</string>
     <string name="label_liveid">LiveID</string>
     <string name="label_enroll_liveid">Enroll LiveID</string>
     <string name="label_login_with_qr">Login with QR</string>
@@ -36,6 +37,7 @@
     <string name="label_nid_enrolled_successfully">National ID enrolled successfully</string>
     <string name="label_document_enrolled_successfully">Document enrolled successfully</string>
     <string name="label_dl_enrolled_successfully">Driver License enrolled successfully</string>
+    <string name="label_ssn_enrolled_successfully">Social Security Number enrolled successfully</string>
     <string name="label_enroll_driver_license">Enroll Driver License</string>
     <string name="label_enroll_passport">Enroll Passport</string>
     <string name="label_scan_passport">Scan photo page of passport</string>
@@ -101,6 +103,7 @@
     <string name="label_restore_account">Restore Account</string>
     <string name="label_restore_acc">Restore Account</string>
     <string name="label_recover_mnemonic">Recover Mnemonic</string>
+    <string name="label_enroll_ssn">Verify SSN</string>
     <string name="label_copy_phrases">Copy phrases</string>
     <string name="label_mnemonic_copy_success">Mnemonic phrase has been copied</string>
     <string name="label_enter_12_phrase">Please enter all 12 mnemonic phrase</string>
@@ -110,5 +113,8 @@
     <string name="label_verify_driver_license">Verify Driver License</string>
     <string name="label_do_you_want_to_verify_driver_license">Do you want to verify Driver License?</string>
     <string name="label_verifying_driver_license">"Verifying Driver License</string>
+    <string name="label_verifying_ssn">"Verifying Social Security Number</string>
     <string name="label_registering_driver_license">"Registering Driver License</string>
+    <string name="label_registering_ssn">"Registering Social Security Number</string>
+    <string name="ssn_consent">I attest that the information I have provided is correct and accept the use of Fair Credit Reporting Act data to verify my identity.</string>
 </resources>
