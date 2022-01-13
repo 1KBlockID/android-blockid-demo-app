@@ -1,10 +1,5 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +22,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
+import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -34,7 +30,15 @@ import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.LinkedHashMap;
+
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 
 /**
@@ -140,7 +144,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         if (driverLicenseMap != null) {
             mDriverLicenseMap = driverLicenseMap;
             mSigToken = signatureToken;
-            registerDriverLicense();
+            verifyDriverLicenseDialog();
             return;
         }
 
@@ -198,7 +202,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtScanSide.setVisibility(View.GONE);
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        ProgressDialog progressDialog = new ProgressDialog(this);
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_registering_driver_license));
         progressDialog.show();
         isRegistrationInProgress = true;
         if (mDriverLicenseMap != null) {
@@ -275,6 +280,57 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                     mDriverLicenseScannerHelper.stopScanning();
                     errorDialog.dismiss();
                     finish();
+                });
+    }
+
+    private void verifyDriverLicenseDialog() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null,
+                getString(R.string.label_verify_driver_license),
+                getString(R.string.label_do_you_want_to_verify_driver_license),
+                getString(R.string.label_yes),
+                getString(R.string.label_no),
+                (dialogInterface, i) -> registerDriverLicense(),
+                dialog -> verifyDriverLicense());
+    }
+
+    private void verifyDriverLicense() {
+        ProgressDialog progressDialog = new ProgressDialog(this, getString(
+                R.string.label_verifying_driver_license));
+        progressDialog.show();
+
+        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mDriverLicenseMap,
+                (status, documentVerification, error) -> {
+                    progressDialog.dismiss();
+                    if (status) {
+                        //Verification success, call documentRegistration API
+
+                        // - Recommended for future use -
+                        // Update DL dictionary to include array of token received
+                        // from verifyDocument API response.
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            JSONArray certificates = jsonObject.getJSONArray("certifications");
+                            String[] tokens = new String[certificates.length()];
+                            for (int index = 0; index < certificates.length(); index++) {
+                                tokens[index] = certificates.getJSONObject(index).getString("token");
+                            }
+                            mDriverLicenseMap.put("tokens", tokens);
+                        } catch (Exception e) {
+                            // do nothing
+                        }
+                        registerDriverLicense();
+                    } else {
+                        ErrorDialog errorDialog = new ErrorDialog(DriverLicenseScanActivity.this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage() + " (" + error.getCode() + ")",
+                                onDismissListener);
+                    }
                 });
     }
 }
