@@ -254,15 +254,13 @@ public class VerifySSNActivity extends AppCompatActivity {
 
                         if (certificates.getJSONObject(index).has("verified") && certificates.getJSONObject(index).getBoolean("verified")) {
                             isVerified = true;
-                        } else {
-                            isVerified = false;
-                            handleFailedSSNVerification();
+                            handleSuccessSSNVerification();
                             break;
                         }
                     }
 
-                    if (isVerified) {
-                        handleSuccessSSNVerification();
+                    if (!isVerified) {
+                        handleFailedSSNVerification();
                     }
                 } catch (JSONException e) {
                     return;

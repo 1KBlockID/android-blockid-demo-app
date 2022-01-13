@@ -115,7 +115,7 @@
     <string name="label_verifying_driver_license">Verifying Driver License</string>
     <string name="label_verifying_ssn">Verifying Social Security Number</string>
     <string name="label_registering_driver_license">"Registering Driver License</string>
-    <string name="ssn_consent">I attest that the information I have provided is correct and accept the use of Fair Credit Reporting Act data to verify my identity.</string>
+    <string name="ssn_consent">I attest that the information I have provided is correct and accept the use of Fair Credit Reporting Act to verify my identity.</string>
     <string name="ssn_verification_heading">SSN Verification</string>
     <string name="ssn_required_text">SSN*</string>
     <string name="first_name_required_text">First Name*</string>
