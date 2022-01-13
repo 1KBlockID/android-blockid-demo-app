@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4.92" + "." + getCurrentTimestampHexValue()
+        versionName "1.4.94" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -44,6 +44,11 @@ def String getCurrentTimestampHexValue() {
     String hexVal = Long.toHexString(timestamp);
     println("HEX VALUE--" + hexVal.toUpperCase());
     return hexVal.toUpperCase();
+}
+
+repositories {
+    // Depending on AndroidX Snapshot Builds to get the latest CameraX libs.
+    maven { url 'https://androidx.dev/snapshots/builds/6787662/artifacts/repository/' }
 }
 
 dependencies {
@@ -109,10 +114,16 @@ dependencies {
     //for json array filters
     implementation 'com.annimon:stream:1.2.2'
 
+
     // CameraX
-    implementation 'androidx.camera:camera-camera2:1.1.0-alpha11'
-    implementation 'androidx.camera:camera-lifecycle:1.1.0-alpha11'
-    implementation 'androidx.camera:camera-view:1.0.0-alpha31'
+//    implementation 'androidx.camera:camera-camera2:1.1.0-alpha12'
+//    implementation 'androidx.camera:camera-lifecycle:1.1.0-alpha12'
+//    implementation 'androidx.camera:camera-view:1.0.0-alpha32'
+
+    // CameraX
+    implementation "androidx.camera:camera-camera2:1.0.0-SNAPSHOT"
+    implementation "androidx.camera:camera-lifecycle:1.0.0-SNAPSHOT"
+    implementation "androidx.camera:camera-view:1.0.0-SNAPSHOT"
 
     // LiveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.7'
@@ -125,5 +136,5 @@ dependencies {
     implementation 'com.google.mlkit:barcode-scanning:17.0.0'
 
     // Opencv
-    implementation 'com.quickbirdstudios:opencv:4.5.3.0'
+    implementation 'com.quickbirdstudios:opencv:4.5.2'
 }
