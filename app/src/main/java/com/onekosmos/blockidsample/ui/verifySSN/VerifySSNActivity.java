@@ -54,6 +54,7 @@ public class VerifySSNActivity extends AppCompatActivity {
     final Calendar mCalendar = Calendar.getInstance();
     private String requiredDateFormat = "yyyy/MM/dd";
     private String displayDateFormat = "MM-dd-yyyy";
+    private String maskData = "XXXXXX";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -256,7 +257,7 @@ public class VerifySSNActivity extends AppCompatActivity {
                             isVerified = true;
                         } else {
                             isVerified = false;
-                            handleFailedSSNVerification();
+                            handleFailedSSNVerification(jsonObject);
                             break;
                         }
                     }
@@ -283,7 +284,82 @@ public class VerifySSNActivity extends AppCompatActivity {
         });
     }
 
-    private void handleFailedSSNVerification() {
+    private void handleFailedSSNVerification(JSONObject responseObject) {
+
+        try {
+            JSONArray certifications = responseObject.getJSONArray("certifications");
+            for (int index = 0; index < certifications.length(); index++) {
+                if (certifications.getJSONObject(index).has("metadata") &&
+                        certifications.getJSONObject(index).getJSONObject("metadata").
+                                has("verifiedPeople")) {
+                    JSONArray verifiedPeopleArray = certifications.getJSONObject(index).
+                            getJSONObject("metadata").getJSONArray("verifiedPeople");
+                    for (int verifiedPeopleIndex = 0; verifiedPeopleIndex < verifiedPeopleArray.length(); verifiedPeopleIndex++) {
+                        JSONObject data = verifiedPeopleArray.getJSONObject(verifiedPeopleIndex);
+
+                        if (data.has("firstName") && data.getJSONObject("firstName").has("value")) {
+                            data.getJSONObject("firstName").put("value", maskData);
+                        }
+
+                        if (data.has("middleName") && data.getJSONObject("middleName").has("value")) {
+                            data.getJSONObject("middleName").put("value", maskData);
+                        }
+
+                        if (data.has("lastName") && data.getJSONObject("lastName").has("value")) {
+                            data.getJSONObject("lastName").put("value", maskData);
+                        }
+
+                        if (data.has("ssn") && data.getJSONObject("ssn").has("value")) {
+                            data.getJSONObject("ssn").put("value", maskData);
+                        }
+
+                        if (data.has("dateOfBirth")) {
+                            if (data.getJSONObject("dateOfBirth").has("month")) {
+                                data.getJSONObject("dateOfBirth").getJSONObject("month").put("value", maskData);
+                            }
+
+                            if (data.getJSONObject("dateOfBirth").has("day")) {
+                                data.getJSONObject("dateOfBirth").getJSONObject("day").put("value", maskData);
+                            }
+
+                            if (data.getJSONObject("dateOfBirth").has("year")) {
+                                data.getJSONObject("dateOfBirth").getJSONObject("year").put("value", maskData);
+                            }
+                        }
+
+                        if (data.has("age") && data.getJSONObject("age").has("value")) {
+                            data.getJSONObject("age").put("value", maskData);
+                        }
+
+                        if (data.has("addresses")) {
+                            for (int addIndex = 0; addIndex < data.getJSONArray("addresses").length(); addIndex++) {
+                                data.getJSONArray("addresses").getJSONObject(addIndex).put("value", maskData);
+                            }
+                        }
+
+                        if (data.has("emails")) {
+                            for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").length(); emailIndex++) {
+                                data.getJSONArray("emails").getJSONObject(emailIndex).put("value", maskData);
+                            }
+                        }
+
+                        if (data.has("phones")) {
+                            for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").length(); phoneIndex++) {
+                                data.getJSONArray("phones").getJSONObject(phoneIndex).put("value", maskData);
+                            }
+                        }
+
+                        if (data.has("indicators")) {
+                            data.put("indicators", maskData);
+                        }
+                    }
+                }
+            }
+            JSONArray newCertifications = certifications;
+        } catch (JSONException e) {
+            return;
+        }
+
         ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
 
         errorDialog.showWithOneButton(null,
