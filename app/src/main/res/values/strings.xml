@@ -73,6 +73,8 @@
     <string name="label_yes">Yes</string>
     <string name="label_no">No</string>
     <string name="label_ok">Ok</string>
+    <string name="label_done">Done</string>
+    <string name="label_details">Details</string>
     <string name="label_cancel">Cancel</string>
     <string name="label_enroll_pin_id">Enroll PIN</string>
     <string name="label_enter_pin">Enter new PIN</string>
@@ -130,7 +132,10 @@
     <string name="phone_number_text">Phone number</string>
     <string name="email_text">Email</string>
     <string name="continue_text">Continue</string>
-    <string name="ssn_verification_failed_no_match">The information you provided does not match the records. Please try again.</string>
+    <string name="ssn_verification_failed_no_match">The information you provided does not match the records.</string>
     <string name="ssn_verification_success">Your Social Security Number has been verified.</string>
     <string name="bad_data">There is some error in the request data.</string>
+    <string name="label_storage_permission_alert">Please note that you will not be able to read or write any of your documents with BlockID Sample into your storage.</string>
+    <string name="label_share">Share</string>
+
 </resources>
