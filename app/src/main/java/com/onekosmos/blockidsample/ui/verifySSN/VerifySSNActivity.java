@@ -75,8 +75,8 @@ public class VerifySSNActivity extends AppCompatActivity {
     final Calendar mCalendar = Calendar.getInstance();
     private String requiredDateFormat = "yyyy/MM/dd";
     private String displayDateFormat = "MM-dd-yyyy";
-    private String maskData = "XXXXXX";
-    JSONArray maskedJsonArray = new JSONArray();
+    private String mMaskData = "XXXXXX";
+    private JSONArray maskedJsonArray = new JSONArray();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -200,7 +200,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-
     }
 
     private void validateAndVerifySSN() {
@@ -383,59 +382,59 @@ public class VerifySSNActivity extends AppCompatActivity {
                         JSONObject data = verifiedPeopleArray.getJSONObject(verifiedPeopleIndex);
 
                         if (data.has("firstName") && data.getJSONObject("firstName").has("value")) {
-                            data.getJSONObject("firstName").put("value", maskData);
+                            data.getJSONObject("firstName").put("value", mMaskData);
                         }
 
                         if (data.has("middleName") && data.getJSONObject("middleName").has("value")) {
-                            data.getJSONObject("middleName").put("value", maskData);
+                            data.getJSONObject("middleName").put("value", mMaskData);
                         }
 
                         if (data.has("lastName") && data.getJSONObject("lastName").has("value")) {
-                            data.getJSONObject("lastName").put("value", maskData);
+                            data.getJSONObject("lastName").put("value", mMaskData);
                         }
 
                         if (data.has("ssn") && data.getJSONObject("ssn").has("value")) {
-                            data.getJSONObject("ssn").put("value", maskData);
+                            data.getJSONObject("ssn").put("value", mMaskData);
                         }
 
                         if (data.has("dateOfBirth")) {
                             if (data.getJSONObject("dateOfBirth").has("month")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("month").put("value", maskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("month").put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("day")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("day").put("value", maskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("day").put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("year")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("year").put("value", maskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("year").put("value", mMaskData);
                             }
                         }
 
                         if (data.has("age") && data.getJSONObject("age").has("value")) {
-                            data.getJSONObject("age").put("value", maskData);
+                            data.getJSONObject("age").put("value", mMaskData);
                         }
 
                         if (data.has("addresses")) {
                             for (int addIndex = 0; addIndex < data.getJSONArray("addresses").length(); addIndex++) {
-                                data.getJSONArray("addresses").getJSONObject(addIndex).put("value", maskData);
+                                data.getJSONArray("addresses").getJSONObject(addIndex).put("value", mMaskData);
                             }
                         }
 
                         if (data.has("emails")) {
                             for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").length(); emailIndex++) {
-                                data.getJSONArray("emails").getJSONObject(emailIndex).put("value", maskData);
+                                data.getJSONArray("emails").getJSONObject(emailIndex).put("value", mMaskData);
                             }
                         }
 
                         if (data.has("phones")) {
                             for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").length(); phoneIndex++) {
-                                data.getJSONArray("phones").getJSONObject(phoneIndex).put("value", maskData);
+                                data.getJSONArray("phones").getJSONObject(phoneIndex).put("value", mMaskData);
                             }
                         }
 
                         if (data.has("indicators")) {
-                            data.put("indicators", maskData);
+                            data.put("indicators", mMaskData);
                         }
                     }
                 }
