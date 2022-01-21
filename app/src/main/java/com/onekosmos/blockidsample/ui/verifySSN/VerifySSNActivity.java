@@ -68,7 +68,7 @@ public class VerifySSNActivity extends AppCompatActivity {
     private ScrollView mScrollView;
     private RelativeLayout mWebLayout;
     private WebView mWebView;
-    private TextView mBackText;
+    private TextView mBackText, mBackTextWebView;
     private CheckBox mConsentCB;
     private Button mContinueBtn;
     private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
@@ -104,6 +104,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mWebView = findViewById(R.id.web_view);
         mWebShareButton = findViewById(R.id.webShareBtn);
         mWebCancelButton = findViewById(R.id.webBckBtn);
+        mBackTextWebView = findViewById(R.id.txt_back_web);
 
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
@@ -134,6 +135,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mContinueBtn.setOnClickListener(v -> validateAndVerifySSN());
         mBackBtn.setOnClickListener(v -> onBackPressed());
         mBackText.setOnClickListener(v -> onBackPressed());
+        mBackTextWebView.setOnClickListener(v -> onBackPressed());
         mWebShareButton.setOnClickListener(v -> { checkStoragePermission();});
         mWebCancelButton.setOnClickListener(v -> {
             mScrollView.setVisibility(View.VISIBLE);
