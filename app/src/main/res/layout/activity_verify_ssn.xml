@@ -2,16 +2,77 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:overScrollMode="ifContentScrolls"
     android:scrollbarStyle="insideOverlay"
     android:scrollbars="vertical"
     tools:context="com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity">
 
+    <RelativeLayout
+        android:id="@+id/webLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/linLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/webBckBtn"
+            android:layout_width="@dimen/dimen_25dp"
+            android:layout_height="@dimen/dimen_25dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/dimen_15dp"
+            android:layout_marginTop="@dimen/dimen_5dp"
+            android:padding="@dimen/dimen_5dp"
+            android:src="@drawable/icon_backarrow" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_back_web"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dimen_15dp"
+                android:text="@string/label_back"
+                android:layout_marginTop="@dimen/dimen_5dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dimen_16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="@dimen/dimen_5dp"
+                android:layout_marginStart="@dimen/dimen_20dp"
+                android:text="@string/ssn_verification_heading"
+                android:textColor="@color/primary3"
+                android:textSize="@dimen/dimen_28sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/webShareBtn"
+            android:layout_width="@dimen/dimen_25dp"
+            android:layout_height="@dimen/dimen_25dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/dimen_40dp"
+            android:tint="@color/primary3"
+            android:src="@drawable/icon_share" />
+        </LinearLayout>
+
+        <WebView
+            android:id="@+id/web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/linLayout" />
+
+    </RelativeLayout>
+
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -29,9 +90,9 @@
                     android:id="@+id/bckBtn"
                     android:layout_width="@dimen/dimen_25dp"
                     android:layout_height="@dimen/dimen_25dp"
-                    android:padding="@dimen/dimen_5dp"
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/dimen_15dp"
+                    android:padding="@dimen/dimen_5dp"
                     android:src="@drawable/icon_backarrow" />
 
                 <androidx.appcompat.widget.AppCompatTextView
