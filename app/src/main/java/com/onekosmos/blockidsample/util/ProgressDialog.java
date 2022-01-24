@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockidsample.R;
 
@@ -18,6 +19,15 @@ public class ProgressDialog extends Dialog {
         super(context);
         setCancelable(false);
         setContentView(R.layout.dialog_loading);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+    }
+
+    public ProgressDialog(@NonNull Context context, String message) {
+        super(context);
+        setCancelable(false);
+        setContentView(R.layout.dialog_loading);
+        AppCompatTextView mTxtMessage = findViewById(R.id.txt_please_wait);
+        mTxtMessage.setText(message);
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
     }
 }
