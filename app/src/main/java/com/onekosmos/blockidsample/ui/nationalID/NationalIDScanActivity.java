@@ -112,6 +112,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                 mSigToken = NationalIDTempData.getInstance().getmSignatureToken();
                 NationalIDTempData.getInstance().clearNationalIDData();
                 mNationalIDMap = mNationalIDFirstSideData;
+                mScannerOverlay.setVisibility(View.VISIBLE);
                 mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
                         mNationalIDMap, mSigToken,
                         mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
