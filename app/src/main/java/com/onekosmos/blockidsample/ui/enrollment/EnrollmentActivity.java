@@ -184,8 +184,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().unenrollPin((status, error) -> {
+            progressDialog.dismiss();
             if (status) {
-                progressDialog.dismiss();
                 refreshEnrollmentRecyclerView();
                 return;
             }
