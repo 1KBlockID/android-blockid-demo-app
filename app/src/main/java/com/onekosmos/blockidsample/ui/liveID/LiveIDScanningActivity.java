@@ -49,12 +49,12 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private int mScannerOverlayMargin = 30;
     private LinearLayout mLayoutMessage;
     private ProgressDialog mProgressDialog;
-    private boolean mWithLivenessCheck;
+    private boolean mIsLivenessNeeded;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liveid_scan);
-        mWithLivenessCheck = getIntent().getBooleanExtra("liveness_check", false);
+        mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
     }
 
@@ -181,7 +181,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         }
 
         mTxtTitle = findViewById(R.id.txt_liveid_title);
-        if (mWithLivenessCheck)
+        if (mIsLivenessNeeded)
             mTxtTitle.setText(R.string.label_enroll_liveid_with_liveness_check);
 
         mTxtMessage = findViewById(R.id.txt_message);
@@ -200,7 +200,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
         mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-        if (mWithLivenessCheck)
+        if (mIsLivenessNeeded)
             mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcID);
         else
             mLiveIDScannerHelper.startLiveIDScanning();
