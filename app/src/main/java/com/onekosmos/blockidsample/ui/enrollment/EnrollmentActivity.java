@@ -26,12 +26,12 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
-import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
+import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -74,7 +74,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
         if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
-            onLiveIdClicked();
+            onLiveIdClicked(false);
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_with_liveness_check))) {
+            onLiveIdClicked(true);
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
@@ -126,10 +128,11 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         populateEnrollmentAssetsData();
     }
 
-    private void onLiveIdClicked() {
+    private void onLiveIdClicked(boolean withLivenessCheck) {
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
             Intent intent = new Intent(this, LiveIDScanningActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra("liveness_check", withLivenessCheck);
             startActivity(intent);
         }
     }
