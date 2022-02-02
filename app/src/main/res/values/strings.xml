@@ -16,7 +16,9 @@
     <string name="label_error">Error</string>
     <string name="label_retry">Retry</string>
     <string name="label_liveid">LiveID</string>
+    <string name="label_liveid_with_liveness_check">LiveID (with liveness check)</string>
     <string name="label_enroll_liveid">Enroll LiveID</string>
+    <string name="label_enroll_liveid_with_liveness_check">Enroll LiveID (with liveness check)</string>
     <string name="label_login_with_qr">Login with QR</string>
     <string name="label_liveid_camera_permission_alert">Please note that you will not be able to secure your accounts with BlockID Sample and proceed until you have enrolled in LiveID</string>
     <string name="label_liveid_please_blink_your_eyes">Please blink your eyes</string>
@@ -137,5 +139,5 @@
     <string name="bad_data">There is some error in the request data.</string>
     <string name="label_storage_permission_alert">Please note that you will not be able to read or write any of your documents with BlockID Sample into your storage.</string>
     <string name="label_share">Share</string>
-
+    <string name="label_verify_liveid">Verifying LiveID</string>
 </resources>

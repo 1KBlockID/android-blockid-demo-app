@@ -20,6 +20,7 @@ import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
+import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -40,17 +41,20 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private AppCompatImageView mImgBack;
-    private AppCompatTextView mTxtBack, mTxtMessage;
+    private AppCompatTextView mTxtBack, mTxtMessage, mTxtTitle;
     private AppCompatButton mBtnCancel;
     private BIDScannerView mBIDScannerView;
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private AppCompatImageView mScannerOverlay;
     private int mScannerOverlayMargin = 30;
     private LinearLayout mLayoutMessage;
+    private ProgressDialog mProgressDialog;
+    private boolean mIsLivenessNeeded;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liveid_scan);
+        mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
     }
 
@@ -59,11 +63,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
         else {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            mLiveIDScannerHelper.startLiveIDScanning();
+            startLiveIDScan();
         }
     }
 
@@ -71,6 +71,14 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     public void onStop() {
         super.onStop();
         mLiveIDScannerHelper.stopLiveIDScanning();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.cancel();
+        }
     }
 
     @Override
@@ -88,10 +96,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-            mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
-            mLiveIDScannerHelper.startLiveIDScanning();
+            startLiveIDScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
@@ -99,6 +104,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     getString(R.string.label_liveid_camera_permission_alert), dialog -> {
                         finish();
                     });
+        }
+    }
+
+    @Override
+    public void onLivenessCheckStarted() {
+        if (!isFinishing()) {
+            mProgressDialog.show();
         }
     }
 
@@ -124,18 +136,28 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mBIDScannerView.setVisibility(View.GONE);
         mScannerOverlay.setVisibility(View.GONE);
         mBtnCancel.setVisibility(View.GONE);
+        if (mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
 
         // call enrollLiveID func here
         ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
         if (liveIDBitmap == null) {
-            errorDialog.show(null,
-                    getString(R.string.label_error),
-                    error.getMessage(), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+
+            String stringError = (error.getObject() != null) ? error.getObject() : "";
+            errorDialog.show(null, getString(R.string.label_error), "(" + error.getCode() + ") " +
+                            error.getMessage() + "\n" + stringError, onDismissListener);
             return;
         }
+
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
             return;
@@ -149,6 +171,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void initViews() {
+        mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.view_overlay);
         mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
@@ -156,6 +179,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
         }
+
+        mTxtTitle = findViewById(R.id.txt_liveid_title);
+        if (mIsLivenessNeeded)
+            mTxtTitle.setText(R.string.label_enroll_liveid_with_liveness_check);
 
         mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_message);
@@ -167,6 +194,16 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
         mBtnCancel = findViewById(R.id.btn_cancel);
         mBtnCancel.setOnClickListener(this);
+    }
+
+    private void startLiveIDScan() {
+        mBIDScannerView.setVisibility(View.VISIBLE);
+        mScannerOverlay.setVisibility(View.VISIBLE);
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
+        if (mIsLivenessNeeded)
+            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcID);
+        else
+            mLiveIDScannerHelper.startLiveIDScanning();
     }
 
     private void showFaceNotFocusedViews(String expression) {
