@@ -47,7 +47,7 @@ def String getCurrentTimestampHexValue() {
 }
 
 dependencies {
-    implementation project(':android-kernel-sdk')
+    implementation project(path: ':BlockIDSDK-release')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
