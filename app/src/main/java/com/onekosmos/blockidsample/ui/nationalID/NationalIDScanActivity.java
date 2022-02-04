@@ -22,7 +22,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder;
 import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -34,11 +33,9 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.LinkedHashMap;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_FRONT_THEN_BACK;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.ScanOrder.BACK_SIDE;
-import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.ScanOrder.FRONT_SIDE;
 
 /**
  * Created by 1Kosmos Engineering
@@ -46,21 +43,20 @@ import static com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity.S
  */
 public class NationalIDScanActivity extends AppCompatActivity implements View.OnClickListener, INationalIDResponseListener {
     private static final int K_CAMERA_PERMISSION_REQUEST_CODE = 1011;
-    private static int K_NATIONAL_ID_EXPIRY_GRACE_DAYS = 90;
+    private static final int K_NATIONAL_ID_EXPIRY_GRACE_DAYS = 90;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private AppCompatImageView mImgBack, mScannerOverlay, mImgSuccess;
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtScanMsg;
     private BIDScannerView mBIDScannerView;
     private LinearLayout mLayoutMessage;
     private NationalIDScannerHelper mNationalIdScannerHelper;
-    private LinkedHashMap<String, Object> mNationalIDMap, mNationalIDFirstSideData;
+    private LinkedHashMap<String, Object> mNationalIDMap;
     private String mSigToken, mScanSide;
-    private NationalIDScanOrder mNationalIDScanOrder = FIRST_BACK_THEN_FRONT;
     private boolean isRegistrationInProgress;
-    private String K_NO_FACE_FOUND = "BlockIDFaceDetectionNotification";
-    private String K_FACE_COUNT = "numberOfFaces";
+    private final String K_NO_FACE_FOUND = "BlockIDFaceDetectionNotification";
+    private final String K_FACE_COUNT = "numberOfFaces";
 
-    private BroadcastReceiver mPPScanReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mPPScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int count = intent.getIntExtra(K_FACE_COUNT, 0);
@@ -73,11 +69,6 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
             });
         }
     };
-
-    enum ScanOrder {
-        FRONT_SIDE,
-        BACK_SIDE
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,42 +90,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
         else {
-            if (NationalIDTempData.getInstance().getNationalIDFirstSideData() == null) {
-                startFirstSideScan();
-                if (mNationalIDScanOrder == FIRST_BACK_THEN_FRONT)
-                    updateScanOrderText(BACK_SIDE);
-                else
-                    updateScanOrderText(FRONT_SIDE);
-            }
-
-            if (NationalIDTempData.getInstance().getNationalIDFirstSideData() != null && NationalIDTempData.getInstance().getmSignatureToken() != null) {
-                mNationalIDFirstSideData = NationalIDTempData.getInstance().getNationalIDFirstSideData();
-                mSigToken = NationalIDTempData.getInstance().getmSignatureToken();
-                NationalIDTempData.getInstance().clearNationalIDData();
-                mNationalIDMap = mNationalIDFirstSideData;
-                mScannerOverlay.setVisibility(View.VISIBLE);
-                mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
-                        mNationalIDMap, mSigToken,
-                        mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
-                mNationalIdScannerHelper.startNationalIDScanning();
-                if (mNationalIDScanOrder != FIRST_BACK_THEN_FRONT)
-                    updateScanOrderText(BACK_SIDE);
-                else
-                    updateScanOrderText(FRONT_SIDE);
-            }
-        }
-        mLayoutMessage.setVisibility(View.VISIBLE);
-        mTxtMessage.setVisibility(View.VISIBLE);
-        mTxtMessage.setText(R.string.label_scanning);
-    }
-
-    private void updateScanOrderText(ScanOrder order) {
-        if (order == BACK_SIDE) {
-            mTxtScanMsg.setText(R.string.label_scan_back);
-            mScanSide = getString(R.string.label_scan_back);
-        } else {
-            mTxtScanMsg.setText(R.string.label_scan_front);
-            mScanSide = getString(R.string.label_scan_front);
+            startScan();
         }
     }
 
@@ -142,7 +98,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
-            startFirstSideScan();
+            startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null,
@@ -206,14 +162,15 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onFirstSideScanResponse(LinkedHashMap<String, Object> nationalIdMap, String signatureToken, ErrorManager.ErrorResponse error) {
-        NationalIDTempData.getInstance().setNationalIDFirstSideData(nationalIdMap);
-        NationalIDTempData.getInstance().setmSignatureToken(signatureToken);
-        Intent intent = new Intent(this, NationalIDScanActivity.class);
-        startActivity(intent);
-        getIntent().setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
-        overridePendingTransition(0, 0);
+    public void scanFrontSide() {
+        mScanSide = getString(R.string.label_scan_front);
+        mTxtScanMsg.setText(mScanSide);
+    }
+
+    @Override
+    public void scanBackSide() {
+        mScanSide = getString(R.string.label_scan_back);
+        mTxtScanMsg.setText(mScanSide);
     }
 
     private void initView() {
@@ -281,12 +238,15 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
                 });
     }
 
-    private void startFirstSideScan() {
+    private void startScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE, mNationalIDScanOrder,
-                mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
+        mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
+                FIRST_FRONT_THEN_BACK, mBIDScannerView, mScannerOverlay,
+                K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
         mNationalIdScannerHelper.startNationalIDScanning();
+        mTxtMessage.setVisibility(View.VISIBLE);
+        mTxtMessage.setText(R.string.label_scanning);
     }
 
     private void stopScan() {
