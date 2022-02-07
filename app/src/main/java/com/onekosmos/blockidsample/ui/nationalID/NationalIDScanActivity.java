@@ -33,7 +33,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.LinkedHashMap;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_FRONT_THEN_BACK;
+import static com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScanOrder.FIRST_BACK_THEN_FRONT;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 
@@ -242,7 +242,7 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
         mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
-                FIRST_FRONT_THEN_BACK, mBIDScannerView, mScannerOverlay,
+                FIRST_BACK_THEN_FRONT, mBIDScannerView, mScannerOverlay,
                 K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
         mNationalIdScannerHelper.startNationalIDScanning();
         mTxtMessage.setVisibility(View.VISIBLE);
