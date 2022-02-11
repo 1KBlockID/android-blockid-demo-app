@@ -140,4 +140,5 @@
     <string name="label_storage_permission_alert">Please note that you will not be able to read or write any of your documents with BlockID Sample into your storage.</string>
     <string name="label_share">Share</string>
     <string name="label_verify_liveid">Verifying LiveID</string>
+    <string name="label_sdk_version">SDK Version:</string>
 </resources>
