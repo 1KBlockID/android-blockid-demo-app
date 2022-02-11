@@ -120,7 +120,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
         }
         String haxCode = splitVersion[splitVersion.length - 1];
-        mTxtSdkVersion.setText(getString(R.string.label_sdk_version) + " " + version + " (" + haxCode + ")");
+        mTxtSdkVersion.setText(getString(R.string.label_sdk_version) + ": " + version + " (" + haxCode + ")");
     }
 
     private void populateEnrollmentAssetsData() {
