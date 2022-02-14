@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,6 +57,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     private RecyclerView mRvEnrollmentAssets;
     private List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
+    private AppCompatTextView mTxtSdkVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +113,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
+        mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
+        String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
+        StringBuilder version = new StringBuilder();
+        for (int index = 0; index < splitVersion.length - 1; index++) {
+            version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
+        }
+        String haxCode = splitVersion[splitVersion.length - 1];
+        mTxtSdkVersion.setText(getString(R.string.label_sdk_version) + ": " + version + " (" + haxCode + ")");
     }
 
     private void populateEnrollmentAssetsData() {
