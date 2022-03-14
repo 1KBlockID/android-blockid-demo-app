@@ -105,6 +105,10 @@
             android:name=".ui.verifySSN.VerifySSNActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.fido.FidoBaseActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>
 
 </manifest>

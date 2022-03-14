@@ -141,4 +141,10 @@
     <string name="label_share">Share</string>
     <string name="label_verify_liveid">Verifying LiveID</string>
     <string name="label_sdk_version">SDK Version</string>
+
+    <!-- Fido 2 demo -->
+    <string name="label_fido2">FIDO2</string>
+    <string name="label_user_name">Username</string>
+    <string name="label_continue">Continue</string>
+    <string name="label_enter_username">Enter username</string>
 </resources>
