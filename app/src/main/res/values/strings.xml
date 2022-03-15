@@ -147,4 +147,11 @@
     <string name="label_user_name">Username</string>
     <string name="label_continue">Continue</string>
     <string name="label_enter_username">Enter username</string>
+    <string name="label_fido2_key_has_been_successfully_registered">Your FIDO2 key has been
+        successfully registered.</string>
+    <string name="label_fido2_key_registration_failed">FIDO2 key registration
+        failed.</string>
+    <string name="label_successfully_authenticated_with_your_fido2_key">Your have successfully
+        authenticated with your FIDO2 key.</string>
+    <string name="label_authentication_failed">Authentication failed</string>
 </resources>

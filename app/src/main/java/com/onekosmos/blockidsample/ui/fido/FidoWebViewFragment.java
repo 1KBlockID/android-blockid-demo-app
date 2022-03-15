@@ -5,6 +5,7 @@ import static android.webkit.WebSettings.LOAD_NO_CACHE;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
+import com.onekosmos.blockidsample.util.SuccessDialog;
 
 import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
 
@@ -43,6 +45,7 @@ public class FidoWebViewFragment extends Fragment {
 
     /**
      * Initialising view for FidoWebViewFragment class
+     *
      * @param view root view of FidoWebViewFragment
      */
     private void initView(View view) {
@@ -65,7 +68,6 @@ public class FidoWebViewFragment extends Fragment {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 mProgressBar.setVisibility(View.GONE);
-                webAppInterface.getUserName();
             }
 
             @Override
@@ -88,28 +90,28 @@ public class FidoWebViewFragment extends Fragment {
 
         @JavascriptInterface
         public void registerKey() {
-            Toast.makeText(mContext, "Register: " +
-                            SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME),
-                    Toast.LENGTH_SHORT).show();
+            showSuccessDialog(R.drawable.icon_dialog_success,
+                    getString(R.string.label_fido2_key_has_been_successfully_registered));
         }
 
         @JavascriptInterface
         public void authenticate() {
-            Toast.makeText(mContext, "Authenticate: " +
-                            SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME),
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        @JavascriptInterface
-        public void manageKeys() {
-            Toast.makeText(mContext, "Manage: " +
-                            SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME),
-                    Toast.LENGTH_SHORT).show();
+            showSuccessDialog(R.drawable.icon_dialog_success,
+                    getString(R.string.label_successfully_authenticated_with_your_fido2_key));
         }
 
         @JavascriptInterface
         public String getUserName() {
             return SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME);
         }
+    }
+
+    private void showSuccessDialog(int imageId, String subMessage) {
+        SuccessDialog dialog = new SuccessDialog(getContext(), imageId,
+                SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME), subMessage);
+        dialog.show();
+        new Handler().postDelayed(() -> {
+            dialog.dismiss();
+        }, 2000);
     }
 }
