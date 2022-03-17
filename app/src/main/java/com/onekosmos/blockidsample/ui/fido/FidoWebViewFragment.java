@@ -78,7 +78,7 @@ public class FidoWebViewFragment extends Fragment {
         };
 
         mWebView.setWebViewClient(webViewClient);
-        mWebView.loadUrl("file:///android_asset/fido.html");
+        mWebView.loadUrl("https://demos.1kosmos.com/composecure/index.php");
     }
 
     private class WebAppInterface {
@@ -110,8 +110,6 @@ public class FidoWebViewFragment extends Fragment {
         SuccessDialog dialog = new SuccessDialog(getContext(), imageId,
                 SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME), subMessage);
         dialog.show();
-        new Handler().postDelayed(() -> {
-            dialog.dismiss();
-        }, 2000);
+        new Handler().postDelayed(() -> dialog.dismiss(), 2000);
     }
 }
