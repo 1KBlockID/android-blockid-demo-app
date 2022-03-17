@@ -89,15 +89,27 @@ public class FidoWebViewFragment extends Fragment {
         }
 
         @JavascriptInterface
-        public void registerKey() {
+        public void registrationSuccess() {
             showSuccessDialog(R.drawable.icon_dialog_success,
                     getString(R.string.label_fido2_key_has_been_successfully_registered));
         }
 
         @JavascriptInterface
-        public void authenticate() {
+        public void registrationFailed() {
+            showSuccessDialog(R.drawable.icon_dialog_fail,
+                    getString(R.string.label_fido2_key_registration_failed));
+        }
+
+        @JavascriptInterface
+        public void authenticationSuccess() {
             showSuccessDialog(R.drawable.icon_dialog_success,
                     getString(R.string.label_successfully_authenticated_with_your_fido2_key));
+        }
+
+        @JavascriptInterface
+        public void authenticationFailed() {
+            showSuccessDialog(R.drawable.icon_dialog_fail,
+                    getString(R.string.label_authentication_failed));
         }
 
         @JavascriptInterface
