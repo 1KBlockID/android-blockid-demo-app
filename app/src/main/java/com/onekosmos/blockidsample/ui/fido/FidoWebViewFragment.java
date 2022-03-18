@@ -54,6 +54,7 @@ public class FidoWebViewFragment extends Fragment {
         mWebView.getSettings().setAppCacheEnabled(false);
         mWebView.getSettings().setCacheMode(LOAD_NO_CACHE);
         mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.getSettings().setDomStorageEnabled(true);
 
         WebAppInterface webAppInterface = new WebAppInterface(getContext());
         mWebView.addJavascriptInterface(webAppInterface, "Android");
@@ -78,7 +79,12 @@ public class FidoWebViewFragment extends Fragment {
         };
 
         mWebView.setWebViewClient(webViewClient);
-        mWebView.loadUrl("https://demos.1kosmos.com/composecure/index.php");
+//        mWebView.loadUrl("https://demos.1kosmos.com/composecure/indexfido.php");
+//        mWebView.loadUrl("https://1kfido.blockid.co/appless/");
+//        mWebView.loadUrl("https://1kosmos.com");
+//        mWebView.loadUrl("https://1kfido.blockid.co/appless_demo/index2.html?username=" + SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME));
+//        mWebView.loadUrl("https://webauthn.io");
+
     }
 
     private class WebAppInterface {

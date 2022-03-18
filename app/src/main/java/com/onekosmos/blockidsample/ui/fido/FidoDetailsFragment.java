@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.fido;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -43,10 +45,12 @@ public class FidoDetailsFragment extends Fragment {
                         R.string.label_enter_username,
                         Toast.LENGTH_SHORT).show();
             } else {
-                SharedPreferenceUtil.getInstance().setString(
-                        SharedPreferenceUtil.K_PREF_FIDO2_USERNAME, userName);
-                getActivity().getSupportFragmentManager().beginTransaction().
-                        add(R.id.fragment_fido_container, new FidoWebViewFragment()).commit();
+
+                String url = "https://1kfido.blockid.co/appless_demo/index2.html?username=" + userName;
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+
             }
         });
         return view;
