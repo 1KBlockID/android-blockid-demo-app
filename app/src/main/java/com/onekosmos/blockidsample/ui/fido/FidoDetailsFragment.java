@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.ui.fido;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,18 +11,18 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.browser.customtabs.CustomTabsCallback;
-import androidx.browser.customtabs.CustomTabsClient;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.browser.customtabs.CustomTabsServiceConnection;
-import androidx.browser.customtabs.CustomTabsSession;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by 1Kosmos Engineering
@@ -33,17 +32,13 @@ public class FidoDetailsFragment extends Fragment {
     private AppCompatButton mBtnContinue;
     private TextInputEditText mEtUserName;
     private String userName;
-    private CustomTabsClient mClient;
-    private CustomTabsIntent mCustomTabsIntent;
-    private CustomTabsSession mSession;
-    private CustomTabsServiceConnection mConnection;
+    private ChromeCustomTab mChromeCustomTab;
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mConnection != null) {
-            getActivity().unbindService(mConnection);
-            mConnection = null;
+        if (mChromeCustomTab != null) {
+            mChromeCustomTab.unbindCustomTabsService();
         }
     }
 
@@ -55,6 +50,7 @@ public class FidoDetailsFragment extends Fragment {
                 container,
                 false);
 
+        mChromeCustomTab = new ChromeCustomTab(getActivity());
         mEtUserName = view.findViewById(R.id.edt_user_name);
         mBtnContinue = view.findViewById(R.id.btn_continue);
 
@@ -66,53 +62,16 @@ public class FidoDetailsFragment extends Fragment {
                         R.string.label_enter_username,
                         Toast.LENGTH_SHORT).show();
             } else {
+
+                Uri uri = createUri(getActivity());
+                Log.e("Uri", "--> " + uri);
+//                String url = "file:///android_asset/fido.html";
                 String url = "https://1kfido.blockid.co/appless_demo/index2.html?username=" + userName;
-//                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-//                CustomTabsIntent customTabsIntent = builder.build();
-//                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
-                loadCustomTab(url);
+                mChromeCustomTab.show(url);
+//                mChromeCustomTab.show(uri);
             }
         });
         return view;
-    }
-
-    private void loadCustomTab(String url) {
-        mConnection = new CustomTabsServiceConnection() {
-            @Override
-            public void onCustomTabsServiceConnected(@NonNull ComponentName name,
-                                                     @NonNull CustomTabsClient client) {
-                Log.e("ComponentName", name.getPackageName());
-                mClient = client;
-                mClient.warmup(0);
-                mSession = mClient.newSession(new CustomTabsCallback() {
-                    @Override
-                    public void onNavigationEvent(int navigationEvent, @Nullable Bundle extras) {
-                        super.onNavigationEvent(navigationEvent, extras);
-                        Log.e("navigationEvent", "--> " + navigationEvent);
-                    }
-
-                    @Override
-                    public void onPostMessage(@NonNull String message, @Nullable Bundle extras) {
-                        super.onPostMessage(message, extras);
-                        Log.e("onPostMessage", "--> " + message);
-                    }
-                });
-                if (mSession != null) {
-                    mSession.mayLaunchUrl(Uri.parse(url), null, null);
-                    mCustomTabsIntent = new CustomTabsIntent.Builder().build();
-                    mCustomTabsIntent.launchUrl(getActivity(), Uri.parse(url));
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mConnection = null;
-            }
-        };
-
-        boolean connected = CustomTabsClient.bindCustomTabsService(getActivity(),
-                ChromeCustomTab.CUSTOM_TAB_PACKAGE_NAME, mConnection);
-        Log.e("Connected", "--> " + connected);
     }
 
     public void hideKeyboard() {
@@ -121,5 +80,34 @@ public class FidoDetailsFragment extends Fragment {
         if (inputMethodManager != null && inputMethodManager.isAcceptingText())
             inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().
                     getWindowToken(), 0);
+    }
+
+    //FIXME new to remove
+    private Uri createUri(Activity context) {
+        try {
+            //Create an empty html file in external cache directory
+            File redirect = new File(context.getExternalCacheDir(), "fido.html");
+
+            //Open and read local html file from asset folder
+            InputStream inputStream = context.getAssets().open("fido.html");
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+            String templateString = new String(buffer, "UTF-8");
+
+            //Write the content of file in redirect.html
+            FileOutputStream fileOutputStream = new FileOutputStream(redirect);
+            fileOutputStream.write(templateString.getBytes());
+
+            //Get the uri of redirect.html using content provider
+            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", redirect);
+
+            return uri;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
