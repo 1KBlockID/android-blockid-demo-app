@@ -35,14 +35,14 @@ public class FidoDetailsFragment extends Fragment {
     private AppCompatButton mBtnContinue, mBtnAuthenticate, mBtnRegister;
     private TextInputEditText mEtUserName;
     private String userName;
-    private ChromeCustomTab mChromeCustomTab;
+//    private ChromeCustomTab mChromeCustomTab;
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mChromeCustomTab != null) {
-            mChromeCustomTab.unbindCustomTabsService();
-        }
+//        if (mChromeCustomTab != null) {
+//            mChromeCustomTab.unbindCustomTabsService();
+//        }
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FidoDetailsFragment extends Fragment {
                 container,
                 false);
 
-        mChromeCustomTab = new ChromeCustomTab(getActivity());
+//        mChromeCustomTab = new ChromeCustomTab(getActivity());
         mEtUserName = view.findViewById(R.id.edt_user_name);
         mBtnContinue = view.findViewById(R.id.btn_continue);
         mBtnAuthenticate = view.findViewById(R.id.btn_authenticate);
@@ -85,22 +85,22 @@ public class FidoDetailsFragment extends Fragment {
             }
         });
 
-        mBtnContinue.setOnClickListener(v -> {
-            userName = mEtUserName.getText().toString().trim();
-            hideKeyboard();
-            if (TextUtils.isEmpty(userName)) {
-                Toast.makeText(getActivity(),
-                        R.string.label_enter_username,
-                        Toast.LENGTH_SHORT).show();
-            } else {
-
-                Uri uri = createUri(getActivity());
-                Log.e("Uri", "--> " + uri);
-                String url = "https://1kfido.blockid.co/appless_demo/index2.html?username=" + userName;
-                mChromeCustomTab.show(url);
-//                mChromeCustomTab.show(uri);
-            }
-        });
+//        mBtnContinue.setOnClickListener(v -> {
+//            userName = mEtUserName.getText().toString().trim();
+//            hideKeyboard();
+//            if (TextUtils.isEmpty(userName)) {
+//                Toast.makeText(getActivity(),
+//                        R.string.label_enter_username,
+//                        Toast.LENGTH_SHORT).show();
+//            } else {
+//
+//                Uri uri = createUri(getActivity());
+//                Log.e("Uri", "--> " + uri);
+//                String url = "https://1kfido.blockid.co/appless_demo/index2.html?username=" + userName;
+//                mChromeCustomTab.show(url);
+////                mChromeCustomTab.show(uri);
+//            }
+//        });
         return view;
     }
 
