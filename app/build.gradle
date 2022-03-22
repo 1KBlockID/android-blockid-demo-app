@@ -129,5 +129,4 @@ dependencies {
 
     // Fido2 browser
     implementation 'androidx.browser:browser:1.4.0'
-
 }

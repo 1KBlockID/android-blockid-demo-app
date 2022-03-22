@@ -59,7 +59,7 @@
     <string name="label_fetching_data_pls_wait">Fetching data. Please wait.</string>
     <string name="label_hold_your_mobile">Hold your mobile near the Passport</string>
     <string name="label_you_have_successfully_authenticated_to_log_in"> You have successfully authenticated</string>
-    <string name="label_authenticate"> Authenticate</string>
+    <string name="label_authenticate">Authenticate</string>
     <string name="label_invalid_code">Invalid Code</string>
     <string name="label_unsupported_qr_code">Unsupported QR code detected.</string>
     <string name="label_scan_qr_code">Scan QR Code</string>
@@ -145,7 +145,8 @@
     <!-- Fido 2 demo -->
     <string name="label_fido2">FIDO2</string>
     <string name="label_user_name">Username</string>
-    <string name="label_continue">Continue</string>
+    <string name="label_continue">Old Continue</string>
+    <string name="label_register">Register</string>
     <string name="label_enter_username">Enter username</string>
     <string name="label_fido2_key_has_been_successfully_registered">Your FIDO2 key has been
         successfully registered.</string>

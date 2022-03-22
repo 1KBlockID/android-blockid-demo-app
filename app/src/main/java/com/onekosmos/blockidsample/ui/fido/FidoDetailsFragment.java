@@ -16,6 +16,9 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
+import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 
@@ -29,7 +32,7 @@ import java.io.InputStream;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class FidoDetailsFragment extends Fragment {
-    private AppCompatButton mBtnContinue;
+    private AppCompatButton mBtnContinue, mBtnAuthenticate, mBtnRegister;
     private TextInputEditText mEtUserName;
     private String userName;
     private ChromeCustomTab mChromeCustomTab;
@@ -53,6 +56,34 @@ public class FidoDetailsFragment extends Fragment {
         mChromeCustomTab = new ChromeCustomTab(getActivity());
         mEtUserName = view.findViewById(R.id.edt_user_name);
         mBtnContinue = view.findViewById(R.id.btn_continue);
+        mBtnAuthenticate = view.findViewById(R.id.btn_authenticate);
+        mBtnRegister = view.findViewById(R.id.btn_register);
+
+        mBtnRegister.setOnClickListener(v -> {
+            if (validateUserName()) {
+                BIDTenant tenant = AppConstant.defaultTenant;
+                BlockIDSDK.getInstance().register(getContext(),
+                        mEtUserName.getText().toString(),
+                        tenant.getDns(),
+                        tenant.getCommunity(),
+                        (status, errorResponse) -> {
+
+                        });
+            }
+        });
+
+        mBtnAuthenticate.setOnClickListener(v -> {
+            if (validateUserName()) {
+                BIDTenant tenant = AppConstant.defaultTenant;
+                BlockIDSDK.getInstance().authenticate(getContext(),
+                        mEtUserName.getText().toString(),
+                        tenant.getDns(),
+                        tenant.getCommunity(),
+                        (status, errorResponse) -> {
+
+                        });
+            }
+        });
 
         mBtnContinue.setOnClickListener(v -> {
             userName = mEtUserName.getText().toString().trim();
@@ -65,13 +96,24 @@ public class FidoDetailsFragment extends Fragment {
 
                 Uri uri = createUri(getActivity());
                 Log.e("Uri", "--> " + uri);
-//                String url = "file:///android_asset/fido.html";
                 String url = "https://1kfido.blockid.co/appless_demo/index2.html?username=" + userName;
                 mChromeCustomTab.show(url);
 //                mChromeCustomTab.show(uri);
             }
         });
         return view;
+    }
+
+    private boolean validateUserName() {
+        userName = mEtUserName.getText().toString().trim();
+        hideKeyboard();
+        if (TextUtils.isEmpty(userName)) {
+            Toast.makeText(getActivity(),
+                    R.string.label_enter_username,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     public void hideKeyboard() {
