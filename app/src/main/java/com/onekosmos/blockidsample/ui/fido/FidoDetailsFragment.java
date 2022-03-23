@@ -61,7 +61,7 @@ public class FidoDetailsFragment extends Fragment {
         mBtnRegister.setOnClickListener(v -> {
             if (validateUserName()) {
                 BIDTenant tenant = AppConstant.defaultTenant;
-                BlockIDSDK.getInstance().registerFIDOKey(getContext(),
+                BlockIDSDK.getInstance().registerFIDOKey(getActivity(),
                         mEtUserName.getText().toString(),
                         tenant.getDns(),
                         tenant.getCommunity(),
@@ -74,7 +74,7 @@ public class FidoDetailsFragment extends Fragment {
         mBtnAuthenticate.setOnClickListener(v -> {
             if (validateUserName()) {
                 BIDTenant tenant = AppConstant.defaultTenant;
-                BlockIDSDK.getInstance().authenticateFIDOKey(getContext(),
+                BlockIDSDK.getInstance().authenticateFIDOKey(getActivity(),
                         mEtUserName.getText().toString(),
                         tenant.getDns(),
                         tenant.getCommunity(),
