@@ -23,24 +23,37 @@ import com.onekosmos.blockidsample.R;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class Fido2Fragment extends Fragment {
-    private AppCompatButton mBtnRegister;
+    private AppCompatButton mBtnRegister, mBtnAuthenticate;
     private TextInputEditText mEtUserName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_fido2_details,
+        View view = inflater.inflate(R.layout.fragment_fido2,
                 container,
                 false);
 
         mEtUserName = view.findViewById(R.id.edt_user_name);
         mBtnRegister = view.findViewById(R.id.btn_register);
+        mBtnAuthenticate = view.findViewById(R.id.btn_authenticate);
 
         mBtnRegister.setOnClickListener(v -> {
             if (validateUserName(mEtUserName.getText().toString())) {
                 BIDTenant tenant = AppConstant.defaultTenant;
                 BlockIDSDK.getInstance().registerFIDOKey(getActivity(),
+                        mEtUserName.getText().toString(),
+                        tenant.getDns(),
+                        tenant.getCommunity(),
+                        (status, errorResponse) -> {
+                        });
+            }
+        });
+
+        mBtnAuthenticate.setOnClickListener(v -> {
+            if (validateUserName(mEtUserName.getText().toString())) {
+                BIDTenant tenant = AppConstant.defaultTenant;
+                BlockIDSDK.getInstance().authenticateFIDOKey(getActivity(),
                         mEtUserName.getText().toString(),
                         tenant.getDns(),
                         tenant.getCommunity(),
