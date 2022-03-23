@@ -14,6 +14,14 @@
         <item name="android:windowDisablePreview">true</item>
     </style>
 
+    <style name="AppTheme.MaterialAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/primary3</item>
+        <item name="colorPrimaryDark">@color/primary3</item>
+        <item name="colorAccent">@color/primary3</item>
+    </style>
+
     <style name="PinWidget.PinView" parent="Widget.AppCompat.EditText">
         <item name="android:background">@null</item>
         <item name="android:minHeight">@dimen/dimen_0dp</item>

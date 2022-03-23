@@ -126,4 +126,7 @@ dependencies {
 
     // Opencv
     implementation 'com.quickbirdstudios:opencv:4.5.2'
+
+    // for adding custom tab intent
+    implementation 'androidx.browser:browser:1.4.0'
 }
