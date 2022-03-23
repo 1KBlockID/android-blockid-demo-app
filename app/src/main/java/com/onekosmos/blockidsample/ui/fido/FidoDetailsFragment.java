@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +61,7 @@ public class FidoDetailsFragment extends Fragment {
         mBtnRegister.setOnClickListener(v -> {
             if (validateUserName()) {
                 BIDTenant tenant = AppConstant.defaultTenant;
-                BlockIDSDK.getInstance().registerKey(getContext(),
+                BlockIDSDK.getInstance().registerFIDOKey(getContext(),
                         mEtUserName.getText().toString(),
                         tenant.getDns(),
                         tenant.getCommunity(),
@@ -75,7 +74,7 @@ public class FidoDetailsFragment extends Fragment {
         mBtnAuthenticate.setOnClickListener(v -> {
             if (validateUserName()) {
                 BIDTenant tenant = AppConstant.defaultTenant;
-                BlockIDSDK.getInstance().authenticateKey(getContext(),
+                BlockIDSDK.getInstance().authenticateFIDOKey(getContext(),
                         mEtUserName.getText().toString(),
                         tenant.getDns(),
                         tenant.getCommunity(),
