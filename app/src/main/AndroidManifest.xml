@@ -106,7 +106,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.fido.FidoBaseActivity"
+            android:name=".ui.fido2.Fido2BaseActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>

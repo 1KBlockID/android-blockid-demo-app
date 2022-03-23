@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.fido;
+package com.onekosmos.blockidsample.ui.fido2;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -22,7 +22,7 @@ import com.onekosmos.blockidsample.R;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class FidoDetailsFragment extends Fragment {
+public class Fido2Fragment extends Fragment {
     private AppCompatButton mBtnRegister;
     private TextInputEditText mEtUserName;
 
@@ -30,7 +30,7 @@ public class FidoDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_fido_details,
+        View view = inflater.inflate(R.layout.fragment_fido2_details,
                 container,
                 false);
 

@@ -15,7 +15,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class SuccessDialog extends Dialog {
+public class ResultDialog extends Dialog {
 
     /**
      * @param context    context in which the dialog should show
@@ -23,16 +23,18 @@ public class SuccessDialog extends Dialog {
      * @param message    text to be display in message
      * @param subMessage text to be display in sub message
      */
-    public SuccessDialog(@NonNull Context context, int imageId, String message, String subMessage) {
+    public ResultDialog(@NonNull Context context, int imageId, String message,
+                        String subMessage) {
         super(context);
         setCancelable(false);
-        setContentView(R.layout.dialog_success);
+        setContentView(R.layout.dialog_result);
         AppCompatImageView imgDialogIcon = findViewById(R.id.img_dialog_icon);
         imgDialogIcon.setImageResource(imageId);
         AppCompatTextView txtDialogMessage = findViewById(R.id.txt_dialog_message);
         txtDialogMessage.setText(message);
         AppCompatTextView txtDialogSubMessage = findViewById(R.id.txt_dialog_sub_message);
         txtDialogSubMessage.setText(subMessage);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawableResource
+                (android.R.color.transparent);
     }
 }

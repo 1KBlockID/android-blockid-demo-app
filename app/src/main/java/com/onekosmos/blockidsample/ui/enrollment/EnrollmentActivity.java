@@ -27,7 +27,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
-import com.onekosmos.blockidsample.ui.fido.FidoBaseActivity;
+import com.onekosmos.blockidsample.ui.fido2.Fido2BaseActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
@@ -360,7 +360,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onFido2Clicked() {
-        Intent intent = new Intent(this, FidoBaseActivity.class);
+        Intent intent = new Intent(this, Fido2BaseActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
