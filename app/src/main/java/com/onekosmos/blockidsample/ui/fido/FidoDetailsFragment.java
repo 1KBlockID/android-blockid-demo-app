@@ -20,7 +20,7 @@ import com.onekosmos.blockidsample.R;
 
 /**
  * Created by 1Kosmos Engineering
- * Copyright © 2021 1Kosmos. All rights reserved.
+ * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class FidoDetailsFragment extends Fragment {
     private AppCompatButton mBtnRegister;
@@ -53,6 +53,7 @@ public class FidoDetailsFragment extends Fragment {
 
     /**
      * Check userName is empty or not
+     *
      * @return userName is empty then return false and show toast else true
      */
     private boolean validateUserName(String userName) {

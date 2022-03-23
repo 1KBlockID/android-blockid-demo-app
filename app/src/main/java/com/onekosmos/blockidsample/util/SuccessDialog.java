@@ -13,7 +13,7 @@ import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
- * Copyright © 2021 1Kosmos. All rights reserved.
+ * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class SuccessDialog extends Dialog {
 

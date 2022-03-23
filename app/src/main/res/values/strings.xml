@@ -142,7 +142,7 @@
     <string name="label_verify_liveid">Verifying LiveID</string>
     <string name="label_sdk_version">SDK Version</string>
 
-    <!-- Fido 2 demo -->
+    <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
     <string name="label_user_name">Username</string>
     <string name="label_continue">Old Continue</string>
