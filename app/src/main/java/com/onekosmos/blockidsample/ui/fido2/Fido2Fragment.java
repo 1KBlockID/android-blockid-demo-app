@@ -71,7 +71,8 @@ public class Fido2Fragment extends Fragment {
                                 if (!status) {
                                     showError(errorResponse);
                                 } else {
-                                    Toast.makeText(getActivity(), getActivity().getString(R.string.label_fido2_key_has_been_successfully_registered), Toast.LENGTH_SHORT).show();
+                                    showResultDialog(R.drawable.icon_dialog_success, getActivity().
+                                            getString(R.string.label_fido2_key_has_been_successfully_registered));
                                 }
                             });
                 }
@@ -94,7 +95,8 @@ public class Fido2Fragment extends Fragment {
                                 if (!status) {
                                     showError(errorResponse);
                                 } else {
-                                    Toast.makeText(getActivity(), getActivity().getString(R.string.label_successfully_authenticated_with_your_fido2_key), Toast.LENGTH_SHORT).show();
+                                    showResultDialog(R.drawable.icon_dialog_success, getActivity().
+                                            getString(R.string.label_successfully_authenticated_with_your_fido2_key));
                                 }
                             });
                 }
@@ -126,7 +128,6 @@ public class Fido2Fragment extends Fragment {
         ErrorDialog errorDialog = new ErrorDialog(getActivity());
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
-//            finish();
         };
         if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
@@ -148,10 +149,10 @@ public class Fido2Fragment extends Fragment {
                     getWindowToken(), 0);
     }
 
-    private void showSuccessDialog(int imageId, String subMessage) {
+    private void showResultDialog(int imageId, String subMessage) {
         ResultDialog dialog = new ResultDialog(getContext(), imageId,
                 SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME), subMessage);
         dialog.show();
-        new Handler().postDelayed(() -> dialog.dismiss(), 2000);
+        new Handler().postDelayed(() -> dialog.dismiss(), 5000);
     }
 }
