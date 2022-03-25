@@ -153,6 +153,6 @@ public class Fido2Fragment extends Fragment {
         ResultDialog dialog = new ResultDialog(getContext(), imageId,
                 SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME), subMessage);
         dialog.show();
-        new Handler().postDelayed(() -> dialog.dismiss(), 5000);
+        new Handler().postDelayed(() -> dialog.dismiss(), 2000);
     }
 }
