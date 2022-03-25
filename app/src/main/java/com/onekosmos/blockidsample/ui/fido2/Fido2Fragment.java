@@ -71,8 +71,11 @@ public class Fido2Fragment extends Fragment {
                                 if (!status) {
                                     showError(errorResponse);
                                 } else {
-                                    showResultDialog(R.drawable.icon_dialog_success, getActivity().
-                                            getString(R.string.label_fido2_key_has_been_successfully_registered));
+                                    SharedPreferenceUtil.getInstance().setString(
+                                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
+                                    showResultDialog(R.drawable.icon_dialog_success,
+                                            getActivity().
+                                                    getString(R.string.label_fido2_key_has_been_successfully_registered));
                                 }
                             });
                 }
@@ -95,6 +98,8 @@ public class Fido2Fragment extends Fragment {
                                 if (!status) {
                                     showError(errorResponse);
                                 } else {
+                                    SharedPreferenceUtil.getInstance().setString(
+                                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
                                     showResultDialog(R.drawable.icon_dialog_success, getActivity().
                                             getString(R.string.label_successfully_authenticated_with_your_fido2_key));
                                 }
@@ -119,8 +124,6 @@ public class Fido2Fragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
             return false;
         }
-        // FIXME need to store after success
-        SharedPreferenceUtil.getInstance().setString(K_PREF_FIDO2_USERNAME, userName);
         return true;
     }
 
