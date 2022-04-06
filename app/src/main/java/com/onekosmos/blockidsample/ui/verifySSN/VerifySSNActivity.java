@@ -1,10 +1,5 @@
 package com.onekosmos.blockidsample.ui.verifySSN;
 
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
-
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -53,6 +48,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 /**
  * Created by 1Kosmos Engineering
@@ -279,7 +279,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         }
 
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mSSNMap,
-                new String[]{""}, (status, documentVerification, error) -> {
+                new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();
                         try {
