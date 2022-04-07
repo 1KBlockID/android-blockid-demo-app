@@ -1,10 +1,5 @@
 package com.onekosmos.blockidsample.ui.verifySSN;
 
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
-
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -53,6 +48,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 /**
  * Created by 1Kosmos Engineering
@@ -136,7 +136,9 @@ public class VerifySSNActivity extends AppCompatActivity {
         mBackBtn.setOnClickListener(v -> onBackPressed());
         mBackText.setOnClickListener(v -> onBackPressed());
         mBackTextWebView.setOnClickListener(v -> onBackPressed());
-        mWebShareButton.setOnClickListener(v -> { checkStoragePermission();});
+        mWebShareButton.setOnClickListener(v -> {
+            checkStoragePermission();
+        });
         mWebCancelButton.setOnClickListener(v -> {
             mScrollView.setVisibility(View.VISIBLE);
             mWebLayout.setVisibility(View.GONE);
@@ -276,50 +278,51 @@ public class VerifySSNActivity extends AppCompatActivity {
             mSSNMap.put("phone", phone);
         }
 
-        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mSSNMap, (status, documentVerification, error) -> {
-            if (status) {
-                progressDialog.dismiss();
-                try {
-                    JSONObject jsonObject = new JSONObject(documentVerification);
-                    JSONArray certificates = jsonObject.getJSONArray("certifications");
+        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mSSNMap,
+                new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
+                    if (status) {
+                        progressDialog.dismiss();
+                        try {
+                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            JSONArray certificates = jsonObject.getJSONArray("certifications");
 
-                    boolean isVerified = false;
+                            boolean isVerified = false;
 
-                    for (int index = 0; index < certificates.length(); index++) {
-                        if (certificates.getJSONObject(index).has("status") && certificates.getJSONObject(index).getInt("status") == 400) {
-                            handleInvalidData();
-                            break;
+                            for (int index = 0; index < certificates.length(); index++) {
+                                if (certificates.getJSONObject(index).has("status") && certificates.getJSONObject(index).getInt("status") == 400) {
+                                    handleInvalidData();
+                                    break;
+                                }
+
+                                if (certificates.getJSONObject(index).has("verified") && certificates.getJSONObject(index).getBoolean("verified")) {
+                                    isVerified = true;
+                                } else {
+                                    isVerified = false;
+                                    handleFailedSSNVerification(jsonObject);
+                                    break;
+                                }
+                            }
+
+                            if (isVerified) {
+                                handleSuccessSSNVerification();
+                            }
+                        } catch (JSONException e) {
+                            return;
                         }
-
-                        if (certificates.getJSONObject(index).has("verified") && certificates.getJSONObject(index).getBoolean("verified")) {
-                            isVerified = true;
-                        } else {
-                            isVerified = false;
-                            handleFailedSSNVerification(jsonObject);
-                            break;
+                    } else {
+                        progressDialog.dismiss();
+                        ErrorDialog errorDialog = new ErrorDialog(this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                            errorDialog.showNoInternetDialog(onDismissListener);
+                            return;
                         }
+                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
                     }
-
-                    if (isVerified) {
-                        handleSuccessSSNVerification();
-                    }
-                } catch (JSONException e) {
-                    return;
-                }
-            } else {
-                progressDialog.dismiss();
-                ErrorDialog errorDialog = new ErrorDialog(this);
-                DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                    errorDialog.dismiss();
-                    finish();
-                };
-                if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                    errorDialog.showNoInternetDialog(onDismissListener);
-                    return;
-                }
-                errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-            }
-        });
+                });
     }
 
     private void handleFailedSSNVerification(JSONObject responseObject) {
@@ -338,13 +341,13 @@ public class VerifySSNActivity extends AppCompatActivity {
                 });
     }
 
-    private void viewResponse(JSONObject responseObject){
+    private void viewResponse(JSONObject responseObject) {
         mScrollView.setVisibility(View.GONE);
         mWebLayout.setVisibility(View.VISIBLE);
         mWebView.setVerticalScrollBarEnabled(true);
         mWebView.setHorizontalScrollBarEnabled(true);
         String respObjStr = responseObject.toString();
-        mWebView.loadData(respObjStr,"text/json","utf-8");
+        mWebView.loadData(respObjStr, "text/json", "utf-8");
     }
 
     private void handleSuccessSSNVerification() {
