@@ -39,6 +39,7 @@ class FIDO2Activity : AppCompatActivity() {
     )
     private var register: Button? = null
     private var login: Button? = null
+    private var logout: Button? = null
     private var editUserName: EditText? = null
     private var editDisplayName: EditText? = null
     private var userInfo:TextView? = null
@@ -78,6 +79,13 @@ class FIDO2Activity : AppCompatActivity() {
                 }
             }
         }
+        logout = findViewById(R.id.logout)
+        logout?.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.signoutUser()
+                updateSession()
+            }
+        }
     }
 
     private fun updateSession() {
@@ -106,6 +114,7 @@ class FIDO2Activity : AppCompatActivity() {
                     is SignInState.SignedIn -> {
                         register?.visibility = View.GONE
                         login?.visibility = View.VISIBLE
+                        logout?.visibility = View.VISIBLE
                         editDisplayName?.visibility = View.GONE
                         editUserName?.visibility = View.GONE
                         userInfo?.text = "Signed in as ${state.username}"
@@ -122,6 +131,7 @@ class FIDO2Activity : AppCompatActivity() {
                     else -> {
                         register?.visibility = View.VISIBLE
                         login?.visibility = View.GONE
+                        logout?.visibility = View.GONE
                         editDisplayName?.visibility = View.VISIBLE
                         editUserName?.visibility = View.VISIBLE
                         userInfo?.text = ""
@@ -167,7 +177,15 @@ class FIDO2Activity : AppCompatActivity() {
                 val credential = PublicKeyCredential.deserializeFromBytes(bytes)
                 val response = credential.response
                 if (response is AuthenticatorErrorResponse) {
-                    Toast.makeText(this, response.errorMessage, Toast.LENGTH_LONG)
+                    val errorMessage = "${response.errorCodeAsInt} : ${response.errorMessage}"
+                    Log.e("FIDOActivity", response.errorMessage)
+                    if (response.errorCodeAsInt == 11) { // user already registered
+                        viewModel.saveUser()
+                        Toast.makeText(this, "User already registered", Toast.LENGTH_LONG)
+                            .show()
+                        return
+                    }
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG)
                         .show()
                 } else {
                     viewModel.registerResponse(credential)

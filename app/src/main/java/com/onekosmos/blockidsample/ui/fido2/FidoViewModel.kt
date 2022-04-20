@@ -265,7 +265,7 @@ class FidoViewModel : ViewModel() {
                             response.signature.toBase64()
                         )
                         name("userHandle").value(
-                            response.userHandle?.toBase64() ?: userName
+                            response.userHandle?.toBase64() ?: credential.id
                         )
                     }
                 })
@@ -500,9 +500,22 @@ class FidoViewModel : ViewModel() {
         return ""
     }
 
-    fun signoutUser() {
+    suspend fun signoutUser() {
         SharedPreferenceUtil.getInstance().remove(SharedPreferenceUtil.K_PREF_FIDO2_USERNAME,
             SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME)
+        signInStateMutable.emit(SignInState.SignedOut)
+    }
+
+    fun saveUser() {
+        viewModelScope.launch {
+            SharedPreferenceUtil.getInstance().setString(
+                SharedPreferenceUtil.K_PREF_FIDO2_USERNAME, userName
+            )
+            SharedPreferenceUtil.getInstance().setString(
+                SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME, displayName
+            )
+            signInStateMutable.emit(SignInState.SignedIn(displayName!!))
+        }
     }
 
     fun registerResponse(credential: PublicKeyCredential) {
@@ -517,11 +530,8 @@ class FidoViewModel : ViewModel() {
                             signInStateMutable.emit(SignInState.SignInError(result.data.error ?: "Error registering user"))
                             return@launch
                         }
-                        SharedPreferenceUtil.getInstance().setString(
-                            SharedPreferenceUtil.K_PREF_FIDO2_USERNAME, userName)
-                        SharedPreferenceUtil.getInstance().setString(
-                            SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME, displayName)
-                        signInStateMutable.emit(SignInState.SignedIn(displayName!!))
+                        userName = result.data.sub
+                        saveUser()
                     }
                 }
             } catch (e: ApiException) {
