@@ -1,3 +1,7 @@
 include ':BlockIDSDK-release'
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
+
+def sdk='/Users/vinothbaskaran/1Kosmos/Repos/test/sdk/android-kernel-sdk'
+include ':blockid'
+project(':blockid').projectDir = new File(sdk + '/app')

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 30
@@ -47,7 +49,9 @@ def String getCurrentTimestampHexValue() {
 }
 
 dependencies {
-    implementation project(path: ':BlockIDSDK-release')
+//    implementation project(path: ':BlockIDSDK-release')
+    // blockid sdk that expose the use of requestID
+    implementation project(path: ':blockid')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -129,4 +133,16 @@ dependencies {
 
     // for adding custom tab intent
     implementation 'androidx.browser:browser:1.4.0'
+
+    implementation 'androidx.fragment:fragment-ktx:1.3.6'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha05"
+    implementation 'com.google.android.gms:play-services-fido:19.0.0-beta'
+    def okhttp_version = '4.9.0'
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation "ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0"
+    def coroutine_version = '1.5.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutine_version"
 }
