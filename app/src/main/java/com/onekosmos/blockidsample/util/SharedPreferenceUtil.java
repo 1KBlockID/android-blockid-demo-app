@@ -16,6 +16,7 @@ import java.security.GeneralSecurityException;
  */
 public class SharedPreferenceUtil {
     public static final String K_PREF_FIDO2_USERNAME = "K_PREF_FIDO2_USERNAME";
+    public static final String K_PREF_FIDO2_DISPLAYNAME = "K_PREF_FIDO2_DISPLAYNAME";
     private static SharedPreferenceUtil mSharedPreferenceUtil;
     private static SharedPreferences mSharedPreferences;
 

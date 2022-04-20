@@ -144,8 +144,10 @@
 
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
-    <string name="label_user_name">Username</string>
+    <string name="label_fido2_native">FIDO2 Native</string>
+    <string name="label_user_name">User Name</string>
     <string name="label_register">Register</string>
+    <string name="label_display_name">Display Name</string>
     <string name="label_enter_username">Enter username</string>
     <string name="label_fido2_key_has_been_successfully_registered">Your FIDO2 key has been
         successfully registered.</string>

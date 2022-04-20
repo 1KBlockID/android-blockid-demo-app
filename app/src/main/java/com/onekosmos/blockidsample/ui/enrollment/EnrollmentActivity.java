@@ -1,5 +1,10 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +32,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
+import com.onekosmos.blockidsample.ui.fido2.FIDO2Activity;
 import com.onekosmos.blockidsample.ui.fido2.Fido2BaseActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
@@ -44,11 +50,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
-
 
 /**
  * Created by 1Kosmos Engineering
@@ -64,6 +65,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
+        BIDAuthProvider.getInstance().unlockSDK();
         initView();
     }
 
@@ -105,6 +107,25 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_fido2_native))) {
+            Intent intent = new Intent(this, FIDO2Activity.class);
+            startActivity(intent);
+
+//            BIDOrigin origin = new BIDOrigin();
+//            origin.tag = "5f3d8d0cd866fa61019cf968";
+//            origin.url = "5f3d8d0cd866fa61019cf968";
+//            origin.communityName = "5f3d8d0cd866fa61019cf969";
+//            origin.communityId = "5f3d8d0cd866fa61019cf969";
+//            BlockIDSDK.getInstance().generateNewSession(origin,
+//            "none",
+//            "", (status, session, generateNewSessionResponsePayload, errorResponse) -> {
+//                if (status) {
+//                    Log.e ("Session URL", session);
+//                    Log.e ("Session ID", generateNewSessionResponsePayload.sessionId);
+//                } else {
+//                    Log.e ("Session Error", "" + errorResponse.getCode() + " " + errorResponse.getMessage());
+//                }
+//            });
         }
     }
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/signedinuser"
+        android:textStyle="bold"
+        android:layout_margin="@dimen/dimen_10dp"
+        android:padding="@dimen/dimen_10dp"
+        android:textSize="@dimen/dimen_16sp"
+        android:layout_gravity="top|end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:hint="@string/label_user_name"
+            android:padding="15dp"
+            android:gravity="center"
+            android:id="@+id/username"
+            android:minWidth="@dimen/dimen_100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:hint="@string/label_display_name"
+            android:padding="15dp"
+            android:gravity="center"
+            android:id="@+id/displayname"
+            android:minWidth="@dimen/dimen_100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:text="Register"
+            android:id="@+id/register"
+            android:minWidth="@dimen/dimen_100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:text="Login"
+            android:id="@+id/login"
+            android:minWidth="@dimen/dimen_100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</FrameLayout>

@@ -2,11 +2,17 @@ package com.onekosmos.blockidsample.ui.enrollment;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.sessionapi.SessionApi;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.fido2.Fido2Helper;
 import com.onekosmos.blockidsample.R;
 
+import org.bitcoinj.core.Block;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -38,6 +44,7 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
         ASSET_RESET_SDK,
+        ASSET_FIDO2_NATIVE,
     }
 
     private EnrollmentsDataSource() {
@@ -64,7 +71,9 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
+        arr.add(EnrollmentAssetEnum.ASSET_FIDO2_NATIVE);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
+
         return arr;
     }
 
@@ -118,6 +127,11 @@ public class EnrollmentsDataSource {
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isNationalIDEnrolled(),
                         context.getResources().getString(R.string.label_national_id_1) + nID1);
                 break;
+
+            case ASSET_FIDO2_NATIVE:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_fido2_native));
+              break;
 
             case ASSET_RESET_SDK:
                 enrollmentAsset = new EnrollmentAsset(false,
