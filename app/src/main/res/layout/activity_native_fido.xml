@@ -34,6 +34,14 @@
             android:minWidth="@dimen/dimen_100dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/authenticator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:switchMinWidth="56dp"
+            android:text="Platform Authenticator"
+            android:textOff="cross-platform"
+            android:textOn ="platform"/>
         <Button
             android:text="Register"
             android:id="@+id/register"

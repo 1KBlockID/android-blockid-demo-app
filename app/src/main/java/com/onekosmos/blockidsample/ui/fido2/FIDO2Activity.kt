@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.fido.Fido
 import com.google.android.gms.fido.fido2.api.common.AuthenticatorErrorResponse
 import com.google.android.gms.fido.fido2.api.common.PublicKeyCredential
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse
 import com.onekosmos.blockid.sdk.BIDAPIs.sessionapi.SessionApi.GenerateNewSessionResponsePayload
 import com.onekosmos.blockid.sdk.BlockIDSDK
@@ -43,6 +44,7 @@ class FIDO2Activity : AppCompatActivity() {
     private var editUserName: EditText? = null
     private var editDisplayName: EditText? = null
     private var userInfo:TextView? = null
+    private lateinit var authenticator: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +54,14 @@ class FIDO2Activity : AppCompatActivity() {
         editDisplayName = findViewById(R.id.displayname)
         userInfo = findViewById(R.id.signedinuser)
         register = findViewById(R.id.register)
+        authenticator = findViewById(R.id.authenticator)
         register?.setOnClickListener {
             val userName = editUserName?.text.toString()
             val displayName = editDisplayName?.text.toString()
             if (userName.isBlank() || displayName.isBlank()) {
                 return@setOnClickListener
             }
-            viewModel.setUserDetail(userName, displayName)
+            viewModel.setUserDetail(userName, displayName, if (authenticator.isChecked) {authenticator.textOn.toString()} else {authenticator.textOff.toString()})
             lifecycleScope.launch {
                 val intent = viewModel.registerRequest()
                 if (intent != null) {
@@ -113,6 +116,7 @@ class FIDO2Activity : AppCompatActivity() {
                 when (state) {
                     is SignInState.SignedIn -> {
                         register?.visibility = View.GONE
+                        authenticator.visibility = View.GONE
                         login?.visibility = View.VISIBLE
                         logout?.visibility = View.VISIBLE
                         editDisplayName?.visibility = View.GONE
@@ -130,6 +134,7 @@ class FIDO2Activity : AppCompatActivity() {
                     }
                     else -> {
                         register?.visibility = View.VISIBLE
+                        authenticator.visibility = View.VISIBLE
                         login?.visibility = View.GONE
                         logout?.visibility = View.GONE
                         editDisplayName?.visibility = View.VISIBLE

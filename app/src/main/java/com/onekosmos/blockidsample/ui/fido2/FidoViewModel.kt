@@ -34,26 +34,32 @@ class FidoViewModel : ViewModel() {
     private var client: OkHttpClient? = null
     private var userName: String? = null
     private var displayName: String? = null
+    private var authenticator:String = "cross-platform"
 
     init {
         viewModelScope.launch {
             val userName = SharedPreferenceUtil.getInstance().getString(SharedPreferenceUtil.K_PREF_FIDO2_USERNAME)
             val displayName = SharedPreferenceUtil.getInstance().getString(SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME)
+            val authenticator = SharedPreferenceUtil.getInstance().getString(SharedPreferenceUtil.K_PREF_FIDO2_AUTHENTICATOR)
             val initialState = when {
                 userName.isNullOrBlank() -> SignInState.SignedOut
                 displayName.isNullOrBlank() -> SignInState.SignedOut
                 else -> {
-                    setUserDetail(userName, displayName)
+                    setUserDetail(userName, displayName, authenticator)
                     SignInState.SignedIn(displayName)
                 }
             }
             signInStateMutable.emit(initialState)
         }
     }
-    fun setUserDetail(name: String, display: String) {
-       userName = name
-       displayName = display
+
+    fun setUserDetail(name: String, display: String, authenticator: String?) {
+        userName = name
+        displayName = display
+        if (!authenticator.isNullOrBlank())
+            this@FidoViewModel.authenticator = authenticator
     }
+
     fun setHTTPClient(okhttp: OkHttpClient) {
        client = okhttp
     }
@@ -102,7 +108,7 @@ class FidoViewModel : ViewModel() {
                     name("tenantId").value("5f3d8d0cd866fa61019cf968")
                     name("attestation").value("direct")
                     name("authenticatorSelection").objectValue {
-                        name("authenticatorAttachment").value("platform")
+                        name("authenticatorAttachment").value(authenticator) // use cross-platform to use external (or) roaming authenticators
                         name("userVerification").value("required")
                     }
                 })
@@ -135,7 +141,7 @@ class FidoViewModel : ViewModel() {
                     name("id").value(rawId)
                     name("type").value(PublicKeyCredentialType.PUBLIC_KEY.toString())
                     name("rawId").value(rawId)
-                    name("authenticatorAttachment").value("platform")
+                    name("authenticatorAttachment").value(authenticator) // use cross-platform to use external (or) roaming authenticators
                     name("getClientExtensionResults").objectValue {
                     }
                     name("response").objectValue {
@@ -502,7 +508,7 @@ class FidoViewModel : ViewModel() {
 
     suspend fun signoutUser() {
         SharedPreferenceUtil.getInstance().remove(SharedPreferenceUtil.K_PREF_FIDO2_USERNAME,
-            SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME)
+            SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME, SharedPreferenceUtil.K_PREF_FIDO2_AUTHENTICATOR)
         signInStateMutable.emit(SignInState.SignedOut)
     }
 
@@ -513,6 +519,9 @@ class FidoViewModel : ViewModel() {
             )
             SharedPreferenceUtil.getInstance().setString(
                 SharedPreferenceUtil.K_PREF_FIDO2_DISPLAYNAME, displayName
+            )
+            SharedPreferenceUtil.getInstance().setString(
+                SharedPreferenceUtil.K_PREF_FIDO2_AUTHENTICATOR, authenticator
             )
             signInStateMutable.emit(SignInState.SignedIn(displayName!!))
         }
