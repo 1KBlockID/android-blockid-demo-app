@@ -114,13 +114,16 @@ public class AuthenticatorActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == K_SCAN_QR_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             updateAuthenticateUi();
-            mAuthRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL), AuthRequestModel.class);
+            mAuthRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL),
+                    AuthRequestModel.class);
             BIDGenericResponse response =
-                    BlockIDSDK.getInstance().getScopes(null, mAuthRequestModel.scopes, mAuthRequestModel.creds, mAuthRequestModel.getOrigin(), String.valueOf(mLatitude),
-                            String.valueOf(mLongitude));
+                    BlockIDSDK.getInstance().getScopes(null, mAuthRequestModel.scopes,
+                            mAuthRequestModel.creds, mAuthRequestModel.getOrigin(),
+                            String.valueOf(mLatitude), String.valueOf(mLongitude));
 
             if (response != null) {
-                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(response.getDataObject());
+                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
+                        response.getDataObject());
                 if (mDisplayScopes != null) {
                     StringBuilder stringBuilder = new StringBuilder();
                     for (String key : mDisplayScopes.keySet()) {
