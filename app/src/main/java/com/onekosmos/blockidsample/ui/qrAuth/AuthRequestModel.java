@@ -33,7 +33,8 @@ public class AuthRequestModel {
         bidOrigin.session = session;
         bidOrigin.tag = tag;
 
-        if (bidOrigin.authPage == null) { // default to native auth without a specific method.
+        // default to native auth without a specific method.
+        if (bidOrigin.authPage == null) {
             bidOrigin.authPage = AccountAuthConstants.K_NATIVE_AUTH_SCHEMA;
         }
 

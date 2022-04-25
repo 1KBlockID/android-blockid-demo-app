@@ -2,6 +2,8 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import androidx.annotation.Keep;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
@@ -10,14 +12,16 @@ import androidx.annotation.Keep;
 public class AuthRequestModel2 {
     public String scopes;
     public String authtype;
-    public String _id;
+    @SerializedName("_id")
+    public String authRequestId;
     public String sessionId;
     public Origin origin;
     public String publicKey;
     public String createdTS;
     public String expiryTS;
     public String expiresDate;
-    public String __v;
+    @SerializedName("__v")
+    public String version;
 
     public AuthRequestModel getAuthRequestModel(String sessionUrl) {
         AuthRequestModel authRequestModel = new AuthRequestModel();

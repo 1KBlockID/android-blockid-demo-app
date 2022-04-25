@@ -184,9 +184,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void startScanQRCodeActivity() {
-        Intent scanQRCodeActivity = new Intent(this, ScanQRCodeActivity.class);
-        scanQRCodeActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(scanQRCodeActivity, K_SCAN_QR_REQUEST_CODE);
+        Intent scanQRCodeIntent = new Intent(this, ScanQRCodeActivity.class);
+        scanQRCodeIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(scanQRCodeIntent, K_SCAN_QR_REQUEST_CODE);
     }
 
     private void authenticate() {

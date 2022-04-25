@@ -22,7 +22,7 @@ public class GetSessionData {
         return sharedInstance;
     }
 
-    public void getSessionData(String url, SessionResponseCallback callback) {
+    public void getSessionData(String url, ISessionResponseCallback callback) {
         AndroidNetworking.get(url)
                 .build()
                 .getAsString(new StringRequestListener() {
@@ -41,7 +41,7 @@ public class GetSessionData {
                 });
     }
 
-    interface SessionResponseCallback {
+    interface ISessionResponseCallback {
         void onSessionResponse(boolean status, String response, ErrorManager.ErrorResponse error);
     }
 }
