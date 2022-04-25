@@ -150,15 +150,15 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
                     return;
                 }
                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                AuthRequestModel2 authRequestModel2 = gson.fromJson(response, AuthRequestModel2.class);
-                processScope(authRequestModel2.getAuthRequestModel(qrCodeData));
+                AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response, AuthenticationPayloadV2.class);
+                processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
             });
         }
         // UWL 1
         else {
             try {
                 String qrResponseString = new String(Base64.decode(qrCodeData, Base64.NO_WRAP));
-                processScope(new Gson().fromJson(qrResponseString, AuthRequestModel.class));
+                processScope(new Gson().fromJson(qrResponseString, AuthenticationPayloadV1.class));
             } catch (Exception e) {
                 errorDialog.show(null,
                         getString(R.string.label_invalid_code),
@@ -167,12 +167,12 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         }
     }
 
-    private void processScope(AuthRequestModel authRequestModel) {
-        String mQRScopes = authRequestModel.scopes.toLowerCase();
+    private void processScope(AuthenticationPayloadV1 authenticationPayloadV1) {
+        String mQRScopes = authenticationPayloadV1.scopes.toLowerCase();
         mQRScopes = mQRScopes.replace("windows", "scep_creds");
-        authRequestModel.scopes = mQRScopes;
+        authenticationPayloadV1.scopes = mQRScopes;
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authRequestModel));
+        resultIntent.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authenticationPayloadV1));
         setResult(RESULT_OK, resultIntent);
         this.finish();
     }

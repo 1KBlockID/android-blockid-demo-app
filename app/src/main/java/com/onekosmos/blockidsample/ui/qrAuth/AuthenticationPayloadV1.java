@@ -10,7 +10,7 @@ import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 @Keep
-public class AuthRequestModel {
+public class AuthenticationPayloadV1 {
     public String authtype;
     public String scopes;
     public String creds;

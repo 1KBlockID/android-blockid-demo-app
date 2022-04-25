@@ -53,7 +53,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private double mLatitude = 0, mLongitude = 0;
     private AppCompatButton mBtnQRSession1, mBtnQRSession2, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
-    private AuthRequestModel mAuthRequestModel = new AuthRequestModel();
+    private AuthenticationPayloadV1 mAuthenticationPayloadV1 = new AuthenticationPayloadV1();
     private RecyclerView mRvUserScope;
     private boolean mScanQRWithScope = false;
 
@@ -114,11 +114,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == K_SCAN_QR_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             updateAuthenticateUi();
-            mAuthRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL),
-                    AuthRequestModel.class);
+            mAuthenticationPayloadV1 = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL),
+                    AuthenticationPayloadV1.class);
             BIDGenericResponse response =
-                    BlockIDSDK.getInstance().getScopes(null, mAuthRequestModel.scopes,
-                            mAuthRequestModel.creds, mAuthRequestModel.getOrigin(),
+                    BlockIDSDK.getInstance().getScopes(null, mAuthenticationPayloadV1.scopes,
+                            mAuthenticationPayloadV1.creds, mAuthenticationPayloadV1.getOrigin(),
                             String.valueOf(mLatitude), String.valueOf(mLongitude));
 
             if (response != null) {
@@ -192,23 +192,23 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private void authenticate() {
         mBtnAuthenticate.setClickable(false);
         if (mScanQRWithScope) {
-            callAuthenticateService(mAuthRequestModel, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude);
         } else {
             String presetData = Objects.requireNonNull(mEtPresetData.getText()).toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
-            callAuthenticateService(mAuthRequestModel, dataObject, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, dataObject, mLatitude, mLongitude);
         }
     }
 
     // authenticate user with scope
-    private void callAuthenticateService(AuthRequestModel authRequestModel, double latitude,
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1, double latitude,
                                          double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session,
-                mAuthRequestModel.sessionURL, authRequestModel.scopes, authRequestModel.creds,
-                authRequestModel.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
+        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+                mAuthenticationPayloadV1.sessionURL, authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
                 BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
@@ -217,14 +217,14 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with pre-set data
-    private void callAuthenticateService(AuthRequestModel authRequestModel,
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
                                          LinkedHashMap<String, Object> dataObject,
                                          double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session,
-                authRequestModel.sessionURL, dataObject, authRequestModel.creds,
-                authRequestModel.getOrigin(), String.valueOf(latitude),
+        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+                authenticationPayloadV1.sessionURL, dataObject, authenticationPayloadV1.creds,
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
                 String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
