@@ -156,5 +156,9 @@
     <string name="label_authentication_failed">Authentication failed</string>
 
     <!-- QR Code -->
+    <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
+        scope data)</string>
+    <string name="label_qr_session_2_with_preset"> QR Session 2 \n (scan qr ,authenticate with
+        preset data)</string>
     <string name="label_suspicious_qr_code">Suspicious QR Code</string>
 </resources>

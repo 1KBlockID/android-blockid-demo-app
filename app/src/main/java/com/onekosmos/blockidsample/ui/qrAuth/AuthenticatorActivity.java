@@ -50,8 +50,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
     private GoogleApiClient mGoogleApiClient;
-    private double mLatitude = 0, mLongitude = 0;
-    private AppCompatButton mBtnQRSession1, mBtnQRSession2, mBtnAuthenticate;
+    private double mLatitude = 0.0, mLongitude = 0.0;
+    private AppCompatButton mBtnQRScope, mBtnQRPresetData, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
     private AuthenticationPayloadV1 mAuthenticationPayloadV1 = new AuthenticationPayloadV1();
     private RecyclerView mRvUserScope;
@@ -113,7 +113,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == K_SCAN_QR_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            updateAuthenticateUi();
+            updateAuthenticateUI();
             mAuthenticationPayloadV1 = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL),
                     AuthenticationPayloadV1.class);
             BIDGenericResponse response =
@@ -140,13 +140,13 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mBtnQRSession1 = findViewById(R.id.btn_qr_session1);
-        mBtnQRSession1.setOnClickListener(view -> {
+        mBtnQRScope = findViewById(R.id.btn_qr_scope);
+        mBtnQRScope.setOnClickListener(view -> {
             mScanQRWithScope = true;
             startScanQRCodeActivity();
         });
-        mBtnQRSession2 = findViewById(R.id.btn_qr_session2);
-        mBtnQRSession2.setOnClickListener(view -> {
+        mBtnQRPresetData = findViewById(R.id.btn_qr_preset_data);
+        mBtnQRPresetData.setOnClickListener(view -> {
             mScanQRWithScope = false;
             startScanQRCodeActivity();
         });
@@ -170,9 +170,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
-    private void updateAuthenticateUi() {
-        mBtnQRSession1.setVisibility(View.GONE);
-        mBtnQRSession2.setVisibility(View.GONE);
+    private void updateAuthenticateUI() {
+        mBtnQRScope.setVisibility(View.GONE);
+        mBtnQRPresetData.setVisibility(View.GONE);
         mBtnAuthenticate.setVisibility(View.VISIBLE);
         if (mScanQRWithScope) {
             mRvUserScope.setVisibility(View.VISIBLE);

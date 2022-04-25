@@ -11,7 +11,8 @@ import com.google.gson.annotations.SerializedName;
 @Keep
 public class AuthenticationPayloadV2 {
     public String scopes;
-    public String authtype;
+    @SerializedName("authtype")
+    public String authType;
     @SerializedName("_id")
     public String requestId;
     public String sessionId;
@@ -25,7 +26,7 @@ public class AuthenticationPayloadV2 {
 
     public AuthenticationPayloadV1 getAuthRequestModel(String sessionUrl) {
         AuthenticationPayloadV1 authenticationPayloadV1 = new AuthenticationPayloadV1();
-        authenticationPayloadV1.authtype = authtype;
+        authenticationPayloadV1.authType = authType;
         authenticationPayloadV1.scopes = scopes;
         authenticationPayloadV1.creds = "";
         authenticationPayloadV1.publicKey = publicKey;

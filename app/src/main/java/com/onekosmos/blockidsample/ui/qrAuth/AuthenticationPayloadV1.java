@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import androidx.annotation.Keep;
 
+import com.google.gson.annotations.SerializedName;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 
@@ -11,7 +12,8 @@ import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
  */
 @Keep
 public class AuthenticationPayloadV1 {
-    public String authtype;
+    @SerializedName("authtype")
+    public String authType;
     public String scopes;
     public String creds;
     public String publicKey;
