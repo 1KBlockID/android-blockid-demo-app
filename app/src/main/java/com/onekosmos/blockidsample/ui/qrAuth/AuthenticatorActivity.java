@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,17 +36,16 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class AuthenticatorActivity extends AppCompatActivity {
-    private static final String K_AUTH_REQUEST_MODEL = "authRequestModel";
+    private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
     private static final int K_SCAN_QR_REQUEST_CODE = 1112;
-    private static final int K_USER_CONSENT_REQUEST_CODE = 1113;
     private CurrentLocationHelper mCurrentLocationHelper;
-    private Location mLocation;
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
@@ -53,9 +54,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private AppCompatButton mBtnQRSession1, mBtnQRSession2, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
     private AuthRequestModel mAuthRequestModel = new AuthRequestModel();
-    private LinkedHashMap<String, Object> mDisplayScopes = new LinkedHashMap<>();
     private RecyclerView mRvUserScope;
-    private UserScopeAdapter mUserScopeAdapter;
     private boolean mScanQRWithScope = false;
 
     @Override
@@ -69,7 +68,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
         mCurrentLocationHelper.createLocationRequest();
         if (!AppPermissionUtils.isPermissionGiven(K_LOCATION_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE, K_LOCATION_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE,
+                    K_LOCATION_PERMISSION);
         else {
             mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
         }
@@ -78,8 +78,10 @@ public class AuthenticatorActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (mGoogleApiClient != null && checkSelfPermission(
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mGoogleApiClient.connect();
             setLocation();
         }
@@ -88,16 +90,20 @@ public class AuthenticatorActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_LOCATION_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_LOCATION_PERMISSION)) {
             mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
             setLocation();
         }
@@ -114,21 +120,17 @@ public class AuthenticatorActivity extends AppCompatActivity {
                             String.valueOf(mLongitude));
 
             if (response != null) {
-                mDisplayScopes = changeDisplayName(response.getDataObject());
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String s : mDisplayScopes.keySet()) {
-                    stringBuilder.append(s + " : " + mDisplayScopes.get(s) + "\n");
+                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(response.getDataObject());
+                if (mDisplayScopes != null) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String key : mDisplayScopes.keySet()) {
+                        stringBuilder.append(key).append(" : ").append(mDisplayScopes.get(key)).
+                                append("\n");
+                    }
+                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
+                    mRvUserScope.setAdapter(mUserScopeAdapter);
                 }
-                mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
-                mRvUserScope.setAdapter(mUserScopeAdapter);
             }
-        } else if (requestCode == K_USER_CONSENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            AuthRequestModel authRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL), AuthRequestModel.class);
-            double lat = data.getDoubleExtra("lat", 0);
-            double lon = data.getDoubleExtra("lon", 0);
-            callAuthenticateService(authRequestModel
-                    , lat
-                    , lon);
         } else {
             finish();
         }
@@ -157,7 +159,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     private void setLocation() {
         if (mGoogleApiClient != null) {
-            mLocation = mCurrentLocationHelper.getLocation();
+            Location mLocation = mCurrentLocationHelper.getLocation();
             if (mLocation != null) {
                 mLatitude = mLocation.getLatitude();
                 mLongitude = mLocation.getLongitude();
@@ -179,9 +181,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void startScanQRCodeActivity() {
-        Intent i = new Intent(this, ScanQRCodeActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, K_SCAN_QR_REQUEST_CODE);
+        Intent scanQRCodeActivity = new Intent(this, ScanQRCodeActivity.class);
+        scanQRCodeActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(scanQRCodeActivity, K_SCAN_QR_REQUEST_CODE);
     }
 
     private void authenticate() {
@@ -189,7 +191,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         if (mScanQRWithScope) {
             callAuthenticateService(mAuthRequestModel, mLatitude, mLongitude);
         } else {
-            String presetData = mEtPresetData.getText().toString();
+            String presetData = Objects.requireNonNull(mEtPresetData.getText()).toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
             callAuthenticateService(mAuthRequestModel, dataObject, mLatitude, mLongitude);
@@ -197,13 +199,14 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with scope
-    private void callAuthenticateService(AuthRequestModel authRequestModel, double lat, double lon) {
+    private void callAuthenticateService(AuthRequestModel authRequestModel, double latitude,
+                                         double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, authRequestModel.scopes
-                , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
-                , String.valueOf(lon), BuildConfig.VERSION_NAME
-                , (status, sessionId, error) -> {
+        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session,
+                mAuthRequestModel.sessionURL, authRequestModel.scopes, authRequestModel.creds,
+                authRequestModel.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
+                BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -211,13 +214,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with pre-set data
-    private void callAuthenticateService(AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
+    private void callAuthenticateService(AuthRequestModel authRequestModel,
+                                         LinkedHashMap<String, Object> dataObject,
+                                         double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, dataObject
-                , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
-                , String.valueOf(lon), BuildConfig.VERSION_NAME
-                , (status, sessionId, error) -> {
+        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session,
+                authRequestModel.sessionURL, dataObject, authRequestModel.creds,
+                authRequestModel.getOrigin(), String.valueOf(latitude),
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -226,36 +231,40 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     private void onUserAuthenticated(boolean status, ErrorManager.ErrorResponse error) {
         if (status) {
-            Toast.makeText(this, R.string.label_you_have_successfully_authenticated_to_log_in, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.label_you_have_successfully_authenticated_to_log_in,
+                    Toast.LENGTH_SHORT).show();
             finish();
-        } else {
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-                finish();
-            };
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            } else {
-                String message = error.getMessage();
-                if (message == null) {
-                    message = "Server Error (" + error.getCode() + ")";
-                }
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        message, onDismissListener);
-            }
+            return;
         }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
+        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
+            return;
+        }
+        String message = error.getMessage();
+        if (message == null) {
+            message = "Server Error (" + error.getCode() + ")";
+        }
+        errorDialog.show(null,
+                getString(R.string.label_error),
+                message, onDismissListener);
     }
 
-    private LinkedHashMap<String, Object> changeDisplayName(HashMap<String, Object> scopesMap) {
-        LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<String, Object>();
+    private LinkedHashMap<String, Object> changeDisplayName
+            (HashMap<String, Object> scopesMap) {
+        LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<>();
         try {
             if (scopesMap != null) {
                 if (isAnyDocumentEnrolled()) {
                     if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
-                        pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
+                        pScopesMap.put("Name : ", scopesMap.get("firstname") + " " +
+                                scopesMap.get("lastname"));
 
                     else if (scopesMap.containsKey("firstname"))
                         pScopesMap.put("Name : ", scopesMap.get("firstname"));
@@ -271,15 +280,18 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     pScopesMap.put("User ID : ", scopesMap.get("userid"));
 
                 if (scopesMap.containsKey("ppt")) {
-                    pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
+                    pScopesMap.put("Passport # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("ppt"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("nationalid")) {
-                    pScopesMap.put("National ID # : ", ((JSONObject) scopesMap.get("nationalid")).get("documentId"));
+                    pScopesMap.put("National ID # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("nationalid"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("dl")) {
-                    pScopesMap.put("Drivers license # : ", ((JSONObject) scopesMap.get("dl")).get("documentId"));
+                    pScopesMap.put("Drivers license # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("dl"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("scep_creds"))

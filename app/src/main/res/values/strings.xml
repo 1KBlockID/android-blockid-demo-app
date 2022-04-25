@@ -154,4 +154,7 @@
     <string name="label_successfully_authenticated_with_your_fido2_key">Your have successfully
         authenticated with your FIDO2 key.</string>
     <string name="label_authentication_failed">Authentication failed</string>
+
+    <!-- QR Code -->
+    <string name="label_suspicious_qr_code">Suspicious QR Code</string>
 </resources>

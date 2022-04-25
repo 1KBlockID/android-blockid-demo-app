@@ -1,6 +1,9 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
@@ -14,12 +17,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
 import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockidsample.R;
-import com.google.gson.Gson;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
@@ -39,7 +44,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private LinearLayout mScannerView;
     private AppCompatImageView mImgBack;
     private int mScannedViewWidthMargin = 50;
-    private static final String K_AUTH_REQUEST_MODEL = "authRequestModel";
+    private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,31 +112,68 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mImgBack.setOnClickListener(view -> onBackPressed());
     }
 
-    private void onQRCodeScanResponse(String qrResponseB64String) {
+    private void onQRCodeScanResponse(String qrResponse) {
+        mBIDScannerView.setVisibility(View.INVISIBLE);
+        mScannerOverlay.setVisibility(View.INVISIBLE);
+        mScannerView.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mTxtPleaseWait.setVisibility(View.VISIBLE);
+        processQRData(qrResponse);
+    }
+
+    private void processQRData(String qrCodeData) {
         ErrorDialog errorDialog = new ErrorDialog(ScanQRCodeActivity.this);
-        try {
-            mBIDScannerView.setVisibility(View.INVISIBLE);
-            mScannerOverlay.setVisibility(View.INVISIBLE);
-            mScannerView.setVisibility(View.INVISIBLE);
-            mProgressBar.setVisibility(View.VISIBLE);
-            mTxtPleaseWait.setVisibility(View.VISIBLE);
-            String qrResponseString = new String(Base64.decode(qrResponseB64String, Base64.NO_WRAP));
-            AuthRequestModel authRequestModel = new Gson().fromJson(qrResponseString, AuthRequestModel.class);
-            String mQRScopes = authRequestModel.scopes.toLowerCase();
-            mQRScopes = mQRScopes.replace("windows", "scep_creds");
-            authRequestModel.scopes = mQRScopes;
-            Intent i = new Intent();
-            i.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authRequestModel));
-            setResult(RESULT_OK, i);
-            this.finish();
-        } catch (Exception e) {
-            mProgressBar.setVisibility(View.GONE);
-            errorDialog.show(null,
-                    getString(R.string.label_invalid_code),
-                    getString(R.string.label_unsupported_qr_code), dialog -> {
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    });
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            setResult(RESULT_CANCELED);
+            finish();
+        };
+        // UWL 2
+        if (qrCodeData.startsWith("https://") && qrCodeData.contains("/sessions/session/")) {
+            String[] sessionDetails = qrCodeData.split("/session/");
+            // check for trusted source
+            if (!BlockIDSDK.getInstance().isTrustedSessionSource(sessionDetails[0])) {
+                errorDialog.show(null, getString(R.string.label_error),
+                        getString(R.string.label_suspicious_qr_code), onDismissListener);
+                return;
+            }
+
+            GetSessionData.getInstance().getSessionData(qrCodeData, (status, response, error) -> {
+                if (!status) {
+                    if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                        errorDialog.showNoInternetDialog(onDismissListener);
+                        return;
+                    }
+
+                    errorDialog.show(null, getString(R.string.label_error),
+                            error.getMessage(), onDismissListener);
+                    return;
+                }
+                Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                AuthRequestModel2 authRequestModel2 = gson.fromJson(response, AuthRequestModel2.class);
+                processScope(authRequestModel2.getAuthRequestModel(qrCodeData));
+            });
         }
+        // UWL 1
+        else {
+            try {
+                String qrResponseString = new String(Base64.decode(qrCodeData, Base64.NO_WRAP));
+                processScope(new Gson().fromJson(qrResponseString, AuthRequestModel.class));
+            } catch (Exception e) {
+                errorDialog.show(null,
+                        getString(R.string.label_invalid_code),
+                        getString(R.string.label_unsupported_qr_code), onDismissListener);
+            }
+        }
+    }
+
+    private void processScope(AuthRequestModel authRequestModel) {
+        String mQRScopes = authRequestModel.scopes.toLowerCase();
+        mQRScopes = mQRScopes.replace("windows", "scep_creds");
+        authRequestModel.scopes = mQRScopes;
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authRequestModel));
+        setResult(RESULT_OK, resultIntent);
+        this.finish();
     }
 }

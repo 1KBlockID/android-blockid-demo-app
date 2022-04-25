@@ -21,6 +21,7 @@ public class AuthRequestModel {
     public String community;
     public String authPage;
     public String name;
+    public String sessionURL;
 
     public BIDOrigin getOrigin() {
         BIDOrigin bidOrigin = new BIDOrigin();
