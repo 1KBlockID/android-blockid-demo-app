@@ -11,8 +11,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -44,7 +45,6 @@ import java.util.Objects;
  */
 public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
-    private static final int K_SCAN_QR_REQUEST_CODE = 1112;
     private CurrentLocationHelper mCurrentLocationHelper;
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
@@ -109,36 +109,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == K_SCAN_QR_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            updateAuthenticateUI();
-            mAuthenticationPayloadV1 = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL),
-                    AuthenticationPayloadV1.class);
-            BIDGenericResponse response =
-                    BlockIDSDK.getInstance().getScopes(null, mAuthenticationPayloadV1.scopes,
-                            mAuthenticationPayloadV1.creds, mAuthenticationPayloadV1.getOrigin(),
-                            String.valueOf(mLatitude), String.valueOf(mLongitude));
-
-            if (response != null) {
-                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
-                        response.getDataObject());
-                if (mDisplayScopes != null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (String key : mDisplayScopes.keySet()) {
-                        stringBuilder.append(key).append(" : ").append(mDisplayScopes.get(key)).
-                                append("\n");
-                    }
-                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
-                    mRvUserScope.setAdapter(mUserScopeAdapter);
-                }
-            }
-        } else {
-            finish();
-        }
-    }
-
     private void initView() {
         mBtnQRScope = findViewById(R.id.btn_qr_scope);
         mBtnQRScope.setOnClickListener(view -> {
@@ -183,10 +153,39 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
+    private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher = registerForActivityResult(new
+            ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            updateAuthenticateUI();
+            mAuthenticationPayloadV1 = new Gson().fromJson(result.getData().
+                    getStringExtra(K_AUTH_REQUEST_MODEL), AuthenticationPayloadV1.class);
+            BIDGenericResponse response =
+                    BlockIDSDK.getInstance().getScopes(null, mAuthenticationPayloadV1.scopes,
+                            mAuthenticationPayloadV1.creds, mAuthenticationPayloadV1.getOrigin(),
+                            String.valueOf(mLatitude), String.valueOf(mLongitude));
+
+            if (response != null) {
+                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
+                        response.getDataObject());
+                if (mDisplayScopes != null) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String key : mDisplayScopes.keySet()) {
+                        stringBuilder.append(key).append(" : ").append(mDisplayScopes.get(key)).
+                                append("\n");
+                    }
+                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
+                    mRvUserScope.setAdapter(mUserScopeAdapter);
+                }
+            }
+        } else {
+            finish();
+        }
+    });
+
     private void startScanQRCodeActivity() {
         Intent scanQRCodeIntent = new Intent(this, ScanQRCodeActivity.class);
         scanQRCodeIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(scanQRCodeIntent, K_SCAN_QR_REQUEST_CODE);
+        scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
     private void authenticate() {

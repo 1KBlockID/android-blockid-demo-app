@@ -33,7 +33,7 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanResponseListener {
-    private AppCompatTextView mTxtBack, mTxtPleaseWait;
+    private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private final String[] K_CAMERA_PERMISSION = new String[]{
             Manifest.permission.CAMERA};
@@ -42,8 +42,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private BIDScannerView mBIDScannerView;
     private RelativeLayout mScannerOverlay;
     private LinearLayout mScannerView;
-    private AppCompatImageView mImgBack;
-    private int mScannedViewWidthMargin = 50;
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
 
     @Override
@@ -57,22 +55,27 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     public void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_QR_CODE_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_QR_CODE_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
         else if (!(mProgressBar.getVisibility() == View.VISIBLE)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
+            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
+                    this, mBIDScannerView);
             mQRScannerHelper.startQRScanning();
         }
     }
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION, this)) {
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView);
+        if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION,
+                this)) {
+            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
+                    this, mBIDScannerView);
             mQRScannerHelper.startQRScanning();
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
@@ -98,16 +101,16 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mScannerView = findViewById(R.id.scanner_view);
         mBIDScannerView = findViewById(R.id.bid_scanner_view);
         mScannerOverlay = findViewById(R.id.scanner_overlay);
-        mBIDScannerView.setScannerWidthMargin(mScannedViewWidthMargin, mScannerOverlay);
+        mBIDScannerView.setScannerWidthMargin(50, mScannerOverlay);
         if (AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
         }
-        mTxtBack = findViewById(R.id.txt_back);
+        AppCompatTextView mTxtBack = findViewById(R.id.txt_back);
         mTxtPleaseWait = findViewById(R.id.txt_please_wait);
         mProgressBar = findViewById(R.id.progress_bar_register);
 
-        mImgBack = findViewById(R.id.img_back);
+        AppCompatImageView mImgBack = findViewById(R.id.img_back);
         mTxtBack.setOnClickListener(view -> onBackPressed());
         mImgBack.setOnClickListener(view -> onBackPressed());
     }
@@ -150,7 +153,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
                     return;
                 }
                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response, AuthenticationPayloadV2.class);
+                AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
+                        AuthenticationPayloadV2.class);
                 processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
             });
         }
