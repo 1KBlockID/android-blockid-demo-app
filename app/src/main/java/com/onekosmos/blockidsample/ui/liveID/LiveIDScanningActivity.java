@@ -206,7 +206,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 false,
                 this);
         if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcID);
+            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
         else
             mLiveIDScannerHelper.startLiveIDScanning();
     }
