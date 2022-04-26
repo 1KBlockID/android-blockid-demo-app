@@ -163,6 +163,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
         BlockIDSDK.getInstance().registerTenant(AppConstant.defaultTenant,
                 (status, error, bidTenant) -> {
                     if (status) {
+                        BlockIDSDK.getInstance().setDvcId(AppConstant.dvcId);
                         restoreAccount();
                         return;
                     }

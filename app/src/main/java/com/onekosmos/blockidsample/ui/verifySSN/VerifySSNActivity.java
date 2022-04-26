@@ -278,7 +278,7 @@ public class VerifySSNActivity extends AppCompatActivity {
             mSSNMap.put("phone", phone);
         }
 
-        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mSSNMap,
+        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mSSNMap,
                 new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();

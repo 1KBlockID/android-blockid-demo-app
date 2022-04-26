@@ -299,7 +299,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                 R.string.label_verifying_driver_license));
         progressDialog.show();
 
-        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcID, mDriverLicenseMap,
+        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mDriverLicenseMap,
                 new String[]{"dl_verify"}, (status, documentVerification, error) -> {
                     progressDialog.dismiss();
                     if (status) {
