@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import androidx.annotation.Keep;
 
+import com.google.gson.annotations.SerializedName;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 
@@ -10,8 +11,9 @@ import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 @Keep
-public class AuthRequestModel {
-    public String authtype;
+public class AuthenticationPayloadV1 {
+    @SerializedName("authtype")
+    public String authType;
     public String scopes;
     public String creds;
     public String publicKey;
@@ -21,6 +23,7 @@ public class AuthRequestModel {
     public String community;
     public String authPage;
     public String name;
+    public String sessionURL;
 
     public BIDOrigin getOrigin() {
         BIDOrigin bidOrigin = new BIDOrigin();
@@ -32,7 +35,8 @@ public class AuthRequestModel {
         bidOrigin.session = session;
         bidOrigin.tag = tag;
 
-        if (bidOrigin.authPage == null) { // default to native auth without a specific method.
+        // default to native auth without a specific method.
+        if (bidOrigin.authPage == null) {
             bidOrigin.authPage = AccountAuthConstants.K_NATIVE_AUTH_SCHEMA;
         }
 
