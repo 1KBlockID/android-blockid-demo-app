@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,8 +11,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -34,28 +37,24 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class AuthenticatorActivity extends AppCompatActivity {
-    private static final String K_AUTH_REQUEST_MODEL = "authRequestModel";
-    private static final int K_SCAN_QR_REQUEST_CODE = 1112;
-    private static final int K_USER_CONSENT_REQUEST_CODE = 1113;
+    private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
     private CurrentLocationHelper mCurrentLocationHelper;
-    private Location mLocation;
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
     private GoogleApiClient mGoogleApiClient;
-    private double mLatitude = 0, mLongitude = 0;
-    private AppCompatButton mBtnQRSession1, mBtnQRSession2, mBtnAuthenticate;
+    private double mLatitude = 0.0, mLongitude = 0.0;
+    private AppCompatButton mBtnQRScope, mBtnQRPresetData, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
-    private AuthRequestModel mAuthRequestModel = new AuthRequestModel();
-    private LinkedHashMap<String, Object> mDisplayScopes = new LinkedHashMap<>();
+    private AuthenticationPayloadV1 mAuthenticationPayloadV1 = new AuthenticationPayloadV1();
     private RecyclerView mRvUserScope;
-    private UserScopeAdapter mUserScopeAdapter;
     private boolean mScanQRWithScope = false;
 
     @Override
@@ -69,7 +68,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
         mCurrentLocationHelper.createLocationRequest();
         if (!AppPermissionUtils.isPermissionGiven(K_LOCATION_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE, K_LOCATION_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE,
+                    K_LOCATION_PERMISSION);
         else {
             mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
         }
@@ -78,8 +78,10 @@ public class AuthenticatorActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (mGoogleApiClient != null && checkSelfPermission(
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mGoogleApiClient.connect();
             setLocation();
         }
@@ -88,60 +90,33 @@ public class AuthenticatorActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_LOCATION_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_LOCATION_PERMISSION)) {
             mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
             setLocation();
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == K_SCAN_QR_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            updateAuthenticateUi();
-            mAuthRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL), AuthRequestModel.class);
-            BIDGenericResponse response =
-                    BlockIDSDK.getInstance().getScopes(null, mAuthRequestModel.scopes, mAuthRequestModel.creds, mAuthRequestModel.getOrigin(), String.valueOf(mLatitude),
-                            String.valueOf(mLongitude));
-
-            if (response != null) {
-                mDisplayScopes = changeDisplayName(response.getDataObject());
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String s : mDisplayScopes.keySet()) {
-                    stringBuilder.append(s + " : " + mDisplayScopes.get(s) + "\n");
-                }
-                mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
-                mRvUserScope.setAdapter(mUserScopeAdapter);
-            }
-        } else if (requestCode == K_USER_CONSENT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            AuthRequestModel authRequestModel = new Gson().fromJson(data.getStringExtra(K_AUTH_REQUEST_MODEL), AuthRequestModel.class);
-            double lat = data.getDoubleExtra("lat", 0);
-            double lon = data.getDoubleExtra("lon", 0);
-            callAuthenticateService(authRequestModel
-                    , lat
-                    , lon);
-        } else {
-            finish();
-        }
-    }
-
     private void initView() {
-        mBtnQRSession1 = findViewById(R.id.btn_qr_session1);
-        mBtnQRSession1.setOnClickListener(view -> {
+        mBtnQRScope = findViewById(R.id.btn_qr_scope);
+        mBtnQRScope.setOnClickListener(view -> {
             mScanQRWithScope = true;
             startScanQRCodeActivity();
         });
-        mBtnQRSession2 = findViewById(R.id.btn_qr_session2);
-        mBtnQRSession2.setOnClickListener(view -> {
+        mBtnQRPresetData = findViewById(R.id.btn_qr_preset_data);
+        mBtnQRPresetData.setOnClickListener(view -> {
             mScanQRWithScope = false;
             startScanQRCodeActivity();
         });
@@ -157,7 +132,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     private void setLocation() {
         if (mGoogleApiClient != null) {
-            mLocation = mCurrentLocationHelper.getLocation();
+            Location mLocation = mCurrentLocationHelper.getLocation();
             if (mLocation != null) {
                 mLatitude = mLocation.getLatitude();
                 mLongitude = mLocation.getLongitude();
@@ -165,9 +140,9 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
-    private void updateAuthenticateUi() {
-        mBtnQRSession1.setVisibility(View.GONE);
-        mBtnQRSession2.setVisibility(View.GONE);
+    private void updateAuthenticateUI() {
+        mBtnQRScope.setVisibility(View.GONE);
+        mBtnQRPresetData.setVisibility(View.GONE);
         mBtnAuthenticate.setVisibility(View.VISIBLE);
         if (mScanQRWithScope) {
             mRvUserScope.setVisibility(View.VISIBLE);
@@ -178,32 +153,62 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
+    private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher = registerForActivityResult(new
+            ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            updateAuthenticateUI();
+            mAuthenticationPayloadV1 = new Gson().fromJson(result.getData().
+                    getStringExtra(K_AUTH_REQUEST_MODEL), AuthenticationPayloadV1.class);
+            BIDGenericResponse response =
+                    BlockIDSDK.getInstance().getScopes(null, mAuthenticationPayloadV1.scopes,
+                            mAuthenticationPayloadV1.creds, mAuthenticationPayloadV1.getOrigin(),
+                            String.valueOf(mLatitude), String.valueOf(mLongitude));
+
+            if (response != null) {
+                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
+                        response.getDataObject());
+                if (mDisplayScopes != null) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String key : mDisplayScopes.keySet()) {
+                        stringBuilder.append(key).append(" : ").append(mDisplayScopes.get(key)).
+                                append("\n");
+                    }
+                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
+                    mRvUserScope.setAdapter(mUserScopeAdapter);
+                }
+            }
+        } else {
+            finish();
+        }
+    });
+
     private void startScanQRCodeActivity() {
-        Intent i = new Intent(this, ScanQRCodeActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, K_SCAN_QR_REQUEST_CODE);
+        Intent scanQRCodeIntent = new Intent(this, ScanQRCodeActivity.class);
+        scanQRCodeIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
     private void authenticate() {
         mBtnAuthenticate.setClickable(false);
         if (mScanQRWithScope) {
-            callAuthenticateService(mAuthRequestModel, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude);
         } else {
-            String presetData = mEtPresetData.getText().toString();
+            String presetData = Objects.requireNonNull(mEtPresetData.getText()).toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
-            callAuthenticateService(mAuthRequestModel, dataObject, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, dataObject, mLatitude, mLongitude);
         }
     }
 
     // authenticate user with scope
-    private void callAuthenticateService(AuthRequestModel authRequestModel, double lat, double lon) {
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1, double latitude,
+                                         double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, authRequestModel.scopes
-                , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
-                , String.valueOf(lon), BuildConfig.VERSION_NAME
-                , (status, sessionId, error) -> {
+        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+                mAuthenticationPayloadV1.sessionURL, authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
+                BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -211,13 +216,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with pre-set data
-    private void callAuthenticateService(AuthRequestModel authRequestModel, LinkedHashMap<String, Object> dataObject, double lat, double lon) {
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
+                                         LinkedHashMap<String, Object> dataObject,
+                                         double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authRequestModel.session, dataObject
-                , authRequestModel.creds, authRequestModel.getOrigin(), String.valueOf(lat)
-                , String.valueOf(lon), BuildConfig.VERSION_NAME
-                , (status, sessionId, error) -> {
+        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+                authenticationPayloadV1.sessionURL, dataObject, authenticationPayloadV1.creds,
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -226,36 +233,40 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     private void onUserAuthenticated(boolean status, ErrorManager.ErrorResponse error) {
         if (status) {
-            Toast.makeText(this, R.string.label_you_have_successfully_authenticated_to_log_in, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.label_you_have_successfully_authenticated_to_log_in,
+                    Toast.LENGTH_SHORT).show();
             finish();
-        } else {
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-                finish();
-            };
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            } else {
-                String message = error.getMessage();
-                if (message == null) {
-                    message = "Server Error (" + error.getCode() + ")";
-                }
-                errorDialog.show(null,
-                        getString(R.string.label_error),
-                        message, onDismissListener);
-            }
+            return;
         }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
+        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
+            return;
+        }
+        String message = error.getMessage();
+        if (message == null) {
+            message = "Server Error (" + error.getCode() + ")";
+        }
+        errorDialog.show(null,
+                getString(R.string.label_error),
+                message, onDismissListener);
     }
 
-    private LinkedHashMap<String, Object> changeDisplayName(HashMap<String, Object> scopesMap) {
-        LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<String, Object>();
+    private LinkedHashMap<String, Object> changeDisplayName
+            (HashMap<String, Object> scopesMap) {
+        LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<>();
         try {
             if (scopesMap != null) {
                 if (isAnyDocumentEnrolled()) {
                     if (scopesMap.containsKey("firstname") && scopesMap.containsKey("lastname"))
-                        pScopesMap.put("Name : ", scopesMap.get("firstname") + " " + scopesMap.get("lastname"));
+                        pScopesMap.put("Name : ", scopesMap.get("firstname") + " " +
+                                scopesMap.get("lastname"));
 
                     else if (scopesMap.containsKey("firstname"))
                         pScopesMap.put("Name : ", scopesMap.get("firstname"));
@@ -271,15 +282,18 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     pScopesMap.put("User ID : ", scopesMap.get("userid"));
 
                 if (scopesMap.containsKey("ppt")) {
-                    pScopesMap.put("Passport # : ", ((JSONObject) scopesMap.get("ppt")).get("documentId"));
+                    pScopesMap.put("Passport # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("ppt"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("nationalid")) {
-                    pScopesMap.put("National ID # : ", ((JSONObject) scopesMap.get("nationalid")).get("documentId"));
+                    pScopesMap.put("National ID # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("nationalid"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("dl")) {
-                    pScopesMap.put("Drivers license # : ", ((JSONObject) scopesMap.get("dl")).get("documentId"));
+                    pScopesMap.put("Drivers license # : ", ((JSONObject)
+                            Objects.requireNonNull(scopesMap.get("dl"))).get("documentId"));
                 }
 
                 if (scopesMap.containsKey("scep_creds"))

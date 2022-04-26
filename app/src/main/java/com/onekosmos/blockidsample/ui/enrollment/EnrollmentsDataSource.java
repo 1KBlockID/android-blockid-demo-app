@@ -36,6 +36,7 @@ public class EnrollmentsDataSource {
         ASSET_SSN,
         ASSET_LOGIN_WITH_QR,
         ASSET_RECOVER_MNEMONIC,
+        ASSET_FIDO2,
         ASSET_RESET_SDK,
     }
 
@@ -62,6 +63,7 @@ public class EnrollmentsDataSource {
 
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
+        arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
     }
@@ -128,6 +130,11 @@ public class EnrollmentsDataSource {
             case ASSET_RECOVER_MNEMONIC:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_recover_mnemonic));
+                break;
+            case ASSET_FIDO2:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_fido2
+                        ));
                 break;
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(false,

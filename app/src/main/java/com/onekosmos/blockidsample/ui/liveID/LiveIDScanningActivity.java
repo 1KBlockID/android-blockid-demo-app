@@ -154,7 +154,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
             String stringError = (error.getObject() != null) ? error.getObject() : "";
             errorDialog.show(null, getString(R.string.label_error), "(" + error.getCode() + ") " +
-                            error.getMessage() + "\n" + stringError, onDismissListener);
+                    error.getMessage() + "\n" + stringError, onDismissListener);
             return;
         }
 
@@ -199,9 +199,14 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private void startLiveIDScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this, ScanningMode.SCAN_LIVE, this, mBIDScannerView, mScannerOverlay);
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
+                ScanningMode.SCAN_LIVE,
+                mBIDScannerView,
+                mScannerOverlay,
+                false,
+                this);
         if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcID);
+            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
         else
             mLiveIDScannerHelper.startLiveIDScanning();
     }

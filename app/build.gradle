@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4.100" + "." + getCurrentTimestampHexValue()
+        versionName "1.7.20" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -50,8 +50,8 @@ dependencies {
     implementation project(path: ':BlockIDSDK-release')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
@@ -126,4 +126,7 @@ dependencies {
 
     // Opencv
     implementation 'com.quickbirdstudios:opencv:4.5.2'
+
+    // for adding custom tab intent
+    implementation 'androidx.browser:browser:1.4.0'
 }
