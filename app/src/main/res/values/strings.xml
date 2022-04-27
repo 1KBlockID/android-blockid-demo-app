@@ -161,4 +161,6 @@
     <string name="label_qr_session_2_with_preset"> QR Session 2 \n (scan qr ,authenticate with
         preset data)</string>
     <string name="label_suspicious_qr_code">Suspicious QR Code</string>
+    <string name="label_enroll_liveid_in_order_to_authenticate">Please enroll LiveID in order to
+        authenticate.</string>
 </resources>
