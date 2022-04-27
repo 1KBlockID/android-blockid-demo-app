@@ -124,7 +124,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
             startScanQRCodeActivity();
         });
         mBtnAuthenticate = findViewById(R.id.btn_authenticate);
-        mBtnAuthenticate.setOnClickListener(view -> onClickAuthenticate());
+        mBtnAuthenticate.setOnClickListener(view -> authenticate());
         mEtPresetData = findViewById(R.id.et_qr_preset_data);
 
         mRvUserScope = findViewById(R.id.rv_user_scope);
@@ -156,34 +156,39 @@ public class AuthenticatorActivity extends AppCompatActivity {
         }
     }
 
-    private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher = registerForActivityResult(new
-            ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-            updateAuthenticateUI();
-            mAuthenticationPayloadV1 = new Gson().fromJson(result.getData().
-                    getStringExtra(K_AUTH_REQUEST_MODEL), AuthenticationPayloadV1.class);
-            BIDGenericResponse response =
-                    BlockIDSDK.getInstance().getScopes(null, mAuthenticationPayloadV1.scopes,
-                            mAuthenticationPayloadV1.creds, mAuthenticationPayloadV1.getOrigin(),
-                            String.valueOf(mLatitude), String.valueOf(mLongitude));
+    private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            updateAuthenticateUI();
+                            mAuthenticationPayloadV1 = new Gson().fromJson(
+                                    result.getData().getStringExtra(K_AUTH_REQUEST_MODEL),
+                                    AuthenticationPayloadV1.class);
+                            BIDGenericResponse response = BlockIDSDK.getInstance().getScopes(
+                                    null, mAuthenticationPayloadV1.scopes,
+                                    mAuthenticationPayloadV1.creds,
+                                    mAuthenticationPayloadV1.getOrigin(),
+                                    String.valueOf(mLatitude), String.valueOf(mLongitude));
 
-            if (response != null) {
-                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
-                        response.getDataObject());
-                if (mDisplayScopes != null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (String key : mDisplayScopes.keySet()) {
-                        stringBuilder.append(key).append(" : ").append(mDisplayScopes.get(key)).
-                                append("\n");
-                    }
-                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(mDisplayScopes);
-                    mRvUserScope.setAdapter(mUserScopeAdapter);
-                }
-            }
-        } else {
-            finish();
-        }
-    });
+                            if (response != null) {
+                                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
+                                        response.getDataObject());
+                                if (mDisplayScopes != null) {
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    for (String key : mDisplayScopes.keySet()) {
+                                        stringBuilder.append(key).append(" : ").
+                                                append(mDisplayScopes.get(key)).
+                                                append("\n");
+                                    }
+                                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(
+                                            mDisplayScopes);
+                                    mRvUserScope.setAdapter(mUserScopeAdapter);
+                                }
+                            }
+                        } else {
+                            finish();
+                        }
+                    });
 
     private void startScanQRCodeActivity() {
         Intent scanQRCodeIntent = new Intent(this, ScanQRCodeActivity.class);
@@ -191,26 +196,23 @@ public class AuthenticatorActivity extends AppCompatActivity {
         scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
-    private void onClickAuthenticate() {
+    private void authenticate() {
         mBtnAuthenticate.setClickable(false);
         verifyAuth(mAuthenticationPayloadV1.authType);
     }
 
     private void verifyAuth(String authType) {
-        switch (authType) {
-            case K_FACE:
-                if (BlockIDSDK.getInstance().isLiveIDRegistered())
-                    startLiveIDVerification();
-                else {
-                    Toast.makeText(this,
-                            R.string.label_enroll_liveid_in_order_to_authenticate,
-                            Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                break;
-            default:
-                onSuccessFullVerification();
-                break;
+        if (K_FACE.equalsIgnoreCase(authType)) {
+            if (BlockIDSDK.getInstance().isLiveIDRegistered())
+                startLiveIDVerification();
+            else {
+                Toast.makeText(this,
+                        R.string.label_enroll_liveid_in_order_to_authenticate,
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+        } else {
+            onSuccessFullVerification();
         }
     }
 

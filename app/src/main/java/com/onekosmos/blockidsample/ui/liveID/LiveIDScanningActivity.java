@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.content.ContextCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -36,7 +37,8 @@ import java.util.LinkedHashMap;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener, ILiveIDResponseListener {
+public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener,
+        ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
@@ -65,7 +67,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
         else {
             startLiveIDScan();
         }
@@ -86,8 +89,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.img_back:
             case R.id.txt_back:
             case R.id.btn_cancel:
@@ -98,17 +101,16 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_CAMERA_PERMISSION)) {
             startLiveIDScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
-                    getString(R.string.label_liveid_camera_permission_alert), dialog -> {
-                        finish();
-                    });
+            errorDialog.show(null, "",
+                    getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
         }
     }
 
@@ -131,7 +133,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     @Override
-    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, ErrorManager.ErrorResponse error) {
+    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken,
+                                 ErrorManager.ErrorResponse error) {
         mTxtMessage.setVisibility(View.GONE);
         mLayoutMessage.setVisibility(View.GONE);
         mLiveIDScannerHelper.stopLiveIDScanning();
@@ -226,13 +229,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
     private void showFaceNotFocusedViews(String expression) {
         mScannerOverlay.setImageResource(R.drawable.group_3);
-        mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc2));
+        mScannerOverlay.setColorFilter(ContextCompat.getColor(this, R.color.misc2));
         mTxtMessage.setText(getMessageForExpression(expression));
     }
 
     private void showFaceFocusedViews() {
         mScannerOverlay.setImageResource(R.drawable.group_3);
-        mScannerOverlay.setColorFilter(getResources().getColor(R.color.misc1));
+        mScannerOverlay.setColorFilter(ContextCompat.getColor(this, (R.color.misc1)));
     }
 
     private String getMessageForExpression(String expression) {
@@ -270,7 +273,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 return;
             }
             if (error == null)
-                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                        K_SOMETHING_WENT_WRONG.getMessage());
 
             ErrorDialog errorDialog = new ErrorDialog(this);
             DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
@@ -298,7 +302,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                     progressDialog.dismiss();
                     DocumentHolder.clearData();
                     if (status) {
-                        Toast.makeText(this, getString(R.string.label_document_enrolled_successfully), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.label_document_enrolled_successfully),
+                                Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     }
