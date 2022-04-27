@@ -1,5 +1,8 @@
 package com.onekosmos.blockidsample.ui.liveID;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+
 import android.Manifest;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -29,14 +32,12 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.LinkedHashMap;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener, ILiveIDResponseListener {
+    public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
@@ -49,15 +50,18 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private int mScannerOverlayMargin = 30;
     private LinearLayout mLayoutMessage;
     private ProgressDialog mProgressDialog;
-    private boolean mIsLivenessNeeded;
+    private boolean mIsLivenessNeeded, mIsFromAuthentication;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_liveid_scan);
+        mIsFromAuthentication = getIntent().hasExtra(IS_FROM_AUTHENTICATE) &&
+                getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
     }
 
+    @Override
     protected void onStart() {
         super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
@@ -87,6 +91,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             case R.id.img_back:
             case R.id.txt_back:
             case R.id.btn_cancel:
+                setResult(RESULT_CANCELED);
                 finish();
                 break;
         }
@@ -158,7 +163,12 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             return;
         }
 
-        if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) && getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
+        if (mIsFromAuthentication) {
+            verifyLiveID(liveIDBitmap);
+            return;
+        }
+        if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) &&
+                getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
             return;
         }
@@ -183,6 +193,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mTxtTitle = findViewById(R.id.txt_liveid_title);
         if (mIsLivenessNeeded)
             mTxtTitle.setText(R.string.label_enroll_liveid_with_liveness_check);
+
+        if (mIsFromAuthentication)
+            mTxtTitle.setText(R.string.label_verify_liveid);
 
         mTxtMessage = findViewById(R.id.txt_message);
         mLayoutMessage = findViewById(R.id.layout_message);
@@ -289,20 +302,41 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                         finish();
                         return;
                     }
-
-                    if (error == null)
-                        error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
-
-                    ErrorDialog errorDialog = new ErrorDialog(this);
-                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                        errorDialog.dismiss();
-                        finish();
-                    };
-                    if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                        errorDialog.showNoInternetDialog(onDismissListener);
-                        return;
-                    }
-                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                    showError(error);
                 });
+    }
+
+    private void verifyLiveID(Bitmap bitmap) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (success, errorResponse) -> {
+            progressDialog.dismiss();
+            if (success) {
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                showError(errorResponse);
+            }
+        });
+    }
+
+    private void showError(ErrorManager.ErrorResponse error) {
+        if (error == null)
+            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage());
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            setResult(RESULT_CANCELED);
+            finish();
+        };
+
+        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
+            return;
+        }
+        errorDialog.show(null, getString(R.string.label_error),
+                error.getMessage(), onDismissListener);
     }
 }

@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -27,6 +28,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -45,6 +47,7 @@ import java.util.Objects;
  */
 public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
+    private static final String K_FACE = "face";
     private CurrentLocationHelper mCurrentLocationHelper;
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
@@ -121,7 +124,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
             startScanQRCodeActivity();
         });
         mBtnAuthenticate = findViewById(R.id.btn_authenticate);
-        mBtnAuthenticate.setOnClickListener(view -> authenticate());
+        mBtnAuthenticate.setOnClickListener(view -> onClickAuthenticate());
         mEtPresetData = findViewById(R.id.et_qr_preset_data);
 
         mRvUserScope = findViewById(R.id.rv_user_scope);
@@ -188,8 +191,47 @@ public class AuthenticatorActivity extends AppCompatActivity {
         scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
-    private void authenticate() {
+    private void onClickAuthenticate() {
         mBtnAuthenticate.setClickable(false);
+        verifyAuth(mAuthenticationPayloadV1.authType);
+    }
+
+    private void verifyAuth(String authType) {
+        switch (authType) {
+            case K_FACE:
+                if (BlockIDSDK.getInstance().isLiveIDRegistered())
+                    startLiveIDVerification();
+                else {
+                    Toast.makeText(this,
+                            R.string.label_enroll_liveid_in_order_to_authenticate,
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                break;
+            default:
+                onSuccessFullVerification();
+                break;
+        }
+    }
+
+    private final ActivityResultLauncher<Intent> scanLiveIDResultLauncher =
+            registerForActivityResult(new
+                    ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    onSuccessFullVerification();
+                } else {
+                    mBtnAuthenticate.setClickable(true);
+                }
+            });
+
+    private void startLiveIDVerification() {
+        Intent scanLiveIdIntent = new Intent(this, LiveIDScanningActivity.class);
+        scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
+        scanLiveIDResultLauncher.launch(scanLiveIdIntent);
+    }
+
+    private void onSuccessFullVerification() {
         if (mScanQRWithScope) {
             callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude);
         } else {
