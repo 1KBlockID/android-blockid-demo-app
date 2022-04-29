@@ -25,10 +25,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
+import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.login.PinVerificationActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -48,6 +51,8 @@ import java.util.Objects;
 public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
     private static final String K_FACE = "face";
+    private static final String K_PIN = "pin";
+    private static final String K_FINGERPRINT = "fingerprint";
     private CurrentLocationHelper mCurrentLocationHelper;
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
@@ -202,21 +207,68 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void verifyAuth(String authType) {
-        if (K_FACE.equalsIgnoreCase(authType)) {
-            if (BlockIDSDK.getInstance().isLiveIDRegistered())
-                startLiveIDVerification();
-            else {
-                Toast.makeText(this,
-                        R.string.label_enroll_liveid_in_order_to_authenticate,
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
-        } else {
-            onSuccessFullVerification();
+        switch (authType.toLowerCase()) {
+            case K_FACE:
+                if (BlockIDSDK.getInstance().isLiveIDRegistered())
+                    startLiveIDVerification();
+                else {
+                    Toast.makeText(this,
+                            R.string.label_enroll_liveid_in_order_to_authenticate,
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                break;
+            case K_PIN:
+                if (BlockIDSDK.getInstance().isPinRegistered()) {
+                    startPinVerification();
+                } else {
+                    Toast.makeText(this,
+                            R.string.label_enroll_pin_in_order_to_authenticate,
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                break;
+            case K_FINGERPRINT:
+                if (BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
+                    startVerifyDeviceAuth();
+                } else {
+                    Toast.makeText(this,
+                            R.string.label_enroll_device_auth_in_order_to_authenticate,
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                break;
+            default:
+                onSuccessFullVerification();
+                break;
         }
     }
 
-    private final ActivityResultLauncher<Intent> scanLiveIDResultLauncher =
+    private void startVerifyDeviceAuth() {
+        BIDAuthProvider.getInstance().verifyDeviceAuth(this,
+                getResources().getString(R.string.label_biometric_auth),
+                getResources().getString(R.string.label_biometric_auth_req), false,
+                new IBiometricResponseListener() {
+                    @Override
+                    public void onBiometricAuthResult(boolean status,
+                                                      ErrorManager.ErrorResponse errorResponse) {
+                        if (status)
+                            onSuccessFullVerification();
+                        else
+                            mBtnAuthenticate.setClickable(true);
+                    }
+
+                    @Override
+                    public void onNonBiometricAuth(boolean status) {
+                        if (status)
+                            onSuccessFullVerification();
+                        else
+                            mBtnAuthenticate.setClickable(true);
+                    }
+                });
+    }
+
+    private final ActivityResultLauncher<Intent> verifyAuthResultLauncher =
             registerForActivityResult(new
                     ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
@@ -226,11 +278,18 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 }
             });
 
+    private void startPinVerification() {
+        Intent scanLiveIdIntent = new Intent(this, PinVerificationActivity.class);
+        scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
+        verifyAuthResultLauncher.launch(scanLiveIdIntent);
+    }
+
     private void startLiveIDVerification() {
         Intent scanLiveIdIntent = new Intent(this, LiveIDScanningActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
-        scanLiveIDResultLauncher.launch(scanLiveIdIntent);
+        verifyAuthResultLauncher.launch(scanLiveIdIntent);
     }
 
     private void onSuccessFullVerification() {
