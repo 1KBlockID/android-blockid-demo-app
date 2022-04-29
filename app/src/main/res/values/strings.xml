@@ -165,4 +165,6 @@
         authenticate.</string>
     <string name="label_enroll_pin_in_order_to_authenticate">Please enroll Pin in order to
         authenticate.</string>
+    <string name="label_enroll_device_auth_in_order_to_authenticate">Please enroll Device Auth in order to
+        authenticate.</string>
 </resources>
