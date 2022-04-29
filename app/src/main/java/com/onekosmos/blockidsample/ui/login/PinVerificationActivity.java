@@ -17,14 +17,16 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.enrollPin.PinView;
 
+import java.util.Objects;
+
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class PinVerificationActivity extends AppCompatActivity {
     private static final int K_PIN_DIGIT_COUNT = 8;
-    private AppCompatTextView mTxtBack, mTxtPinError;
-    private AppCompatImageView mImgShowHidePsw, mImgBack;
+    private AppCompatTextView mTxtPinError;
+    private AppCompatImageView mImgShowHidePsw;
     private PinView mPvEnterPin;
     private boolean mShowPivValue;
 
@@ -43,22 +45,23 @@ public class PinVerificationActivity extends AppCompatActivity {
 
     private void initView() {
         mTxtPinError = findViewById(R.id.txt_pin_error);
-        mTxtBack = findViewById(R.id.txt_back);
+        AppCompatTextView mTxtBack = findViewById(R.id.txt_back);
         mImgShowHidePsw = findViewById(R.id.img_show_hide_psw);
-        mImgBack = findViewById(R.id.img_back);
+        AppCompatImageView mImgBack = findViewById(R.id.img_back);
         mPvEnterPin = findViewById(R.id.edt_enter_pin);
         setPinViewColor();
-        mTxtBack.setOnClickListener(v -> onCancel());
-        mImgBack.setOnClickListener(v -> onCancel());
-        mImgShowHidePsw.setOnClickListener(v -> showHidePassWord());
+        mTxtBack.setOnClickListener(view -> onCancel());
+        mImgBack.setOnClickListener(view -> onCancel());
+        mImgShowHidePsw.setOnClickListener(view -> showHidePassWord());
 
         mPvEnterPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence charSequence, int start, int count,
+                                          int after) {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 setPinViewColor();
                 mTxtPinError.setVisibility(View.GONE);
             }
@@ -66,7 +69,7 @@ public class PinVerificationActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (mPvEnterPin.length() == K_PIN_DIGIT_COUNT)
-                    verifyPin(mPvEnterPin.getText().toString());
+                    verifyPin(Objects.requireNonNull(mPvEnterPin.getText()).toString());
             }
         });
     }
@@ -76,14 +79,14 @@ public class PinVerificationActivity extends AppCompatActivity {
         finish();
     }
 
-    private boolean verifyPin(String pin) {
-        if (TextUtils.isEmpty(pin) || pin.length() < K_PIN_DIGIT_COUNT || !BlockIDSDK.getInstance().verifyPin(pin)) {
+    private void verifyPin(String pin) {
+        if (TextUtils.isEmpty(pin) || pin.length() < K_PIN_DIGIT_COUNT ||
+                !BlockIDSDK.getInstance().verifyPin(pin)) {
             inCorrectPin();
-            return false;
+            return;
         }
         setResult(RESULT_OK);
         finish();
-        return true;
     }
 
     private void setPinViewColor() {
@@ -98,7 +101,8 @@ public class PinVerificationActivity extends AppCompatActivity {
             mImgShowHidePsw.setImageResource(R.drawable.icon_active);
             mShowPivValue = true;
         } else {
-            mPvEnterPin.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+            mPvEnterPin.setInputType(InputType.TYPE_CLASS_NUMBER |
+                    InputType.TYPE_NUMBER_VARIATION_PASSWORD);
             mImgShowHidePsw.setImageResource(R.drawable.icon_deactive);
             mShowPivValue = false;
         }
@@ -112,7 +116,8 @@ public class PinVerificationActivity extends AppCompatActivity {
     }
 
     private void closeKeyboard() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().
+                getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(mPvEnterPin.getWindowToken(), 0);
     }
 }
