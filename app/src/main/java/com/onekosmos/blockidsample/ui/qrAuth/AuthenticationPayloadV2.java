@@ -39,6 +39,7 @@ public class AuthenticationPayloadV2 {
         return authenticationPayloadV1;
     }
 
+    @Keep
     public static class Origin {
         public String tag;
         public String url;
