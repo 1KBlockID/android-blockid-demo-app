@@ -6,6 +6,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_EXPIRED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_REDEEMED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -15,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -235,9 +238,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     // Check access code is valid (ex. Expired, already redeemed)
     private void validateAccessCode(String mMagicLinkData) {
         showProgress();
-        MagicLinkData magicLinkData = BIDUtil.JSONStringToObject(mMagicLinkData, MagicLinkData.class);
-        BlockIDSDK.getInstance().checkIfADRequired(magicLinkData.code, magicLinkData.tag,
-                magicLinkData.api, magicLinkData.community,
+        MagicLinkData magicLinkDataModel = BIDUtil.JSONStringToObject(mMagicLinkData,
+                MagicLinkData.class);
+        BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
+                magicLinkDataModel.api, magicLinkDataModel.community,
                 (status, error, bidGenericResponse, userId) -> {
                     if (!status) {
                         hideProgress();
@@ -248,7 +252,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     if (response.getAccessCodePayload().getAuthType().
                             equalsIgnoreCase("none")) {
                         // Get public key
-                        getPublicKey(magicLinkData);
+                        getPublicKey(magicLinkDataModel);
                     } else {
                         String errorMessage = "Auth type " +
                                 response.getAccessCodePayload().getAuthType()
@@ -264,10 +268,13 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param magicLinkData {@link MagicLinkData}
      */
     private void getPublicKey(MagicLinkData magicLinkData) {
-        AndroidNetworking.get(magicLinkData.api + "/api/r1/community/default/publickeys")
-                .addPathParameter("community", magicLinkData.community)
-                .addHeaders("X-TenantTag", magicLinkData.tag)
-                .addHeaders("Content-Type", "application/json")
+        String[] splitData = mMagicLinkData.split("acr");
+
+//        AndroidNetworking.get(magicLinkData.api + "/api/r1/community/default/publickeys")
+//                .addPathParameter("community", magicLinkData.community)
+//                .addHeaders("X-TenantTag", magicLinkData.tag)
+//                .addHeaders("Content-Type", "application/json")
+        AndroidNetworking.get(splitData[0] + "/acr/publickeys")
                 .build()
                 .getAsObject(ACRPublicKey.class, new ParsedRequestListener<ACRPublicKey>() {
                     @Override
@@ -346,7 +353,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 mAcrPublicKey);
 
         // Generate ACR Data request
-        ACRData acrRequestData = new ACRData();
+        ACRRequestData acrRequestData = new ACRRequestData();
         acrRequestData.data = encryptedAcrRequest;
         acrRequestData.publicKey = BlockIDSDK.getInstance().getPublicKey();
 
@@ -414,11 +421,12 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 mAcrPublicKey);
 
         // Generate acr response data
-        ACRData acrDataResponse = BIDUtil.JSONStringToObject(decryptedPayload, ACRData.class);
+        ACRResponseData acrResponseData = BIDUtil.JSONStringToObject(decryptedPayload,
+                ACRResponseData.class);
 
         // decrypt data
-        String decryptedData = BlockIDSDK.getInstance().decryptString(acrDataResponse.data,
-                acrDataResponse.publicKey);
+        String decryptedData = BlockIDSDK.getInstance().decryptString(acrResponseData.data,
+                acrResponseData.publickey);
 
         UserData userData = BIDUtil.JSONStringToObject(decryptedData, UserData.class);
 
@@ -429,8 +437,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                         return;
                     }
 
-                    Toast.makeText(this, getString(R.string.label_user_added_successfully),
+                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();
+                    finish();
                 });
     }
 
@@ -474,7 +483,17 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             errorDialog.showNoInternetDialog(dismissListener);
             return;
         }
-        String errorMessage = "(" + error.getCode() + ") " + error.getMessage();
+
+        Log.e("Error", "(" + error.getCode() + ") " + error.getMessage());
+        String errorMessage;
+        if (error.getCode() == RESPONSE_CODE_LINK_EXPIRED) {
+            errorMessage = "(" + error.getCode() + ") " + getString(R.string.label_link_Expired);
+        } else if (error.getCode() == RESPONSE_CODE_LINK_REDEEMED) {
+            errorMessage = "(" + error.getCode() + ") " +
+                    getString(R.string.label_code_already_redeemed);
+        } else {
+            errorMessage = "(" + error.getCode() + ") " + error.getMessage();
+        }
         errorDialog.show(null, getString(R.string.label_error), errorMessage,
                 dismissListener);
     }
@@ -522,9 +541,15 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     @Keep
-    private static class ACRData {
+    private static class ACRRequestData {
         String data;
         String publicKey;
+    }
+
+    @Keep
+    private static class ACRResponseData {
+        String data;
+        String publickey;
     }
 
     @Keep

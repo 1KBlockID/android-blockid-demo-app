@@ -9,6 +9,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.R;
 
@@ -16,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 1Kosmos Engineering
@@ -75,8 +78,13 @@ public class EnrollmentsDataSource {
         EnrollmentAsset enrollmentAsset = null;
         switch (type) {
             case ASSET_ADD_USER:
-                enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_add_user));
+                String userId = getLinkedAccountList();
+                if (TextUtils.isEmpty(userId))
+                    enrollmentAsset = new EnrollmentAsset(false,
+                            context.getResources().getString(R.string.label_add_user));
+                else
+                    enrollmentAsset = new EnrollmentAsset(false,
+                            userId);
                 break;
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
@@ -149,6 +157,19 @@ public class EnrollmentsDataSource {
                 break;
         }
         return enrollmentAsset;
+    }
+
+    private String getLinkedAccountList() {
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+        if (response.getStatus()) {
+            List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+            if (mLinkedAccountsList != null && mLinkedAccountsList.size() > 0) {
+                BIDLinkedAccount account = mLinkedAccountsList.get(0);
+                return account.getUserId() + "\n" + account.getOrigin().getTag() + " | " +
+                        account.getOrigin().getCommunity();
+            }
+        }
+        return null;
     }
 
     public boolean isPassportEnrolled(int count) {
