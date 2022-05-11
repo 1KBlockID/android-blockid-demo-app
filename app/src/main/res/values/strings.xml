@@ -173,6 +173,9 @@
     <string name="label_invalid_link">Invalid link</string>
     <string name="label_empty_payload">Empty payload</string>
     <string name="label_user_registration_successful">User registration successful</string>
+    <string name="label_user_registration_unsuccessful">User registration is unsuccessful.
+        Please try again</string>
     <string name="label_link_Expired">Link already expired.</string>
     <string name="label_code_already_redeemed">Code already redeemed.</string>
+    <string name="label_remove_user">Do you want to remove user?</string>
 </resources>

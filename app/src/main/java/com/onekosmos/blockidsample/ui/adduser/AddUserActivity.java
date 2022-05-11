@@ -17,7 +17,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -60,9 +59,16 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2022 1Kosmos. All rights reserved.
+ */
 public class AddUserActivity extends AppCompatActivity implements IOnQRScanResponseListener {
     private static final int K_PERMISSION_REQUEST_CODE = 1007;
     private final String[] K_PERMISSIONS = new String[]{CAMERA, ACCESS_FINE_LOCATION};
+    private CurrentLocationHelper mCurrentLocationHelper;
+    private GoogleApiClient mGoogleApiClient;
+    private double mLatitude = 0, mLongitude = 0;
     private LinearLayout mScannerView;
     private BIDScannerView mBIDScannerView;
     private View mScannerOverlay;
@@ -71,11 +77,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private ProgressBar mProgressBar;
     private QRScannerHelper mQRScannerHelper;
     private String mMagicLinkData, mAcrPublicKey;
-
-    // Location
-    private CurrentLocationHelper mCurrentLocationHelper;
-    private GoogleApiClient mGoogleApiClient;
-    private double mLatitude = 0, mLongitude = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,7 +129,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 if (grantResults[index] == PERMISSION_GRANTED) {
                     startQRCodeScanning();
                 } else {
-                    showError(null, getString(R.string.label_camera_permission_alert));
+                    showError(getString(R.string.label_camera_permission_alert));
                 }
             }
 
@@ -224,13 +225,11 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 validateAccessCode(decodedLinkData);
             } catch (Exception e) {
                 // Show error when Base64 is not valid
-                showError(getString(R.string.label_error),
-                        getString(R.string.label_invalid_link));
+                showError(getString(R.string.label_invalid_link));
             }
         } else {
             // Show error when QR code data does not contain acr and code
-            showError(getString(R.string.label_error),
-                    getString(R.string.label_unsupported_qr_code));
+            showError(getString(R.string.label_unsupported_qr_code));
         }
     }
 
@@ -369,10 +368,11 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     /**
-     * Payload in webview
+     * Payload in WebView
      *
-     * @param payload to be load in webview
+     * @param payload to be load in WebView
      */
+    @SuppressLint("SetJavaScriptEnabled")
     private void loadWebView(String payload) {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -385,8 +385,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 //no payload available.
                 if (request.getUrl().getQueryParameter("payload").equals("")) {
                     mWebView.setVisibility(View.GONE);
-                    showError(getString(R.string.label_error),
-                            getString(R.string.label_empty_payload));
+                    showError(getString(R.string.label_empty_payload));
                 } else {
                     mWebView.setVisibility(View.GONE);
                     addUser(request.getUrl().getQueryParameter("payload"));
@@ -410,7 +409,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     /**
      * Add user in BlockID SDK
      *
-     * @param payload String payload return from webview
+     * @param payload String payload return from WebView
      */
     private void addUser(String payload) {
         // base64 decode
@@ -430,17 +429,21 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         UserData userData = BIDUtil.JSONStringToObject(decryptedData, UserData.class);
 
-        BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
-                    if (!status) {
-                        showError(error);
-                        return;
-                    }
+        if (userData.isLinked) {
+            BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
+                    userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
+                        if (!status) {
+                            showError(error);
+                            return;
+                        }
 
-                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-                });
+                        Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+        } else {
+            showError(getString(R.string.label_user_registration_unsuccessful));
+        }
     }
 
     private void showProgress() {
@@ -456,16 +459,16 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     /**
      * Show error dialog after
      *
-     * @param title   String title of dialog
      * @param message String message of dialog
      */
-    private void showError(String title, String message) {
+    private void showError(String message) {
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
             finish();
         };
-        errorDialog.show(null, title, message, onDismissListener);
+        errorDialog.showWithOneButton(null, null, message, getString(R.string.label_ok),
+                onDismissListener);
     }
 
     /**
@@ -484,7 +487,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             return;
         }
 
-        Log.e("Error", "(" + error.getCode() + ") " + error.getMessage());
         String errorMessage;
         if (error.getCode() == RESPONSE_CODE_LINK_EXPIRED) {
             errorMessage = "(" + error.getCode() + ") " + getString(R.string.label_link_Expired);
@@ -494,10 +496,13 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         } else {
             errorMessage = "(" + error.getCode() + ") " + error.getMessage();
         }
-        errorDialog.show(null, getString(R.string.label_error), errorMessage,
-                dismissListener);
+        errorDialog.showWithOneButton(null, null, errorMessage,
+                getString(R.string.label_ok), dismissListener);
     }
 
+    /**
+     * Decoded base64 magic link data
+     */
     @Keep
     private static class MagicLinkData {
         String tag;
@@ -506,11 +511,17 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         String code;
     }
 
+    /**
+     * ACR Server PublicKey
+     */
     @Keep
     private static class ACRPublicKey {
         String publicKey;
     }
 
+    /**
+     * Event data add into {@link ACRRequest}
+     */
     @Keep
     private static class EventData {
         String license_hash;
@@ -530,6 +541,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         String device_name;
     }
 
+    /**
+     * ACR Request Data add into {@link ACRRequestData}
+     */
     @Keep
     private static class ACRRequest {
         String did;
@@ -540,24 +554,33 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         String eventData;
     }
 
+    /**
+     * Final ACRData to be send in WebView Payload
+     */
     @Keep
     private static class ACRRequestData {
         String data;
         String publicKey;
     }
 
+    /**
+     * Response from WebView
+     */
     @Keep
     private static class ACRResponseData {
         String data;
         String publickey;
     }
 
+    /**
+     * Data get from {@link ACRResponseData}
+     */
     @Keep
     private static class UserData {
         String userId;
         String scep_hash;
         String scep_privatekey;
-        String isLinked;
+        boolean isLinked;
         BIDOrigin origin;
         BIDAccount account;
     }

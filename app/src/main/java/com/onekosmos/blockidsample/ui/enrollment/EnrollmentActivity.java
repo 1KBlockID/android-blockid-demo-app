@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
@@ -22,11 +23,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
@@ -149,6 +151,50 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onAddUserClicked() {
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+
+        if (!response.getStatus()) {
+            startAddUserActivity();
+            return;
+        }
+        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+            startAddUserActivity();
+            return;
+        }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
+                getString(R.string.label_yes), getString(R.string.label_no),
+                (dialogInterface, which) -> errorDialog.dismiss(),
+                dialog -> {
+                    errorDialog.dismiss();
+                    unlinkAccount(mLinkedAccountsList.get(0));
+                });
+    }
+
+    private void unlinkAccount(BIDLinkedAccount linkedAccount) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
+            progressDialog.dismiss();
+            if (status) {
+                refreshEnrollmentRecyclerView();
+                return;
+            }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
+        });
+    }
+
+    private void startAddUserActivity() {
         Intent intent = new Intent(this, AddUserActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
@@ -220,7 +266,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
             DialogInterface.OnDismissListener onDismissListener = dialogInterface -> errorDialog.dismiss();
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
@@ -331,7 +377,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             ErrorDialog errorDialog = new ErrorDialog(this);
             DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
                     errorDialog.dismiss();
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
