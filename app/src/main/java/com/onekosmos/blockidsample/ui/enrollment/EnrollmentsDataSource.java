@@ -1,5 +1,10 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -12,11 +17,6 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
-
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
@@ -25,6 +25,7 @@ public class EnrollmentsDataSource {
     public static EnrollmentsDataSource sharedInstance = new EnrollmentsDataSource();
 
     public enum EnrollmentAssetEnum {
+        ASSET_ADD_USER,
         ASSET_LIVE_ID,
         ASSET_LIVE_ID_WITH_LIVENESS,
         ASSET_PIN,
@@ -50,6 +51,8 @@ public class EnrollmentsDataSource {
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
 
+        arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
+
         arr.add(EnrollmentAssetEnum.ASSET_DL);
         arr.add(EnrollmentAssetEnum.ASSET_PP1);
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
@@ -71,6 +74,10 @@ public class EnrollmentsDataSource {
     public EnrollmentAsset assetDataFor(Context context, EnrollmentAssetEnum type) {
         EnrollmentAsset enrollmentAsset = null;
         switch (type) {
+            case ASSET_ADD_USER:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_add_user));
+                break;
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";

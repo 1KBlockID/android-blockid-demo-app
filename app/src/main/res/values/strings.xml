@@ -6,7 +6,7 @@
     <string name="label_unlock_sdk">Unlock SDK</string>
     <string name="label_login_successfully">Login Successfully</string>
     <string name="label_driver_license_1">Driver License 1</string>
-    <string name="label_driver_license_with_verification">Driver License with Verication</string>
+    <string name="label_driver_license_with_verification">Driver License with Verification</string>
     <string name="label_passport1">Passport 1</string>
     <string name="label_passport2">Passport 2</string>
     <string name="label_app_pin">App Pin</string>
@@ -167,4 +167,10 @@
         authenticate.</string>
     <string name="label_enroll_device_auth_in_order_to_authenticate">Please enroll Device Auth in order to
         authenticate.</string>
+
+    <!-- Add User -->
+    <string name="label_add_user">Add User</string>
+    <string name="label_invalid_link">Invalid link</string>
+    <string name="label_empty_payload">Empty payload</string>
+    <string name="label_user_added_successfully">User added successfully</string>
 </resources>
