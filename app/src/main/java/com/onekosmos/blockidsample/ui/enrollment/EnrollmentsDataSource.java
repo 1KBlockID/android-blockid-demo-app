@@ -52,7 +52,7 @@ public class EnrollmentsDataSource {
     }
 
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
-        ArrayList<EnrollmentAssetEnum> arr = new ArrayList<EnrollmentAssetEnum>();
+        ArrayList<EnrollmentAssetEnum> arr = new ArrayList<>();
 
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
@@ -148,8 +148,7 @@ public class EnrollmentsDataSource {
                 break;
             case ASSET_FIDO2:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_fido2
-                        ));
+                        context.getResources().getString(R.string.label_fido2));
                 break;
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(false,
@@ -174,12 +173,13 @@ public class EnrollmentsDataSource {
 
     public boolean isPassportEnrolled(int count) {
         try {
-            String ppArrayList = BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name());
+            String ppArrayList = BIDDocumentProvider.getInstance().getUserDocument("",
+                    PPT.getValue(), identity_document.name());
             if (TextUtils.isEmpty(ppArrayList)) {
                 return false;
             }
             JSONArray ppDoc = new JSONArray(ppArrayList);
-            return (ppDoc != null && ppDoc.length() >= count);
+            return ppDoc.length() >= count;
         } catch (JSONException e) {
             return false;
         }
@@ -192,7 +192,7 @@ public class EnrollmentsDataSource {
         }
         try {
             JSONArray ppDoc = new JSONArray(ppArrayList);
-            if (ppDoc != null && ppDoc.length() >= count) {
+            if (ppDoc.length() >= count) {
                 return ppDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
@@ -208,7 +208,7 @@ public class EnrollmentsDataSource {
         }
         try {
             JSONArray dlDoc = new JSONArray(dlArrayList);
-            if (dlDoc != null && dlDoc.length() >= count) {
+            if (dlDoc.length() >= count) {
                 return dlDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {
@@ -224,7 +224,7 @@ public class EnrollmentsDataSource {
         }
         try {
             JSONArray nidDoc = new JSONArray(nidArrayList);
-            if (nidDoc != null && nidDoc.length() >= count) {
+            if (nidDoc.length() >= count) {
                 return nidDoc.getJSONObject(count - 1).getString("id");
             }
         } catch (JSONException e) {

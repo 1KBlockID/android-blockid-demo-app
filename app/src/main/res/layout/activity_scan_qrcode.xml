@@ -62,7 +62,7 @@
                 android:id="@+id/scanner_overlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/frame_qr_code_scaner"
+                android:background="@drawable/frame_qr_code_scanner"
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>

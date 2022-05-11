@@ -76,7 +76,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private QRScannerHelper mQRScannerHelper;
-    private String mMagicLinkData, mAcrPublicKey;
+    private String mMagicLink, mAcrPublicKey;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,7 +123,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         for (int index = 0; index < permissions.length; index++) {
             if (permissions[index].equals(CAMERA)) {
                 if (grantResults[index] == PERMISSION_GRANTED) {
@@ -153,21 +152,11 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             mQRScannerHelper = null;
         }
 
-        mMagicLinkData = qrCodeData;
+        mMagicLink = qrCodeData;
         runOnUiThread(() -> {
             hideQRCodeScanner();
             validateQRData(qrCodeData);
         });
-    }
-
-    private void setLocation() {
-        if (mGoogleApiClient != null) {
-            Location mLocation = mCurrentLocationHelper.getLocation();
-            if (mLocation != null) {
-                mLatitude = mLocation.getLatitude();
-                mLongitude = mLocation.getLongitude();
-            }
-        }
     }
 
     /**
@@ -180,7 +169,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         AppCompatImageView mImgBack = findViewById(R.id.img_back_add_user);
         mImgBack.setOnClickListener(view -> onBackPressed());
 
-        mScannerView = findViewById(R.id.scanner_view);
+        mScannerView = findViewById(R.id.scanner_view_add_user);
         mBIDScannerView = findViewById(R.id.bid_scanner_view_add_user);
         mScannerOverlay = findViewById(R.id.scanner_overlay_add_user);
         mBIDScannerView.setScannerWidthMargin(50, mScannerOverlay);
@@ -212,6 +201,19 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     /**
+     * Get current location and set it
+     */
+    private void setLocation() {
+        if (mGoogleApiClient != null) {
+            Location location = mCurrentLocationHelper.getLocation();
+            if (location != null) {
+                mLatitude = location.getLatitude();
+                mLongitude = location.getLongitude();
+            }
+        }
+    }
+
+    /**
      * After successful scan validate QR data
      */
     private void validateQRData(String qrCodeData) {
@@ -233,7 +235,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         }
     }
 
-    // FIXME GetAccessCodeResponse data should return
     // Check access code is valid (ex. Expired, already redeemed)
     private void validateAccessCode(String mMagicLinkData) {
         showProgress();
@@ -241,20 +242,20 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 MagicLinkData.class);
         BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
                 magicLinkDataModel.api, magicLinkDataModel.community,
-                (status, error, bidGenericResponse, userId) -> {
+                (status, error, response, userId) -> {
                     if (!status) {
                         hideProgress();
                         showError(error);
                         return;
                     }
-                    GetAccessCodeResponse response = bidGenericResponse.getDataObject();
-                    if (response.getAccessCodePayload().getAuthType().
+                    GetAccessCodeResponse accessCodeResponse = response.getDataObject();
+                    if (accessCodeResponse.getAccessCodePayload().getAuthType().
                             equalsIgnoreCase("none")) {
-                        // Get public key
+                        // Get acr public key
                         getPublicKey(magicLinkDataModel);
                     } else {
                         String errorMessage = "Auth type " +
-                                response.getAccessCodePayload().getAuthType()
+                                accessCodeResponse.getAccessCodePayload().getAuthType()
                                 + " not supported";
                         showError(new ErrorManager.ErrorResponse(500, errorMessage));
                     }
@@ -267,12 +268,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param magicLinkData {@link MagicLinkData}
      */
     private void getPublicKey(MagicLinkData magicLinkData) {
-        String[] splitData = mMagicLinkData.split("acr");
-
-//        AndroidNetworking.get(magicLinkData.api + "/api/r1/community/default/publickeys")
-//                .addPathParameter("community", magicLinkData.community)
-//                .addHeaders("X-TenantTag", magicLinkData.tag)
-//                .addHeaders("Content-Type", "application/json")
+        String[] splitData = mMagicLink.split("acr");
         AndroidNetworking.get(splitData[0] + "/acr/publickeys")
                 .build()
                 .getAsObject(ACRPublicKey.class, new ParsedRequestListener<ACRPublicKey>() {
@@ -291,10 +287,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 });
     }
 
-    //
-
     /**
-     * Generate WebView payload*
+     * Generate WebView payload
      */
     @SuppressLint("HardwareIds")
     private void generatePayload(String code) {
@@ -360,15 +354,14 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Base64 of final ACR Request Data
         String base64AcrDataRequest = Base64.encodeToString(
-                acrDataRequestString.getBytes(StandardCharsets.UTF_8),
-                Base64.DEFAULT);
+                acrDataRequestString.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
 
         // Load Request Data in WebView
         loadWebView(base64AcrDataRequest);
     }
 
     /**
-     * Payload in WebView
+     * Set Payload in WebView
      *
      * @param payload to be load in WebView
      */
@@ -403,7 +396,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         mWebView.getSettings().setLoadsImagesAutomatically(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        mWebView.loadUrl(mMagicLinkData + "&payload=" + payload);
+        mWebView.loadUrl(mMagicLink + "&payload=" + payload);
     }
 
     /**
@@ -412,10 +405,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param payload String payload return from WebView
      */
     private void addUser(String payload) {
-        // base64 decode
+        // Base64 decode
         String base64DecodedPayload = new String(Base64.decode(payload, Base64.NO_WRAP));
 
-        // decrypt decoded payload
+        // Decrypt decoded payload
         String decryptedPayload = BlockIDSDK.getInstance().decryptString(base64DecodedPayload,
                 mAcrPublicKey);
 
@@ -423,34 +416,42 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         ACRResponseData acrResponseData = BIDUtil.JSONStringToObject(decryptedPayload,
                 ACRResponseData.class);
 
-        // decrypt data
+        // Decrypt data
         String decryptedData = BlockIDSDK.getInstance().decryptString(acrResponseData.data,
                 acrResponseData.publickey);
 
         UserData userData = BIDUtil.JSONStringToObject(decryptedData, UserData.class);
 
-        if (userData.isLinked) {
-            BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                    userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
-                        if (!status) {
-                            showError(error);
-                            return;
-                        }
-
-                        Toast.makeText(this, getString(R.string.label_user_registration_successful),
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
-        } else {
+        if (!userData.isLinked) {
             showError(getString(R.string.label_user_registration_unsuccessful));
+            return;
         }
+
+        // Add user data in SDK
+        BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
+                userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
+                    if (!status) {
+                        showError(error);
+                        return;
+                    }
+
+                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                });
     }
 
+    /**
+     * Show progress ui
+     */
     private void showProgress() {
         mProgressBar.setVisibility(View.VISIBLE);
         mTxtPleaseWait.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Hide progress ui
+     */
     private void hideProgress() {
         mProgressBar.setVisibility(View.GONE);
         mTxtPleaseWait.setVisibility(View.GONE);

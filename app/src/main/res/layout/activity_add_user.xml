@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="@id/txt_back_add_user" />
 
     <LinearLayout
-        android:id="@+id/scanner_view"
+        android:id="@+id/scanner_view_add_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_50dp"
@@ -52,7 +52,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:ignore="UselessParent">
 
             <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
                 android:id="@+id/bid_scanner_view_add_user"
@@ -64,7 +65,7 @@
                 android:id="@+id/scanner_overlay_add_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/frame_qr_code_scaner"
+                android:background="@drawable/frame_qr_code_scanner"
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
