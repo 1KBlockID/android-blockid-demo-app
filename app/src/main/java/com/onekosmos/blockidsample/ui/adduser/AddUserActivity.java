@@ -68,7 +68,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private final String[] K_PERMISSIONS = new String[]{CAMERA, ACCESS_FINE_LOCATION};
     private CurrentLocationHelper mCurrentLocationHelper;
     private GoogleApiClient mGoogleApiClient;
-    private double mLatitude = 0, mLongitude = 0;
+    private double mLatitude = 0.0, mLongitude = 0.0;
     private LinearLayout mScannerView;
     private BIDScannerView mBIDScannerView;
     private View mScannerOverlay;
@@ -215,8 +215,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      */
     private void validateQRData(String qrCodeData) {
         // Check QR code data contains acr and code
-        if (qrCodeData.startsWith("https://") && qrCodeData.contains("/acr")
-                && qrCodeData.contains("?code=")) {
+        if (qrCodeData.startsWith("https://") && qrCodeData.contains("/acr/?code=")) {
             String linkData = Uri.parse(qrCodeData).getQueryParameter("code");
             try {
                 // Validate Base64 Data

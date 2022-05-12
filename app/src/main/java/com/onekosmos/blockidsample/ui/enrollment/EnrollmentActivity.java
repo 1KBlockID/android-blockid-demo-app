@@ -128,9 +128,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         for (int index = 0; index < splitVersion.length - 1; index++) {
             version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
         }
-        String haxCode = splitVersion[splitVersion.length - 1];
+        String hexCode = splitVersion[splitVersion.length - 1];
         String versionText = getString(R.string.label_sdk_version) + ": " + version +
-                " (" + haxCode + ")";
+                " (" + hexCode + ")";
         mTxtSdkVersion.setText(versionText);
     }
 
