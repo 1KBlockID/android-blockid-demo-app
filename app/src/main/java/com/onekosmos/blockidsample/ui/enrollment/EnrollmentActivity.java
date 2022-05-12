@@ -179,6 +179,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
             progressDialog.dismiss();
             if (status) {
+                Toast.makeText(this, getString(R.string.label_account_removed),
+                        Toast.LENGTH_SHORT).show();
                 refreshEnrollmentRecyclerView();
                 return;
             }

@@ -178,4 +178,5 @@
     <string name="label_link_Expired">Link already expired.</string>
     <string name="label_code_already_redeemed">Code already redeemed.</string>
     <string name="label_remove_user">Do you want to remove user?</string>
+    <string name="label_account_removed">Your account is removed.</string>
 </resources>
