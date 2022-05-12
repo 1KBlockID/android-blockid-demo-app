@@ -1,5 +1,12 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,15 +23,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.Fido2BaseActivity;
@@ -43,11 +52,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import java.util.Objects;
 
 
 /**
@@ -55,10 +60,8 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
-    private RecyclerView mRvEnrollmentAssets;
-    private List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
+    private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
-    private AppCompatTextView mTxtSdkVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +79,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
+        if (position == 0) {
+            onAddUserClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_with_liveness_check))) {
             onLiveIdClicked(true);
@@ -111,22 +116,25 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     private void initView() {
         populateEnrollmentAssetsData();
         mEnrollmentAdapter = new EnrollmentAdapter(this, enrollmentAssets);
-        mRvEnrollmentAssets = findViewById(R.id.recycler_enrollment_assets);
+        RecyclerView mRvEnrollmentAssets = findViewById(R.id.recycler_enrollment_assets);
         RecyclerView.LayoutManager mLayoutManagerBiometric = new LinearLayoutManager(this);
         mRvEnrollmentAssets.setLayoutManager(mLayoutManagerBiometric);
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
-        mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
+        AppCompatTextView mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
         String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
         StringBuilder version = new StringBuilder();
         for (int index = 0; index < splitVersion.length - 1; index++) {
             version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
         }
-        String haxCode = splitVersion[splitVersion.length - 1];
-        mTxtSdkVersion.setText(getString(R.string.label_sdk_version) + ": " + version + " (" + haxCode + ")");
+        String hexCode = splitVersion[splitVersion.length - 1];
+        String versionText = getString(R.string.label_sdk_version) + ": " + version +
+                " (" + hexCode + ")";
+        mTxtSdkVersion.setText(versionText);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void populateEnrollmentAssetsData() {
         enrollmentAssets.clear();
         ArrayList<EnrollmentsDataSource.EnrollmentAssetEnum> listEnrollmentAssets = EnrollmentsDataSource.getInstance().prepareAssetsList();
@@ -140,6 +148,58 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void refreshEnrollmentRecyclerView() {
         populateEnrollmentAssetsData();
+    }
+
+    private void onAddUserClicked() {
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+
+        if (!response.getStatus()) {
+            startAddUserActivity();
+            return;
+        }
+        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+            startAddUserActivity();
+            return;
+        }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
+                getString(R.string.label_yes), getString(R.string.label_no),
+                (dialogInterface, which) -> errorDialog.dismiss(),
+                dialog -> {
+                    errorDialog.dismiss();
+                    unlinkAccount(mLinkedAccountsList.get(0));
+                });
+    }
+
+    private void unlinkAccount(BIDLinkedAccount linkedAccount) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
+            progressDialog.dismiss();
+            if (status) {
+                Toast.makeText(this, getString(R.string.label_account_removed),
+                        Toast.LENGTH_SHORT).show();
+                refreshEnrollmentRecyclerView();
+                return;
+            }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
+        });
+    }
+
+    private void startAddUserActivity() {
+        Intent intent = new Intent(this, AddUserActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void onLiveIdClicked(boolean withLivenessCheck) {
@@ -207,14 +267,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 return;
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
         });
     }
 
@@ -318,14 +377,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 return;
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
         });
     }
 
