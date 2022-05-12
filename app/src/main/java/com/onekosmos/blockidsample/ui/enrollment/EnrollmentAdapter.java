@@ -1,11 +1,13 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.onekosmos.blockidsample.R;
@@ -17,16 +19,17 @@ import java.util.List;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EnrollmentAdapter extends RecyclerView.Adapter<EnrollmentAdapter.BiometricAssetViewHolder> {
-    private EnrollmentClickListener mClickListener;
-    private List<EnrollmentAsset> mEnrollmentAssets;
+    private final EnrollmentClickListener mClickListener;
+    private final List<EnrollmentAsset> mEnrollmentAssets;
 
-    public class BiometricAssetViewHolder extends RecyclerView.ViewHolder {
-        private ImageView mAssetStatus;
-        private TextView mAssetTitle;
+    public static class BiometricAssetViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView mAssetStatus;
+        private final TextView mAssetTitle, mAssetSubTitle;
 
         private BiometricAssetViewHolder(View view) {
             super(view);
             mAssetTitle = view.findViewById(R.id.txt_asset_name);
+            mAssetSubTitle = view.findViewById(R.id.txt_asset_sub_name);
             mAssetStatus = view.findViewById(R.id.img_enrollment_status);
         }
     }
@@ -36,6 +39,7 @@ public class EnrollmentAdapter extends RecyclerView.Adapter<EnrollmentAdapter.Bi
         mEnrollmentAssets = biometricAssets;
     }
 
+    @NonNull
     @Override
     public BiometricAssetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -45,14 +49,21 @@ public class EnrollmentAdapter extends RecyclerView.Adapter<EnrollmentAdapter.Bi
     }
 
     @Override
-    public void onBindViewHolder(BiometricAssetViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BiometricAssetViewHolder holder, int position) {
         EnrollmentAsset enrollmentAsset = mEnrollmentAssets.get(position);
         if (enrollmentAsset.getAssetSuccess())
             holder.mAssetStatus.setVisibility(View.VISIBLE);
         else
             holder.mAssetStatus.setVisibility(View.INVISIBLE);
         holder.mAssetTitle.setText(enrollmentAsset.getAssetTitle());
-        holder.mAssetTitle.setOnClickListener(view -> mClickListener.onclick(mEnrollmentAssets, position));
+        if (!TextUtils.isEmpty(enrollmentAsset.getAssetSubTitle())) {
+            holder.mAssetSubTitle.setVisibility(View.VISIBLE);
+            holder.mAssetSubTitle.setText(enrollmentAsset.getAssetSubTitle());
+        } else {
+            holder.mAssetSubTitle.setVisibility(View.GONE);
+        }
+        holder.mAssetTitle.setOnClickListener(view ->
+                mClickListener.onclick(mEnrollmentAssets, position));
     }
 
     @Override
