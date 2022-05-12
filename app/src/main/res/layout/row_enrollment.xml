@@ -19,6 +19,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_asset_sub_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_20dp"
+        android:padding="@dimen/dimen_5dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_16sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/img_enrollment_status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_asset_name" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_enrollment_status"
         android:layout_width="@dimen/dimen_25dp"

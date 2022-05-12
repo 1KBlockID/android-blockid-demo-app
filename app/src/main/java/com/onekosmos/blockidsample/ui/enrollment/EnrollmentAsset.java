@@ -5,12 +5,14 @@ package com.onekosmos.blockidsample.ui.enrollment;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class EnrollmentAsset {
-    private boolean mAssetStatus;
-    private String mAssetTitle;
+    private final boolean mAssetStatus;
+    private final String mAssetTitle;
+    private final String mAssetSubTitle;
 
-    public EnrollmentAsset(boolean assetStatus, String assetTitle) {
+    public EnrollmentAsset(boolean assetStatus, String assetTitle, String assetSubTitle) {
         mAssetStatus = assetStatus;
         mAssetTitle = assetTitle;
+        mAssetSubTitle = assetSubTitle;
     }
 
     public String getAssetTitle() {
@@ -19,5 +21,9 @@ public class EnrollmentAsset {
 
     public boolean getAssetSuccess() {
         return mAssetStatus;
+    }
+
+    public String getAssetSubTitle() {
+        return mAssetSubTitle;
     }
 }

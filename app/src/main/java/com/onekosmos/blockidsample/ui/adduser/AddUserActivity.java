@@ -163,9 +163,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Initialize UI Objects
      */
     private void initView() {
-        AppCompatTextView mTxtBack = findViewById(R.id.txt_back_add_user);
-        mTxtBack.setOnClickListener(view -> onBackPressed());
-
         AppCompatImageView mImgBack = findViewById(R.id.img_back_add_user);
         mImgBack.setOnClickListener(view -> onBackPressed());
 

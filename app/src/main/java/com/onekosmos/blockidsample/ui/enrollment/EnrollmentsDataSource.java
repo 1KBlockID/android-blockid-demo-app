@@ -78,94 +78,94 @@ public class EnrollmentsDataSource {
         EnrollmentAsset enrollmentAsset = null;
         switch (type) {
             case ASSET_ADD_USER:
-                String userId = getLinkedAccountList();
-                if (TextUtils.isEmpty(userId))
+                BIDLinkedAccount account = getLinkedAccountList();
+                if (account == null)
                     enrollmentAsset = new EnrollmentAsset(false,
-                            context.getResources().getString(R.string.label_add_user));
+                            context.getResources().getString(R.string.label_add_user), null);
                 else
                     enrollmentAsset = new EnrollmentAsset(false,
-                            userId);
+                            account.getUserId(), account.getOrigin().getTag() + " | " +
+                            account.getOrigin().getCommunity());
                 break;
+
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
-                        context.getResources().getString(R.string.label_driver_license_1) + dlID1);
+                        context.getResources().getString(R.string.label_driver_license_1) + dlID1, null);
                 break;
 
             case ASSET_PP1:
                 String ppID1 = getPassportID(1);
                 ppID1 = TextUtils.isEmpty(ppID1) ? "" : " (# " + ppID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled(1),
-                        context.getResources().getString(R.string.label_passport1) + ppID1);
+                        context.getResources().getString(R.string.label_passport1) + ppID1, null);
                 break;
 
             case ASSET_PP2:
                 String ppID2 = getPassportID(2);
                 ppID2 = TextUtils.isEmpty(ppID2) ? "" : " (# " + ppID2 + ")";
                 enrollmentAsset = new EnrollmentAsset(isPassportEnrolled(2),
-                        context.getResources().getString(R.string.label_passport2) + ppID2);
+                        context.getResources().getString(R.string.label_passport2) + ppID2, null);
                 break;
 
             case ASSET_LIVE_ID:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
-                        context.getResources().getString(R.string.label_liveid));
+                        context.getResources().getString(R.string.label_liveid), null);
                 break;
 
             case ASSET_LIVE_ID_WITH_LIVENESS:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
-                        context.getResources().getString(R.string.label_liveid_with_liveness_check));
+                        context.getResources().getString(R.string.label_liveid_with_liveness_check), null);
                 break;
 
             case ASSET_DEVICE_AUTH:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDeviceAuthEnrolled(),
-                        context.getResources().getString(R.string.label_device_auth));
+                        context.getResources().getString(R.string.label_device_auth), null);
                 break;
 
             case ASSET_PIN:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPinRegistered(),
-                        context.getResources().getString(R.string.label_app_pin));
+                        context.getResources().getString(R.string.label_app_pin), null);
                 break;
 
             case ASSET_NATIONAL_ID:
                 String nID1 = getNationalID(1);
                 nID1 = TextUtils.isEmpty(nID1) ? "" : " (# " + nID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isNationalIDEnrolled(),
-                        context.getResources().getString(R.string.label_national_id_1) + nID1);
+                        context.getResources().getString(R.string.label_national_id_1) + nID1, null);
                 break;
 
             case ASSET_RESET_SDK:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_reset_app));
+                        context.getResources().getString(R.string.label_reset_app), null);
                 break;
             case ASSET_LOGIN_WITH_QR:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_login_with_qr));
+                        context.getResources().getString(R.string.label_login_with_qr), null);
                 break;
             case ASSET_RECOVER_MNEMONIC:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_recover_mnemonic));
+                        context.getResources().getString(R.string.label_recover_mnemonic), null);
                 break;
             case ASSET_FIDO2:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_fido2));
+                        context.getResources().getString(R.string.label_fido2), null);
                 break;
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_enroll_ssn));
+                        context.getResources().getString(R.string.label_enroll_ssn), null);
                 break;
         }
         return enrollmentAsset;
     }
 
-    private String getLinkedAccountList() {
+    private BIDLinkedAccount getLinkedAccountList() {
         BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
         if (response.getStatus()) {
             List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
             if (mLinkedAccountsList != null && mLinkedAccountsList.size() > 0) {
-                BIDLinkedAccount account = mLinkedAccountsList.get(0);
-                return account.getUserId() + "\n" + account.getOrigin().getTag() + " | " +
-                        account.getOrigin().getCommunity();
+                return mLinkedAccountsList.get(0);
             }
         }
         return null;
