@@ -42,6 +42,7 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
         ASSET_RESET_SDK,
+        ASSET_WEB_SCANNER,
     }
 
     private EnrollmentsDataSource() {
@@ -57,6 +58,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
+        arr.add(EnrollmentAssetEnum.ASSET_WEB_SCANNER);
         arr.add(EnrollmentAssetEnum.ASSET_PP1);
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
@@ -93,6 +95,12 @@ public class EnrollmentsDataSource {
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
                         context.getResources().getString(R.string.label_driver_license_1) + dlID1, null);
+                break;
+
+            case ASSET_WEB_SCANNER:
+                // TODO Vaishali
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_web_scanner), null);
                 break;
 
             case ASSET_PP1:

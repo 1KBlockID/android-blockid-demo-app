@@ -34,6 +34,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
+import com.onekosmos.blockidsample.ui.dlWebScanner.WebScannerActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.Fido2BaseActivity;
@@ -53,7 +54,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-
 
 /**
  * Created by 1Kosmos Engineering
@@ -110,6 +110,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
+                getString(R.string.label_web_scanner))) {
+            onWebScannerClick();
         }
     }
 
@@ -148,6 +151,12 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void refreshEnrollmentRecyclerView() {
         populateEnrollmentAssetsData();
+    }
+
+    private void onWebScannerClick() {
+        Intent intent = new Intent(this, WebScannerActivity.class);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void onAddUserClicked() {
