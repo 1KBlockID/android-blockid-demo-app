@@ -65,9 +65,7 @@ class FIDO2Activity : AppCompatActivity() {
             lifecycleScope.launch {
                 val intent = viewModel.registerRequest()
                 if (intent != null) {
-                    createCredentialIntentLauncher.launch(
-                        IntentSenderRequest.Builder(intent).build()
-                    )
+                    createCredentialIntentLauncher.launch(IntentSenderRequest.Builder(intent).build())
                 }
             }
         }

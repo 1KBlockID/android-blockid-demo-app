@@ -1,35 +1,43 @@
 package com.onekosmos.blockidsample.ui.enrollment;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.annimon.stream.Objects;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
+import com.onekosmos.blockid.sdk.fido2.Fido2NativeActivity;
+import com.onekosmos.blockid.sdk.fido2.Fido2NativeWithObserverHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2Activity;
@@ -39,7 +47,6 @@ import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
-import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -55,16 +62,56 @@ import java.util.List;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
-    private RecyclerView mRvEnrollmentAssets;
-    private List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
+public class EnrollmentActivity extends Fido2NativeActivity implements EnrollmentAdapter.EnrollmentClickListener {
+    private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
-    private AppCompatTextView mTxtSdkVersion;
+    Fido2NativeWithObserverHelper helper;
 
+//    Fido2ApiClient fido2ApiClient;
+//    ActivityResultLauncher<IntentSenderRequest> createCredentialIntentLauncher =
+//            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+//                    result -> {
+//                        handleCreateCredentialResult(result);
+//                    });
+
+    //    private void handleCreateCredentialResult(ActivityResult activityResult) {
+//        byte[] bytes = activityResult.getData().getByteArrayExtra(Fido.FIDO2_KEY_CREDENTIAL_EXTRA);
+//        if (activityResult.getResultCode() != Activity.RESULT_OK) {
+//            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//
+//        if (bytes == null) {
+//            Toast.makeText(this, "Error creating credential", Toast.LENGTH_LONG)
+//                    .show();
+//            return;
+//        }
+//
+//        PublicKeyCredential credential = PublicKeyCredential.deserializeFromBytes(bytes);
+//        AuthenticatorResponse response = credential.getResponse();
+//        if (response instanceof AuthenticatorErrorResponse) {
+//            String errorMessage = ((AuthenticatorErrorResponse) response).getErrorCodeAsInt() + "-->" +
+//                    ((AuthenticatorErrorResponse) response).getErrorMessage();
+//            Log.e("FIDOActivity", errorMessage);
+//
+//            if (((AuthenticatorErrorResponse) response).getErrorCodeAsInt() == 11) {
+//                // user already registered
+//                Toast.makeText(this, "User already registered", Toast.LENGTH_LONG).show();
+//                return;
+//            }
+//            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+//        } else {
+//            Toast.makeText(this, "Register option successful", Toast.LENGTH_LONG)
+//                    .show();
+//        }
+//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
+        helper = new Fido2NativeWithObserverHelper(this);
+        helper.initHelper();
+
         BIDAuthProvider.getInstance().unlockSDK();
         initView();
     }
@@ -78,7 +125,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
+        if (position == 0) {
+            onAddUserClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_with_liveness_check))) {
             onLiveIdClicked(true);
@@ -110,44 +159,31 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_fido2_native))) {
             Intent intent = new Intent(this, FIDO2Activity.class);
             startActivity(intent);
-
-//            BIDOrigin origin = new BIDOrigin();
-//            origin.tag = "5f3d8d0cd866fa61019cf968";
-//            origin.url = "5f3d8d0cd866fa61019cf968";
-//            origin.communityName = "5f3d8d0cd866fa61019cf969";
-//            origin.communityId = "5f3d8d0cd866fa61019cf969";
-//            BlockIDSDK.getInstance().generateNewSession(origin,
-//            "none",
-//            "", (status, session, generateNewSessionResponsePayload, errorResponse) -> {
-//                if (status) {
-//                    Log.e ("Session URL", session);
-//                    Log.e ("Session ID", generateNewSessionResponsePayload.sessionId);
-//                } else {
-//                    Log.e ("Session Error", "" + errorResponse.getCode() + " " + errorResponse.getMessage());
-//                }
-//            });
         }
     }
 
     private void initView() {
         populateEnrollmentAssetsData();
         mEnrollmentAdapter = new EnrollmentAdapter(this, enrollmentAssets);
-        mRvEnrollmentAssets = findViewById(R.id.recycler_enrollment_assets);
+        RecyclerView mRvEnrollmentAssets = findViewById(R.id.recycler_enrollment_assets);
         RecyclerView.LayoutManager mLayoutManagerBiometric = new LinearLayoutManager(this);
         mRvEnrollmentAssets.setLayoutManager(mLayoutManagerBiometric);
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
-        mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
+        AppCompatTextView mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
         String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
         StringBuilder version = new StringBuilder();
         for (int index = 0; index < splitVersion.length - 1; index++) {
             version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
         }
-        String haxCode = splitVersion[splitVersion.length - 1];
-        mTxtSdkVersion.setText(getString(R.string.label_sdk_version) + ": " + version + " (" + haxCode + ")");
+        String hexCode = splitVersion[splitVersion.length - 1];
+        String versionText = getString(R.string.label_sdk_version) + ": " + version +
+                " (" + hexCode + ")";
+        mTxtSdkVersion.setText(versionText);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void populateEnrollmentAssetsData() {
         enrollmentAssets.clear();
         ArrayList<EnrollmentsDataSource.EnrollmentAssetEnum> listEnrollmentAssets = EnrollmentsDataSource.getInstance().prepareAssetsList();
@@ -161,6 +197,58 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void refreshEnrollmentRecyclerView() {
         populateEnrollmentAssetsData();
+    }
+
+    private void onAddUserClicked() {
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+
+        if (!response.getStatus()) {
+            startAddUserActivity();
+            return;
+        }
+        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+            startAddUserActivity();
+            return;
+        }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
+                getString(R.string.label_yes), getString(R.string.label_no),
+                (dialogInterface, which) -> errorDialog.dismiss(),
+                dialog -> {
+                    errorDialog.dismiss();
+                    unlinkAccount(mLinkedAccountsList.get(0));
+                });
+    }
+
+    private void unlinkAccount(BIDLinkedAccount linkedAccount) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
+            progressDialog.dismiss();
+            if (status) {
+                Toast.makeText(this, getString(R.string.label_account_removed),
+                        Toast.LENGTH_SHORT).show();
+                refreshEnrollmentRecyclerView();
+                return;
+            }
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                errorDialog.showNoInternetDialog(onDismissListener);
+                return;
+            }
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
+        });
+    }
+
+    private void startAddUserActivity() {
+        Intent intent = new Intent(this, AddUserActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void onLiveIdClicked(boolean withLivenessCheck) {
@@ -228,14 +316,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 return;
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
         });
     }
 
@@ -324,9 +411,37 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onVerifySSNClicked() {
-        Intent intent = new Intent(this, VerifySSNActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+//        Intent intent = new Intent(this, VerifySSNActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        startActivity(intent);
+
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+        if (!response.getStatus()) {
+            startAddUserActivity();
+            return;
+        }
+
+        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+            return;
+        }
+
+//        BlockIDSDK.getInstance().registerNativeFIDOKey(this, mLinkedAccountsList.get(0),
+//                FIDO2KeyType.platformAuthenticator, (status, data, errorResponse) -> {
+//                    if (status) {
+////                        openFido2NativeView(this, data);
+//                    } else {
+//                        Log.e("Error", "-->" + errorResponse.getMessage());
+//                    }
+//                });
+
+        helper.registerNativeFido2(mLinkedAccountsList.get(0),
+                FIDO2KeyType.platformAuthenticator, (status, data, error) -> {
+                    if (status) {
+                    } else {
+                        Log.e("Error", "-->" + error.getMessage());
+                    }
+                });
     }
 
     private void removeDocument(LinkedHashMap<String, Object> removeDocMap) {
@@ -339,14 +454,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 return;
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
-            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
+            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+            errorDialog.show(null, getString(R.string.label_error),
+                    Objects.requireNonNull(error).getMessage(), onDismissListener);
         });
     }
 
