@@ -4,10 +4,15 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.PermissionRequest;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -60,25 +65,40 @@ public class WebScannerActivity extends AppCompatActivity {
     }
 
     private void loadWebView(String webUrl, String sessionId) {
-        mWebView.getSettings().setJavaScriptEnabled(false);
-//        mWebView.getSettings().setLoadWithOverviewMode(true);
-//        mWebView.getSettings().setUseWideViewPort(true);
-//        mWebView.setWebViewClient(new WebViewClient() {
-//
-//            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                mProgressBar.setVisibility(View.VISIBLE);
-//                mTxtPlsWait.setVisibility(View.VISIBLE);
-//                view.loadUrl(url);
-//                return true;
-//            }
-//
-////            @Override
-////            public void onPageFinished(WebView view, final String url) {
-////                mProgressBar.setVisibility(View.GONE);
-////                mTxtPlsWait.setVisibility(View.GONE);
-////            }
-//        });
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.getSettings().setLoadWithOverviewMode(true);
+        mWebView.getSettings().setUseWideViewPort(true);
+        mWebView.getSettings().setBuiltInZoomControls(true);
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                mTxtPlsWait.setVisibility(View.VISIBLE);
+                view.loadUrl(url);
+                return true;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, final String url) {
+                mProgressBar.setVisibility(View.GONE);
+                mTxtPlsWait.setVisibility(View.GONE);
+            }
+        });
+
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            // Grant permissions for cam
+            @Override
+            public void onPermissionRequest(final PermissionRequest request) {
+                WebScannerActivity.this.runOnUiThread(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void run() {
+                        request.grant(request.getResources());
+                    }
+                });
+            }
+        });
 
         mWebView.loadUrl(webUrl);
         verifySessionStatus(sessionId);
@@ -88,9 +108,9 @@ public class WebScannerActivity extends AppCompatActivity {
         mDisableBackPress = true;
         SessionApi.getInstance().checkSessionStatus(sessionId, this, (status, response, error) -> {
             if (!status) {
-//                if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
-//                    return;
-//                }
+                if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                    return;
+                }
                 return;
             } else {
                 LinkedHashMap<String, Object> driverLicenseMap = new LinkedHashMap<>();
