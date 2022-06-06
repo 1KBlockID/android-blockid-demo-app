@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -58,28 +60,28 @@ public class WebScannerActivity extends AppCompatActivity {
     }
 
     private void loadWebView(String webUrl, String sessionId) {
-        mWebView.loadUrl(webUrl);
-        verifySessionStatus(sessionId);
-
+        mWebView.getSettings().setJavaScriptEnabled(false);
+//        mWebView.getSettings().setLoadWithOverviewMode(true);
+//        mWebView.getSettings().setUseWideViewPort(true);
 //        mWebView.setWebViewClient(new WebViewClient() {
+//
 //            @Override
-//            public void onPageFinished(WebView view, String url) {
-//                super.onPageFinished(view, url);
-//                mWebView.setVisibility(View.VISIBLE);
-//                Toast.makeText(WebScannerActivity.this, "hi", Toast.LENGTH_SHORT).show();
-//                //  verifySessionStatus();
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                mProgressBar.setVisibility(View.VISIBLE);
+//                mTxtPlsWait.setVisibility(View.VISIBLE);
+//                view.loadUrl(url);
+//                return true;
 //            }
+//
 ////            @Override
-////            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-////
-////                return true;
+////            public void onPageFinished(WebView view, final String url) {
+////                mProgressBar.setVisibility(View.GONE);
+////                mTxtPlsWait.setVisibility(View.GONE);
 ////            }
 //        });
-//      //  mWebView.getSettings().setLoadsImagesAutomatically(true);
-//        mWebView.getSettings().setJavaScriptEnabled(true);
-//      //  mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-//        mWebView.loadUrl(webUrl);
 
+        mWebView.loadUrl(webUrl);
+        verifySessionStatus(sessionId);
     }
 
     private void verifySessionStatus(String sessionId) {
@@ -91,16 +93,45 @@ public class WebScannerActivity extends AppCompatActivity {
 //                }
                 return;
             } else {
-                Toast.makeText(WebScannerActivity.this, "done", Toast.LENGTH_SHORT).show();
                 LinkedHashMap<String, Object> driverLicenseMap = new LinkedHashMap<>();
-                driverLicenseMap.put("category", identity_document.name());
-                driverLicenseMap.put("type", DL.getValue());
-                driverLicenseMap.put("id", driverLicenseMap.get("id"));
+                driverLicenseMap.put("category", response.getDl_object().getCategory());
+                driverLicenseMap.put("type", response.getDl_object().getType());
+                driverLicenseMap.put("id", response.getDl_object().getId());
+
+                driverLicenseMap.put("proofedBy", response.getDl_object().getProofedBy());
+                driverLicenseMap.put("documentId", response.getDl_object().getDocumentId());
+                driverLicenseMap.put("documentType", response.getDl_object().getDocumentType());
+                driverLicenseMap.put("firstName", response.getDl_object().getFirstName());
+                driverLicenseMap.put("lastName", response.getDl_object().getLastName());
+                driverLicenseMap.put("familyName", response.getDl_object().getFamilyName());
+                driverLicenseMap.put("middleName", response.getDl_object().getMiddleName());
+                driverLicenseMap.put("givenName", response.getDl_object().getGivenName());
+                driverLicenseMap.put("fullName", response.getDl_object().getFullName());
+                driverLicenseMap.put("dob", response.getDl_object().getDob());
+                driverLicenseMap.put("doe", response.getDl_object().getDoe());
+                driverLicenseMap.put("doi", response.getDl_object().getDoi());
+                driverLicenseMap.put("face", response.getDl_object().getFace());
+                driverLicenseMap.put("image", response.getDl_object().getImage());
+                driverLicenseMap.put("imageBack", response.getDl_object().getImageBack());
+                driverLicenseMap.put("gender", response.getDl_object().getGender());
+                driverLicenseMap.put("height", response.getDl_object().getHeight());
+                driverLicenseMap.put("street", response.getDl_object().getStreet());
+                driverLicenseMap.put("city", response.getDl_object().getCity());
+                driverLicenseMap.put("restrictionCode", response.getDl_object().getRestrictionCode());
+                driverLicenseMap.put("residenceCity", response.getDl_object().getResidenceCity());
+                driverLicenseMap.put("state", response.getDl_object().getState());
+                driverLicenseMap.put("country", response.getDl_object().getCountry());
+                driverLicenseMap.put("zipCode", response.getDl_object().getZipCode());
+                driverLicenseMap.put("residenceZipCode", response.getDl_object().getResidenceZipCode());
+                driverLicenseMap.put("classificationCode", response.getDl_object().getClassificationCode());
+                driverLicenseMap.put("complianceType", response.getDl_object().getComplianceType());
+                driverLicenseMap.put("placeOfBirth", response.getDl_object().getPlaceOfBirth());
+
                 BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
                         null, (registerStatus, err) -> {
 //                            progressDialog.dismiss();
 //                            isRegistrationInProgress = false;
-                            if (status) {
+                            if (registerStatus) {
                                 mDisableBackPress = false;
                                 Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                         Toast.LENGTH_LONG).show();

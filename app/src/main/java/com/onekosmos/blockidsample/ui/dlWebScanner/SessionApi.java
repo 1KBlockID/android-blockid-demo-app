@@ -139,8 +139,8 @@ public class SessionApi {
                         .getAsObject(SessionStatusResponse.class, new ParsedRequestListener<SessionStatusResponse>() {
                             @Override
                             public void onResponse(SessionStatusResponse response) {
-                                String data = response.data;
-                                String decryptedData = BlockIDSDK.getInstance().decryptString(data, publicKey);
+                                String data = response.getData();
+                                String decryptedData = BlockIDSDK.getInstance().decryptString(data.toString(), publicKey);
                                 SessionStatusDecryptedData sessionStatusDecryptedData = null;
                                 try {
 
@@ -157,19 +157,20 @@ public class SessionApi {
                                 if (!sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
                                     // continue polling
                                     verifySessionStatus(publicKey);
-                                    Log.e("errorrrrrr","reshu wip");
+                                    Log.e("errorrrrrr", "reshu wip");
                                 }
                                 if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
                                     // continue polling
-                                    Log.e("errorrrrrr","reshu success");
-                                    sessionStatusResponseCallback.setSessionStatusResponse(true, response, null);
+                                    Log.e("errorrrrrr", "reshu success");
+                                    sessionStatusResponseCallback.setSessionStatusResponse(true, sessionStatusDecryptedData, null);
                                 } else
-                                    sessionStatusResponseCallback.setSessionStatusResponse(false, response, null);
+                                    sessionStatusResponseCallback.setSessionStatusResponse(false, sessionStatusDecryptedData, null);
                             }
 
                             @Override
                             public void onError(ANError anError) {
-                                sessionStatusResponseCallback.setSessionStatusResponse(true, null, null);
+                                verifySessionStatus(publicKey);
+                                sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
                             }
                         });
             }
@@ -193,9 +194,195 @@ public class SessionApi {
 
     protected class SessionStatusDecryptedData {
         private String responseStatus;
+        private String sessionId;
+        public DLObject dl_object;
+        public LiveidObject liveid_object;
+        public String token;
 
         public String getResponseStatus() {
             return responseStatus;
+        }
+
+        public String getSessionId() {
+            return sessionId;
+        }
+
+        public DLObject getDl_object() {
+            return dl_object;
+        }
+
+        public LiveidObject getLiveid_object() {
+            return liveid_object;
+        }
+
+        public String getToken() {
+            return token;
+        }
+    }
+
+    public class LiveidObject {
+        public String id;
+        public String type;
+        public String category;
+        public String proofedBy;
+        public String face;
+    }
+
+    protected class DLObject {
+        private String type;
+        private String documentType;
+        private String category;
+        private String proofedBy;
+        private String documentId;
+        private String id;
+        private String firstName;
+        private String lastName;
+        private String familyName;
+        private String middleName;
+        private String givenName;
+        private String fullName;
+        private String dob;
+        private String doe;
+        private String doi;
+        private String face;
+        private String image;
+        private String imageBack;
+        private String gender;
+        private String height;
+        private String street;
+        private String city;
+        private String restrictionCode;
+        private String residenceCity;
+        private String state;
+        private String country;
+        private String zipCode;
+        private String residenceZipCode;
+        private String classificationCode;
+        private String complianceType;
+        private String placeOfBirth;
+
+        public String getType() {
+            return type;
+        }
+
+        public String getDocumentType() {
+            return documentType;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public String getProofedBy() {
+            return proofedBy;
+        }
+
+        public String getDocumentId() {
+            return documentId;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public String getFamilyName() {
+            return familyName;
+        }
+
+        public String getMiddleName() {
+            return middleName;
+        }
+
+        public String getGivenName() {
+            return givenName;
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+
+        public String getDob() {
+            return dob;
+        }
+
+        public String getDoe() {
+            return doe;
+        }
+
+        public String getDoi() {
+            return doi;
+        }
+
+        public String getFace() {
+            return face;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public String getImageBack() {
+            return imageBack;
+        }
+
+        public String getGender() {
+            return gender;
+        }
+
+        public String getHeight() {
+            return height;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public String getRestrictionCode() {
+            return restrictionCode;
+        }
+
+        public String getResidenceCity() {
+            return residenceCity;
+        }
+
+        public String getState() {
+            return state;
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public String getZipCode() {
+            return zipCode;
+        }
+
+        public String getResidenceZipCode() {
+            return residenceZipCode;
+        }
+
+        public String getClassificationCode() {
+            return classificationCode;
+        }
+
+        public String getComplianceType() {
+            return complianceType;
+        }
+
+        public String getPlaceOfBirth() {
+            return placeOfBirth;
         }
     }
 
@@ -282,6 +469,6 @@ public class SessionApi {
     }
 
     public interface ISessionStatusResponseCallback {
-        void setSessionStatusResponse(boolean status, SessionStatusResponse response, ErrorManager.ErrorResponse error);
+        void setSessionStatusResponse(boolean status, SessionStatusDecryptedData response, ErrorManager.ErrorResponse error);
     }
 }
