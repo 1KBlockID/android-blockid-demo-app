@@ -83,6 +83,7 @@ public class WebScannerActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, final String url) {
                 mProgressBar.setVisibility(View.GONE);
                 mTxtPlsWait.setVisibility(View.GONE);
+                mWebView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -105,7 +106,6 @@ public class WebScannerActivity extends AppCompatActivity {
     }
 
     private void verifySessionStatus(String sessionId) {
-        mDisableBackPress = true;
         SessionApi.getInstance().checkSessionStatus(sessionId, this, (status, response, error) -> {
             if (!status) {
                 if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
