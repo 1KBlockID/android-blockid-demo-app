@@ -1,8 +1,6 @@
 package com.onekosmos.blockidsample.ui.dlWebScanner;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
@@ -10,7 +8,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.CookieManager;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -23,7 +20,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -31,6 +27,10 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.util.LinkedHashMap;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2022 1Kosmos. All rights reserved.
+ */
 public class WebScannerActivity extends AppCompatActivity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
@@ -88,7 +88,7 @@ public class WebScannerActivity extends AppCompatActivity {
         });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
-            // Grant permissions for cam
+            // Grant permissions
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
                 WebScannerActivity.this.runOnUiThread(new Runnable() {
@@ -113,44 +113,10 @@ public class WebScannerActivity extends AppCompatActivity {
                 }
                 return;
             } else {
-                LinkedHashMap<String, Object> driverLicenseMap = new LinkedHashMap<>();
-                driverLicenseMap.put("category", response.getDl_object().getCategory());
-                driverLicenseMap.put("type", response.getDl_object().getType());
-                driverLicenseMap.put("id", response.getDl_object().getId());
-
-                driverLicenseMap.put("proofedBy", response.getDl_object().getProofedBy());
-                driverLicenseMap.put("documentId", response.getDl_object().getDocumentId());
-                driverLicenseMap.put("documentType", response.getDl_object().getDocumentType());
-                driverLicenseMap.put("firstName", response.getDl_object().getFirstName());
-                driverLicenseMap.put("lastName", response.getDl_object().getLastName());
-                driverLicenseMap.put("familyName", response.getDl_object().getFamilyName());
-                driverLicenseMap.put("middleName", response.getDl_object().getMiddleName());
-                driverLicenseMap.put("givenName", response.getDl_object().getGivenName());
-                driverLicenseMap.put("fullName", response.getDl_object().getFullName());
-                driverLicenseMap.put("dob", response.getDl_object().getDob());
-                driverLicenseMap.put("doe", response.getDl_object().getDoe());
-                driverLicenseMap.put("doi", response.getDl_object().getDoi());
-                driverLicenseMap.put("face", response.getDl_object().getFace());
-                driverLicenseMap.put("image", response.getDl_object().getImage());
-                driverLicenseMap.put("imageBack", response.getDl_object().getImageBack());
-                driverLicenseMap.put("gender", response.getDl_object().getGender());
-                driverLicenseMap.put("height", response.getDl_object().getHeight());
-                driverLicenseMap.put("street", response.getDl_object().getStreet());
-                driverLicenseMap.put("city", response.getDl_object().getCity());
-                driverLicenseMap.put("restrictionCode", response.getDl_object().getRestrictionCode());
-                driverLicenseMap.put("residenceCity", response.getDl_object().getResidenceCity());
-                driverLicenseMap.put("state", response.getDl_object().getState());
-                driverLicenseMap.put("country", response.getDl_object().getCountry());
-                driverLicenseMap.put("zipCode", response.getDl_object().getZipCode());
-                driverLicenseMap.put("residenceZipCode", response.getDl_object().getResidenceZipCode());
-                driverLicenseMap.put("classificationCode", response.getDl_object().getClassificationCode());
-                driverLicenseMap.put("complianceType", response.getDl_object().getComplianceType());
-                driverLicenseMap.put("placeOfBirth", response.getDl_object().getPlaceOfBirth());
+                LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
 
                 BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
                         null, (registerStatus, err) -> {
-//                            progressDialog.dismiss();
-//                            isRegistrationInProgress = false;
                             if (registerStatus) {
                                 mDisableBackPress = false;
                                 Toast.makeText(this, R.string.label_dl_enrolled_successfully,
@@ -189,4 +155,41 @@ public class WebScannerActivity extends AppCompatActivity {
             super.onBackPressed();
     }
 
+    private LinkedHashMap<String, Object> createDLData(SessionApi.SessionStatusDecryptedData dlData) {
+        LinkedHashMap<String, Object> driverLicenseMap = new LinkedHashMap<>();
+        driverLicenseMap.put("category", dlData.getDl_object().getCategory());
+        driverLicenseMap.put("type", dlData.getDl_object().getType());
+        driverLicenseMap.put("id", dlData.getDl_object().getId());
+
+        driverLicenseMap.put("proofedBy", dlData.getDl_object().getProofedBy());
+        driverLicenseMap.put("documentId", dlData.getDl_object().getDocumentId());
+        driverLicenseMap.put("documentType", dlData.getDl_object().getDocumentType());
+        driverLicenseMap.put("firstName", dlData.getDl_object().getFirstName());
+        driverLicenseMap.put("lastName", dlData.getDl_object().getLastName());
+        driverLicenseMap.put("familyName", dlData.getDl_object().getFamilyName());
+        driverLicenseMap.put("middleName", dlData.getDl_object().getMiddleName());
+        driverLicenseMap.put("givenName", dlData.getDl_object().getGivenName());
+        driverLicenseMap.put("fullName", dlData.getDl_object().getFullName());
+        driverLicenseMap.put("dob", dlData.getDl_object().getDob());
+        driverLicenseMap.put("doe", dlData.getDl_object().getDoe());
+        driverLicenseMap.put("doi", dlData.getDl_object().getDoi());
+        driverLicenseMap.put("face", dlData.getDl_object().getFace());
+        driverLicenseMap.put("image", dlData.getDl_object().getImage());
+        driverLicenseMap.put("imageBack", dlData.getDl_object().getImageBack());
+        driverLicenseMap.put("gender", dlData.getDl_object().getGender());
+        driverLicenseMap.put("height", dlData.getDl_object().getHeight());
+        driverLicenseMap.put("street", dlData.getDl_object().getStreet());
+        driverLicenseMap.put("city", dlData.getDl_object().getCity());
+        driverLicenseMap.put("restrictionCode", dlData.getDl_object().getRestrictionCode());
+        driverLicenseMap.put("residenceCity", dlData.getDl_object().getResidenceCity());
+        driverLicenseMap.put("state", dlData.getDl_object().getState());
+        driverLicenseMap.put("country", dlData.getDl_object().getCountry());
+        driverLicenseMap.put("zipCode", dlData.getDl_object().getZipCode());
+        driverLicenseMap.put("residenceZipCode", dlData.getDl_object().getResidenceZipCode());
+        driverLicenseMap.put("classificationCode", dlData.getDl_object().getClassificationCode());
+        driverLicenseMap.put("complianceType", dlData.getDl_object().getComplianceType());
+        driverLicenseMap.put("placeOfBirth", dlData.getDl_object().getPlaceOfBirth());
+
+        return driverLicenseMap;
+    }
 }

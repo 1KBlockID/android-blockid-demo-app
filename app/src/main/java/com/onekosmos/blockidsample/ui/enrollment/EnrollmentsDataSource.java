@@ -98,7 +98,6 @@ public class EnrollmentsDataSource {
                 break;
 
             case ASSET_WEB_SCANNER:
-                // TODO Vaishali
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_web_scanner), null);
                 break;

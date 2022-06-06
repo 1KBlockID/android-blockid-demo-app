@@ -3,7 +3,6 @@ package com.onekosmos.blockidsample.ui.dlWebScanner;
 import android.content.Context;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
@@ -150,18 +149,12 @@ public class SessionApi {
                                 } catch (JSONException t) {
                                 }
 
-                                // SessionStatusDecryptedData sessionStatusDecryptedData = BIDUtil.JSONStringToObject(data, SessionStatusDecryptedData.class);
-
-//                                SessionStatusDecryptedData sessionStatusDecryptedData = new Gson().fromJson(data, SessionStatusDecryptedData.class);
-
                                 if (!sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
                                     // continue polling
                                     verifySessionStatus(publicKey);
-                                    Log.e("errorrrrrr", "reshu wip");
                                 }
                                 if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
                                     // continue polling
-                                    Log.e("errorrrrrr", "reshu success");
                                     sessionStatusResponseCallback.setSessionStatusResponse(true, sessionStatusDecryptedData, null);
                                 } else
                                     sessionStatusResponseCallback.setSessionStatusResponse(false, sessionStatusDecryptedData, null);
