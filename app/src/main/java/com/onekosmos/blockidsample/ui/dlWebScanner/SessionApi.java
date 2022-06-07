@@ -48,17 +48,17 @@ public class SessionApi {
     public void createSession(Context context, ICreateSessionResponseCallback callback) {
         mContext = context;
         createSessionResponseCallback = callback;
-        fetchServerPublicKey(K_CREATE_SESSION);
+        createSession(callback);
     }
 
     public void checkSessionStatus(String sessionId, Context context, ISessionStatusResponseCallback callback) {
         mContext = context;
         this.mSessionID = sessionId;
         sessionStatusResponseCallback = callback;
-        fetchServerPublicKey(K_SESSION_STATUS);
+        verifySession(callback);
     }
 
-    private void fetchServerPublicKey(int sessionApi) {
+    private void createSession(ICreateSessionResponseCallback callback) {
         AndroidNetworking.get(AppConstant.defaultTenant.getDns() + K_PUBLIC_KEYS)
                 .addHeaders("Content-Type", "application/json")
                 .doNotCacheResponse()
@@ -67,17 +67,35 @@ public class SessionApi {
                     @Override
                     public void onResponse(PublicKeysResponse response) {
                         String publicKey = response.publicKey;
-                        if (sessionApi == 1001)
-                            createSession(publicKey);
-                        if (sessionApi == 1002)
-                            verifySessionStatus(publicKey);
+                        createSession(publicKey);
                     }
 
                     @Override
                     public void onError(ANError anError) {
-//                        callback.apiResponse(false, anError.getMessage(),
-//                                new ErrorManager.ErrorResponse(anError.getErrorCode(),
-//                                        anError.getMessage()), null);
+                        callback.onCreateSessionResponse(false, null,
+                                new ErrorManager.ErrorResponse(anError.getErrorCode(),
+                                        anError.getMessage()));
+                    }
+                });
+    }
+
+    private void verifySession(ISessionStatusResponseCallback callback) {
+        AndroidNetworking.get(AppConstant.defaultTenant.getDns() + K_PUBLIC_KEYS)
+                .addHeaders("Content-Type", "application/json")
+                .doNotCacheResponse()
+                .build()
+                .getAsObject(PublicKeysResponse.class, new ParsedRequestListener<PublicKeysResponse>() {
+                    @Override
+                    public void onResponse(PublicKeysResponse response) {
+                        String publicKey = response.publicKey;
+                        verifySessionStatus(publicKey);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        callback.setSessionStatusResponse(false, null,
+                                new ErrorManager.ErrorResponse(anError.getErrorCode(),
+                                        anError.getMessage()));
                     }
                 });
     }
