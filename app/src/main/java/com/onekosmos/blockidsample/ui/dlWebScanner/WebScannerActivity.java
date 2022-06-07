@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.dlWebScanner;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,11 +11,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 
@@ -23,6 +26,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.util.LinkedHashMap;
@@ -36,6 +40,8 @@ public class WebScannerActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private AppCompatTextView mTxtPlsWait;
     private boolean mDisableBackPress;
+    private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
+    private static final int K_WEB_SCANNER_PERMISSION_REQUEST_CODE = 1012;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +50,43 @@ public class WebScannerActivity extends AppCompatActivity {
         initView();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
+            AppPermissionUtils.requestPermission(this, K_WEB_SCANNER_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
+        else
+            initWebSDK();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_CAMERA_PERMISSION)) {
+            initWebSDK();
+        } else {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.show(null,
+                    "",
+                    getString(R.string.label_camera_permission_alert), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+        }
+    }
+
     private void initView() {
         mWebView = findViewById(R.id.web_view);
         mProgressBar = findViewById(R.id.progress_bar);
         mTxtPlsWait = findViewById(R.id.txt_please_wait);
         mProgressBar.setVisibility(View.VISIBLE);
         mTxtPlsWait.setVisibility(View.VISIBLE);
+    }
 
+    private void initWebSDK() {
         SessionApi.getInstance().createSession(this, (status, response, error) -> {
             if (!status) {
                 if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
@@ -70,6 +106,18 @@ public class WebScannerActivity extends AppCompatActivity {
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
+
+        mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // chromium, enable hardware acceleration
+            mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        } else {
+            // older android version, disable hardware acceleration
+            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+
+        mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mWebView.setVisibility(View.VISIBLE);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -83,7 +131,7 @@ public class WebScannerActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, final String url) {
                 mProgressBar.setVisibility(View.GONE);
                 mTxtPlsWait.setVisibility(View.GONE);
-                mWebView.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -113,8 +161,8 @@ public class WebScannerActivity extends AppCompatActivity {
                 }
                 return;
             } else {
+                mDisableBackPress = true;
                 LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
-
                 BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
                         null, (registerStatus, err) -> {
                             if (registerStatus) {
@@ -160,7 +208,6 @@ public class WebScannerActivity extends AppCompatActivity {
         driverLicenseMap.put("category", dlData.getDl_object().getCategory());
         driverLicenseMap.put("type", dlData.getDl_object().getType());
         driverLicenseMap.put("id", dlData.getDl_object().getId());
-
         driverLicenseMap.put("proofedBy", dlData.getDl_object().getProofedBy());
         driverLicenseMap.put("documentId", dlData.getDl_object().getDocumentId());
         driverLicenseMap.put("documentType", dlData.getDl_object().getDocumentType());
@@ -189,7 +236,6 @@ public class WebScannerActivity extends AppCompatActivity {
         driverLicenseMap.put("classificationCode", dlData.getDl_object().getClassificationCode());
         driverLicenseMap.put("complianceType", dlData.getDl_object().getComplianceType());
         driverLicenseMap.put("placeOfBirth", dlData.getDl_object().getPlaceOfBirth());
-
         return driverLicenseMap;
     }
 }

@@ -30,6 +30,8 @@ public class SessionApi {
     private final String K_DOC_TYPE_DL = "dl_object";
     private Context mContext;
     private String mSessionID;
+    private final int K_CREATE_SESSION = 1001;
+    private final int K_SESSION_STATUS = 1002;
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
 
@@ -46,14 +48,38 @@ public class SessionApi {
     public void createSession(Context context, ICreateSessionResponseCallback callback) {
         mContext = context;
         createSessionResponseCallback = callback;
-        fetchServerPublicKey(1001);
+        fetchServerPublicKey(K_CREATE_SESSION);
     }
 
     public void checkSessionStatus(String sessionId, Context context, ISessionStatusResponseCallback callback) {
         mContext = context;
         this.mSessionID = sessionId;
         sessionStatusResponseCallback = callback;
-        fetchServerPublicKey(1002);
+        fetchServerPublicKey(K_SESSION_STATUS);
+    }
+
+    private void fetchServerPublicKey(int sessionApi) {
+        AndroidNetworking.get(AppConstant.defaultTenant.getDns() + K_PUBLIC_KEYS)
+                .addHeaders("Content-Type", "application/json")
+                .doNotCacheResponse()
+                .build()
+                .getAsObject(PublicKeysResponse.class, new ParsedRequestListener<PublicKeysResponse>() {
+                    @Override
+                    public void onResponse(PublicKeysResponse response) {
+                        String publicKey = response.publicKey;
+                        if (sessionApi == 1001)
+                            createSession(publicKey);
+                        if (sessionApi == 1002)
+                            verifySessionStatus(publicKey);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+//                        callback.apiResponse(false, anError.getMessage(),
+//                                new ErrorManager.ErrorResponse(anError.getErrorCode(),
+//                                        anError.getMessage()), null);
+                    }
+                });
     }
 
     private void createSession(String publicKey) {
@@ -84,30 +110,6 @@ public class SessionApi {
                     @Override
                     public void onError(ANError anError) {
                         createSessionResponseCallback.onCreateSessionResponse(true, null, null);
-                    }
-                });
-    }
-
-    private void fetchServerPublicKey(int sessionApi) {
-        AndroidNetworking.get(AppConstant.defaultTenant.getDns() + K_PUBLIC_KEYS)
-                .addHeaders("Content-Type", "application/json")
-                .doNotCacheResponse()
-                .build()
-                .getAsObject(PublicKeysResponse.class, new ParsedRequestListener<PublicKeysResponse>() {
-                    @Override
-                    public void onResponse(PublicKeysResponse response) {
-                        String publicKey = response.publicKey;
-                        if (sessionApi == 1001)
-                            createSession(publicKey);
-                        if (sessionApi == 1002)
-                            verifySessionStatus(publicKey);
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-//                        callback.apiResponse(false, anError.getMessage(),
-//                                new ErrorManager.ErrorResponse(anError.getErrorCode(),
-//                                        anError.getMessage()), null);
                     }
                 });
     }
