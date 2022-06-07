@@ -95,10 +95,8 @@ public class WebScannerActivity extends AppCompatActivity {
                     return;
                 }
                 return;
-            } else {
-                String webUrl = response.getUrl();
-                loadWebView(webUrl, response.getSessionId());
-            }
+            } else
+                loadWebView(response.getUrl(), response.getSessionId());
         });
     }
 
@@ -133,12 +131,10 @@ public class WebScannerActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, final String url) {
                 mProgressBar.setVisibility(View.GONE);
                 mTxtPlsWait.setVisibility(View.GONE);
-
             }
         });
 
         mWebView.setWebChromeClient(new WebChromeClient() {
-            // Grant permissions
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
                 WebScannerActivity.this.runOnUiThread(new Runnable() {
@@ -163,7 +159,7 @@ public class WebScannerActivity extends AppCompatActivity {
                 }
                 return;
             } else {
-                // mDisableBackPress = true;
+                mDisableBackPress = true;
                 LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
                 BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
                         null, (registerStatus, err) -> {
@@ -201,9 +197,11 @@ public class WebScannerActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        super.onBackPressed();
-        AndroidNetworking.cancel(K_CHECK_SESSION_STATUS);
-        SessionApi.getInstance().stopPolling();
+        if (!mDisableBackPress) {
+            super.onBackPressed();
+            AndroidNetworking.cancel(K_CHECK_SESSION_STATUS);
+            SessionApi.getInstance().stopPolling();
+        }
     }
 
     private LinkedHashMap<String, Object> createDLData(SessionApi.SessionStatusDecryptedData dlData) {
