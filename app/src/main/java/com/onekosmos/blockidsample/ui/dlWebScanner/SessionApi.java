@@ -25,7 +25,7 @@ import java.util.UUID;
 public class SessionApi {
     private static SessionApi sharedInstance;
     private static final String K_DOC_CREATE_SESSION = "/docuverify/document_share_session/create";
-    private static final String K_CHECK_SESSION_STATUS = "/docuverify/document_share_session/result";
+    public static final String K_CHECK_SESSION_STATUS = "/docuverify/document_share_session/result";
     private static final String K_PUBLIC_KEYS = "/docuverify/publickeys";
     private final String K_DOC_TYPE_DL = "dl_object";
     private Context mContext;
@@ -34,6 +34,7 @@ public class SessionApi {
     private final int K_SESSION_STATUS = 1002;
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
+    Handler mHandler = new Handler();
 
     private SessionApi() {
     }
@@ -133,7 +134,6 @@ public class SessionApi {
     }
 
     private void verifySessionStatus(String publicKey) {
-        Handler mHandler = new Handler();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -148,6 +148,7 @@ public class SessionApi {
                 String encryptedSessionRequest = BlockIDSDK.getInstance().encryptString(strRequest, publicKey);
                 CreateSessionRequestModel createSessionRequestModel = new CreateSessionRequestModel(encryptedSessionRequest);
                 AndroidNetworking.post(AppConstant.defaultTenant.getDns() + K_CHECK_SESSION_STATUS)
+                        .setTag(K_CHECK_SESSION_STATUS)
                         .addHeaders("publickey", BlockIDSDK.getInstance().getPublicKey())
                         .addHeaders("licensekey", BlockIDSDK.getInstance().encryptString(AppConstant.licenseKey, publicKey))
                         .addHeaders("Content-Type", "application/json")
@@ -178,6 +179,7 @@ public class SessionApi {
                                     sessionStatusResponseCallback.setSessionStatusResponse(true, sessionStatusDecryptedData, null);
                                 } else
                                     sessionStatusResponseCallback.setSessionStatusResponse(false, sessionStatusDecryptedData, null);
+
                             }
 
                             @Override
@@ -188,6 +190,10 @@ public class SessionApi {
                         });
             }
         }, 500);
+    }
+
+    public void stopPolling() {
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     private String getRequestId(Context context, String publicKey) {

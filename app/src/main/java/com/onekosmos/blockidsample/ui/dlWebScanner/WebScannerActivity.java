@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.dlWebScanner;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockidsample.ui.dlWebScanner.SessionApi.K_CHECK_SESSION_STATUS;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -21,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.androidnetworking.AndroidNetworking;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
@@ -161,7 +163,7 @@ public class WebScannerActivity extends AppCompatActivity {
                 }
                 return;
             } else {
-                mDisableBackPress = true;
+                // mDisableBackPress = true;
                 LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
                 BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
                         null, (registerStatus, err) -> {
@@ -199,8 +201,9 @@ public class WebScannerActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        if (mDisableBackPress = false)
-            super.onBackPressed();
+        super.onBackPressed();
+        AndroidNetworking.cancel(K_CHECK_SESSION_STATUS);
+        SessionApi.getInstance().stopPolling();
     }
 
     private LinkedHashMap<String, Object> createDLData(SessionApi.SessionStatusDecryptedData dlData) {
