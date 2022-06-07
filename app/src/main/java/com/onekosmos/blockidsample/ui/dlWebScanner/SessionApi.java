@@ -30,8 +30,6 @@ public class SessionApi {
     private final String K_DOC_TYPE_DL = "dl_object";
     private Context mContext;
     private String mSessionID;
-    private final int K_CREATE_SESSION = 1001;
-    private final int K_SESSION_STATUS = 1002;
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
     Handler mHandler = new Handler();
@@ -163,7 +161,6 @@ public class SessionApi {
                                 String decryptedData = BlockIDSDK.getInstance().decryptString(data.toString(), publicKey);
                                 SessionStatusDecryptedData sessionStatusDecryptedData = null;
                                 try {
-
                                     JSONObject obj = new JSONObject(decryptedData);
                                     Gson gson = new Gson();
                                     sessionStatusDecryptedData = gson.fromJson(obj.toString(), SessionStatusDecryptedData.class);
@@ -175,7 +172,6 @@ public class SessionApi {
                                     verifySessionStatus(publicKey);
                                 }
                                 if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
-                                    // continue polling
                                     sessionStatusResponseCallback.setSessionStatusResponse(true, sessionStatusDecryptedData, null);
                                 } else
                                     sessionStatusResponseCallback.setSessionStatusResponse(false, sessionStatusDecryptedData, null);
@@ -184,6 +180,7 @@ public class SessionApi {
 
                             @Override
                             public void onError(ANError anError) {
+                                // continue polling
                                 verifySessionStatus(publicKey);
                                 sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
                             }
