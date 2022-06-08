@@ -188,4 +188,5 @@
     <string name="label_remove_user">Do you want to remove user?</string>
     <string name="label_account_removed">Your account is removed.</string>
     <string name="label_web_scanner">Add Document (Web Scanner) </string>
+    <string name="label_user_not_added">Please add a user in order to add document </string>
 </resources>

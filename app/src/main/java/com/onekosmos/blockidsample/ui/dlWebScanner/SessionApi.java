@@ -10,6 +10,7 @@ import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 
@@ -33,6 +34,7 @@ public class SessionApi {
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
     Handler mHandler = new Handler();
+    private String mUserID;
 
     private SessionApi() {
     }
@@ -100,11 +102,14 @@ public class SessionApi {
     }
 
     private void createSession(String publicKey) {
+        BIDLinkedAccount selectedAccount = BlockIDSDK.getInstance().getSelectedAccount().getDataObject();
+        if (selectedAccount != null)
+            mUserID = selectedAccount.getUserId();
         String reqID = getRequestId(mContext, publicKey);
         SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
                 AppConstant.defaultTenant.getCommunity(),
                 K_DOC_TYPE_DL,
-                "Vaishali", // TODO Vaishali
+                mUserID,
                 BlockIDSDK.getInstance().getDID());
         CreateSessionRequest createSessionRequest = new CreateSessionRequest(AppConstant.dvcId, sessionRequest);
         String strRequest = BIDUtil.objectToJSONString(createSessionRequest, true);
@@ -132,6 +137,9 @@ public class SessionApi {
     }
 
     private void verifySessionStatus(String publicKey) {
+        BIDLinkedAccount selectedAccount = BlockIDSDK.getInstance().getSelectedAccount().getDataObject();
+        if (selectedAccount != null)
+            mUserID = selectedAccount.getUserId();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -139,7 +147,7 @@ public class SessionApi {
                 SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
                         AppConstant.defaultTenant.getCommunity(),
                         K_DOC_TYPE_DL,
-                        "Vaishali", // TODO Vaishali
+                        mUserID,
                         BlockIDSDK.getInstance().getDID());
                 VerifySessionRequest verifySessionRequest = new VerifySessionRequest(AppConstant.dvcId, mSessionID);
                 String strRequest = BIDUtil.objectToJSONString(verifySessionRequest, true);
