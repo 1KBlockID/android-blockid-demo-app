@@ -429,8 +429,11 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
 //        BlockIDSDK.getInstance().registerNativeFIDOKey(this, mLinkedAccountsList.get(0),
 //                FIDO2KeyType.platformAuthenticator, (status, data, errorResponse) -> {
 //                    if (status) {
+//                        Toast.makeText(this, "Fido Registered", Toast.LENGTH_SHORT).show();
 ////                        openFido2NativeView(this, data);
 //                    } else {
+//                        Toast.makeText(this, errorResponse.getMessage(),
+//                                Toast.LENGTH_LONG).show();
 //                        Log.e("Error", "-->" + errorResponse.getMessage());
 //                    }
 //                });
@@ -439,6 +442,8 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
                 FIDO2KeyType.platformAuthenticator, (status, data, error) -> {
                     if (status) {
                     } else {
+                        Toast.makeText(this, error.getMessage(),
+                                Toast.LENGTH_LONG).show();
                         Log.e("Error", "-->" + error.getMessage());
                     }
                 });
