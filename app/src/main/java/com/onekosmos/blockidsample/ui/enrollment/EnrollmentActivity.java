@@ -340,7 +340,8 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
                             }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
