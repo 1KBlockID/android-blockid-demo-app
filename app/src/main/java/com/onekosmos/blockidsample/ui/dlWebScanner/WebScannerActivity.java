@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
@@ -157,41 +158,45 @@ public class WebScannerActivity extends AppCompatActivity {
                     return;
                 }
                 return;
-            } else {
-                mDisableBackPress = true;
-                LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
-                BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
-                        null, (registerStatus, err) -> {
-                            if (registerStatus) {
-                                mDisableBackPress = false;
-                                Toast.makeText(this, R.string.label_dl_enrolled_successfully,
-                                        Toast.LENGTH_LONG).show();
-                                finish();
-                                return;
-                            }
-
-                            if (error != null && error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                                DocumentHolder.setData(driverLicenseMap, null);
-                                Intent intent = new Intent(this, LiveIDScanningActivity.class);
-                                intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                                startActivity(intent);
-                                finish();
-                                return;
-                            }
-
-                            ErrorDialog errorDialog = new ErrorDialog(this);
-                            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                                errorDialog.dismiss();
-                                finish();
-                            };
-                            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                                errorDialog.showNoInternetDialog(onDismissListener);
-                                return;
-                            }
-                            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-                        });
             }
+            mDisableBackPress = true;
+            LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
+            BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
+                    null, (registerStatus, registerError) -> {
+                        if (registerStatus) {
+                            mDisableBackPress = false;
+                            Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                    Toast.LENGTH_LONG).show();
+                            finish();
+                            return;
+                        }
+
+                        if (registerError != null && registerError.getCode() ==
+                                ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
+                            DocumentHolder.setData(driverLicenseMap, null);
+                            Intent intent = new Intent(this,
+                                    LiveIDScanningActivity.class);
+                            intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            startActivity(intent);
+                            finish();
+                            return;
+                        }
+
+                        ErrorDialog errorDialog = new ErrorDialog(this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        if (registerError != null && registerError.getCode() ==
+                                ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                            errorDialog.showNoInternetDialog(onDismissListener);
+                            return;
+                        }
+                        errorDialog.show(null, getString(R.string.label_error),
+                                Objects.requireNonNull(registerError).getMessage(),
+                                onDismissListener);
+                    });
         });
     }
 
