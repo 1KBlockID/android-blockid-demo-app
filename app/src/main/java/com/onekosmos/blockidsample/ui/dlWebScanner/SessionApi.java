@@ -210,8 +210,8 @@ public class SessionApi {
             jsonObject.put("deviceId", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
             jsonObject.put("uuid", UUID.randomUUID().toString());
             reqID = BlockIDSDK.getInstance().encryptString(jsonObject.toString(), publicKey);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException ignore) {
+            return null;
         }
         return reqID;
     }

@@ -5,10 +5,8 @@ import static com.onekosmos.blockidsample.ui.dlWebScanner.SessionApi.K_CHECK_SES
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -24,8 +22,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.content.ContextCompat;
 
 import com.androidnetworking.AndroidNetworking;
 import com.google.common.reflect.TypeToken;
@@ -101,12 +97,7 @@ public class WebScannerActivity extends AppCompatActivity {
 
     private void initWebSDK() {
         SessionApi.getInstance().createSession(this, (status, response, error) -> {
-            if (!status) {
-                if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                    return;
-                }
-                return;
-            } else
+            if (status)
                 loadWebView(response.getUrl(), response.getSessionId());
         });
     }
@@ -123,12 +114,7 @@ public class WebScannerActivity extends AppCompatActivity {
         mWebView.getSettings().setEnableSmoothTransition(true);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-
-        if (Build.VERSION.SDK_INT >= 19) {
-            mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        } else {
-            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
+        mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         mWebView.setVisibility(View.VISIBLE);
         mWebView.setWebViewClient(new WebViewClient() {
