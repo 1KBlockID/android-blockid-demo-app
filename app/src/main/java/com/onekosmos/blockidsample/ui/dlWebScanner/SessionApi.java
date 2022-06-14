@@ -144,11 +144,6 @@ public class SessionApi {
             mUserID = selectedAccount.getUserId();
         mHandler.postDelayed(() -> {
             String reqID = getRequestId(mContext, publicKey);
-            SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
-                    AppConstant.defaultTenant.getCommunity(),
-                    K_DOC_TYPE_DL,
-                    mUserID,
-                    BlockIDSDK.getInstance().getDID());
             VerifySessionRequest verifySessionRequest = new VerifySessionRequest(AppConstant.dvcId, mSessionID);
             String strRequest = BIDUtil.objectToJSONString(verifySessionRequest, true);
             String encryptedSessionRequest = BlockIDSDK.getInstance().encryptString(strRequest, publicKey);
@@ -174,23 +169,21 @@ public class SessionApi {
                                 sessionStatusDecryptedData = gson.fromJson(obj.toString(), SessionStatusDecryptedData.class);
                             } catch (JSONException ignore) {
                             }
-
-                            if (!sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
+                            if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
+                                stopPolling();
+                                sessionStatusResponseCallback.setSessionStatusResponse(true, decryptedData, null);
+                            } else {
                                 // continue polling
                                 verifySessionStatus(publicKey);
                             }
-                            if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
-                                sessionStatusResponseCallback.setSessionStatusResponse(true, decryptedData, null);
-                            } else
-                                sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
-
                         }
 
                         @Override
                         public void onError(ANError anError) {
                             // continue polling
                             verifySessionStatus(publicKey);
-                            sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
+                            sessionStatusResponseCallback.setSessionStatusResponse(false,
+                                    null, null);
                         }
                     });
         }, 500);

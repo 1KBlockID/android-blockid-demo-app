@@ -1,11 +1,10 @@
 package com.onekosmos.blockidsample.ui.dlWebScanner;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockidsample.ui.dlWebScanner.SessionApi.K_CHECK_SESSION_STATUS;
 
 import android.Manifest;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,9 +27,8 @@ import com.google.gson.GsonBuilder;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
+import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import org.json.JSONException;
@@ -129,7 +127,6 @@ public class WebScannerActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, final String url) {
                 mProgressBar.setVisibility(View.GONE);
                 mTxtPlsWait.setVisibility(View.GONE);
-                verifySessionStatus(sessionId);
             }
         });
 
@@ -141,36 +138,36 @@ public class WebScannerActivity extends AppCompatActivity {
         });
 
         mWebView.loadUrl(webUrl);
+        verifySessionStatus(sessionId);
     }
 
     private void verifySessionStatus(String sessionId) {
         SessionApi.getInstance().checkSessionStatus(sessionId, this, (status, response, error) -> {
             if (!status) {
-                if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                    return;
-                }
                 return;
             }
+            SessionApi.getInstance().stopPolling();
             mDisableBackPress = true;
+            String liveIdProofedBy = null;
+            Bitmap liveIDBitmap = null;
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONObject liveIDObject = jsonObject.getJSONObject("liveid_object");
+                liveIdProofedBy = liveIDObject.getString("proofedBy");
+                liveIDBitmap = AppUtil.imageBase64ToBitmap(
+                        liveIDObject.getString("face"));
+            } catch (Exception ignore) {
+            }
+
             LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
+
             BlockIDSDK.getInstance().registerDocument(this, driverLicenseMap,
-                    null, (registerStatus, registerError) -> {
+                    liveIDBitmap, liveIdProofedBy, null, null,
+                    (registerStatus, registerError) -> {
                         if (registerStatus) {
                             mDisableBackPress = false;
                             Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                     Toast.LENGTH_LONG).show();
-                            finish();
-                            return;
-                        }
-
-                        if (registerError != null && registerError.getCode() ==
-                                ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(driverLicenseMap, null);
-                            Intent intent = new Intent(this,
-                                    LiveIDScanningActivity.class);
-                            intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(intent);
                             finish();
                             return;
                         }
