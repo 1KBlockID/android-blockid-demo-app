@@ -4,10 +4,8 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
 import static com.onekosmos.blockidsample.ui.dlWebScanner.SessionApi.K_CHECK_SESSION_STATUS;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -137,13 +135,7 @@ public class WebScannerActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
-                WebScannerActivity.this.runOnUiThread(new Runnable() {
-                    @TargetApi(Build.VERSION_CODES.M)
-                    @Override
-                    public void run() {
-                        request.grant(request.getResources());
-                    }
-                });
+                WebScannerActivity.this.runOnUiThread(() -> request.grant(request.getResources()));
             }
         });
 
@@ -156,7 +148,6 @@ public class WebScannerActivity extends AppCompatActivity {
                 if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
                     return;
                 }
-                return;
             } else {
                 mDisableBackPress = true;
                 LinkedHashMap<String, Object> driverLicenseMap = createDLData(response);
@@ -211,7 +202,7 @@ public class WebScannerActivity extends AppCompatActivity {
             String dl_data = jsonObject.getString("dl_object");
             driverLicenseMap = gson.fromJson(dl_data, new TypeToken<LinkedHashMap<String, Object>>() {
             }.getType());
-        } catch (JSONException e) {
+        } catch (JSONException ignore) {
 
         }
         return driverLicenseMap;
