@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.provider.Settings;
 
+import androidx.annotation.Keep;
+
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
@@ -140,60 +142,57 @@ public class SessionApi {
         BIDLinkedAccount selectedAccount = BlockIDSDK.getInstance().getSelectedAccount().getDataObject();
         if (selectedAccount != null)
             mUserID = selectedAccount.getUserId();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                String reqID = getRequestId(mContext, publicKey);
-                SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
-                        AppConstant.defaultTenant.getCommunity(),
-                        K_DOC_TYPE_DL,
-                        mUserID,
-                        BlockIDSDK.getInstance().getDID());
-                VerifySessionRequest verifySessionRequest = new VerifySessionRequest(AppConstant.dvcId, mSessionID);
-                String strRequest = BIDUtil.objectToJSONString(verifySessionRequest, true);
-                String encryptedSessionRequest = BlockIDSDK.getInstance().encryptString(strRequest, publicKey);
-                CreateSessionRequestModel createSessionRequestModel = new CreateSessionRequestModel(encryptedSessionRequest);
-                AndroidNetworking.post(AppConstant.defaultTenant.getDns() + K_CHECK_SESSION_STATUS)
-                        .setTag(K_CHECK_SESSION_STATUS)
-                        .addHeaders("publickey", BlockIDSDK.getInstance().getPublicKey())
-                        .addHeaders("licensekey", BlockIDSDK.getInstance().encryptString(AppConstant.licenseKey, publicKey))
-                        .addHeaders("Content-Type", "application/json")
-                        .addHeaders("requestid", reqID)
-                        .doNotCacheResponse()
-                        .addApplicationJsonBody(createSessionRequestModel)
-                        .build()
-                        .getAsObject(SessionStatusResponse.class, new ParsedRequestListener<SessionStatusResponse>() {
-                            @Override
-                            public void onResponse(SessionStatusResponse response) {
-                                String data = response.getData();
-                                String decryptedData = BlockIDSDK.getInstance().decryptString(data.toString(), publicKey);
-                                SessionStatusDecryptedData sessionStatusDecryptedData = null;
-                                try {
-                                    JSONObject obj = new JSONObject(decryptedData);
-                                    Gson gson = new Gson();
-                                    sessionStatusDecryptedData = gson.fromJson(obj.toString(), SessionStatusDecryptedData.class);
-                                } catch (JSONException t) {
-                                }
-
-                                if (!sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
-                                    // continue polling
-                                    verifySessionStatus(publicKey);
-                                }
-                                if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
-                                    sessionStatusResponseCallback.setSessionStatusResponse(true, decryptedData, null);
-                                } else
-                                    sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
-
+        mHandler.postDelayed(() -> {
+            String reqID = getRequestId(mContext, publicKey);
+            SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
+                    AppConstant.defaultTenant.getCommunity(),
+                    K_DOC_TYPE_DL,
+                    mUserID,
+                    BlockIDSDK.getInstance().getDID());
+            VerifySessionRequest verifySessionRequest = new VerifySessionRequest(AppConstant.dvcId, mSessionID);
+            String strRequest = BIDUtil.objectToJSONString(verifySessionRequest, true);
+            String encryptedSessionRequest = BlockIDSDK.getInstance().encryptString(strRequest, publicKey);
+            CreateSessionRequestModel createSessionRequestModel = new CreateSessionRequestModel(encryptedSessionRequest);
+            AndroidNetworking.post(AppConstant.defaultTenant.getDns() + K_CHECK_SESSION_STATUS)
+                    .setTag(K_CHECK_SESSION_STATUS)
+                    .addHeaders("publickey", BlockIDSDK.getInstance().getPublicKey())
+                    .addHeaders("licensekey", BlockIDSDK.getInstance().encryptString(AppConstant.licenseKey, publicKey))
+                    .addHeaders("Content-Type", "application/json")
+                    .addHeaders("requestid", reqID)
+                    .doNotCacheResponse()
+                    .addApplicationJsonBody(createSessionRequestModel)
+                    .build()
+                    .getAsObject(SessionStatusResponse.class, new ParsedRequestListener<SessionStatusResponse>() {
+                        @Override
+                        public void onResponse(SessionStatusResponse response) {
+                            String data = response.getData();
+                            String decryptedData = BlockIDSDK.getInstance().decryptString(data.toString(), publicKey);
+                            SessionStatusDecryptedData sessionStatusDecryptedData = null;
+                            try {
+                                JSONObject obj = new JSONObject(decryptedData);
+                                Gson gson = new Gson();
+                                sessionStatusDecryptedData = gson.fromJson(obj.toString(), SessionStatusDecryptedData.class);
+                            } catch (JSONException ignore) {
                             }
 
-                            @Override
-                            public void onError(ANError anError) {
+                            if (!sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
                                 // continue polling
                                 verifySessionStatus(publicKey);
-                                sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
                             }
-                        });
-            }
+                            if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
+                                sessionStatusResponseCallback.setSessionStatusResponse(true, decryptedData, null);
+                            } else
+                                sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            // continue polling
+                            verifySessionStatus(publicKey);
+                            sessionStatusResponseCallback.setSessionStatusResponse(false, null, null);
+                        }
+                    });
         }, 500);
     }
 
@@ -216,6 +215,7 @@ public class SessionApi {
         return reqID;
     }
 
+    @Keep
     protected class SessionStatusDecryptedData {
         private String responseStatus;
 
@@ -224,10 +224,12 @@ public class SessionApi {
         }
     }
 
+    @Keep
     private class PublicKeysResponse {
         private String publicKey;
     }
 
+    @Keep
     protected class SessionStatusResponse {
         private String publicKey;
         private String data;
@@ -241,6 +243,7 @@ public class SessionApi {
         }
     }
 
+    @Keep
     public class CreateSessionResponse {
         private String sessionId;
         private String url;
@@ -258,6 +261,7 @@ public class SessionApi {
         }
     }
 
+    @Keep
     private class CreateSessionRequestModel {
         String data;
 
@@ -266,6 +270,7 @@ public class SessionApi {
         }
     }
 
+    @Keep
     private class SessionRequest {
         private String tenantDNS;
         private String communityName;
@@ -282,6 +287,7 @@ public class SessionApi {
         }
     }
 
+    @Keep
     private class VerifySessionRequest {
         String dvcID;
         String sessionId;
@@ -292,6 +298,7 @@ public class SessionApi {
         }
     }
 
+    @Keep
     private class CreateSessionRequest {
         String dvcID;
         SessionRequest sessionRequest;
