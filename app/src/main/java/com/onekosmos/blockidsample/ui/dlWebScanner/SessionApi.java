@@ -35,8 +35,7 @@ public class SessionApi {
     private String mSessionID;
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
-    Handler mHandler = new Handler();
-    private String mUserID;
+    private final Handler mHandler = new Handler();
 
     private SessionApi() {
     }
@@ -104,44 +103,44 @@ public class SessionApi {
     }
 
     private void createSession(String publicKey) {
-        BIDLinkedAccount selectedAccount = BlockIDSDK.getInstance().getSelectedAccount().getDataObject();
-        if (selectedAccount != null)
-            mUserID = selectedAccount.getUserId();
         String reqID = getRequestId(mContext, publicKey);
-        SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().replace("http://", "").replace("https://", ""),
-                AppConstant.defaultTenant.getCommunity(),
-                K_DOC_TYPE_DL,
-                mUserID,
-                BlockIDSDK.getInstance().getDID());
-        CreateSessionRequest createSessionRequest = new CreateSessionRequest(AppConstant.dvcId, sessionRequest);
+        String did = BlockIDSDK.getInstance().getDID();
+        SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().
+                replace("http://", "").replace("https://", ""),
+                AppConstant.defaultTenant.getCommunity(), K_DOC_TYPE_DL, did, did);
+
+        CreateSessionRequest createSessionRequest = new CreateSessionRequest(AppConstant.dvcId,
+                sessionRequest);
         String strRequest = BIDUtil.objectToJSONString(createSessionRequest, true);
         String encryptedSessionRequest = BlockIDSDK.getInstance().encryptString(strRequest, publicKey);
-        CreateSessionRequestModel createSessionRequestModel = new CreateSessionRequestModel(encryptedSessionRequest);
+        CreateSessionRequestModel createSessionRequestModel = new CreateSessionRequestModel(
+                encryptedSessionRequest);
 
         AndroidNetworking.post(AppConstant.defaultTenant.getDns() + K_DOC_CREATE_SESSION)
                 .addHeaders("publickey", BlockIDSDK.getInstance().getPublicKey())
-                .addHeaders("licensekey", BlockIDSDK.getInstance().encryptString(AppConstant.licenseKey, publicKey))
+                .addHeaders("licensekey", BlockIDSDK.getInstance().encryptString(
+                        AppConstant.licenseKey, publicKey))
                 .addHeaders("Content-Type", "application/json")
                 .addHeaders("requestid", reqID)
                 .addApplicationJsonBody(createSessionRequestModel)
                 .build()
-                .getAsObject(CreateSessionResponse.class, new ParsedRequestListener<CreateSessionResponse>() {
-                    @Override
-                    public void onResponse(CreateSessionResponse response) {
-                        createSessionResponseCallback.onCreateSessionResponse(true, response, null);
-                    }
+                .getAsObject(CreateSessionResponse.class,
+                        new ParsedRequestListener<CreateSessionResponse>() {
+                            @Override
+                            public void onResponse(CreateSessionResponse response) {
+                                createSessionResponseCallback.onCreateSessionResponse(
+                                        true, response, null);
+                            }
 
-                    @Override
-                    public void onError(ANError anError) {
-                        createSessionResponseCallback.onCreateSessionResponse(true, null, null);
-                    }
-                });
+                            @Override
+                            public void onError(ANError anError) {
+                                createSessionResponseCallback.onCreateSessionResponse(
+                                        true, null, null);
+                            }
+                        });
     }
 
     private void verifySessionStatus(String publicKey) {
-        BIDLinkedAccount selectedAccount = BlockIDSDK.getInstance().getSelectedAccount().getDataObject();
-        if (selectedAccount != null)
-            mUserID = selectedAccount.getUserId();
         mHandler.postDelayed(() -> {
             String reqID = getRequestId(mContext, publicKey);
             VerifySessionRequest verifySessionRequest = new VerifySessionRequest(AppConstant.dvcId, mSessionID);

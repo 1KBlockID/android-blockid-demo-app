@@ -154,19 +154,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onWebScannerClick() {
-        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
-
-        if (!response.getStatus()) {
-            Toast.makeText(EnrollmentActivity.this, R.string.label_user_not_added, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
-        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
-            Toast.makeText(EnrollmentActivity.this, R.string.label_user_not_added, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         Intent intent = new Intent(this, WebScannerActivity.class);
         startActivity(intent);
         overridePendingTransition(0, 0);
