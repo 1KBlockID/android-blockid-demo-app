@@ -9,14 +9,12 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.fido.Fido
-import com.google.android.gms.fido.fido2.api.common.AuthenticatorErrorResponse
-import com.google.android.gms.fido.fido2.api.common.PublicKeyCredential
+//import com.google.android.gms.fido.Fido
+//import com.google.android.gms.fido.fido2.api.common.AuthenticatorErrorResponse
+//import com.google.android.gms.fido.fido2.api.common.PublicKeyCredential
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse
 import com.onekosmos.blockid.sdk.BIDAPIs.sessionapi.SessionApi.GenerateNewSessionResponsePayload
@@ -26,24 +24,33 @@ import com.onekosmos.blockidsample.R
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import webauthnkit.core.authenticator.internal.ui.UserConsentUI
+import webauthnkit.core.authenticator.internal.ui.UserConsentUIFactory
+import webauthnkit.core.client.WebAuthnClient
+import webauthnkit.core.data.MakeCredentialResponse
+import webauthnkit.core.util.ByteArrayUtil
+import webauthnkit.core.util.WAKLogger
 import java.util.concurrent.TimeUnit
 
 class FIDO2Activity : AppCompatActivity() {
+    var consentUI: UserConsentUI? = null
+
     private val viewModel: FidoViewModel by viewModels()
-    private val createCredentialIntentLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult(),
-        ::handleCreateCredentialResult
-    )
-    private val signIntentLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult(),
-        ::handleSignResult
-    )
+
+    //    private val createCredentialIntentLauncher = registerForActivityResult(
+//        ActivityResultContracts.StartIntentSenderForResult(),
+//        ::handleCreateCredentialResult
+//    )
+//    private val signIntentLauncher = registerForActivityResult(
+//        ActivityResultContracts.StartIntentSenderForResult(),
+//        ::handleSignResult
+//    )
     private var register: Button? = null
     private var login: Button? = null
     private var logout: Button? = null
     private var editUserName: EditText? = null
     private var editDisplayName: EditText? = null
-    private var userInfo:TextView? = null
+    private var userInfo: TextView? = null
     private lateinit var authenticator: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,23 +68,41 @@ class FIDO2Activity : AppCompatActivity() {
             if (userName.isBlank() || displayName.isBlank()) {
                 return@setOnClickListener
             }
-            viewModel.setUserDetail(userName, displayName, if (authenticator.isChecked) {authenticator.textOn.toString()} else {authenticator.textOff.toString()})
-            lifecycleScope.launch {
-                val intent = viewModel.registerRequest()
-                if (intent != null) {
-                    createCredentialIntentLauncher.launch(IntentSenderRequest.Builder(intent).build())
+            viewModel.setUserDetail(
+                userName, displayName, if (authenticator.isChecked) {
+                    authenticator.textOn.toString()
+                } else {
+                    authenticator.textOff.toString()
                 }
+            )
+            lifecycleScope.launch {
+                val cred = viewModel.registerRequest()
+                if (cred != null)
+                    showResultActivity(cred)
+//                if (intent != null) {
+//                    createCredentialIntentLauncher.launch(
+//                        IntentSenderRequest.Builder(intent).build()
+//                    )
+//                }
             }
         }
         login = findViewById(R.id.login)
         login?.setOnClickListener {
             lifecycleScope.launch {
-                val intent = viewModel.signinRequest()
-                if (intent != null) {
-                    signIntentLauncher.launch(
-                        IntentSenderRequest.Builder(intent).build()
-                    )
+               val cred =   viewModel.signinRequest()
+
+                if(cred != null){
+                    //                Log.e("CHALLENGE:" , ByteArrayUtil.encodeBase64URL(cred!!.response.clientDataJSON.toByteArray()))
+
+                    viewModel.signinResponse(cred)
                 }
+
+
+//                if (intent != null) {
+//                    signIntentLauncher.launch(
+//                        IntentSenderRequest.Builder(intent).build()
+//                    )
+//                }
             }
         }
         logout = findViewById(R.id.logout)
@@ -87,6 +112,17 @@ class FIDO2Activity : AppCompatActivity() {
                 updateSession()
             }
         }
+    }
+
+    private fun showResultActivity(cred: MakeCredentialResponse) {
+//        Log.e("CRED_ID", cred.id)
+//        Log.e("CRED_RAW", ByteArrayUtil.toHex(cred.rawId))
+//
+//        Log.e("ATTESTATION", ByteArrayUtil.encodeBase64URL(cred.response.attestationObject))
+//        Log.e("CLIENT_JSON", cred.response.clientDataJSON)
+        viewModel.registerResponse(cred)
+        Toast.makeText(this, "Register option successful", Toast.LENGTH_LONG)
+                        .show()
     }
 
     private fun updateSession() {
@@ -128,7 +164,11 @@ class FIDO2Activity : AppCompatActivity() {
                         Toast.makeText(this@FIDO2Activity, state.error, Toast.LENGTH_LONG).show()
                     }
                     is SignInState.Authenticated -> {
-                        Toast.makeText(this@FIDO2Activity, "Authenticated successfully", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@FIDO2Activity,
+                            "Authenticated successfully",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                     else -> {
                         register?.visibility = View.VISIBLE
@@ -146,7 +186,7 @@ class FIDO2Activity : AppCompatActivity() {
         updateSession()
     }
 
-    private fun provideOkHttpClient() : OkHttpClient {
+    private fun provideOkHttpClient(): OkHttpClient {
         val logging = HttpLoggingInterceptor()
         logging.level = (HttpLoggingInterceptor.Level.BODY)
 
@@ -158,9 +198,25 @@ class FIDO2Activity : AppCompatActivity() {
             .build()
     }
 
+    private fun createWebAuthnClient(): WebAuthnClient {
+
+        consentUI = UserConsentUIFactory.create(this)
+
+        val webAuthnClient = WebAuthnClient.create(
+            activity = this,
+            origin = "1k-dev.1kosmos.net",
+            ui = consentUI!!
+        )
+
+        webAuthnClient.maxTimeout = 30
+        webAuthnClient.defaultTimeout = 20
+
+        return webAuthnClient
+    }
+
     override fun onResume() {
         super.onResume()
-        viewModel.setFido2ApiClient(Fido.getFido2ApiClient(this))
+        viewModel.setFido2ApiClient(createWebAuthnClient())
     }
 
     override fun onPause() {
@@ -168,55 +224,55 @@ class FIDO2Activity : AppCompatActivity() {
         viewModel.setFido2ApiClient(null)
     }
 
-    private fun handleCreateCredentialResult(activityResult: ActivityResult) {
-        val bytes = activityResult.data?.getByteArrayExtra(Fido.FIDO2_KEY_CREDENTIAL_EXTRA)
-        when {
-            activityResult.resultCode != Activity.RESULT_OK ->
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
-            bytes == null ->
-                Toast.makeText(this, "Error creating credential", Toast.LENGTH_LONG)
-                    .show()
-            else -> {
-                val credential = PublicKeyCredential.deserializeFromBytes(bytes)
-                val response = credential.response
-                if (response is AuthenticatorErrorResponse) {
-                    val errorMessage = "${response.errorCodeAsInt} : ${response.errorMessage}"
-                    Log.e("FIDOActivity", response.errorMessage)
-                    if (response.errorCodeAsInt == 11) { // user already registered
-                        viewModel.saveUser()
-                        Toast.makeText(this, "User already registered", Toast.LENGTH_LONG)
-                            .show()
-                        return
-                    }
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    viewModel.registerResponse(credential)
-                    Toast.makeText(this, "Register option successful", Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        }
-    }
+//    private fun handleCreateCredentialResult(activityResult: ActivityResult) {
+//        val bytes = activityResult.data?.getByteArrayExtra(Fido.FIDO2_KEY_CREDENTIAL_EXTRA)
+//        when {
+//            activityResult.resultCode != Activity.RESULT_OK ->
+//                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+//            bytes == null ->
+//                Toast.makeText(this, "Error creating credential", Toast.LENGTH_LONG)
+//                    .show()
+//            else -> {
+//                val credential = PublicKeyCredential.deserializeFromBytes(bytes)
+//                val response = credential.response
+//                if (response is AuthenticatorErrorResponse) {
+//                    val errorMessage = "${response.errorCodeAsInt} : ${response.errorMessage}"
+//                    Log.e("FIDOActivity", response.errorMessage)
+//                    if (response.errorCodeAsInt == 11) { // user already registered
+//                        viewModel.saveUser()
+//                        Toast.makeText(this, "User already registered", Toast.LENGTH_LONG)
+//                            .show()
+//                        return
+//                    }
+//                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG)
+//                        .show()
+//                } else {
+//                    viewModel.registerResponse(credential)
+//                    Toast.makeText(this, "Register option successful", Toast.LENGTH_LONG)
+//                        .show()
+//                }
+//            }
+//        }
+//    }
 
-    private fun handleSignResult(activityResult: ActivityResult) {
-        val bytes = activityResult.data?.getByteArrayExtra(Fido.FIDO2_KEY_CREDENTIAL_EXTRA)
-        when {
-            activityResult.resultCode != Activity.RESULT_OK ->
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
-            bytes == null ->
-                Toast.makeText(this, "Error using credential", Toast.LENGTH_LONG).show()
-            else -> {
-                val credential = PublicKeyCredential.deserializeFromBytes(bytes)
-                val response = credential.response
-                if (response is AuthenticatorErrorResponse) {
-                    val errorMessage = "${response.errorCodeAsInt} : ${response.errorMessage}"
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    viewModel.signinResponse(credential)
-                }
-            }
-        }
-    }
+//    private fun handleSignResult(activityResult: ActivityResult) {
+//        val bytes = activityResult.data?.getByteArrayExtra(Fido.FIDO2_KEY_CREDENTIAL_EXTRA)
+//        when {
+//            activityResult.resultCode != Activity.RESULT_OK ->
+//                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+//            bytes == null ->
+//                Toast.makeText(this, "Error using credential", Toast.LENGTH_LONG).show()
+//            else -> {
+//                val credential = PublicKeyCredential.deserializeFromBytes(bytes)
+//                val response = credential.response
+//                if (response is AuthenticatorErrorResponse) {
+//                    val errorMessage = "${response.errorCodeAsInt} : ${response.errorMessage}"
+//                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG)
+//                        .show()
+//                } else {
+//                    viewModel.signinResponse(credential)
+//                }
+//            }
+//        }
+//    }
 }

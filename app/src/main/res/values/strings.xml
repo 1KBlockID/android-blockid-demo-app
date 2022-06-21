@@ -112,7 +112,7 @@
     <string name="label_restore_account">Restore Account</string>
     <string name="label_restore_acc">Restore Account</string>
     <string name="label_recover_mnemonic">Recover Mnemonic</string>
-    <string name="label_enroll_ssn">Register Fido key</string>
+    <string name="label_enroll_ssn">Verify SSN</string>
     <string name="label_copy_phrases">Copy phrases</string>
     <string name="label_mnemonic_copy_success">Mnemonic phrase has been copied.</string>
     <string name="label_enter_12_phrase">Please enter all 12 mnemonic phrase.</string>

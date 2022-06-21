@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -32,8 +33,8 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.fido2.Fido2NativeActivity;
-import com.onekosmos.blockid.sdk.fido2.Fido2NativeWithObserverHelper;
+//import com.onekosmos.blockid.sdk.fido2.Fido2NativeActivity;
+//import com.onekosmos.blockid.sdk.fido2.Fido2NativeWithObserverHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
@@ -47,6 +48,7 @@ import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
+import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -62,10 +64,10 @@ import java.util.List;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends Fido2NativeActivity implements EnrollmentAdapter.EnrollmentClickListener {
+public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
-    Fido2NativeWithObserverHelper helper;
+//    Fido2NativeWithObserverHelper helper;
 
 //    Fido2ApiClient fido2ApiClient;
 //    ActivityResultLauncher<IntentSenderRequest> createCredentialIntentLauncher =
@@ -109,8 +111,8 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
-        helper = new Fido2NativeWithObserverHelper(this);
-        helper.initHelper();
+//        helper = new Fido2NativeWithObserverHelper(this);
+//        helper.initHelper();
 
         BIDAuthProvider.getInstance().unlockSDK();
         initView();
@@ -412,20 +414,20 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
     }
 
     private void onVerifySSNClicked() {
-//        Intent intent = new Intent(this, VerifySSNActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//        startActivity(intent);
+        Intent intent = new Intent(this, VerifySSNActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
 
-        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
-        if (!response.getStatus()) {
-            startAddUserActivity();
-            return;
-        }
-
-        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
-        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
-            return;
-        }
+//        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+//        if (!response.getStatus()) {
+//            startAddUserActivity();
+//            return;
+//        }
+//
+//        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+//        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+//            return;
+//        }
 
 //        BlockIDSDK.getInstance().registerNativeFIDOKey(this, mLinkedAccountsList.get(0),
 //                FIDO2KeyType.platformAuthenticator, (status, data, errorResponse) -> {
@@ -439,15 +441,15 @@ public class EnrollmentActivity extends Fido2NativeActivity implements Enrollmen
 //                    }
 //                });
 
-        helper.registerNativeFido2(mLinkedAccountsList.get(0),
-                FIDO2KeyType.platformAuthenticator, (status, data, error) -> {
-                    if (status) {
-                    } else {
-                        Toast.makeText(this, error.getMessage(),
-                                Toast.LENGTH_LONG).show();
-                        Log.e("Error", "-->" + error.getMessage());
-                    }
-                });
+//        helper.registerNativeFido2(mLinkedAccountsList.get(0),
+//                FIDO2KeyType.platformAuthenticator, (status, data, error) -> {
+//                    if (status) {
+//                    } else {
+//                        Toast.makeText(this, error.getMessage(),
+//                                Toast.LENGTH_LONG).show();
+//                        Log.e("Error", "-->" + error.getMessage());
+//                    }
+//                });
     }
 
     private void removeDocument(LinkedHashMap<String, Object> removeDocMap) {
