@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.dlWebScanner;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.provider.Settings;
@@ -12,7 +13,6 @@ import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 
@@ -26,18 +26,19 @@ import java.util.UUID;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class SessionApi {
+    @SuppressLint("StaticFieldLeak")
     private static SessionApi sharedInstance;
     private static final String K_DOC_CREATE_SESSION = "/docuverify/document_share_session/create";
     public static final String K_CHECK_SESSION_STATUS = "/docuverify/document_share_session/result";
     private static final String K_PUBLIC_KEYS = "/docuverify/publickeys";
-    private final String K_DOC_TYPE_DL = "dl_object";
+
     private Context mContext;
     private String mSessionID;
     private ICreateSessionResponseCallback createSessionResponseCallback;
     private ISessionStatusResponseCallback sessionStatusResponseCallback;
     private final Handler mHandler = new Handler();
 
-    private SessionApi() {
+    public SessionApi() {
     }
 
     public static SessionApi getInstance() {
@@ -103,6 +104,7 @@ public class SessionApi {
     }
 
     private void createSession(String publicKey) {
+        String K_DOC_TYPE_DL = "dl_object";
         String reqID = getRequestId(mContext, publicKey);
         String did = BlockIDSDK.getInstance().getDID();
         SessionRequest sessionRequest = new SessionRequest(AppConstant.defaultTenant.getDns().
@@ -160,7 +162,7 @@ public class SessionApi {
                         @Override
                         public void onResponse(SessionStatusResponse response) {
                             String data = response.getData();
-                            String decryptedData = BlockIDSDK.getInstance().decryptString(data.toString(), publicKey);
+                            String decryptedData = BlockIDSDK.getInstance().decryptString(data, publicKey);
                             SessionStatusDecryptedData sessionStatusDecryptedData = null;
                             try {
                                 JSONObject obj = new JSONObject(decryptedData);
@@ -168,7 +170,8 @@ public class SessionApi {
                                 sessionStatusDecryptedData = gson.fromJson(obj.toString(), SessionStatusDecryptedData.class);
                             } catch (JSONException ignore) {
                             }
-                            if (sessionStatusDecryptedData.getResponseStatus().toString().toLowerCase().equals("success")) {
+                            assert sessionStatusDecryptedData != null;
+                            if (sessionStatusDecryptedData.getResponseStatus().equalsIgnoreCase("success")) {
                                 stopPolling();
                                 sessionStatusResponseCallback.setSessionStatusResponse(true, decryptedData, null);
                             } else {
@@ -192,8 +195,9 @@ public class SessionApi {
         mHandler.removeCallbacksAndMessages(null);
     }
 
+    @SuppressLint("HardwareIds")
     private String getRequestId(Context context, String publicKey) {
-        String reqID = "";
+        String reqID;
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("ts", System.currentTimeMillis() / 1000);
@@ -208,6 +212,7 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     protected class SessionStatusDecryptedData {
         private String responseStatus;
 
@@ -217,18 +222,16 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private class PublicKeysResponse {
         private String publicKey;
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     protected class SessionStatusResponse {
-        private String publicKey;
+        public String publicKey;
         private String data;
-
-        public String getPublicKey() {
-            return publicKey;
-        }
 
         public String getData() {
             return data;
@@ -236,9 +239,10 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     public class CreateSessionResponse {
         private String sessionId;
-        private String url;
+        private final String url;
 
         CreateSessionResponse(String url) {
             this.url = url;
@@ -254,6 +258,7 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private class CreateSessionRequestModel {
         String data;
 
@@ -263,12 +268,13 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private class SessionRequest {
-        private String tenantDNS;
-        private String communityName;
-        private String documentType;
-        private String userUID;
-        private String did;
+        private final String tenantDNS;
+        private final String communityName;
+        private final String documentType;
+        private final String userUID;
+        private final String did;
 
         private SessionRequest(String tenantDNS, String communityName, String documentType, String userUID, String did) {
             this.tenantDNS = tenantDNS;
@@ -280,6 +286,7 @@ public class SessionApi {
     }
 
     @Keep
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private class VerifySessionRequest {
         String dvcID;
         String sessionId;

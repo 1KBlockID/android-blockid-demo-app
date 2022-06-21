@@ -3,6 +3,7 @@ package com.onekosmos.blockidsample.ui.dlWebScanner;
 import static com.onekosmos.blockidsample.ui.dlWebScanner.SessionApi.K_CHECK_SESSION_STATUS;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
+@SuppressWarnings("ALL")
 public class WebScannerActivity extends AppCompatActivity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
@@ -99,6 +101,7 @@ public class WebScannerActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void loadWebView(String webUrl, String sessionId) {
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setDomStorageEnabled(true);
@@ -196,6 +199,7 @@ public class WebScannerActivity extends AppCompatActivity {
             SessionApi.getInstance().stopPolling();
         }
     }
+
 
     private LinkedHashMap<String, Object> createDLData(String response) {
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
