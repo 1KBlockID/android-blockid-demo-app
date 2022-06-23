@@ -6,6 +6,7 @@ import android.util.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onekosmos.blockid.sdk.BlockIDSDK
+import com.onekosmos.blockidsample.AppConstant
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -84,7 +85,6 @@ class FidoViewModel : ViewModel() {
                     ApiResult.SignedOutFromServer -> signoutUser()
                     is ApiResult.Success -> {
                         val cred = client.create(apiResult.data)
-//                        showResultActivity(cred)
                         return cred
                     }
                     else -> return null
@@ -104,8 +104,6 @@ class FidoViewModel : ViewModel() {
                 .addHeader("requestid", BlockIDSDK.getInstance().requestID)
                 .method("POST", jsonRequestBody {
                     name("dns").value("1k-dev.1kosmos.net")
-//                    name("username").value("rishabh")
-//                    name("displayName").value("Rishabh Srivastava")
                     name("username").value(userName)
                     name("displayName").value(displayName)
                     name("communityId").value("5f3d8d0cd866fa61019cf969")
@@ -160,7 +158,7 @@ class FidoViewModel : ViewModel() {
             requireResidentKey = true,
             userVerification   =  UserVerificationRequirement.Discouraged
         )
-        builder.attestation = AttestationConveyancePreference.Direct
+//        builder.attestation = AttestationConveyancePreference.Direct
         builder.addPubKeyCredParam(
             alg = COSEAlgorithmIdentifier.es256
         )
@@ -613,7 +611,7 @@ class FidoViewModel : ViewModel() {
     }
 
     companion object {
-        private const val LICENSE_KEY = "3f2282e9-3d46-4961-b103-a9319ad4560c"
+        private const val LICENSE_KEY = AppConstant.licenseKey
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE
     }
 }
