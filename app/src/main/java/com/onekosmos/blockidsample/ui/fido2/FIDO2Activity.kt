@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui.fido2
 
-import android.app.Activity
+//import com.google.android.gms.fido.Fido
+//import com.google.android.gms.fido.fido2.api.common.AuthenticatorErrorResponse
+//import com.google.android.gms.fido.fido2.api.common.PublicKeyCredential
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,13 +10,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-//import com.google.android.gms.fido.Fido
-//import com.google.android.gms.fido.fido2.api.common.AuthenticatorErrorResponse
-//import com.google.android.gms.fido.fido2.api.common.PublicKeyCredential
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse
 import com.onekosmos.blockid.sdk.BIDAPIs.sessionapi.SessionApi.GenerateNewSessionResponsePayload
@@ -28,11 +26,11 @@ import webauthnkit.core.authenticator.internal.ui.UserConsentUI
 import webauthnkit.core.authenticator.internal.ui.UserConsentUIFactory
 import webauthnkit.core.client.WebAuthnClient
 import webauthnkit.core.data.MakeCredentialResponse
-import webauthnkit.core.util.ByteArrayUtil
-import webauthnkit.core.util.WAKLogger
 import java.util.concurrent.TimeUnit
 
 class FIDO2Activity : AppCompatActivity() {
+    var webAuthnClient: WebAuthnClient? = null
+
     var consentUI: UserConsentUI? = null
 
     private val viewModel: FidoViewModel by viewModels()
@@ -76,9 +74,14 @@ class FIDO2Activity : AppCompatActivity() {
                 }
             )
             lifecycleScope.launch {
-                val cred = viewModel.registerRequest()
-                if (cred != null)
+                val options = viewModel.registerRequest()
+                if (options != null) {
+                    val cred = webAuthnClient!!.create(options)
                     showResultActivity(cred)
+                }
+
+//                if (cred != null)
+//                    showResultActivity(cred)
 //                if (intent != null) {
 //                    createCredentialIntentLauncher.launch(
 //                        IntentSenderRequest.Builder(intent).build()
@@ -89,13 +92,16 @@ class FIDO2Activity : AppCompatActivity() {
         login = findViewById(R.id.login)
         login?.setOnClickListener {
             lifecycleScope.launch {
-               val cred =   viewModel.signinRequest()
-
-                if(cred != null){
-                    //                Log.e("CHALLENGE:" , ByteArrayUtil.encodeBase64URL(cred!!.response.clientDataJSON.toByteArray()))
-
+                val options = viewModel.signinRequest()
+                if (options != null) {
+                    val cred = webAuthnClient!!.get(options)
                     viewModel.signinResponse(cred)
                 }
+//                if (cred != null) {
+//                    //                Log.e("CHALLENGE:" , ByteArrayUtil.encodeBase64URL(cred!!.response.clientDataJSON.toByteArray()))
+//
+//                    viewModel.signinResponse(cred)
+//                }
 
 
 //                if (intent != null) {
@@ -122,7 +128,7 @@ class FIDO2Activity : AppCompatActivity() {
 //        Log.e("CLIENT_JSON", cred.response.clientDataJSON)
         viewModel.registerResponse(cred)
         Toast.makeText(this, "Register option successful", Toast.LENGTH_LONG)
-                        .show()
+            .show()
     }
 
     private fun updateSession() {
@@ -216,12 +222,13 @@ class FIDO2Activity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setFido2ApiClient(createWebAuthnClient())
+        webAuthnClient = createWebAuthnClient();
+//        viewModel.setFido2ApiClient(createWebAuthnClient())
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.setFido2ApiClient(null)
+//        viewModel.setFido2ApiClient(null)
     }
 
 //    private fun handleCreateCredentialResult(activityResult: ActivityResult) {

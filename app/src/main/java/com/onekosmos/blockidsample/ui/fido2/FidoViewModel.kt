@@ -18,14 +18,13 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.gildor.coroutines.okhttp.await
 import webauthnkit.core.authenticator.COSEAlgorithmIdentifier
-import webauthnkit.core.client.WebAuthnClient
 import webauthnkit.core.data.*
 import webauthnkit.core.util.ByteArrayUtil
 import java.io.StringReader
 import java.io.StringWriter
 
 class FidoViewModel : ViewModel() {
-    private var fido2ApiClient: WebAuthnClient? = null
+    //    private var fido2ApiClient: WebAuthnClient? = null
     private val _processing = MutableStateFlow(false)
     private val signInStateMutable = MutableSharedFlow<SignInState>(
         replay = 1,
@@ -73,23 +72,24 @@ class FidoViewModel : ViewModel() {
         sessionID = session
     }
 
-    fun setFido2ApiClient(client: WebAuthnClient?) {
-        fido2ApiClient = client
-    }
+//    fun setFido2ApiClient(client: WebAuthnClient?) {
+//        fido2ApiClient = client
+//    }
 
-    suspend fun registerRequest(): MakeCredentialResponse? {
+    suspend fun registerRequest(): PublicKeyCredentialCreationOptions? {
         _processing.value = true
         try {
-            fido2ApiClient?.let { client ->
-                when (val apiResult = register()) {
-                    ApiResult.SignedOutFromServer -> signoutUser()
-                    is ApiResult.Success -> {
-                        val cred = client.create(apiResult.data)
-                        return cred
-                    }
-                    else -> return null
+//            fido2ApiClient?.let { client ->
+            when (val apiResult = register()) {
+                ApiResult.SignedOutFromServer -> signoutUser()
+                is ApiResult.Success -> {
+                    return apiResult.data
+//                        val cred = client.create(apiResult.data)
+//                        return cred
                 }
+                else -> return null
             }
+//            }
         } finally {
             _processing.value = false
         }
@@ -156,7 +156,7 @@ class FidoViewModel : ViewModel() {
 
         builder.authenticatorSelection = AuthenticatorSelectionCriteria(
             requireResidentKey = true,
-            userVerification   =  UserVerificationRequirement.Discouraged
+            userVerification = UserVerificationRequirement.Discouraged
         )
 //        builder.attestation = AttestationConveyancePreference.Direct
         builder.addPubKeyCredParam(
@@ -213,25 +213,49 @@ class FidoViewModel : ViewModel() {
         }
     }
 
-    suspend fun signinRequest(): GetAssertionResponse? {
-        _processing.value = true
-        try {
-            fido2ApiClient?.let { client ->
-                when (val apiResult = signin()) {
-                    ApiResult.SignedOutFromServer -> signoutUser()
-                    is ApiResult.Success -> {
-                        val cred = client.get(apiResult.data)
-                        return cred
-                    }
-                    else -> return null
+    private fun parseUserCredentials(body: ResponseBody): Credential {
+        var credential = Credential("", "", "Unknown error! Please try again later")
+        JsonReader(body.byteStream().bufferedReader()).use { reader ->
+            reader.beginObject()
+            var sub: String? = null
+            var error: String? = null
+            var status: String? = null
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "sub" -> sub = reader.nextString()
+                    "errorMessage" -> error = reader.nextString()
+                    "status" -> status = reader.nextString()
                 }
             }
+            reader.endObject()
+            if (status != null) {
+                credential = Credential(sub ?: "", status, error)
+            }
+        }
+
+        return credential
+    }
+
+    // sign in
+    suspend fun signinRequest(): PublicKeyCredentialRequestOptions? {
+        _processing.value = true
+        try {
+//            fido2ApiClient?.let { client ->
+            when (val apiResult = signin()) {
+                ApiResult.SignedOutFromServer -> signoutUser()
+                is ApiResult.Success -> {
+//                        val cred = client.get(apiResult.data)
+//                        return cred
+                    return apiResult.data
+                }
+                else -> return null
+            }
+//            }
         } catch (e: Exception) {
             signInStateMutable.emit(SignInState.AuthError("Connection Error! Please try again later."))
         } finally {
             _processing.value = false
         }
-
         return null
     }
 
@@ -258,6 +282,31 @@ class FidoViewModel : ViewModel() {
         }
     }
 
+    // signe in
+    private fun parsePublicKeyCredentialRequestOptions(
+        body: ResponseBody
+    ): PublicKeyCredentialRequestOptions {
+        val builder = PublicKeyCredentialRequestOptions()
+        JsonReader(body.byteStream().bufferedReader()).use { reader ->
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    "challenge" -> builder.challenge = reader.nextString().decodeBase64()
+                    "userVerification" -> reader.skipValue()
+//                    "allowCredentials" -> builder.allowCredential =
+//                        (parseCredentialDescriptors(reader))
+                    "allowCredentials" -> reader.skipValue()
+                    "rpId" -> builder.rpId = (reader.nextString())
+                    "timeout" -> reader.skipValue()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+        }
+        builder.userVerification = UserVerificationRequirement.Discouraged
+        return builder
+    }
+
     fun signinResponse(credential: GetAssertionResponse) {
         viewModelScope.launch {
             _processing.value = true
@@ -265,7 +314,6 @@ class FidoViewModel : ViewModel() {
                 when (val result = signinResult(credential)) {
                     ApiResult.SignedOutFromServer -> signoutUser()
                     is ApiResult.Success -> {
-                        Log.e("FidoViewModel", "Signin success ${result.data.sub}")
                         if (result.data.sub.isBlank()) {
                             signInStateMutable.emit(
                                 SignInState.AuthError(
@@ -308,7 +356,7 @@ class FidoViewModel : ViewModel() {
                     }
                     name("response").objectValue {
                         name("clientDataJSON").value(
-                            ByteArrayUtil.encodeBase64URL(response.clientDataJSON.toByteArray())
+                            response.clientDataJSON.toByteArray().toBase64()
                         )
                         name("authenticatorData").value(
                             response.authenticatorData.toBase64()
@@ -327,35 +375,6 @@ class FidoViewModel : ViewModel() {
         return apiResponse?.result("Error calling /signingResponse") {
             parseUserCredentials(body ?: throw ApiException("Empty response from /signinResponse"))
         }
-    }
-
-
-    // signe in
-    private fun parsePublicKeyCredentialRequestOptions(
-        body: ResponseBody
-    ): PublicKeyCredentialRequestOptions {
-        Log.e("body", body.string())
-        val builder = PublicKeyCredentialRequestOptions()
-        JsonReader(body.byteStream().bufferedReader()).use { reader ->
-            reader.beginObject()
-            while (reader.hasNext()) {
-                when (reader.nextName()) {
-                    "challenge" -> builder.challenge = reader.nextString().toByteArray()
-                    "userVerification" -> reader.skipValue()
-                    "allowCredentials" -> builder.allowCredential =
-                        (parseCredentialDescriptors(reader))
-                    "rpId" -> builder.rpId = (reader.nextString())
-                    "timeout" -> builder.timeout = (reader.nextLong())
-                    else -> reader.skipValue()
-                }
-            }
-            reader.endObject()
-        }
-        builder.userVerification = UserVerificationRequirement.Discouraged
-
-        Log.e("CHALLENGE:", ByteArrayUtil.encodeBase64URL(builder.challenge))
-
-        return builder
     }
 
     private fun parseRp(reader: JsonReader): PublicKeyCredentialRpEntity {
@@ -585,29 +604,6 @@ class FidoViewModel : ViewModel() {
                 _processing.value = false
             }
         }
-    }
-
-    private fun parseUserCredentials(body: ResponseBody): Credential {
-        var credential = Credential("", "", "Unknown error! Please try again later")
-        JsonReader(body.byteStream().bufferedReader()).use { reader ->
-            reader.beginObject()
-            var sub: String? = null
-            var error: String? = null
-            var status: String? = null
-            while (reader.hasNext()) {
-                when (reader.nextName()) {
-                    "sub" -> sub = reader.nextString()
-                    "errorMessage" -> error = reader.nextString()
-                    "status" -> status = reader.nextString()
-                }
-            }
-            reader.endObject()
-            if (status != null) {
-                credential = Credential(sub ?: "", status, error)
-            }
-        }
-
-        return credential
     }
 
     companion object {

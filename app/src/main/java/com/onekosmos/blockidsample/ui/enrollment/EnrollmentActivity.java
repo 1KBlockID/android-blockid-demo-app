@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,9 +31,6 @@ import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseList
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-//import com.onekosmos.blockid.sdk.fido2.Fido2NativeActivity;
-//import com.onekosmos.blockid.sdk.fido2.Fido2NativeWithObserverHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
@@ -58,6 +54,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import webauthnkit.core.util.WAKLogger;
 
 
 /**
@@ -113,6 +111,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         setContentView(R.layout.activity_enrollment);
 //        helper = new Fido2NativeWithObserverHelper(this);
 //        helper.initHelper();
+        WAKLogger.INSTANCE.setAvailable(true);
 
         BIDAuthProvider.getInstance().unlockSDK();
         initView();
@@ -344,7 +343,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
                                     jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                                    }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing

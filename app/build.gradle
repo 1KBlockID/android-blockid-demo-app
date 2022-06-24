@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
@@ -36,6 +37,7 @@ android {
         exclude 'lib/x86_64/freebsd/libscrypt.so'
         exclude 'lib/x86_64/linux/libscrypt.so'
         exclude 'AndroidManifest.xml'
+        exclude("META-INF/*.kotlin_module")
     }
 }
 
@@ -49,6 +51,8 @@ def String getCurrentTimestampHexValue() {
 }
 
 dependencies {
+    implementation files('libs/webauthnkit-release.aar')
+
 //    implementation project(path: ':BlockIDSDK-release')
     // blockid sdk that expose the use of requestID
     implementation project(path: ':android-kernel-sdk')
@@ -148,5 +152,15 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-process:2.4.1'
 
-    implementation 'webauthnkit:webauthnkit-core:0.9.3'
+//    implementation 'webauthnkit:webauthnkit-core:0.9.3'
+
+
+    // fido
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
+    api "com.fasterxml.jackson.core:jackson-databind:2.9.5"
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
 }
