@@ -4,13 +4,13 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.7.30" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -52,8 +52,9 @@ def String getCurrentTimestampHexValue() {
 
 dependencies {
     implementation files('libs/webauthnkit-release.aar')
+    implementation files('libs/BlockIDSDK-release.aar')
 
-    implementation project(path: ':BlockIDSDK-release')
+//    implementation project(path: ':BlockIDSDK-release')
     // blockid sdk that expose the use of requestID
 //    implementation project(path: ':android-kernel-sdk')
 
@@ -152,15 +153,13 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-process:2.4.1'
 
-//    implementation 'webauthnkit:webauthnkit-core:0.9.3'
-
 
     // fido
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
-    api "com.fasterxml.jackson.core:jackson-databind:2.9.5"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
+    api "com.fasterxml.jackson.core:jackson-databind:2.11.1"
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 }

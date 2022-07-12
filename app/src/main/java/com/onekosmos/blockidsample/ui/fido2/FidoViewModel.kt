@@ -324,6 +324,7 @@ class FidoViewModel : ViewModel() {
                         }
                         signInStateMutable.emit(SignInState.Authenticated)
                     }
+                    null -> TODO()
                 }
             } catch (e: ApiException) {
                 Log.e("FidoViewModel", "Cannot call signinResponse", e)
@@ -597,6 +598,7 @@ class FidoViewModel : ViewModel() {
                         userName = result.data.sub
                         saveUser()
                     }
+                    null -> TODO()
                 }
             } catch (e: ApiException) {
                 Log.e("FidoViewModel", "Cannot call registerResponse", e)
