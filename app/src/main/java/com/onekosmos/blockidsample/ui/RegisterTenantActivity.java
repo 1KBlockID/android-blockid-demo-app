@@ -81,7 +81,7 @@ public class RegisterTenantActivity extends AppCompatActivity {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+            errorDialog.showWithOneButton(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
         });
     }
 
