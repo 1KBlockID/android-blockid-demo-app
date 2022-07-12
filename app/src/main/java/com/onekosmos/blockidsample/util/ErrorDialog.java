@@ -68,7 +68,7 @@ public class ErrorDialog extends Dialog {
         this.show();
     }
 
-    public void showWithOKButton(Drawable dialogIcon, String title, String message, Dialog.OnDismissListener dismissListener) {
+    public void showWithOneButton(Drawable dialogIcon, String title, String message, Dialog.OnDismissListener dismissListener) {
         mDismissListener = dismissListener;
         mBtn1.setVisibility(View.VISIBLE);
         mBtn1.setText(R.string.label_ok);
