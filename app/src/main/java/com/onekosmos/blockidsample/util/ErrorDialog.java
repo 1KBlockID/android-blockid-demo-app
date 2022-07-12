@@ -68,29 +68,6 @@ public class ErrorDialog extends Dialog {
         this.show();
     }
 
-    public void showWithOneButton(Drawable dialogIcon, String title, String message, Dialog.OnDismissListener dismissListener) {
-        mDismissListener = dismissListener;
-        mBtn1.setVisibility(View.VISIBLE);
-        mBtn1.setText(R.string.label_ok);
-        try {
-            if (dialogIcon != null) {
-                mImgDialogIcon.setVisibility(View.VISIBLE);
-                mImgDialogIcon.setImageDrawable(dialogIcon);
-            }
-            if (!TextUtils.isEmpty(title)) {
-                mTxtTitle.setVisibility(View.VISIBLE);
-                mTxtTitle.setText(title);
-            }
-            if (!TextUtils.isEmpty(message)) {
-                mTxtMessage.setVisibility(View.VISIBLE);
-                mTxtMessage.setText(message);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.show();
-    }
-
     public void showWithOneButton(Drawable dialogIcon, String title, String message, String btnTitle, Dialog.OnDismissListener dismissListener) {
         mDismissListener = dismissListener;
         mBtn1.setVisibility(View.VISIBLE);
