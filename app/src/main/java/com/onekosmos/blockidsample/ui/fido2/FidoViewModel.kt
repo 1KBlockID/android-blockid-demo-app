@@ -608,6 +608,7 @@ class FidoViewModel : ViewModel() {
 
     companion object {
         private const val LICENSE_KEY = AppConstant.licenseKey
+//        private const val LICENSE_KEY = "3f2282e9-3d46-4961-b103-a9319ad4560c"
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE
     }
 }
