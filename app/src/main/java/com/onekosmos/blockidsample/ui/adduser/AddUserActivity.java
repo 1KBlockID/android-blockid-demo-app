@@ -17,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -48,7 +49,9 @@ import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanRespo
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
+import com.onekosmos.blockid.sdk.fido2.Fido2KeyType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
@@ -58,6 +61,7 @@ import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Created by 1Kosmos Engineering
@@ -386,7 +390,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 mWebView.setVisibility(View.VISIBLE);
-                hideProgress();
             }
         });
         mWebView.getSettings().setLoadsImagesAutomatically(true);
@@ -431,10 +434,27 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                         return;
                     }
 
-                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
-                            Toast.LENGTH_SHORT).show();
-                    finish();
+                    BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+                    List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
+
+                    registerFidoKey(linkedAccounts.get(0));
                 });
+    }
+
+    private void registerFidoKey(BIDLinkedAccount linkedAccount) {
+        BlockIDSDK.getInstance().registerNativeFIDO2Key(this, linkedAccount,
+                Fido2KeyType.platformAuthenticator, (status, errorResponse) -> {
+                    hideProgress();
+                    if (status) {
+                        Log.e("Fido2Key", "Registered Successfully");
+                    } else {
+                        Log.e("Fido2Key Error", errorResponse.getMessage() +
+                                "(" + errorResponse.getCode() + ")");
+                    }
+                });
+        Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     /**
