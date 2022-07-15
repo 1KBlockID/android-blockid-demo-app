@@ -390,6 +390,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 mWebView.setVisibility(View.VISIBLE);
+                hideProgress();
             }
         });
         mWebView.getSettings().setLoadsImagesAutomatically(true);
@@ -404,6 +405,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param payload String payload return from WebView
      */
     private void addUser(String payload) {
+        showProgress();
         // Base64 decode
         String base64DecodedPayload = new String(Base64.decode(payload, Base64.NO_WRAP));
 
