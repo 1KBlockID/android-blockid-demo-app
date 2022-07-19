@@ -10,12 +10,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/BlockIDSDK-release" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/../../sdk/android-kernel-sdk/app" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
