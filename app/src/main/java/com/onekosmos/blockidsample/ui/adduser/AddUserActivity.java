@@ -17,7 +17,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -447,16 +446,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         BlockIDSDK.getInstance().registerNativeFIDO2Key(this, linkedAccount,
                 Fido2KeyType.platformAuthenticator, (status, errorResponse) -> {
                     hideProgress();
-                    if (status) {
-                        Log.e("Fido2Key", "Registered Successfully");
-                    } else {
-                        Log.e("Fido2Key Error", errorResponse.getMessage() +
-                                "(" + errorResponse.getCode() + ")");
-                    }
+                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                            Toast.LENGTH_SHORT).show();
+                    finish();
                 });
-        Toast.makeText(this, getString(R.string.label_user_registration_successful),
-                Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     /**
