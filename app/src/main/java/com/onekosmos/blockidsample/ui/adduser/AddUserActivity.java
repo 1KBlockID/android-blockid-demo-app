@@ -50,7 +50,7 @@ import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
-import com.onekosmos.blockid.sdk.fido2.Fido2KeyType;
+import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
@@ -70,6 +70,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private static final int K_PERMISSION_REQUEST_CODE = 1007;
     private final String[] K_PERMISSIONS = new String[]{CAMERA, ACCESS_FINE_LOCATION};
     private CurrentLocationHelper mCurrentLocationHelper;
+    @SuppressWarnings("deprecation")
     private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private LinearLayout mScannerView;
@@ -443,8 +444,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     private void registerFidoKey(BIDLinkedAccount linkedAccount) {
-        BlockIDSDK.getInstance().registerNativeFIDO2Key(this, linkedAccount,
-                Fido2KeyType.platformAuthenticator, (status, errorResponse) -> {
+        BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccount,
+                FIDO2KeyType.PLATFORM, (status, errorResponse) -> {
                     hideProgress();
                     Toast.makeText(this, getString(R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();

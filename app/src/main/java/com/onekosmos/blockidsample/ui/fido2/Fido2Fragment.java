@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.fido2;
 
+import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -24,8 +26,6 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
-
-import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
 
 /**
  * Created by 1Kosmos Engineering
@@ -61,7 +61,7 @@ public class Fido2Fragment extends Fragment {
                     mProgressDialog.show();
                     mBtnRegisterClicked = true;
                     BIDTenant tenant = AppConstant.defaultTenant;
-                    BlockIDSDK.getInstance().registerFIDOKey(getActivity(),
+                    BlockIDSDK.getInstance().registerFIDO2Key(getActivity(),
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
                             tenant.getCommunity(),
@@ -88,7 +88,7 @@ public class Fido2Fragment extends Fragment {
                     mProgressDialog.show();
                     mBtnAuthenticateClicked = true;
                     BIDTenant tenant = AppConstant.defaultTenant;
-                    BlockIDSDK.getInstance().authenticateFIDOKey(getActivity(),
+                    BlockIDSDK.getInstance().authenticateFIDO2Key(getActivity(),
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
                             tenant.getCommunity(),
