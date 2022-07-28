@@ -11,7 +11,7 @@ import com.onekosmos.blockidsample.R;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class Fido2BaseActivity extends AppCompatActivity {
+public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
 
     @Override
