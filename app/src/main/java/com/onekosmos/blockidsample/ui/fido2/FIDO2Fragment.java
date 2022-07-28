@@ -31,7 +31,7 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class Fido2Fragment extends Fragment {
+public class FIDO2Fragment extends Fragment {
     private AppCompatButton mBtnRegister, mBtnAuthenticate;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;

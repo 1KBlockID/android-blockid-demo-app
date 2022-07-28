@@ -22,6 +22,6 @@ public class Fido2BaseActivity extends AppCompatActivity {
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(v -> onBackPressed());
         getSupportFragmentManager().beginTransaction().
-                add(R.id.fragment_fido_container, new Fido2Fragment()).commit();
+                add(R.id.fragment_fido_container, new FIDO2Fragment()).commit();
     }
 }
