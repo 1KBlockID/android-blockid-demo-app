@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class WalletConnectActivity extends AppCompatActivity {
     private WalletConnectHelper walletConnectHelper;
-    private List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
+    private final List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
     private DAppAdapter adapter;
     private ProgressDialog mProgressDialog;
     private boolean isConnected;
