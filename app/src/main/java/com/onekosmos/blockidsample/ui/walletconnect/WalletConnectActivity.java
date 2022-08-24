@@ -1,6 +1,5 @@
 package com.onekosmos.blockidsample.ui.walletconnect;
 
-import static com.google.android.gms.common.util.CollectionUtils.listOf;
 import static com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity.IS_FROM_WALLET_CONNECT;
 
 import android.content.DialogInterface;
@@ -87,31 +86,15 @@ public class WalletConnectActivity extends AppCompatActivity {
         // FIXME  pankti need talk to vinoth about url and redirect
 
         List<String> iconList = new ArrayList<>();
-//        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
-//                getString(R.string.app_name),
-//                getString(R.string.wallet_connect_description),
-//                "example.wallet", iconList,
-//                "kotlin-wallet-wc:/request");
-
-//        walletConnectHelper.initializeWalletConnectSDK(getApplication(),
-//                "932edbeee51ba767c6e1fb7947b92c39", metadata);
-
+        iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
         Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
-                "Kotlin Wallet",
-                "Wallet description",
-                "example.wallet",
-                listOf("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media"),
+                getString(R.string.app_name),
+                getString(R.string.wallet_connect_description),
+                "example.wallet", iconList,
                 "kotlin-wallet-wc:/request");
 
         walletConnectHelper.initializeWalletConnectSDK(getApplication(),
-                "8ba9ee138960775e5231b70cc5ef1c3a", metadata);
-//        metadata = Sign.Model.AppMetaData(
-//                name = "Kotlin Wallet",
-//                description = "Wallet description",
-//                url = "example.wallet",
-//                icons = listOf("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media"),
-//                redirect = "kotlin-wallet-wc:/request"
-//        )
+                "932edbeee51ba767c6e1fb7947b92c39", metadata);
     }
 
     /**

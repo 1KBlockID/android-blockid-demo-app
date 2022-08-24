@@ -7,9 +7,6 @@ import android.util.Log;
 import com.walletconnect.sign.client.Sign;
 import com.walletconnect.sign.client.SignClient;
 
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-
 public class WalletConnectHelper {
     private static WalletConnectHelper sharedInstance;
     private static final String WALLET_CONNECT_PROD_RELAY_URL = "relay.walletconnect.com";
@@ -35,45 +32,33 @@ public class WalletConnectHelper {
 
     public void initializeWalletConnectSDK(Application context, String projectId,
                                            Sign.Model.AppMetaData metaData) {
-        // FIXME projectId should not be null
         if (TextUtils.isEmpty(projectId)) {
             Log.e("Init error", "project id is empty");
             return;
         }
 
-        String relayServerUrl = "wss://" + WALLET_CONNECT_PROD_RELAY_URL + "?projectId=" + projectId;
-        Log.e("URL", relayServerUrl);
+        String relayServerUrl = "wss://" + WALLET_CONNECT_PROD_RELAY_URL + "?projectId=" +
+                projectId;
 
-        // Need Application context for this
         Sign.Params.Init init = null;
         try {
             init = new Sign.Params.Init(context, relayServerUrl, metaData,
                     null, Sign.ConnectionType.AUTOMATIC);
 
         } catch (Exception e) {
-            Log.e("Init error1", "Exception");
-            e.printStackTrace();
+            Log.e("Init error1", "Exception --> " + e.getMessage());
+            return;
         }
-        if(init == null){
-            Log.e("Init error1", "Wallet connect init method");
-        }
-        try {
-//            SignClient.INSTANCE.initialize(init, error -> {
-//                error.getThrowable().printStackTrace();
-//                Log.e("Error", error.getThrowable().getMessage());
-//                return null;
-//            });
 
-            SignClient.INSTANCE.initialize(init, new Function1<Sign.Model.Error, Unit>() {
-                @Override
-                public Unit invoke(Sign.Model.Error error) {
-                    return null;
-                }
-            });
-        }catch (Exception e){
-            Log.e("Init error2", "Exception");
-            e.printStackTrace();
-        }
+        SignClient.INSTANCE.initialize(init, error -> {
+            if (error != null) {
+                // Software caused connection abort (offline)
+                Log.e("Init2 Error", error.getThrowable().getMessage());
+            } else {
+                Log.e("Init", "success");
+            }
+            return null;
+        });
     }
 
     public void connect() {

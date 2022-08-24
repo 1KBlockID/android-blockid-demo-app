@@ -7,7 +7,9 @@ import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.ui.login.LoginActivity;
 
 /**
@@ -29,7 +31,8 @@ public class SplashActivity extends AppCompatActivity {
     private void checkTenantRegistered() {
         Intent intent;
         if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
-            intent = new Intent(this, LoginActivity.class);
+            BIDAuthProvider.getInstance().unlockSDK();
+            intent = new Intent(this, EnrollmentActivity.class);
         } else {
             intent = new Intent(this, RegisterTenantActivity.class);
         }
