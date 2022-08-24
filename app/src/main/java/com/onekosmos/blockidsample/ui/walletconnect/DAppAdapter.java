@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatRadioButton;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,10 +18,10 @@ import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
- * Copyright © 2021 1Kosmos. All rights reserved.
+ * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
-    private final List<Sign.Model.Session> mDAppUrls;
+    private final List<DAppData> mDAppUrls;
     private int mSelectedPosition = 0;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -33,7 +34,7 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
         }
     }
 
-    public DAppAdapter(List<Sign.Model.Session> sessions) {
+    public DAppAdapter(List<DAppData> sessions) {
         mDAppUrls = sessions;
     }
 
@@ -50,12 +51,24 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.mRadioButton.setText(Objects.requireNonNull(
-                mDAppUrls.get(position).getMetaData()).getUrl());
-        holder.mRadioButton.setChecked(position == mSelectedPosition);
+                mDAppUrls.get(position).session.getMetaData()).getUrl());
+
+        holder.mRadioButton.setOnCheckedChangeListener(null);
+
+        holder.mRadioButton.setChecked(mSelectedPosition == position &&
+                mDAppUrls.get(position).checked);
+
         holder.mRadioButton.setOnCheckedChangeListener((compoundButton, check) -> {
-            if (check) {
+            if (compoundButton.isChecked()) {
+                holder.mRadioButton.setChecked(true);
                 mSelectedPosition = holder.getBindingAdapterPosition();
-                notifyDataSetChanged();
+            } else {
+                holder.mRadioButton.setChecked(false);
+            }
+
+            for (int i = 0; i < mDAppUrls.size(); i++) {
+                mDAppUrls.get(i).checked = i == mSelectedPosition;
+                notifyItemChanged(i);
             }
         });
     }
@@ -68,5 +81,11 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
     @Override
     public long getItemId(int position) {
         return mSelectedPosition;
+    }
+
+    @Keep
+    static class DAppData {
+        Sign.Model.Session session;
+        boolean checked;
     }
 }

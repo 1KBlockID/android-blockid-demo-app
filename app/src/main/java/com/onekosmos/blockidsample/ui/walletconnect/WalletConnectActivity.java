@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -37,7 +38,7 @@ import java.util.List;
  */
 public class WalletConnectActivity extends AppCompatActivity {
     private WalletConnectHelper walletConnectHelper;
-    private List<Sign.Model.Session> mDAppList = new ArrayList<>();
+    private List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
     private DAppAdapter adapter;
     private ProgressDialog mProgressDialog;
     private boolean isConnected;
@@ -67,6 +68,7 @@ public class WalletConnectActivity extends AppCompatActivity {
                                                     settledSessionResponse) {
             Log.e("Called", "onSessionSettleResponse-->" +
                     BIDUtil.objectToJSONString(settledSessionResponse, true));
+            getConnectedSession();
         }
 
         @Override
@@ -88,8 +90,7 @@ public class WalletConnectActivity extends AppCompatActivity {
 
         @Override
         public void onError(@NonNull Sign.Model.Error error) {
-            Log.e("Called", "onError-->" +
-                    BIDUtil.objectToJSONString(error, true));
+            Log.e("Called", "onError-->" + error.getThrowable().getMessage());
         }
     };
 
@@ -142,6 +143,9 @@ public class WalletConnectActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerViewDApps.setLayoutManager(layoutManager);
         recyclerViewDApps.setAdapter(adapter);
+
+        ViewGroup.LayoutParams params = recyclerViewDApps.getLayoutParams();
+        recyclerViewDApps.setLayoutParams(params);
     }
 
     private void initWalletConnect() {
@@ -161,6 +165,9 @@ public class WalletConnectActivity extends AppCompatActivity {
                 getString(R.string.project_id), metadata, walletDelegate);
     }
 
+    /**
+     * Get list of connected session and display it
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void getConnectedSession() {
         List<Sign.Model.Session> sessionList = walletConnectHelper.getConnectedSessions();
@@ -169,10 +176,20 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         Log.e("sessionList", "" + sessionList.size());
-        mDAppList.addAll(sessionList);
+        mDAppList.clear();
+        for (int i = 0; i < sessionList.size(); i++) {
+            DAppAdapter.DAppData data = new DAppAdapter.DAppData();
+            data.session = sessionList.get(i);
+            mDAppList.add(data);
+        }
         runOnUiThread(() -> adapter.notifyDataSetChanged());
     }
 
+    /**
+     * Connect to DApp
+     *
+     * @param paringUri
+     */
     private void connectToDApp(String paringUri) {
         if (walletConnectHelper == null)
             return;
@@ -180,6 +197,11 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper.connect(paringUri);
     }
 
+    /**
+     * Approve DApp
+     *
+     * @param sessionProposal
+     */
     private void approveDApp(Sign.Model.SessionProposal sessionProposal) {
         if (walletConnectHelper == null)
             return;
