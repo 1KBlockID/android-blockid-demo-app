@@ -196,4 +196,14 @@
     <string name="label_connect_to_dapp">Connect to DApp</string>
     <string name="label_disconnect">Disconnect</string>
     <string name="label_qr_code_scanning_canceled">QR code scanning canceled</string>
+    <string name="label_sign_transaction">Would you like to sign this transaction request from</string>
+    <string name="label_from_address">From Address:</string>
+    <string name="label_to_address">To Address:</string>
+    <string name="label_value">Value:</string>
+    <string name="label_gas_price">Gas Price:</string>
+    <string name="label_data">Data:</string>
+    <string name="label_nonce">Nonce:</string>
+    <string name="label_reject">Reject</string>
+    <string name="label_approve">Approve</string>
+
 </resources>

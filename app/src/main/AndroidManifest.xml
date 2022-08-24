@@ -123,6 +123,10 @@
             android:name=".ui.walletconnect.WalletConnectActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
+            android:name=".ui.walletconnect.ConsentScreenActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>
 
 </manifest>
