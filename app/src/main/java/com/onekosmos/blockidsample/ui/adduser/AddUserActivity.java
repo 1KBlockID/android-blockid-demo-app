@@ -470,7 +470,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     /**
-     * Show error dialog after
+     * Show error dialog
      *
      * @param message String message of dialog
      */

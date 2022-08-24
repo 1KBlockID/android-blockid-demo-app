@@ -187,4 +187,12 @@
     <string name="label_code_already_redeemed">Code already redeemed.</string>
     <string name="label_remove_user">Do you want to remove user?</string>
     <string name="label_account_removed">Your account is removed.</string>
+
+    <!-- Wallet Connect -->
+    <string name="wallet_connect_description">1Kosmos WalletConnect Demo</string>
+    <string name="label_wallet_connect">WalletConnect</string>
+    <string name="label_decentralized_apps">Decentralized APPs</string>
+    <string name="label_connect_to_dapp">Connect to DApp</string>
+    <string name="label_disconnect">Disconnect</string>
+    <string name="label_qr_code_scanning_canceled">QR code scanning canceled</string>
 </resources>

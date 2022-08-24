@@ -18,6 +18,7 @@
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
@@ -26,14 +27,13 @@
         android:theme="@style/Theme.BlockIDSdkDemo"
         android:usesCleartextTraffic="true"
         tools:ignore="DataExtractionRules"
-        tools:replace="android:allowBackup,android:label,android:theme"
+        tools:replace="android:allowBackup,android:label,android:theme,android:fullBackupContent"
         tools:targetApi="n">
-
         <activity
             android:name=".ui.SplashActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -119,5 +119,10 @@
             android:name=".ui.adduser.AddUserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
+            android:name=".ui.walletconnect.WalletConnectActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>
+
 </manifest>

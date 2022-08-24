@@ -43,6 +43,7 @@ import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
 import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
+import com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -79,7 +80,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (position == 0) {
+        if (TextUtils.equals(asset.getAssetTitle(), getResources().
+                getString(R.string.label_add_user))) {
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
@@ -110,6 +112,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
+            onWalletConnectClicked();
         }
     }
 
@@ -420,6 +424,12 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void onFido2Clicked() {
         Intent intent = new Intent(this, FIDO2BaseActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onWalletConnectClicked() {
+        Intent intent = new Intent(this, WalletConnectActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
