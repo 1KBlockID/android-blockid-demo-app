@@ -430,7 +430,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Add user data in SDK
         BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
+                userData.scep_privatekey, userData.scep_expiry, userData.origin,
+                userData.account, (status, error) -> {
                     if (!status) {
                         showError(error);
                         return;
@@ -593,6 +594,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         String userId;
         String scep_hash;
         String scep_privatekey;
+        String scep_expiry;
         boolean isLinked;
         BIDOrigin origin;
         BIDAccount account;

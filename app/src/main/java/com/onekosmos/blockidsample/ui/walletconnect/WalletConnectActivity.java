@@ -7,11 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -21,6 +21,7 @@ import com.onekosmos.blockidsample.WalletConnectHelper;
 import com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
+import com.walletconnect.sign.client.SignInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,44 @@ import java.util.List;
  */
 public class WalletConnectActivity extends AppCompatActivity {
     private WalletConnectHelper walletConnectHelper;
+    private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
+        @Override
+        public void onSessionProposal(@NonNull Sign.Model.SessionProposal sessionProposal) {
+            Log.e("Called", "onSessionProposal");
+        }
+
+        @Override
+        public void onSessionRequest(@NonNull Sign.Model.SessionRequest sessionRequest) {
+
+        }
+
+        @Override
+        public void onSessionDelete(@NonNull Sign.Model.DeletedSession deletedSession) {
+
+        }
+
+        @Override
+        public void onSessionSettleResponse(@NonNull Sign.Model.SettledSessionResponse
+                                                    settledSessionResponse) {
+
+        }
+
+        @Override
+        public void onSessionUpdateResponse(@NonNull Sign.Model.SessionUpdateResponse sessionUpdateResponse) {
+
+        }
+
+        @Override
+        public void onConnectionStateChange(@NonNull Sign.Model.ConnectionState connectionState) {
+
+        }
+
+        @Override
+        public void onError(@NonNull Sign.Model.Error error) {
+
+        }
+    };
+
     private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
             StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_CANCELED) {
@@ -48,6 +87,7 @@ public class WalletConnectActivity extends AppCompatActivity {
                 showErrorDialog(getString(R.string.label_invalid_code),
                         getString(R.string.label_unsupported_qr_code));
             }
+            connectToDApp(qrData);
         }
     });
 
@@ -70,11 +110,8 @@ public class WalletConnectActivity extends AppCompatActivity {
         btnConnect.setOnClickListener(view -> openScanQRCodeActivity());
 
         AppCompatButton btnDisconnect = findViewById(R.id.btn_disconnect);
-        btnDisconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
+        btnDisconnect.setOnClickListener(view -> {
+            // TODO
         });
     }
 
@@ -84,17 +121,21 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         // FIXME  pankti need talk to vinoth about url and redirect
-
         List<String> iconList = new ArrayList<>();
         iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
-        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
-                getString(R.string.app_name),
-                getString(R.string.wallet_connect_description),
-                "example.wallet", iconList,
+        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(getString(R.string.app_name),
+                getString(R.string.wallet_connect_description), "example.wallet", iconList,
                 "kotlin-wallet-wc:/request");
 
         walletConnectHelper.initializeWalletConnectSDK(getApplication(),
-                "932edbeee51ba767c6e1fb7947b92c39", metadata);
+                getString(R.string.project_id), metadata, walletDelegate);
+    }
+
+    private void connectToDApp(String paringUri) {
+        if (walletConnectHelper == null)
+            return;
+
+        walletConnectHelper.connect(paringUri);
     }
 
     /**

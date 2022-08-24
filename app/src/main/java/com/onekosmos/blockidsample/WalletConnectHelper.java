@@ -1,11 +1,13 @@
 package com.onekosmos.blockidsample;
 
+
 import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.walletconnect.sign.client.Sign;
 import com.walletconnect.sign.client.SignClient;
+import com.walletconnect.sign.client.SignInterface;
 
 public class WalletConnectHelper {
     private static WalletConnectHelper sharedInstance;
@@ -31,7 +33,8 @@ public class WalletConnectHelper {
     }
 
     public void initializeWalletConnectSDK(Application context, String projectId,
-                                           Sign.Model.AppMetaData metaData) {
+                                           Sign.Model.AppMetaData metaData,
+                                           SignInterface.WalletDelegate walletDelegate) {
         if (TextUtils.isEmpty(projectId)) {
             Log.e("Init error", "project id is empty");
             return;
@@ -59,9 +62,23 @@ public class WalletConnectHelper {
             }
             return null;
         });
+
+        // SignClient.getListOfSettledSessions()
+        SignClient.INSTANCE.setWalletDelegate(walletDelegate);
     }
 
-    public void connect() {
+    public void connect(String pairingUri) {
+        Sign.Params.Pair pairingParams = new Sign.Params.Pair(pairingUri);
+        SignClient.INSTANCE.pair(pairingParams, error -> {
+            if (error != null) {
+                // Software caused connection abort (offline)
+                Log.e("Pair Error", error.getThrowable().getMessage());
+            } else {
+                Log.e("Pair", "success");
+            }
+            return null;
+        });
+        // look for session propose
 
     }
 }

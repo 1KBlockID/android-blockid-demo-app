@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BlockID Demo</string>
+    <string name="app_project_id">932edbeee51ba767c6e1fb7947b92c39</string>
     <string name="label_register_default_tenant">Register Default Tenant</string>
     <string name="label_device_auth">Device Auth</string>
     <string name="label_device_auth_enrolled">Device auth enrolled</string>
