@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.walletconnect.sign.client.Sign;
 import com.walletconnect.sign.client.SignClient;
 import com.walletconnect.sign.client.SignInterface;
@@ -132,5 +131,17 @@ public class WalletConnectHelper {
 
     public List<Sign.Model.Session> getConnectedSessions() {
         return SignClient.INSTANCE.getListOfSettledSessions();
+    }
+
+    public void disconnect(String sessionTopic) {
+        Sign.Params.Disconnect disconnect = new Sign.Params.Disconnect(sessionTopic);
+        SignClient.INSTANCE.disconnect(disconnect, error -> {
+            if (error != null) {
+                Log.e("Disconnect Error", error.getThrowable().getMessage());
+            } else {
+                Log.e("Disconnected", "Successfully");
+            }
+            return null;
+        });
     }
 }

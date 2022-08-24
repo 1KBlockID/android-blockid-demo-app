@@ -134,9 +134,8 @@ public class WalletConnectActivity extends AppCompatActivity {
         btnConnect.setOnClickListener(view -> openScanQRCodeActivity());
 
         AppCompatButton btnDisconnect = findViewById(R.id.btn_disconnect);
-        btnDisconnect.setOnClickListener(view -> {
-            // TODO
-        });
+        btnDisconnect.setOnClickListener(view -> disconnect(
+                adapter.getSelectedItem().session.getTopic()));
 
         adapter = new DAppAdapter(mDAppList);
         RecyclerView recyclerViewDApps = findViewById(R.id.recyclerview_dapp);
@@ -209,6 +208,14 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper.approveDApp(sessionProposal);
     }
 
+    private void disconnect(String topic) {
+        if (walletConnectHelper == null)
+            return;
+
+        walletConnectHelper.disconnect(topic);
+        getConnectedSession();
+    }
+
     /**
      * Open scan QR code activity
      */
@@ -245,7 +252,6 @@ public class WalletConnectActivity extends AppCompatActivity {
         };
         errorDialog.show(null, title, message, onDismissListener);
     }
-
 
     private void showProgressDialog() {
         if (mProgressDialog == null)

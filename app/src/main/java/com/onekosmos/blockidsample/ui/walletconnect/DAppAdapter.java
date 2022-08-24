@@ -21,7 +21,7 @@ import java.util.Objects;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
-    private final List<DAppData> mDAppUrls;
+    private final List<DAppData> mDAppList;
     private int mSelectedPosition = 0;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -34,8 +34,8 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
         }
     }
 
-    public DAppAdapter(List<DAppData> sessions) {
-        mDAppUrls = sessions;
+    public DAppAdapter(List<DAppData> list) {
+        mDAppList = list;
     }
 
     @NonNull
@@ -51,12 +51,15 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.mRadioButton.setText(Objects.requireNonNull(
-                mDAppUrls.get(position).session.getMetaData()).getUrl());
+                mDAppList.get(position).session.getMetaData()).getUrl());
 
         holder.mRadioButton.setOnCheckedChangeListener(null);
 
+        if (position == mSelectedPosition)
+            mDAppList.get(position).checked = true;
+
         holder.mRadioButton.setChecked(mSelectedPosition == position &&
-                mDAppUrls.get(position).checked);
+                mDAppList.get(position).checked);
 
         holder.mRadioButton.setOnCheckedChangeListener((compoundButton, check) -> {
             if (compoundButton.isChecked()) {
@@ -66,8 +69,8 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
                 holder.mRadioButton.setChecked(false);
             }
 
-            for (int i = 0; i < mDAppUrls.size(); i++) {
-                mDAppUrls.get(i).checked = i == mSelectedPosition;
+            for (int i = 0; i < mDAppList.size(); i++) {
+                mDAppList.get(i).checked = i == mSelectedPosition;
                 notifyItemChanged(i);
             }
         });
@@ -75,12 +78,11 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mDAppUrls.size();
+        return mDAppList.size();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return mSelectedPosition;
+    public DAppData getSelectedItem() {
+        return mDAppList.get(mSelectedPosition);
     }
 
     @Keep
