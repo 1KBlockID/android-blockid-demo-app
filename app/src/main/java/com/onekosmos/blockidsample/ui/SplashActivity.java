@@ -32,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
         Intent intent;
         if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
             BIDAuthProvider.getInstance().unlockSDK();
-            intent = new Intent(this, EnrollmentActivity.class);
+            intent = new Intent(this, LoginActivity.class);
         } else {
             intent = new Intent(this, RegisterTenantActivity.class);
         }
