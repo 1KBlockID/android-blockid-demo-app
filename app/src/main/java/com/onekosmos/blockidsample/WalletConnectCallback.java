@@ -23,7 +23,7 @@ public interface WalletConnectCallback {
      *
      * @param settleSessionResponse {@link Sign.Model.SettledSessionResponse}
      */
-    void onSessionSettleResponse(Sign.Model.SettledSessionResponse settleSessionResponse);
+    void onSessionSettleResponse(Sign.Model.SettledSessionResponse.Result settleSessionResponse);
 
     /**
      * Connection deleted

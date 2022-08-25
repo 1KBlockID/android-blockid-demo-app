@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockid.sdk.wallet.BIDWallet;
-import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
 import com.walletconnect.sign.client.SignClient;
 import com.walletconnect.sign.client.SignInterface;
@@ -54,7 +53,8 @@ public class WalletConnectHelper {
         @Override
         public void onSessionSettleResponse(@NonNull Sign.Model.SettledSessionResponse
                                                     settledSessionResponse) {
-            walletConnectCallback.onSessionSettleResponse(settledSessionResponse);
+            walletConnectCallback.onSessionSettleResponse((Sign.Model.SettledSessionResponse.Result)
+                    settledSessionResponse);
         }
 
 
@@ -171,6 +171,10 @@ public class WalletConnectHelper {
     }
 
     public void rejectConnectionRequest(@NonNull Sign.Model.SessionProposal sessionProposal) {
+        //noinspection ConstantConditions
+        if (sessionProposal == null)
+            return;
+
         Sign.Params.Reject reject = new Sign.Params.Reject(sessionProposal.getProposerPublicKey(),
                 "Reject Session", 406);
         SignClient.INSTANCE.rejectSession(reject, error -> {

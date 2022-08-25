@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.onekosmos.blockidsample.WalletConnectHelper;
 import com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.ResultDialog;
 import com.walletconnect.sign.client.Sign;
 
 import java.util.ArrayList;
@@ -109,7 +111,9 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSessionSettleResponse(Sign.Model.SettledSessionResponse settleSessionResponse) {
+        public void onSessionSettleResponse(Sign.Model.SettledSessionResponse.Result settleSessionResponse) {
+            runOnUiThread(() -> showSuccessDialog(
+                    settleSessionResponse.getSession().getMetaData().getUrl()));
             updateSessionList();
         }
 
@@ -352,6 +356,14 @@ public class WalletConnectActivity extends AppCompatActivity {
      */
     private boolean validateQRCodeData(String qrData) {
         return !TextUtils.isEmpty(qrData);
+    }
+
+    private void showSuccessDialog(String url) {
+        ResultDialog successDialog = new ResultDialog(this, R.drawable.icon_dialog_success,
+                getString(R.string.label_success), getString(R.string.label_wallet_has_been_connected,
+                url));
+        successDialog.show();
+        new Handler().postDelayed(successDialog::dismiss, 2000);
     }
 
     /**
