@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.walletconnect.ConsentScreenActivity">
+    tools:context=".ui.walletconnect.TransactionRequestConsentActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_title_header"
@@ -193,69 +193,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/txt_nonce" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_constraint_scr_2"
-        android:layout_width="327dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/dimen_20dp"
-        android:layout_marginTop="@dimen/dimen_55dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_sub_heading">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txt_wallet_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/dimen_20dp"
-            android:layout_marginTop="@dimen/dimen_20dp"
-            android:text="Wallet Address:"
-            android:textColor="@color/secondary5"
-            android:textSize="@dimen/dimen_12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txt_wallet_from_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/dimen_20dp"
-            android:text="From Address:"
-            android:textColor="@color/secondary6"
-            android:textSize="@dimen/dimen_12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txt_wallet_address" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txt_view_balance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/dimen_20dp"
-            android:layout_marginTop="@dimen/dimen_20dp"
-            android:textColor="@color/secondary5"
-            android:text="- View your wallet balance, activity"
-            android:textSize="@dimen/dimen_12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_wallet_from_address" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txt_request_approval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/dimen_20dp"
-            android:text="- Request approval for transactions"
-            android:textSize="@dimen/dimen_12sp"
-            android:textColor="@color/secondary5"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txt_view_balance" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

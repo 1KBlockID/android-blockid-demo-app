@@ -112,6 +112,8 @@ public class WalletConnectActivity extends AppCompatActivity {
         AppCompatButton btnDisconnect = findViewById(R.id.btn_disconnect);
         btnDisconnect.setOnClickListener(view -> {
             // TODO
+            Intent i = new Intent(this, TransactionRequestConsentActivity.class);
+            startActivity(i);
         });
     }
 

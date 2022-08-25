@@ -2,7 +2,6 @@ package com.onekosmos.blockidsample.ui.walletconnect;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +15,7 @@ import com.onekosmos.blockidsample.R;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class ConsentScreenActivity extends AppCompatActivity {
+public class TransactionRequestConsentActivity extends AppCompatActivity {
 
     AppCompatTextView mTxtHeader, mTxtSubHeader, mTxtFromAddressValue, mTxtToAddressValue,
             mTxtValueData, mTxtGasPriceValue, mTxtDataValue, mTxtNonceValue, mTxtWalletAddressValue;
@@ -26,7 +25,7 @@ public class ConsentScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_consent_screen);
+        setContentView(R.layout.activity_transaction_request_consent_screen);
         initView();
     }
 
@@ -49,12 +48,18 @@ public class ConsentScreenActivity extends AppCompatActivity {
 
         mBtnReject.setOnClickListener(v -> {
             //TODO :- When user clicks on Reject Button
-            Toast.makeText(this, "Reject Clicked", Toast.LENGTH_SHORT).show();
+            mLayoutScr1.setVisibility(View.VISIBLE);
+            mLayoutScr2.setVisibility(View.GONE);
+            mTxtHeader.setText(getString(R.string.label_sign_transaction));
+            mTxtSubHeader.setText("Dapp-URL-1");
         });
 
         mBtnApprove.setOnClickListener(v -> {
             //TODO :- When user clicks on Reject Button
-            Toast.makeText(this, "Approve Clicked", Toast.LENGTH_SHORT).show();
+            mLayoutScr1.setVisibility(View.GONE);
+            mLayoutScr2.setVisibility(View.VISIBLE);
+            mTxtHeader.setText("Dapp-URL-1");
+            mTxtSubHeader.setText(getString(R.string.label_connect_wallet));
         });
     }
 }
