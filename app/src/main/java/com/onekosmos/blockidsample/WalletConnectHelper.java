@@ -47,6 +47,7 @@ public class WalletConnectHelper implements SignInterface.WalletDelegate {
      *
      * @return {@link WalletConnectHelper}
      */
+    // FIXME need to add check SDK Ready
     public static WalletConnectHelper getInstance() {
         if (sharedInstance == null) {
             sharedInstance = new WalletConnectHelper();
