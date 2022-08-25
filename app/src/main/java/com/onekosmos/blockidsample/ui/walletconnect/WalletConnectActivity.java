@@ -40,9 +40,9 @@ import java.util.List;
 public class WalletConnectActivity extends AppCompatActivity {
     public static final String D_APP_URL = "D_APP_URL";
     public static final String SIGN_TRANSACTION_DATA = "SIGN_TRANSACTION_DATA";
-    private WalletConnectHelper walletConnectHelper;
     private final List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
-    private DAppAdapter adapter;
+    private WalletConnectHelper mWalletConnectHelper;
+    private DAppAdapter mDAppAdapter;
     private ProgressDialog mProgressDialog;
     private AppCompatButton mBtnDisconnect;
     private Sign.Model.SessionProposal mSessionProposal;
@@ -147,7 +147,7 @@ public class WalletConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_connect);
-        walletConnectHelper = WalletConnectHelper.getInstance();
+        mWalletConnectHelper = WalletConnectHelper.getInstance();
         initWalletConnect();
         initView();
     }
@@ -156,7 +156,7 @@ public class WalletConnectActivity extends AppCompatActivity {
      * Initialize wallet connect SDK
      */
     private void initWalletConnect() {
-        if (walletConnectHelper == null) {
+        if (mWalletConnectHelper == null) {
             return;
         }
 
@@ -168,7 +168,7 @@ public class WalletConnectActivity extends AppCompatActivity {
                 getString(R.string.wallet_connect_description), "example.wallet", iconList,
                 "kotlin-wallet-wc:/request");
 
-        walletConnectHelper.initializeWalletConnectSDK(getApplication(),
+        mWalletConnectHelper.initializeWalletConnectSDK(getApplication(),
                 getString(R.string.project_id), metadata, walletConnectCallback);
     }
 
@@ -184,11 +184,11 @@ public class WalletConnectActivity extends AppCompatActivity {
         mBtnDisconnect = findViewById(R.id.btn_disconnect);
         mBtnDisconnect.setOnClickListener(view -> disconnect());
 
-        adapter = new DAppAdapter(mDAppList);
+        mDAppAdapter = new DAppAdapter(mDAppList);
         RecyclerView recyclerViewDApps = findViewById(R.id.recyclerview_dapp);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerViewDApps.setLayoutManager(layoutManager);
-        recyclerViewDApps.setAdapter(adapter);
+        recyclerViewDApps.setAdapter(mDAppAdapter);
 
         ViewGroup.LayoutParams params = recyclerViewDApps.getLayoutParams();
         recyclerViewDApps.setLayoutParams(params);
@@ -199,7 +199,7 @@ public class WalletConnectActivity extends AppCompatActivity {
      * Enable/Disable disconnect button
      */
     private void updateDisconnectButton() {
-        if (adapter.getItemCount() == 0) {
+        if (mDAppAdapter.getItemCount() == 0) {
             mBtnDisconnect.setBackgroundColor(getColor(android.R.color.darker_gray));
             mBtnDisconnect.setEnabled(false);
         } else {
@@ -213,7 +213,7 @@ public class WalletConnectActivity extends AppCompatActivity {
      */
     @SuppressLint("NotifyDataSetChanged")
     private void updateSessionList() {
-        List<Sign.Model.Session> sessionList = walletConnectHelper.getConnectedSessions();
+        List<Sign.Model.Session> sessionList = mWalletConnectHelper.getConnectedSessions();
         if (sessionList == null) {
             return;
         }
@@ -225,7 +225,7 @@ public class WalletConnectActivity extends AppCompatActivity {
             mDAppList.add(data);
         }
         runOnUiThread(() -> {
-            adapter.notifyDataSetChanged();
+            mDAppAdapter.notifyDataSetChanged();
             updateDisconnectButton();
         });
     }
@@ -236,10 +236,10 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param paringURI String paring URI
      */
     private void connectToDApp(String paringURI) {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
 
-        walletConnectHelper.connect(paringURI);
+        mWalletConnectHelper.connect(paringURI);
     }
 
     /**
@@ -248,10 +248,10 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
     private void approveDApp(Sign.Model.SessionProposal sessionProposal) {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
 
-        walletConnectHelper.approveConnectionRequest(sessionProposal);
+        mWalletConnectHelper.approveConnectionRequest(sessionProposal);
     }
 
     /**
@@ -260,10 +260,10 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
     private void rejectDApp(Sign.Model.SessionProposal sessionProposal) {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
 
-        walletConnectHelper.rejectConnectionRequest(sessionProposal);
+        mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
     }
 
     /**
@@ -272,9 +272,9 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param sessionRequest {@link Sign.Model.SessionRequest}
      */
     private void signTransaction(Sign.Model.SessionRequest sessionRequest) {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
-        walletConnectHelper.signTransaction(sessionRequest);
+        mWalletConnectHelper.signTransaction(sessionRequest);
     }
 
     /**
@@ -283,23 +283,23 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param sessionRequest {@link Sign.Model.SessionRequest}
      */
     private void rejectTransaction(Sign.Model.SessionRequest sessionRequest) {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
-        walletConnectHelper.rejectTransaction(sessionRequest);
+        mWalletConnectHelper.rejectTransaction(sessionRequest);
     }
 
     /**
      * Disconnect decentralized app
      */
     private void disconnect() {
-        if (walletConnectHelper == null)
+        if (mWalletConnectHelper == null)
             return;
 
-        if (adapter.getItemCount() == 0)
+        if (mDAppAdapter.getItemCount() == 0)
             return;
 
-        String topic = adapter.getSelectedItem().session.getTopic();
-        String url = adapter.getSelectedItem().session.getMetaData().getUrl();
+        String topic = mDAppAdapter.getSelectedItem().session.getTopic();
+        String url = mDAppAdapter.getSelectedItem().session.getMetaData().getUrl();
         String message = getString(R.string.label_do_you_want_to_disconnect, url);
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(null, getString(R.string.label_are_you_sure),
@@ -309,7 +309,7 @@ public class WalletConnectActivity extends AppCompatActivity {
                 dialog -> {
                     errorDialog.dismiss();
                     // call disconnect
-                    walletConnectHelper.disconnect(topic);
+                    mWalletConnectHelper.disconnect(topic);
                     updateSessionList();
                 });
     }

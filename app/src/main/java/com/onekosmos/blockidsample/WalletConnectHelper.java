@@ -33,39 +33,39 @@ public class WalletConnectHelper {
     private static final String WALLET_CONNECT_PROD_RELAY_URL = "relay.walletconnect.com";
     private static final String chainNamespace = "eip155";
     private static final String chainReference = "1";
-    private WalletConnectCallback walletConnectCallback;
+    private WalletConnectCallback mWalletConnectCallback;
     private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
         @Override
         public void onConnectionStateChange(@NonNull Sign.Model.ConnectionState connectionState) {
-            walletConnectCallback.onConnectionStateChange(connectionState);
+            mWalletConnectCallback.onConnectionStateChange(connectionState);
         }
 
         @Override
         public void onError(@NonNull Sign.Model.Error error) {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
         }
 
         @Override
         public void onSessionProposal(@NonNull Sign.Model.SessionProposal sessionProposal) {
-            walletConnectCallback.onSessionProposal(sessionProposal);
+            mWalletConnectCallback.onSessionProposal(sessionProposal);
         }
 
         @Override
         public void onSessionSettleResponse(@NonNull Sign.Model.SettledSessionResponse
                                                     settledSessionResponse) {
-            walletConnectCallback.onSessionSettleResponse((Sign.Model.SettledSessionResponse.Result)
-                    settledSessionResponse);
+            mWalletConnectCallback.onSessionSettleResponse(
+                    (Sign.Model.SettledSessionResponse.Result) settledSessionResponse);
         }
 
 
         @Override
         public void onSessionDelete(@NonNull Sign.Model.DeletedSession deletedSession) {
-            walletConnectCallback.onSessionDelete(deletedSession);
+            mWalletConnectCallback.onSessionDelete(deletedSession);
         }
 
         @Override
         public void onSessionRequest(@NonNull Sign.Model.SessionRequest sessionRequest) {
-            walletConnectCallback.onSessionRequest(sessionRequest);
+            mWalletConnectCallback.onSessionRequest(sessionRequest);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class WalletConnectHelper {
                                            @NonNull String projectId,
                                            @NonNull Sign.Model.AppMetaData metaData,
                                            @NonNull WalletConnectCallback callback) {
-        sharedInstance.walletConnectCallback = callback;
+        sharedInstance.mWalletConnectCallback = callback;
         if (TextUtils.isEmpty(projectId)) {
             callback.onError(new Sign.Model.Error(new Throwable("ProjectId is empty")));
             return;
@@ -131,7 +131,7 @@ public class WalletConnectHelper {
     public void connect(@NonNull String pairingUri) {
         Sign.Params.Pair pairingParams = new Sign.Params.Pair(pairingUri);
         SignClient.INSTANCE.pair(pairingParams, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
@@ -142,7 +142,7 @@ public class WalletConnectHelper {
         Sign.Model.Namespace.Proposal proposal = requiredNamespaces.get(chainNamespace);
 
         if (proposal == null) {
-            walletConnectCallback.onError(new Sign.Model.Error(
+            mWalletConnectCallback.onError(new Sign.Model.Error(
                     new Throwable("Invalid namespace")));
             return;
         }
@@ -165,7 +165,7 @@ public class WalletConnectHelper {
                 sessionProposal.getProposerPublicKey(), namespaces, null);
 
         SignClient.INSTANCE.approveSession(approve, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
@@ -178,7 +178,7 @@ public class WalletConnectHelper {
         Sign.Params.Reject reject = new Sign.Params.Reject(sessionProposal.getProposerPublicKey(),
                 "Reject Session", 406);
         SignClient.INSTANCE.rejectSession(reject, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
@@ -188,7 +188,7 @@ public class WalletConnectHelper {
 
         String method = request.getMethod();
         if (!method.equalsIgnoreCase("eth_signTransaction")) {
-            walletConnectCallback.onError(new Sign.Model.Error(
+            mWalletConnectCallback.onError(new Sign.Model.Error(
                     new Throwable("Invalid session request")));
             return;
         }
@@ -222,7 +222,7 @@ public class WalletConnectHelper {
                         hexValue
                 ));
         SignClient.INSTANCE.respond(response, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
@@ -235,7 +235,7 @@ public class WalletConnectHelper {
                         "Kotlin Wallet Error"));
 
         SignClient.INSTANCE.respond(result, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
@@ -247,7 +247,7 @@ public class WalletConnectHelper {
     public void disconnect(String sessionTopic) {
         Sign.Params.Disconnect disconnect = new Sign.Params.Disconnect(sessionTopic);
         SignClient.INSTANCE.disconnect(disconnect, error -> {
-            walletConnectCallback.onError(error);
+            mWalletConnectCallback.onError(error);
             return null;
         });
     }
