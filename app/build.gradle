@@ -81,6 +81,7 @@ dependencies {
 
     // wallet
 //    implementation 'org.web3j:core:3.3.1-android'
+    implementation 'org.web3j:core:4.8.7-android'
 
     //generate mnemonics
     implementation('org.bitcoinj:bitcoinj-core:0.16.1') {
@@ -155,5 +156,4 @@ dependencies {
     implementation 'com.walletconnect:WalletConnectKotlinV2:2.0.0-rc.2'
 
     implementation("org.web3j:utils:5.0.0")
-    implementation("org.web3j:core:4.8.7-android")
 }
