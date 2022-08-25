@@ -98,7 +98,7 @@ public class WalletConnectHelper {
         Sign.Model.Namespace.Proposal proposal = requiredNamespaces.get(chainNamespace);
 
         if (proposal == null) {
-            Log.e("Approve Dapp", "Chain Name space not found in session proposal");
+            Log.e("Approve DApp", "Chain Name space not found in session proposal");
             return;
         }
 
