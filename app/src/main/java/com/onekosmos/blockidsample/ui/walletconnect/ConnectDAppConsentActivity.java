@@ -17,7 +17,6 @@ import com.onekosmos.blockidsample.R;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class ConnectDAppConsentActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,21 +27,21 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
     private void initView() {
         String dAppUrl = getIntent().hasExtra(D_APP_URL) ?
                 getIntent().getStringExtra(D_APP_URL) : "";
-        AppCompatTextView mTxtHeader = findViewById(R.id.txt_dapp_url);
-        mTxtHeader.setText(dAppUrl);
+        AppCompatTextView txtHeader = findViewById(R.id.txt_dapp_url);
+        txtHeader.setText(dAppUrl);
 
-        AppCompatTextView mTxtWalletAddressValue = findViewById(R.id.txt_wallet_address);
-        mTxtWalletAddressValue.setText(BlockIDSDK.getInstance().getDID());
+        AppCompatTextView txtWalletAddressValue = findViewById(R.id.txt_wallet_address);
+        txtWalletAddressValue.setText(BlockIDSDK.getInstance().getDID());
 
-        AppCompatButton mBtnReject = findViewById(R.id.btn_reject_dapp_consent);
-        AppCompatButton mBtnApprove = findViewById(R.id.btn_approve_dapp_consent);
+        AppCompatButton btnReject = findViewById(R.id.btn_reject_dapp_consent);
+        AppCompatButton btnApprove = findViewById(R.id.btn_approve_dapp_consent);
 
-        mBtnReject.setOnClickListener(v -> {
+        btnReject.setOnClickListener(view -> {
             setResult(RESULT_CANCELED);
             finish();
         });
 
-        mBtnApprove.setOnClickListener(v -> {
+        btnApprove.setOnClickListener(view -> {
             setResult(RESULT_OK);
             finish();
         });

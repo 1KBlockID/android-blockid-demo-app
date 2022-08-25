@@ -38,6 +38,7 @@ import java.util.List;
  */
 public class WalletConnectActivity extends AppCompatActivity {
     public static final String D_APP_URL = "D_APP_URL";
+    public static final String SIGN_TRANSACTION_DATA = "SIGN_TRANSACTION_DATA";
     private WalletConnectHelper walletConnectHelper;
     private final List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
     private DAppAdapter adapter;
@@ -45,6 +46,8 @@ public class WalletConnectActivity extends AppCompatActivity {
     private AppCompatButton mBtnDisconnect;
     private boolean isConnected;
     private Sign.Model.SessionProposal mSessionProposal;
+    private Sign.Model.SessionRequest mSessionRequest;
+
     private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
             StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_CANCELED) {
@@ -79,6 +82,19 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
     });
 
+    private final ActivityResultLauncher<Intent> signTransaction = registerForActivityResult(new
+            StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_CANCELED) {
+            rejectTransaction(mSessionRequest);
+            mSessionRequest = null;
+            return;
+        }
+
+        if (result.getResultCode() == RESULT_OK) {
+            signTransaction(mSessionRequest);
+            mSessionRequest = null;
+        }
+    });
 
     private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
         @Override
@@ -91,8 +107,11 @@ public class WalletConnectActivity extends AppCompatActivity {
 
         @Override
         public void onSessionRequest(@NonNull Sign.Model.SessionRequest sessionRequest) {
+            // sign transaction request
             Log.e("Called", "onSessionRequest-->" +
                     BIDUtil.objectToJSONString(sessionRequest, true));
+            mSessionRequest = sessionRequest;
+            startSignTransactionConsent(sessionRequest);
         }
 
         @Override
@@ -208,7 +227,6 @@ public class WalletConnectActivity extends AppCompatActivity {
             return;
         }
 
-        Log.e("sessionList", "" + sessionList.size());
         mDAppList.clear();
         for (int i = 0; i < sessionList.size(); i++) {
             DAppAdapter.DAppData data = new DAppAdapter.DAppData();
@@ -257,6 +275,18 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper.rejectDApp(sessionProposal);
     }
 
+    private void signTransaction(Sign.Model.SessionRequest sessionRequest) {
+        if (walletConnectHelper == null)
+            return;
+        walletConnectHelper.signTransaction(sessionRequest);
+    }
+
+    private void rejectTransaction(Sign.Model.SessionRequest sessionRequest) {
+        if (walletConnectHelper == null)
+            return;
+        walletConnectHelper.rejectTransaction(sessionRequest);
+    }
+
     /**
      * Disconnect from dApp
      */
@@ -290,6 +320,18 @@ public class WalletConnectActivity extends AppCompatActivity {
         Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
         connectDAppIntent.putExtra(D_APP_URL, dAppURL);
         connectionResult.launch(connectDAppIntent);
+    }
+
+    /**
+     * Open Connect to DApp Activity
+     *
+     * @param sessionRequest
+     */
+    private void startSignTransactionConsent(Sign.Model.SessionRequest sessionRequest) {
+        Intent connectDAppIntent = new Intent(this, TransactionRequestConsentActivity.class);
+        connectDAppIntent.putExtra(SIGN_TRANSACTION_DATA, BIDUtil.objectToJSONString(sessionRequest,
+                true));
+        signTransaction.launch(connectDAppIntent);
     }
 
     /**
