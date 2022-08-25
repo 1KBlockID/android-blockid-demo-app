@@ -209,4 +209,6 @@
     <string name="label_viw_your_wallet_balance">- View your wallet balance, activity</string>
     <string name="label_request_approval_for_transactions">- Request approval for transactions</string>
     <string name="label_invalid_session_request">Invalid session request.</string>
+    <string name="label_are_you_sure">Are you sure?</string>
+    <string name="label_do_you_want_to_disconnect">Do you want to disconnect from %1$s</string>
 </resources>

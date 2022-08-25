@@ -295,9 +295,21 @@ public class WalletConnectActivity extends AppCompatActivity {
             return;
 
         String topic = adapter.getSelectedItem().session.getTopic();
-        walletConnectHelper.disconnect(topic);
-        updateSessionList();
+        String url = adapter.getSelectedItem().session.getMetaData().getUrl();
+        String message = getString(R.string.label_do_you_want_to_disconnect, url);
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null, getString(R.string.label_are_you_sure),
+                message, getString(R.string.label_yes), getString(R.string.label_no),
+                (dialogInterface, which) ->
+                        errorDialog.dismiss(),
+                dialog -> {
+                    errorDialog.dismiss();
+                    // call disconnect
+                    walletConnectHelper.disconnect(topic);
+                    updateSessionList();
+                });
     }
+
 
     /**
      * Open scan QR code activity

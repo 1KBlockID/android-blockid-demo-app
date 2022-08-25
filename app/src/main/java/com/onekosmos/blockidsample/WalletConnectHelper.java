@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockid.sdk.wallet.BIDWallet;
+import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
 import com.walletconnect.sign.client.SignClient;
 import com.walletconnect.sign.client.SignInterface;
