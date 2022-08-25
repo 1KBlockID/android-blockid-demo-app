@@ -124,7 +124,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity
-            android:name=".ui.walletconnect.TransactionRequestConsentActivity"
+            android:name=".ui.walletconnect.SignTransactionConsentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity

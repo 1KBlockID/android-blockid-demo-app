@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.walletconnect.TransactionRequestConsentActivity">
+    tools:context=".ui.walletconnect.SignTransactionConsentActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_title_sign_transaction"
@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_24dp"
         android:layout_marginTop="@dimen/dimen_55dp"
+        android:gravity="center"
         android:text="@string/label_sign_transaction"
-        android:textAlignment="center"
         android:textColor="@color/primary3"
         android:textSize="@dimen/dimen_20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_24dp"
         android:layout_marginTop="@dimen/dimen_12dp"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@color/primary3"
         android:textSize="@dimen/dimen_20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -190,6 +190,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_reject_sign_transaction"
+        style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
         android:layout_marginStart="@dimen/dimen_26dp"
@@ -197,15 +198,15 @@
         android:layout_marginBottom="@dimen/dimen_30dp"
         android:background="@color/secondary5"
         android:text="@string/label_reject"
-        android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_approve_sign_transaction"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_approve_sign_transaction"
+        style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
         android:layout_marginStart="@dimen/dimen_10dp"
@@ -213,9 +214,8 @@
         android:layout_marginBottom="@dimen/dimen_30dp"
         android:background="@color/black"
         android:text="@string/label_approve"
-        android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btn_reject_sign_transaction" />

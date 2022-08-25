@@ -18,12 +18,12 @@ import com.walletconnect.sign.client.Sign;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class TransactionRequestConsentActivity extends AppCompatActivity {
+public class SignTransactionConsentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transaction_request_consent_screen);
+        setContentView(R.layout.activity_sign_transaction_consent);
         initView();
     }
 

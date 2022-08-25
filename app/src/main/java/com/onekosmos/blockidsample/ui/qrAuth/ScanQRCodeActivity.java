@@ -34,6 +34,7 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
  */
 public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanResponseListener {
     public static final String IS_FROM_WALLET_CONNECT = "IS_FROM_WALLET_CONNECT";
+    public static final String WALLET_CONNECT_QR_DATA = "WALLET_CONNECT_QR_DATA";
     private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private final String[] K_CAMERA_PERMISSION = new String[]{
@@ -129,7 +130,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         // wallet connect
         if (isFromWalletConnect) {
             Intent resultIntent = new Intent();
-            resultIntent.putExtra("wc_data", qrResponse);
+            resultIntent.putExtra(WALLET_CONNECT_QR_DATA, qrResponse);
             setResult(RESULT_OK, resultIntent);
             this.finish();
             return;
