@@ -45,6 +45,39 @@ public class WalletConnectActivity extends AppCompatActivity {
     private AppCompatButton mBtnDisconnect;
     private boolean isConnected;
     private Sign.Model.SessionProposal mSessionProposal;
+    private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
+            StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_CANCELED) {
+            Toast.makeText(this, getString(R.string.label_qr_code_scanning_canceled),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (result.getResultCode() == RESULT_OK) {
+            String qrData = result.getData() != null ?
+                    result.getData().getStringExtra("wc_data") : null;
+            Log.e("Data", "-->" + qrData);
+            if (!validateQRCodeData(qrData)) {
+                showErrorDialog(getString(R.string.label_invalid_code),
+                        getString(R.string.label_unsupported_qr_code));
+            }
+            connectToDApp(qrData);
+        }
+    });
+
+    private final ActivityResultLauncher<Intent> connectionResult = registerForActivityResult(new
+            StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_CANCELED) {
+            rejectDApp(mSessionProposal);
+            mSessionProposal = null;
+            return;
+        }
+
+        if (result.getResultCode() == RESULT_OK) {
+            approveDApp(mSessionProposal);
+            mSessionProposal = null;
+        }
+    });
 
 
     private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
@@ -53,8 +86,7 @@ public class WalletConnectActivity extends AppCompatActivity {
             Log.e("Called", "onSessionProposal-->" +
                     BIDUtil.objectToJSONString(sessionProposal, true));
             mSessionProposal = sessionProposal;
-            String dAppUrl = sessionProposal.getUrl();
-            startDAppConnectActivity(dAppUrl);
+            startConnectDAppConsentActivity(sessionProposal.getUrl());
         }
 
         @Override
@@ -101,49 +133,6 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
     };
 
-    private void startDAppConnectActivity(String dAppURL) {
-        Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
-        connectDAppIntent.putExtra(D_APP_URL, dAppURL);
-        connectionResult.launch(connectDAppIntent);
-    }
-
-    private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
-            StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_CANCELED) {
-            Toast.makeText(this, getString(R.string.label_qr_code_scanning_canceled),
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (result.getResultCode() == RESULT_OK) {
-            // process wallet data
-            String qrData = result.getData() != null ?
-                    result.getData().getStringExtra("wc_data") : null;
-            Log.e("Data", "-->" + qrData);
-            if (!validateQRCodeData(qrData)) {
-                showErrorDialog(getString(R.string.label_invalid_code),
-                        getString(R.string.label_unsupported_qr_code));
-            }
-            connectToDApp(qrData);
-        }
-    });
-
-    private final ActivityResultLauncher<Intent> connectionResult = registerForActivityResult(new
-            StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_CANCELED) {
-            mSessionProposal = null;
-            Toast.makeText(this, getString(R.string.label_reject_proposal),
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (result.getResultCode() == RESULT_OK) {
-            // process wallet data
-            approveDApp(mSessionProposal);
-            mSessionProposal = null;
-        }
-    });
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +140,26 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper = WalletConnectHelper.getInstance();
         initWalletConnect();
         initView();
+    }
+
+    /**
+     * Initialize wallet connect SDK
+     */
+    private void initWalletConnect() {
+        if (walletConnectHelper == null) {
+            return;
+        }
+
+        showProgressDialog();
+        // FIXME  pankti need talk to vinoth about url and redirect
+        List<String> iconList = new ArrayList<>();
+        iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
+        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(getString(R.string.app_name),
+                getString(R.string.wallet_connect_description), "example.wallet", iconList,
+                "kotlin-wallet-wc:/request");
+
+        walletConnectHelper.initializeWalletConnectSDK(getApplication(),
+                getString(R.string.project_id), metadata, walletDelegate);
     }
 
     /**
@@ -176,6 +185,9 @@ public class WalletConnectActivity extends AppCompatActivity {
         updateDisconnectUi();
     }
 
+    /**
+     * Enable/Disable disconnect button
+     */
     private void updateDisconnectUi() {
         if (adapter.getItemCount() == 0) {
             mBtnDisconnect.setBackgroundColor(getColor(android.R.color.darker_gray));
@@ -184,23 +196,6 @@ public class WalletConnectActivity extends AppCompatActivity {
             mBtnDisconnect.setBackgroundColor(getColor(android.R.color.black));
             mBtnDisconnect.setEnabled(true);
         }
-    }
-
-    private void initWalletConnect() {
-        if (walletConnectHelper == null) {
-            return;
-        }
-
-        showProgressDialog();
-        // FIXME  pankti need talk to vinoth about url and redirect
-        List<String> iconList = new ArrayList<>();
-        iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
-        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(getString(R.string.app_name),
-                getString(R.string.wallet_connect_description), "example.wallet", iconList,
-                "kotlin-wallet-wc:/request");
-
-        walletConnectHelper.initializeWalletConnectSDK(getApplication(),
-                getString(R.string.project_id), metadata, walletDelegate);
     }
 
     /**
@@ -229,19 +224,19 @@ public class WalletConnectActivity extends AppCompatActivity {
     /**
      * Connect to DApp
      *
-     * @param paringUri
+     * @param paringURI String paring URI
      */
-    private void connectToDApp(String paringUri) {
+    private void connectToDApp(String paringURI) {
         if (walletConnectHelper == null)
             return;
 
-        walletConnectHelper.connect(paringUri);
+        walletConnectHelper.connect(paringURI);
     }
 
     /**
      * Approve DApp
      *
-     * @param sessionProposal
+     * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
     private void approveDApp(Sign.Model.SessionProposal sessionProposal) {
         if (walletConnectHelper == null)
@@ -250,6 +245,21 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper.approveDApp(sessionProposal);
     }
 
+    /**
+     * Reject DApp
+     *
+     * @param sessionProposal {@link Sign.Model.SessionProposal}
+     */
+    private void rejectDApp(Sign.Model.SessionProposal sessionProposal) {
+        if (walletConnectHelper == null)
+            return;
+
+        walletConnectHelper.rejectDApp(sessionProposal);
+    }
+
+    /**
+     * Disconnect from dApp
+     */
     private void disconnect() {
         if (walletConnectHelper == null)
             return;
@@ -272,17 +282,24 @@ public class WalletConnectActivity extends AppCompatActivity {
     }
 
     /**
+     * Open Connect to DApp Activity
+     *
+     * @param dAppURL String DApp URL
+     */
+    private void startConnectDAppConsentActivity(String dAppURL) {
+        Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
+        connectDAppIntent.putExtra(D_APP_URL, dAppURL);
+        connectionResult.launch(connectDAppIntent);
+    }
+
+    /**
      * Validate QR Code data
      * If QR data is invalid show error dialog
      *
      * @param qrData QR code data
      */
     private boolean validateQRCodeData(String qrData) {
-        if (TextUtils.isEmpty(qrData)) {
-            return false;
-        }
-        // check other conditions
-        return true;
+        return !TextUtils.isEmpty(qrData);
     }
 
     /**
@@ -293,12 +310,14 @@ public class WalletConnectActivity extends AppCompatActivity {
      */
     private void showErrorDialog(String title, String message) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-            errorDialog.dismiss();
-        };
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                errorDialog.dismiss();
         errorDialog.show(null, title, message, onDismissListener);
     }
 
+    /**
+     * Show progress dialog
+     */
     private void showProgressDialog() {
         if (mProgressDialog == null)
             mProgressDialog = new ProgressDialog(this,
@@ -307,6 +326,9 @@ public class WalletConnectActivity extends AppCompatActivity {
         mProgressDialog.show();
     }
 
+    /**
+     * Hide progress dialog
+     */
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing())
             mProgressDialog.dismiss();

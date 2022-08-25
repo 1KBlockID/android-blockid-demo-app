@@ -129,6 +129,19 @@ public class WalletConnectHelper {
         });
     }
 
+    public void rejectDApp(Sign.Model.SessionProposal sessionProposal) {
+        Sign.Params.Reject reject = new Sign.Params.Reject(sessionProposal.getProposerPublicKey(),
+                "Reject Session", 406);
+        SignClient.INSTANCE.rejectSession(reject, error -> {
+            if (error != null) {
+                Log.e("Reject Dapp", error.getThrowable().getMessage());
+            } else {
+                Log.e("Rejected", "Successfully");
+            }
+            return null;
+        });
+    }
+
     public List<Sign.Model.Session> getConnectedSessions() {
         return SignClient.INSTANCE.getListOfSettledSessions();
     }
