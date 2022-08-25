@@ -132,7 +132,7 @@ public class WalletConnectActivity extends AppCompatActivity {
             StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_CANCELED) {
             mSessionProposal = null;
-            Toast.makeText(this, getString(R.string.label_qr_code_scanning_canceled),
+            Toast.makeText(this, getString(R.string.label_reject_proposal),
                     Toast.LENGTH_SHORT).show();
             return;
         }

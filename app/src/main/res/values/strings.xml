@@ -206,5 +206,6 @@
     <string name="label_reject">Reject</string>
     <string name="label_approve">Approve</string>
     <string name="label_connect_wallet">Would you like to connect with your wallet </string>
+    <string name="label_reject_proposal">Wallet connect proposal rejected</string>
 
 </resources>
