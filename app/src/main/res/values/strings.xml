@@ -207,5 +207,7 @@
     <string name="label_approve">Approve</string>
     <string name="label_connect_wallet">Would you like to connect with your wallet </string>
     <string name="label_reject_proposal">Wallet connect proposal rejected</string>
-
+    <string name="label_wallet_address">Wallet Address:</string>
+    <string name="label_viw_your_wallet_balance">- View your wallet balance, activity</string>
+    <string name="label_request_approval_for_transactions">- Request approval for transactions</string>
 </resources>
