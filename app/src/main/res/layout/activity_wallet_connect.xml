@@ -64,7 +64,7 @@
         android:paddingHorizontal="@dimen/dimen_20dp"
         android:text="@string/label_disconnect"
         android:textAllCaps="false"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

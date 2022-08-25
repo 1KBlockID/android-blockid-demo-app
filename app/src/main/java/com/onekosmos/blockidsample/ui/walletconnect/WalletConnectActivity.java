@@ -41,6 +41,7 @@ public class WalletConnectActivity extends AppCompatActivity {
     private final List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
     private DAppAdapter adapter;
     private ProgressDialog mProgressDialog;
+    private AppCompatButton mBtnDisconnect;
     private boolean isConnected;
 
     private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
@@ -134,9 +135,8 @@ public class WalletConnectActivity extends AppCompatActivity {
         AppCompatButton btnConnect = findViewById(R.id.btn_connect_to_d_app);
         btnConnect.setOnClickListener(view -> openScanQRCodeActivity());
 
-        AppCompatButton btnDisconnect = findViewById(R.id.btn_disconnect);
-        btnDisconnect.setOnClickListener(view -> disconnect(
-                adapter.getSelectedItem().session.getTopic()));
+        mBtnDisconnect = findViewById(R.id.btn_disconnect);
+        mBtnDisconnect.setOnClickListener(view -> disconnect());
 
         adapter = new DAppAdapter(mDAppList);
         RecyclerView recyclerViewDApps = findViewById(R.id.recyclerview_dapp);
@@ -146,6 +146,17 @@ public class WalletConnectActivity extends AppCompatActivity {
 
         ViewGroup.LayoutParams params = recyclerViewDApps.getLayoutParams();
         recyclerViewDApps.setLayoutParams(params);
+        updateDisconnectUi();
+    }
+
+    private void updateDisconnectUi() {
+        if (adapter.getItemCount() == 0) {
+            mBtnDisconnect.setBackgroundColor(getColor(android.R.color.darker_gray));
+            mBtnDisconnect.setEnabled(false);
+        } else {
+            mBtnDisconnect.setBackgroundColor(getColor(android.R.color.black));
+            mBtnDisconnect.setEnabled(true);
+        }
     }
 
     private void initWalletConnect() {
@@ -182,7 +193,10 @@ public class WalletConnectActivity extends AppCompatActivity {
             data.session = sessionList.get(i);
             mDAppList.add(data);
         }
-        runOnUiThread(() -> adapter.notifyDataSetChanged());
+        runOnUiThread(() -> {
+            adapter.notifyDataSetChanged();
+            updateDisconnectUi();
+        });
     }
 
     /**
@@ -209,10 +223,14 @@ public class WalletConnectActivity extends AppCompatActivity {
         walletConnectHelper.approveDApp(sessionProposal);
     }
 
-    private void disconnect(String topic) {
+    private void disconnect() {
         if (walletConnectHelper == null)
             return;
 
+        if (adapter.getItemCount() == 0)
+            return;
+
+        String topic = adapter.getSelectedItem().session.getTopic();
         walletConnectHelper.disconnect(topic);
         getConnectedSession();
     }
