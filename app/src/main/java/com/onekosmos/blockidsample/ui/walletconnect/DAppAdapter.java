@@ -50,6 +50,9 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (mSelectedPosition >= mDAppList.size())
+            mSelectedPosition = 0;
+
         holder.mRadioButton.setText(Objects.requireNonNull(
                 mDAppList.get(position).session.getMetaData()).getUrl());
 
