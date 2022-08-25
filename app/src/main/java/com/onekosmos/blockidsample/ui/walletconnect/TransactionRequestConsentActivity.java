@@ -31,9 +31,6 @@ public class TransactionRequestConsentActivity extends AppCompatActivity {
 
     private void initView() {
         mLayoutScr1 = findViewById(R.id.layout_constraint_scr_1);
-        mLayoutScr2 = findViewById(R.id.layout_constraint_scr_2);
-        mLayoutScr1.setVisibility(View.VISIBLE);
-        mLayoutScr2.setVisibility(View.GONE);
         mTxtHeader = findViewById(R.id.txt_title_header);
         mTxtSubHeader = findViewById(R.id.txt_sub_heading);
         mTxtFromAddressValue = findViewById(R.id.txt_from_address_value);
