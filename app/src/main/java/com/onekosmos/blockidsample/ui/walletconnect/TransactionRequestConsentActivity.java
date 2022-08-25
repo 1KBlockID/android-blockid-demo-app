@@ -39,7 +39,7 @@ public class TransactionRequestConsentActivity extends AppCompatActivity {
         mTxtGasPriceValue = findViewById(R.id.txt_gas_price_value);
         mTxtDataValue = findViewById(R.id.txt_data_value);
         mTxtNonceValue = findViewById(R.id.txt_nonce_value);
-        mTxtWalletAddressValue = findViewById(R.id.txt_wallet_from_address);
+        mTxtWalletAddressValue = findViewById(R.id.txt_wallet_address);
         mBtnReject = findViewById(R.id.btn_reject);
         mBtnApprove = findViewById(R.id.btn_approve);
 
