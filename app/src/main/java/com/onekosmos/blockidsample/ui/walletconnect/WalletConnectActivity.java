@@ -120,8 +120,14 @@ public class WalletConnectActivity extends AppCompatActivity {
 
         @Override
         public void onSessionRequest(Sign.Model.SessionRequest sessionRequest) {
+            if (!sessionRequest.getRequest().getMethod().equalsIgnoreCase(
+                    "eth_signTransaction")) {
+                runOnUiThread(() -> showErrorDialog(getString(R.string.label_error),
+                        getString(R.string.label_invalid_session_request)));
+                return;
+            }
             mSessionRequest = sessionRequest;
-            startSignTransactionConsent(sessionRequest);
+            startSignTransactionConsentActivity(sessionRequest);
         }
 
         @Override
@@ -319,7 +325,7 @@ public class WalletConnectActivity extends AppCompatActivity {
      *
      * @param sessionRequest {@link Sign.Model.SessionRequest }
      */
-    private void startSignTransactionConsent(Sign.Model.SessionRequest sessionRequest) {
+    private void startSignTransactionConsentActivity(Sign.Model.SessionRequest sessionRequest) {
         Intent connectDAppIntent = new Intent(this, SignTransactionConsentActivity.class);
         connectDAppIntent.putExtra(SIGN_TRANSACTION_DATA, BIDUtil.objectToJSONString(sessionRequest,
                 true));
@@ -346,7 +352,8 @@ public class WalletConnectActivity extends AppCompatActivity {
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
                 errorDialog.dismiss();
-        errorDialog.show(null, title, message, onDismissListener);
+        errorDialog.showWithOneButton(null, title, message, getString(R.string.label_ok),
+                onDismissListener);
     }
 
     /**

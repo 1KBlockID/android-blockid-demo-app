@@ -111,12 +111,10 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
         }
-        AppCompatTextView mTxtBack = findViewById(R.id.txt_back);
         mTxtPleaseWait = findViewById(R.id.txt_please_wait);
         mProgressBar = findViewById(R.id.progress_bar_register);
 
-        AppCompatImageView mImgBack = findViewById(R.id.img_back);
-        mTxtBack.setOnClickListener(view -> onBackPressed());
+        AppCompatImageView mImgBack = findViewById(R.id.img_back_scan_qr);
         mImgBack.setOnClickListener(view -> onBackPressed());
     }
 

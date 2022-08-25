@@ -192,7 +192,6 @@
     <!-- Wallet Connect -->
     <string name="wallet_connect_description">1Kosmos WalletConnect Demo</string>
     <string name="label_wallet_connect">WalletConnect</string>
-<!--    <string name="label_decentralized_apps">Decentralized APPs</string>-->
     <string name="label_connect_to_dapp">Connect to DApp</string>
     <string name="label_disconnect">Disconnect</string>
     <string name="label_qr_code_scanning_canceled">QR code scanning canceled</string>
@@ -205,9 +204,9 @@
     <string name="label_nonce">Nonce:</string>
     <string name="label_reject">Reject</string>
     <string name="label_approve">Approve</string>
-    <string name="label_connect_wallet">Would you like to connect with your wallet </string>
-    <string name="label_reject_proposal">Wallet connect proposal rejected</string>
+    <string name="label_connect_wallet">Would you like to connect with your wallet</string>
     <string name="label_wallet_address">Wallet Address:</string>
     <string name="label_viw_your_wallet_balance">- View your wallet balance, activity</string>
     <string name="label_request_approval_for_transactions">- Request approval for transactions</string>
+    <string name="label_invalid_session_request">Invalid session request.</string>
 </resources>
