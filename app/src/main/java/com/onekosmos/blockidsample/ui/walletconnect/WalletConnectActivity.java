@@ -61,6 +61,7 @@ public class WalletConnectActivity extends AppCompatActivity {
         public void onSessionDelete(@NonNull Sign.Model.DeletedSession deletedSession) {
             Log.e("Called", "onSessionDelete-->" +
                     BIDUtil.objectToJSONString(deletedSession, true));
+            getConnectedSession();
         }
 
         @Override
