@@ -28,12 +28,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WalletConnectHelper implements SignInterface.WalletDelegate {
+public class WalletConnectHelper {
     private static WalletConnectHelper sharedInstance;
     private static final String WALLET_CONNECT_PROD_RELAY_URL = "relay.walletconnect.com";
     private static final String chainNamespace = "eip155";
     private static final String chainReference = "1";
     private WalletConnectCallback walletConnectCallback;
+    private final SignInterface.WalletDelegate walletDelegate = new SignInterface.WalletDelegate() {
+        @Override
+        public void onConnectionStateChange(@NonNull Sign.Model.ConnectionState connectionState) {
+            walletConnectCallback.onConnectionStateChange(connectionState);
+        }
+
+        @Override
+        public void onError(@NonNull Sign.Model.Error error) {
+            walletConnectCallback.onError(error);
+        }
+
+        @Override
+        public void onSessionProposal(@NonNull Sign.Model.SessionProposal sessionProposal) {
+            walletConnectCallback.onSessionProposal(sessionProposal);
+        }
+
+        @Override
+        public void onSessionSettleResponse(@NonNull Sign.Model.SettledSessionResponse
+                                                    settledSessionResponse) {
+            walletConnectCallback.onSessionSettleResponse(settledSessionResponse);
+        }
+
+
+        @Override
+        public void onSessionDelete(@NonNull Sign.Model.DeletedSession deletedSession) {
+            walletConnectCallback.onSessionDelete(deletedSession);
+        }
+
+        @Override
+        public void onSessionRequest(@NonNull Sign.Model.SessionRequest sessionRequest) {
+            walletConnectCallback.onSessionRequest(sessionRequest);
+        }
+
+        @Override
+        public void onSessionUpdateResponse(@NonNull Sign.Model.SessionUpdateResponse
+                                                    sessionUpdateResponse) {
+            // FIXME tbd with vinoth
+        }
+    };
 
     /**
      * private constructor
@@ -85,7 +124,7 @@ public class WalletConnectHelper implements SignInterface.WalletDelegate {
             return null;
         });
 
-        SignClient.INSTANCE.setWalletDelegate(sharedInstance);
+        SignClient.INSTANCE.setWalletDelegate(sharedInstance.walletDelegate);
     }
 
     public void connect(@NonNull String pairingUri) {
@@ -206,44 +245,6 @@ public class WalletConnectHelper implements SignInterface.WalletDelegate {
             walletConnectCallback.onError(error);
             return null;
         });
-    }
-
-    @Override
-    public void onConnectionStateChange(@NonNull Sign.Model.ConnectionState connectionState) {
-        walletConnectCallback.onConnectionStateChange(connectionState);
-    }
-
-    @Override
-    public void onError(@NonNull Sign.Model.Error error) {
-        walletConnectCallback.onError(error);
-    }
-
-    @Override
-    public void onSessionProposal(@NonNull Sign.Model.SessionProposal sessionProposal) {
-        walletConnectCallback.onSessionProposal(sessionProposal);
-    }
-
-    @Override
-    public void onSessionSettleResponse(@NonNull Sign.Model.SettledSessionResponse
-                                                settledSessionResponse) {
-        walletConnectCallback.onSessionSettleResponse(settledSessionResponse);
-    }
-
-
-    @Override
-    public void onSessionDelete(@NonNull Sign.Model.DeletedSession deletedSession) {
-        walletConnectCallback.onSessionDelete(deletedSession);
-    }
-
-    @Override
-    public void onSessionRequest(@NonNull Sign.Model.SessionRequest sessionRequest) {
-        walletConnectCallback.onSessionRequest(sessionRequest);
-    }
-
-    @Override
-    public void onSessionUpdateResponse(@NonNull Sign.Model.SessionUpdateResponse
-                                                sessionUpdateResponse) {
-        // FIXME tbd with vinoth
     }
 
     @Keep
