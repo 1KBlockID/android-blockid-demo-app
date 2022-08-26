@@ -165,7 +165,7 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         List<String> iconList = new ArrayList<>();
-        iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
+        iconList.add("https://www.1kosmos.com/favicon.ico");
 
         showProgressDialog();
         Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
