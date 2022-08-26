@@ -15,9 +15,6 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:remove="android:maxSdkVersion" />
 
-    <!--    android:fullBackupContent="false"-->
-    <!--    tools:replace="android:allowBackup,android:label,android:theme,android:fullBackupContent"-->
-
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
