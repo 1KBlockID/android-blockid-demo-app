@@ -3,14 +3,11 @@ package com.onekosmos.blockidsample.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.ui.login.LoginActivity;
 
 /**

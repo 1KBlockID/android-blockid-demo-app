@@ -55,7 +55,6 @@ public class EnrollmentsDataSource {
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<>();
 
-        arr.add(EnrollmentAssetEnum.ASSET_WALLET_CONNECT);
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
@@ -72,7 +71,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
-//        arr.add(EnrollmentAssetEnum.ASSET_WALLET_CONNECT);
+        arr.add(EnrollmentAssetEnum.ASSET_WALLET_CONNECT);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
     }

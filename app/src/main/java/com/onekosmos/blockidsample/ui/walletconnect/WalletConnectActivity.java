@@ -21,9 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectCallback;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.WalletConnectCallback;
-import com.onekosmos.blockidsample.WalletConnectHelper;
 import com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -51,7 +51,8 @@ public class WalletConnectActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
             StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_CANCELED) {
-            Toast.makeText(this, getString(R.string.label_qr_code_scanning_canceled), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.label_qr_code_scanning_canceled),
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -62,23 +63,24 @@ public class WalletConnectActivity extends AppCompatActivity {
                 showErrorDialog(getString(R.string.label_invalid_code),
                         getString(R.string.label_unsupported_qr_code));
             }
-            connectToDApp(qrData);
+
+            connectSession(qrData);
         }
     });
 
-    private final ActivityResultLauncher<Intent> connectionResult = registerForActivityResult(new
-            StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_CANCELED) {
-            rejectDApp(mSessionProposal);
-            mSessionProposal = null;
-            return;
-        }
+    private final ActivityResultLauncher<Intent> connectionResult = registerForActivityResult(
+            new StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_CANCELED) {
+                    rejectSession(mSessionProposal);
+                    mSessionProposal = null;
+                    return;
+                }
 
-        if (result.getResultCode() == RESULT_OK) {
-            approveDApp(mSessionProposal);
-            mSessionProposal = null;
-        }
-    });
+                if (result.getResultCode() == RESULT_OK) {
+                    approveSession(mSessionProposal);
+                    mSessionProposal = null;
+                }
+            });
 
     private final ActivityResultLauncher<Intent> signTransactionResult = registerForActivityResult(
             new StartActivityForResult(), result -> {
@@ -111,9 +113,11 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSessionSettleResponse(Sign.Model.SettledSessionResponse.Result settleSessionResponse) {
-            runOnUiThread(() -> showSuccessDialog(
-                    settleSessionResponse.getSession().getMetaData().getUrl()));
+        public void onSessionSettleResponse(Sign.Model.SettledSessionResponse.Result
+                                                    settleSessionResponse) {
+            Sign.Model.AppMetaData metaData = settleSessionResponse.getSession().getMetaData();
+            if (metaData != null)
+                runOnUiThread(() -> showSuccessDialog(metaData.getUrl()));
             updateSessionList();
         }
 
@@ -160,16 +164,19 @@ public class WalletConnectActivity extends AppCompatActivity {
             return;
         }
 
-        showProgressDialog();
-        // FIXME  pankti need talk to vinoth about url and redirect
         List<String> iconList = new ArrayList<>();
         iconList.add("https://gblobscdn.gitbook.com/spaces%2F-LJJeCjcLrr53DcT1Ml7%2Favatar.png?alt=media");
-        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(getString(R.string.app_name),
-                getString(R.string.wallet_connect_description), "example.wallet", iconList,
+
+        showProgressDialog();
+        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
+                getString(R.string.app_name),
+                getString(R.string.wallet_connect_description),
+                "example.wallet",
+                iconList,
                 "kotlin-wallet-wc:/request");
 
         mWalletConnectHelper.initializeWalletConnectSDK(getApplication(),
-                getString(R.string.project_id), metadata, walletConnectCallback);
+                getString(R.string.app_project_id), metadata, walletConnectCallback);
     }
 
     /**
@@ -219,9 +226,9 @@ public class WalletConnectActivity extends AppCompatActivity {
         }
 
         mDAppList.clear();
-        for (int i = 0; i < sessionList.size(); i++) {
+        for (int index = 0; index < sessionList.size(); index++) {
             DAppAdapter.DAppData data = new DAppAdapter.DAppData();
-            data.session = sessionList.get(i);
+            data.session = sessionList.get(index);
             mDAppList.add(data);
         }
         runOnUiThread(() -> {
@@ -231,11 +238,11 @@ public class WalletConnectActivity extends AppCompatActivity {
     }
 
     /**
-     * Connect to decentralized app
+     * Connect to session
      *
      * @param paringURI String paring URI
      */
-    private void connectToDApp(String paringURI) {
+    private void connectSession(String paringURI) {
         if (mWalletConnectHelper == null)
             return;
 
@@ -243,11 +250,11 @@ public class WalletConnectActivity extends AppCompatActivity {
     }
 
     /**
-     * Approve decentralized app proposal
+     * Approve session proposal
      *
      * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
-    private void approveDApp(Sign.Model.SessionProposal sessionProposal) {
+    private void approveSession(Sign.Model.SessionProposal sessionProposal) {
         if (mWalletConnectHelper == null)
             return;
 
@@ -255,11 +262,11 @@ public class WalletConnectActivity extends AppCompatActivity {
     }
 
     /**
-     * Reject decentralized app proposal
+     * Reject session proposal
      *
      * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
-    private void rejectDApp(Sign.Model.SessionProposal sessionProposal) {
+    private void rejectSession(Sign.Model.SessionProposal sessionProposal) {
         if (mWalletConnectHelper == null)
             return;
 
@@ -289,7 +296,7 @@ public class WalletConnectActivity extends AppCompatActivity {
     }
 
     /**
-     * Disconnect decentralized app
+     * Disconnect from session
      */
     private void disconnect() {
         if (mWalletConnectHelper == null)
@@ -298,8 +305,10 @@ public class WalletConnectActivity extends AppCompatActivity {
         if (mDAppAdapter.getItemCount() == 0)
             return;
 
-        String topic = mDAppAdapter.getSelectedItem().session.getTopic();
-        String url = mDAppAdapter.getSelectedItem().session.getMetaData().getUrl();
+        Sign.Model.Session session = mDAppAdapter.getSelectedItem().session;
+        String topic = session.getTopic();
+        Sign.Model.AppMetaData metaData = session.getMetaData();
+        String url = metaData != null ? metaData.getUrl() : "";
         String message = getString(R.string.label_do_you_want_to_disconnect, url);
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(null, getString(R.string.label_are_you_sure),
@@ -342,7 +351,8 @@ public class WalletConnectActivity extends AppCompatActivity {
      * @param sessionRequest {@link Sign.Model.SessionRequest }
      */
     private void startSignTransactionConsentActivity(Sign.Model.SessionRequest sessionRequest) {
-        Intent connectDAppIntent = new Intent(this, SignTransactionConsentActivity.class);
+        Intent connectDAppIntent = new Intent(this,
+                SignTransactionConsentActivity.class);
         connectDAppIntent.putExtra(SIGN_TRANSACTION_DATA, BIDUtil.objectToJSONString(sessionRequest,
                 true));
         signTransactionResult.launch(connectDAppIntent);
@@ -360,8 +370,8 @@ public class WalletConnectActivity extends AppCompatActivity {
 
     private void showSuccessDialog(String url) {
         ResultDialog successDialog = new ResultDialog(this, R.drawable.icon_dialog_success,
-                getString(R.string.label_success), getString(R.string.label_wallet_has_been_connected,
-                url));
+                getString(R.string.label_success),
+                getString(R.string.label_wallet_has_been_connected, url));
         successDialog.show();
         new Handler().postDelayed(successDialog::dismiss, 2000);
     }

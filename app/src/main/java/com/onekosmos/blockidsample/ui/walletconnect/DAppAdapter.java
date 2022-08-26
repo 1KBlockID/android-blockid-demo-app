@@ -72,9 +72,9 @@ public class DAppAdapter extends RecyclerView.Adapter<DAppAdapter.ViewHolder> {
                 holder.mRadioButton.setChecked(false);
             }
 
-            for (int i = 0; i < mDAppList.size(); i++) {
-                mDAppList.get(i).checked = i == mSelectedPosition;
-                notifyItemChanged(i);
+            for (int index = 0; index < mDAppList.size(); index++) {
+                mDAppList.get(index).checked = index == mSelectedPosition;
+                notifyItemChanged(index);
             }
         });
     }

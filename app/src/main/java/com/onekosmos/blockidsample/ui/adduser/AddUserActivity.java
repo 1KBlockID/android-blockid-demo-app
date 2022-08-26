@@ -6,8 +6,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_EXPIRED;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_REDEEMED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_EXPIRED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_REDEEMED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -242,7 +242,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 MagicLinkData.class);
         BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
                 magicLinkDataModel.api, magicLinkDataModel.community,
-                (status, error, response, userId) -> {
+                (status, response, userId, error) -> {
                     if (!status) {
                         hideProgress();
                         showError(error);

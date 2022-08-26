@@ -10,8 +10,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.WalletConnectHelper.SessionRequestParams;
 import com.walletconnect.sign.client.Sign;
 
 /**
@@ -28,7 +28,6 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
     }
 
     private void initView() {
-
         Sign.Model.SessionRequest sessionRequest =
                 BIDUtil.JSONStringToObject(getIntent().getStringExtra(SIGN_TRANSACTION_DATA),
                         Sign.Model.SessionRequest.class);
@@ -41,11 +40,19 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
         AppCompatTextView txtNonce = findViewById(R.id.txt_nonce);
 
         if (sessionRequest != null) {
-            txtDAppURL.setText(sessionRequest.getPeerMetaData().getUrl());
-            String params = sessionRequest.getRequest().getParams().replaceAll("[\\[\\]]",
-                    "");
-            SessionRequestParams requestParams = BIDUtil.JSONStringToObject(params,
-                    SessionRequestParams.class);
+            Sign.Model.AppMetaData metaData = sessionRequest.getPeerMetaData();
+            if (metaData == null)
+                return;
+
+            txtDAppURL.setText(metaData.getUrl());
+            String params = sessionRequest.getRequest().getParams().
+                    replaceAll("[\\[\\]]", "");
+            WalletConnectHelper.SessionRequestParams requestParams =
+                    BIDUtil.JSONStringToObject(params,
+                            WalletConnectHelper.SessionRequestParams.class);
+            if (requestParams == null)
+                return;
+
             txtFromAddress.setText(requestParams.from);
             txtToAddress.setText(requestParams.to);
             txtValue.setText(requestParams.value);
