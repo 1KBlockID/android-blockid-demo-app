@@ -145,6 +145,11 @@ public class WalletConnectActivity extends AppCompatActivity {
                         error.getThrowable().getMessage()));
             }
         }
+
+        @Override
+        public void onSessionUpdateResponse(Sign.Model.SessionUpdateResponse sessionUpdateResponse) {
+            updateSessionList();
+        }
     };
 
     @Override
