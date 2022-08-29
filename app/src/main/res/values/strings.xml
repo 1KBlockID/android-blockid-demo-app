@@ -212,4 +212,5 @@
     <string name="label_are_you_sure">Are you sure?</string>
     <string name="label_do_you_want_to_disconnect">Do you want to disconnect from %1$s</string>
     <string name="label_wallet_has_been_connected">Your wallet has been connected to %1$s</string>
+    <string name="label_message">Message:</string>
 </resources>

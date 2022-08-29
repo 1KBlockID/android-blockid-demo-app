@@ -3,16 +3,21 @@ package com.onekosmos.blockidsample.ui.walletconnect;
 import static com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity.SIGN_TRANSACTION_DATA;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.R;
 import com.walletconnect.sign.client.Sign;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * Created by 1Kosmos Engineering
@@ -31,6 +36,8 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
         Sign.Model.SessionRequest sessionRequest =
                 BIDUtil.JSONStringToObject(getIntent().getStringExtra(SIGN_TRANSACTION_DATA),
                         Sign.Model.SessionRequest.class);
+        ConstraintLayout layoutSignTransaction = findViewById(R.id.layout_sign_transaction);
+        ConstraintLayout layoutPersonalSign = findViewById(R.id.layout_personal_sign);
         AppCompatTextView txtDAppURL = findViewById(R.id.txt_dapp_url_sign_transaction);
         AppCompatTextView txtFromAddress = findViewById(R.id.txt_from_address);
         AppCompatTextView txtToAddress = findViewById(R.id.txt_to_address);
@@ -38,28 +45,44 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
         AppCompatTextView txtGasPrice = findViewById(R.id.txt_gas_price);
         AppCompatTextView txtData = findViewById(R.id.txt_data);
         AppCompatTextView txtNonce = findViewById(R.id.txt_nonce);
-
+        AppCompatTextView txtMessage = findViewById(R.id.txt_message_personal_sign);
         if (sessionRequest != null) {
             Sign.Model.AppMetaData metaData = sessionRequest.getPeerMetaData();
             if (metaData == null)
                 return;
 
             txtDAppURL.setText(metaData.getUrl());
-            String params = sessionRequest.getRequest().getParams().
-                    replaceAll("[\\[\\]]", "");
-            WalletConnectHelper.SessionRequestParams requestParams =
-                    BIDUtil.JSONStringToObject(params,
-                            WalletConnectHelper.SessionRequestParams.class);
-            if (requestParams == null)
-                return;
 
-            txtFromAddress.setText(requestParams.from);
-            txtToAddress.setText(requestParams.to);
-            txtValue.setText(requestParams.value);
-            txtGasPrice.setText(requestParams.gasPrice);
-            txtData.setText(requestParams.data);
-            txtNonce.setText(requestParams.nonce);
-            txtGasPrice.setText(requestParams.gasPrice);
+            if (sessionRequest.getRequest().getMethod().
+                    equalsIgnoreCase("eth_signTransaction")) {
+                layoutSignTransaction.setVisibility(View.VISIBLE);
+                String params = sessionRequest.getRequest().getParams().
+                        replaceAll("[\\[\\]]", "");
+                WalletConnectHelper.SessionRequestParams requestParams =
+                        BIDUtil.JSONStringToObject(params,
+                                WalletConnectHelper.SessionRequestParams.class);
+                if (requestParams == null)
+                    return;
+
+                txtFromAddress.setText(requestParams.from);
+                txtToAddress.setText(requestParams.to);
+                txtValue.setText(requestParams.value);
+                txtGasPrice.setText(requestParams.gasPrice);
+                txtData.setText(requestParams.data);
+                txtNonce.setText(requestParams.nonce);
+                txtGasPrice.setText(requestParams.gasPrice);
+            } else if (sessionRequest.getRequest().getMethod().
+                    equalsIgnoreCase("personal_sign")) {
+                layoutPersonalSign.setVisibility(View.VISIBLE);
+                String[] messageData = sessionRequest.getRequest().getParams().split("\"");
+                String message = null;
+                try {
+                    message = new String(Hex.decodeHex(messageData[1].substring(2)));
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                txtMessage.setText(message);
+            }
         }
 
         AppCompatButton btnReject = findViewById(R.id.btn_reject_sign_transaction);

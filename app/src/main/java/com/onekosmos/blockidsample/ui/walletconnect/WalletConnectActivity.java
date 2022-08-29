@@ -64,20 +64,20 @@ public class WalletConnectActivity extends AppCompatActivity {
                         getString(R.string.label_unsupported_qr_code));
             }
 
-            connectSession(qrData);
+            connect(qrData);
         }
     });
 
     private final ActivityResultLauncher<Intent> connectionResult = registerForActivityResult(
             new StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_CANCELED) {
-                    rejectSession(mSessionProposal);
+                    rejectSessionProposal(mSessionProposal);
                     mSessionProposal = null;
                     return;
                 }
 
                 if (result.getResultCode() == RESULT_OK) {
-                    approveSession(mSessionProposal);
+                    approveSessionProposal(mSessionProposal);
                     mSessionProposal = null;
                 }
             });
@@ -128,8 +128,10 @@ public class WalletConnectActivity extends AppCompatActivity {
 
         @Override
         public void onSessionRequest(Sign.Model.SessionRequest sessionRequest) {
-            if (!sessionRequest.getRequest().getMethod().equalsIgnoreCase(
-                    "eth_signTransaction")) {
+            if (!(sessionRequest.getRequest().getMethod().equalsIgnoreCase(
+                    "eth_signTransaction")
+                    || sessionRequest.getRequest().getMethod().equalsIgnoreCase(
+                    "personal_sign"))) {
                 runOnUiThread(() -> showErrorDialog(getString(R.string.label_error),
                         getString(R.string.label_invalid_session_request)));
                 return;
@@ -191,7 +193,7 @@ public class WalletConnectActivity extends AppCompatActivity {
         AppCompatImageView btnBack = findViewById(R.id.img_back_wallet_connect);
         btnBack.setOnClickListener(view -> onBackPressed());
         AppCompatButton btnConnect = findViewById(R.id.btn_connect_to_d_app);
-        btnConnect.setOnClickListener(view -> openScanQRCodeActivity());
+        btnConnect.setOnClickListener(view -> startScanQRCodeActivity());
 
         mBtnDisconnect = findViewById(R.id.btn_disconnect);
         mBtnDisconnect.setOnClickListener(view -> disconnect());
@@ -247,57 +249,11 @@ public class WalletConnectActivity extends AppCompatActivity {
      *
      * @param paringURI String paring URI
      */
-    private void connectSession(String paringURI) {
+    private void connect(String paringURI) {
         if (mWalletConnectHelper == null)
             return;
 
         mWalletConnectHelper.connect(paringURI);
-    }
-
-    /**
-     * Approve session proposal
-     *
-     * @param sessionProposal {@link Sign.Model.SessionProposal}
-     */
-    private void approveSession(Sign.Model.SessionProposal sessionProposal) {
-        if (mWalletConnectHelper == null)
-            return;
-
-        mWalletConnectHelper.approveConnectionRequest(sessionProposal);
-    }
-
-    /**
-     * Reject session proposal
-     *
-     * @param sessionProposal {@link Sign.Model.SessionProposal}
-     */
-    private void rejectSession(Sign.Model.SessionProposal sessionProposal) {
-        if (mWalletConnectHelper == null)
-            return;
-
-        mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
-    }
-
-    /**
-     * Sign requested session
-     *
-     * @param sessionRequest {@link Sign.Model.SessionRequest}
-     */
-    private void signTransaction(Sign.Model.SessionRequest sessionRequest) {
-        if (mWalletConnectHelper == null)
-            return;
-        mWalletConnectHelper.signTransaction(sessionRequest);
-    }
-
-    /**
-     * Reject requested session
-     *
-     * @param sessionRequest {@link Sign.Model.SessionRequest}
-     */
-    private void rejectTransaction(Sign.Model.SessionRequest sessionRequest) {
-        if (mWalletConnectHelper == null)
-            return;
-        mWalletConnectHelper.rejectTransaction(sessionRequest);
     }
 
     /**
@@ -328,11 +284,56 @@ public class WalletConnectActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Approve session proposal
+     *
+     * @param sessionProposal {@link Sign.Model.SessionProposal}
+     */
+    private void approveSessionProposal(Sign.Model.SessionProposal sessionProposal) {
+        if (mWalletConnectHelper == null)
+            return;
+
+        mWalletConnectHelper.approveConnectionRequest(sessionProposal);
+    }
 
     /**
+     * Reject session proposal
+     *
+     * @param sessionProposal {@link Sign.Model.SessionProposal}
+     */
+    private void rejectSessionProposal(Sign.Model.SessionProposal sessionProposal) {
+        if (mWalletConnectHelper == null)
+            return;
+
+        mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
+    }
+
+    /**
+     * Sign requested session
+     *
+     * @param sessionRequest {@link Sign.Model.SessionRequest}
+     */
+    private void signTransaction(Sign.Model.SessionRequest sessionRequest) {
+        if (mWalletConnectHelper == null)
+            return;
+        mWalletConnectHelper.signSessionRequest(sessionRequest);
+    }
+
+    /**
+     * Reject requested session
+     *
+     * @param sessionRequest {@link Sign.Model.SessionRequest}
+     */
+    private void rejectTransaction(Sign.Model.SessionRequest sessionRequest) {
+        if (mWalletConnectHelper == null)
+            return;
+        mWalletConnectHelper.rejectSessionRequest(sessionRequest);
+    }
+
+    /** 69de... 08f6
      * Open scan QR code activity
      */
-    private void openScanQRCodeActivity() {
+    private void startScanQRCodeActivity() {
         Intent scanQRIntent = new Intent(this, ScanQRCodeActivity.class);
         scanQRIntent.putExtra(IS_FROM_WALLET_CONNECT, true);
         scanQResult.launch(scanQRIntent);
