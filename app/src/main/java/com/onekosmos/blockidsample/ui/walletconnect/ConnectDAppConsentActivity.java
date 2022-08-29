@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.walletconnect;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
 
 /**
@@ -41,15 +43,30 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
         AppCompatButton btnReject = findViewById(R.id.btn_reject_dapp_consent);
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_dapp_consent);
         WalletConnectHelper mWalletConnectHelper = WalletConnectHelper.getInstance();
+
+        if (sessionProposal == null) {
+
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                errorDialog.dismiss();
+                finish();
+            };
+            errorDialog.showWithOneButton(null,
+                    getString(R.string.label_error),
+                    getString(R.string.label_invalid_session_proposal),
+                    getString(R.string.label_ok),
+                    onDismissListener);
+
+            return;
+        }
+
         btnReject.setOnClickListener(view -> {
             mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
-//            rejectSessionProposal(sessionProposal);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
             mWalletConnectHelper.approveConnectionRequest(sessionProposal);
-//            approveSessionProposal(sessionProposal);
             finish();
         });
     }

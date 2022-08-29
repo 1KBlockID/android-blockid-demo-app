@@ -4,7 +4,6 @@ package com.onekosmos.blockidsample;
 import static com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity.K_SESSION_PROPOSAL_DATA;
 import static com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity.K_SESSION_REQUEST_DATA;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +18,6 @@ import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity;
 import com.onekosmos.blockidsample.ui.walletconnect.DAppViewModel;
 import com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity;
-import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
 
 import java.util.ArrayList;
@@ -68,14 +66,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         @Override
         public void onSessionRequest(Sign.Model.SessionRequest sessionRequest) {
-            if (!(sessionRequest.getRequest().getMethod().equalsIgnoreCase(
-                    "eth_signTransaction")
-                    || sessionRequest.getRequest().getMethod().equalsIgnoreCase(
-                    "personal_sign"))) {
-                runOnUiThread(() -> showErrorDialog(getString(R.string.label_error),
-                        getString(R.string.label_invalid_session_request)));
-                return;
-            }
             startSignTransactionConsentActivity(sessionRequest);
         }
 
@@ -160,20 +150,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         connectSignTransaction.putExtra(K_SESSION_REQUEST_DATA,
                 BIDUtil.objectToJSONString(sessionRequest, true));
         startActivity(connectSignTransaction);
-    }
-
-    /**
-     * Show error dialog
-     *
-     * @param title   to be show on dialog
-     * @param message to be show on dialog
-     */
-    private void showErrorDialog(String title, String message) {
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
-                errorDialog.dismiss();
-        errorDialog.showWithOneButton(null, title, message, getString(R.string.label_ok),
-                onDismissListener);
     }
 
     public static DAppViewModel getModel() {
