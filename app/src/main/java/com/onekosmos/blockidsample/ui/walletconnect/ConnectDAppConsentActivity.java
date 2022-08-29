@@ -29,6 +29,9 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * Initialize UI Objects
+     */
     private void initView() {
         Sign.Model.SessionProposal sessionProposal = BIDUtil.JSONStringToObject(
                 getIntent().getStringExtra(K_SESSION_PROPOSAL_DATA),
@@ -42,7 +45,7 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
 
         AppCompatButton btnReject = findViewById(R.id.btn_reject_dapp_consent);
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_dapp_consent);
-        WalletConnectHelper mWalletConnectHelper = WalletConnectHelper.getInstance();
+        WalletConnectHelper walletConnectHelper = WalletConnectHelper.getInstance();
 
         if (sessionProposal == null) {
 
@@ -61,12 +64,12 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
         }
 
         btnReject.setOnClickListener(view -> {
-            mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
+            walletConnectHelper.rejectConnectionRequest(sessionProposal);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            mWalletConnectHelper.approveConnectionRequest(sessionProposal);
+            walletConnectHelper.approveConnectionRequest(sessionProposal);
             finish();
         });
     }

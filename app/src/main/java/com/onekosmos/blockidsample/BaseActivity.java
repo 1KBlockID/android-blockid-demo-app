@@ -29,7 +29,7 @@ import java.util.List;
  */
 public abstract class BaseActivity extends AppCompatActivity {
     private WalletConnectHelper mWalletConnectHelper;
-    private static DAppViewModel viewModel;
+    private static DAppViewModel mViewModel;
     private List<Sign.Model.Session> mSessionList;
 
     private final WalletConnectCallback walletConnectCallback = new WalletConnectCallback() {
@@ -88,7 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         mWalletConnectHelper = WalletConnectHelper.getInstance();
         initWalletConnect();
 
-        viewModel = new ViewModelProvider(this).get(DAppViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(DAppViewModel.class);
     }
 
     /**
@@ -123,14 +123,14 @@ public abstract class BaseActivity extends AppCompatActivity {
             mSessionList.clear();
         }
         mSessionList.addAll(mWalletConnectHelper.getConnectedSessions());
-        viewModel.update(mSessionList);
+        mViewModel.update(mSessionList);
     }
 
     /**
      * Open {@link ConnectDAppConsentActivity} to approve/reject connection proposal for
      * decentralized app
      *
-     * @param sessionProposal {@link Sign.Model.SessionProposal }
+     * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
     private void startConnectDAppConsentActivity(Sign.Model.SessionProposal sessionProposal) {
         Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
@@ -140,9 +140,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Open {@link }
+     * Open {@link SignTransactionConsentActivity} to approve/reject session request
      *
-     * @param sessionRequest {@link Sign.Model.SessionRequest }
+     * @param sessionRequest {@link Sign.Model.SessionRequest}
      */
     private void startSignTransactionConsentActivity(Sign.Model.SessionRequest sessionRequest) {
         Intent connectSignTransaction = new Intent(this,
@@ -153,6 +153,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public static DAppViewModel getModel() {
-        return viewModel;
+        return mViewModel;
     }
 }

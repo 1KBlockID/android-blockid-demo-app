@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -26,7 +25,6 @@ import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
-import com.onekosmos.blockidsample.util.ResultDialog;
 import com.walletconnect.sign.client.Sign;
 
 import java.util.ArrayList;
@@ -40,6 +38,12 @@ import java.util.Objects;
 public class WalletConnectActivity extends AppCompatActivity {
     private final List<DAppAdapter.DAppData> mDAppList = new ArrayList<>();
     private WalletConnectHelper mWalletConnectHelper;
+    private DAppAdapter mDAppAdapter;
+    private AppCompatButton mBtnDisconnect;
+    private final Observer<List<Sign.Model.Session>> userListUpdateObserver =
+            this::updateSessionList;
+    private DAppViewModel viewModel;
+
     private final ActivityResultLauncher<Intent> scanQResult = registerForActivityResult(new
             StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_CANCELED) {
@@ -59,10 +63,7 @@ public class WalletConnectActivity extends AppCompatActivity {
             mWalletConnectHelper.connect(Objects.requireNonNull(qrData));
         }
     });
-    private DAppAdapter mDAppAdapter;
-    private AppCompatButton mBtnDisconnect;
-    Observer<List<Sign.Model.Session>> userListUpdateObserver = this::updateSessionList;
-    private DAppViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

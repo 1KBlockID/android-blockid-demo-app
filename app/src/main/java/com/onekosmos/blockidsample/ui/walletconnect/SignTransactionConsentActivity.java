@@ -16,8 +16,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.walletconnect.sign.client.Sign;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Created by 1Kosmos Engineering
@@ -33,6 +32,9 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * Initialize UI Objects
+     */
     private void initView() {
         Sign.Model.SessionRequest sessionRequest = BIDUtil.JSONStringToObject(
                 getIntent().getStringExtra(K_SESSION_REQUEST_DATA),
@@ -93,25 +95,20 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
                 equalsIgnoreCase("personal_sign")) {
             layoutPersonalSign.setVisibility(View.VISIBLE);
             String[] messageData = sessionRequest.getRequest().getParams().split("\"");
-            String message = null;
-            try {
-                message = new String(Hex.decodeHex(messageData[1].substring(2)));
-            } catch (DecoderException e) {
-                e.printStackTrace();
-            }
+            String message = new String(Hex.decode(messageData[1].substring(2)));
             txtMessage.setText(message);
         }
 
         AppCompatButton btnReject = findViewById(R.id.btn_reject_sign_transaction);
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_sign_transaction);
-        WalletConnectHelper mWalletConnectHelper = WalletConnectHelper.getInstance();
+        WalletConnectHelper walletConnectHelper = WalletConnectHelper.getInstance();
         btnReject.setOnClickListener(view -> {
-            mWalletConnectHelper.rejectSessionRequest(sessionRequest);
+            walletConnectHelper.rejectSessionRequest(sessionRequest);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            mWalletConnectHelper.signSessionRequest(sessionRequest);
+            walletConnectHelper.signSessionRequest(sessionRequest);
             finish();
         });
     }

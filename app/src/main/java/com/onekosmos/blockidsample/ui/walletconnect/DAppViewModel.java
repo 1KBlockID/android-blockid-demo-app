@@ -10,23 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DAppViewModel extends ViewModel {
-    private final MutableLiveData<List<Sign.Model.Session>> userLiveData;
-    private List<Sign.Model.Session> userArrayList;
+    private final MutableLiveData<List<Sign.Model.Session>> liveData;
+    private List<Sign.Model.Session> appList;
 
     public DAppViewModel() {
-        userLiveData = new MutableLiveData<>();
-        userLiveData.setValue(userArrayList);
+        liveData = new MutableLiveData<>();
+        liveData.setValue(appList);
     }
 
     public MutableLiveData<List<Sign.Model.Session>> getUserMutableLiveData() {
-        return userLiveData;
+        return liveData;
     }
 
     public void update(List<Sign.Model.Session> sessionList) {
-        if (userArrayList == null)
-            userArrayList = new ArrayList<>();
-        userArrayList.clear();
-        userArrayList.addAll(sessionList);
-        userLiveData.postValue(userArrayList);
+        if (appList == null)
+            appList = new ArrayList<>();
+        appList.clear();
+        appList.addAll(sessionList);
+        liveData.postValue(appList);
     }
 }
