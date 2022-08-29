@@ -7,8 +7,8 @@ import static com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsen
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,7 +20,6 @@ import com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity;
 import com.onekosmos.blockidsample.ui.walletconnect.DAppViewModel;
 import com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
-import com.onekosmos.blockidsample.util.ResultDialog;
 import com.walletconnect.sign.client.Sign;
 
 import java.util.ArrayList;
@@ -54,8 +53,11 @@ public abstract class BaseActivity extends AppCompatActivity {
                                                     settleSessionResponse) {
             Sign.Model.AppMetaData metaData = settleSessionResponse.getSession().getMetaData();
             if (metaData != null)
-                runOnUiThread(() -> showSuccessDialog(metaData.getUrl()));
-
+                runOnUiThread(() -> Toast.makeText(
+                        getApplicationContext(),
+                        getString(R.string.label_wallet_has_been_connected,
+                                metaData.getUrl()),
+                        Toast.LENGTH_SHORT).show());
             getSessionList();
         }
 
@@ -176,13 +178,5 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public static DAppViewModel getModel() {
         return viewModel;
-    }
-
-    private void showSuccessDialog(String url) {
-        ResultDialog successDialog = new ResultDialog(this, R.drawable.icon_dialog_success,
-                getString(R.string.label_success),
-                getString(R.string.label_wallet_has_been_connected, url));
-        successDialog.show();
-        new Handler().postDelayed(successDialog::dismiss, 2000);
     }
 }
