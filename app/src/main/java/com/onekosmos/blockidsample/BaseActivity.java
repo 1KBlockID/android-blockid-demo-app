@@ -1,0 +1,188 @@
+package com.onekosmos.blockidsample;
+
+
+import static com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity.K_SESSION_PROPOSAL_DATA;
+import static com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity.K_SESSION_REQUEST_DATA;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectCallback;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
+import com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity;
+import com.onekosmos.blockidsample.ui.walletconnect.DAppViewModel;
+import com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity;
+import com.onekosmos.blockidsample.util.ErrorDialog;
+import com.onekosmos.blockidsample.util.ResultDialog;
+import com.walletconnect.sign.client.Sign;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2022 1Kosmos. All rights reserved.
+ */
+public abstract class BaseActivity extends AppCompatActivity {
+    private WalletConnectHelper mWalletConnectHelper;
+    private static DAppViewModel viewModel;
+    private List<Sign.Model.Session> mSessionList;
+
+    private final WalletConnectCallback walletConnectCallback = new WalletConnectCallback() {
+        @Override
+        public void onConnectionStateChange(Sign.Model.ConnectionState connectionState) {
+            boolean isConnected = connectionState.isAvailable();
+            if (isConnected) {
+                getSessionList();
+            }
+        }
+
+        @Override
+        public void onSessionProposal(Sign.Model.SessionProposal sessionProposal) {
+            startConnectDAppConsentActivity(sessionProposal);
+        }
+
+        @Override
+        public void onSessionSettleResponse(Sign.Model.SettledSessionResponse.Result
+                                                    settleSessionResponse) {
+            Sign.Model.AppMetaData metaData = settleSessionResponse.getSession().getMetaData();
+            if (metaData != null)
+                runOnUiThread(() -> showSuccessDialog(metaData.getUrl()));
+
+            getSessionList();
+        }
+
+        @Override
+        public void onSessionDelete(Sign.Model.DeletedSession deletedSession) {
+            getSessionList();
+        }
+
+        @Override
+        public void onSessionRequest(Sign.Model.SessionRequest sessionRequest) {
+            if (!(sessionRequest.getRequest().getMethod().equalsIgnoreCase(
+                    "eth_signTransaction")
+                    || sessionRequest.getRequest().getMethod().equalsIgnoreCase(
+                    "personal_sign"))) {
+                runOnUiThread(() -> showErrorDialog(getString(R.string.label_error),
+                        getString(R.string.label_invalid_session_request)));
+                return;
+            }
+            startSignTransactionConsentActivity(sessionRequest);
+        }
+
+        @Override
+        public void onError(Sign.Model.Error error) {
+            if (error != null) {
+                Log.e("Error", error.getThrowable().getMessage());
+            }
+        }
+
+        @Override
+        public void onSessionUpdateResponse(Sign.Model.SessionUpdateResponse sessionUpdateResponse) {
+            getSessionList();
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mWalletConnectHelper = WalletConnectHelper.getInstance();
+        initWalletConnect();
+
+        viewModel = new ViewModelProvider(this).get(DAppViewModel.class);
+    }
+
+    /**
+     * Initialize wallet connect SDK
+     */
+    private void initWalletConnect() {
+        if (mWalletConnectHelper == null) {
+            return;
+        }
+
+        List<String> iconList = new ArrayList<>();
+        iconList.add("https://www.1kosmos.com/favicon.ico");
+
+        Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
+                getString(R.string.app_name),
+                getString(R.string.wallet_connect_description),
+                "example.wallet",
+                iconList,
+                "kotlin-wallet-wc:/request");
+
+        mWalletConnectHelper.initializeWalletConnectSDK(getApplication(),
+                getString(R.string.app_project_id), metadata, walletConnectCallback);
+    }
+
+    /**
+     * Get list of connected session and update in recycler view
+     */
+    private void getSessionList() {
+        if (mSessionList == null) {
+            mSessionList = new ArrayList<>();
+        } else {
+            mSessionList.clear();
+        }
+        mSessionList.addAll(mWalletConnectHelper.getConnectedSessions());
+        viewModel.update(mSessionList);
+    }
+
+    /**
+     * Open {@link ConnectDAppConsentActivity} to approve/reject connection proposal for
+     * decentralized app
+     *
+     * @param sessionProposal {@link Sign.Model.SessionProposal }
+     */
+    private void startConnectDAppConsentActivity(Sign.Model.SessionProposal sessionProposal) {
+        Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
+        connectDAppIntent.putExtra(K_SESSION_PROPOSAL_DATA,
+                BIDUtil.objectToJSONString(sessionProposal, true));
+        startActivity(connectDAppIntent);
+    }
+
+    /**
+     * Open {@link }
+     *
+     * @param sessionRequest {@link Sign.Model.SessionRequest }
+     */
+    private void startSignTransactionConsentActivity(Sign.Model.SessionRequest sessionRequest) {
+        Intent connectSignTransaction = new Intent(this,
+                SignTransactionConsentActivity.class);
+        connectSignTransaction.putExtra(K_SESSION_REQUEST_DATA,
+                BIDUtil.objectToJSONString(sessionRequest, true));
+        startActivity(connectSignTransaction);
+    }
+
+    /**
+     * Show error dialog
+     *
+     * @param title   to be show on dialog
+     * @param message to be show on dialog
+     */
+    private void showErrorDialog(String title, String message) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                errorDialog.dismiss();
+        errorDialog.showWithOneButton(null, title, message, getString(R.string.label_ok),
+                onDismissListener);
+    }
+
+    public static DAppViewModel getModel() {
+        return viewModel;
+    }
+
+    private void showSuccessDialog(String url) {
+        ResultDialog successDialog = new ResultDialog(this, R.drawable.icon_dialog_success,
+                getString(R.string.label_success),
+                getString(R.string.label_wallet_has_been_connected, url));
+        successDialog.show();
+        new Handler().postDelayed(successDialog::dismiss, 2000);
+    }
+}

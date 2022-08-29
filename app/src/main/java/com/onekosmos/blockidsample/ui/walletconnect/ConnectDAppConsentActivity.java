@@ -1,7 +1,5 @@
 package com.onekosmos.blockidsample.ui.walletconnect;
 
-import static com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity.D_APP_URL;
-
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,13 +8,18 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
+import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
 import com.onekosmos.blockidsample.R;
+import com.walletconnect.sign.client.Sign;
 
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class ConnectDAppConsentActivity extends AppCompatActivity {
+    public static final String K_SESSION_PROPOSAL_DATA = "K_SESSION_PROPOSAL_DATA";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,8 +28,10 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        String dAppUrl = getIntent().hasExtra(D_APP_URL) ?
-                getIntent().getStringExtra(D_APP_URL) : "";
+        Sign.Model.SessionProposal sessionProposal = BIDUtil.JSONStringToObject(
+                getIntent().getStringExtra(K_SESSION_PROPOSAL_DATA),
+                Sign.Model.SessionProposal.class);
+        String dAppUrl = sessionProposal != null ? sessionProposal.getUrl() : "";
         AppCompatTextView txtHeader = findViewById(R.id.txt_dapp_url);
         txtHeader.setText(dAppUrl);
 
@@ -35,14 +40,16 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
 
         AppCompatButton btnReject = findViewById(R.id.btn_reject_dapp_consent);
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_dapp_consent);
-
+        WalletConnectHelper mWalletConnectHelper = WalletConnectHelper.getInstance();
         btnReject.setOnClickListener(view -> {
-            setResult(RESULT_CANCELED);
+            mWalletConnectHelper.rejectConnectionRequest(sessionProposal);
+//            rejectSessionProposal(sessionProposal);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            setResult(RESULT_OK);
+            mWalletConnectHelper.approveConnectionRequest(sessionProposal);
+//            approveSessionProposal(sessionProposal);
             finish();
         });
     }

@@ -1,7 +1,5 @@
 package com.onekosmos.blockidsample.ui.walletconnect;
 
-import static com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity.SIGN_TRANSACTION_DATA;
-
 import android.os.Bundle;
 import android.view.View;
 
@@ -24,6 +22,7 @@ import org.apache.commons.codec.binary.Hex;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class SignTransactionConsentActivity extends AppCompatActivity {
+    public static final String K_SESSION_REQUEST_DATA = "K_SESSION_PROPOSAL_DATA";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,9 +32,9 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        Sign.Model.SessionRequest sessionRequest =
-                BIDUtil.JSONStringToObject(getIntent().getStringExtra(SIGN_TRANSACTION_DATA),
-                        Sign.Model.SessionRequest.class);
+        Sign.Model.SessionRequest sessionRequest = BIDUtil.JSONStringToObject(
+                getIntent().getStringExtra(K_SESSION_REQUEST_DATA),
+                Sign.Model.SessionRequest.class);
         ConstraintLayout layoutSignTransaction = findViewById(R.id.layout_sign_transaction);
         ConstraintLayout layoutPersonalSign = findViewById(R.id.layout_personal_sign);
         AppCompatTextView txtDAppURL = findViewById(R.id.txt_dapp_url_sign_transaction);
@@ -87,14 +86,20 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
 
         AppCompatButton btnReject = findViewById(R.id.btn_reject_sign_transaction);
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_sign_transaction);
-
+        WalletConnectHelper mWalletConnectHelper = WalletConnectHelper.getInstance();
         btnReject.setOnClickListener(view -> {
-            setResult(RESULT_CANCELED);
+            mWalletConnectHelper.rejectSessionRequest(sessionRequest);
+//            Intent intent = getIntent();
+//            setResult(RESULT_CANCELED, intent);
+//            rejectTransaction(sessionRequest);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            setResult(RESULT_OK);
+//            Intent intent = getIntent();
+//            setResult(RESULT_OK, intent);
+//            signTransaction(sessionRequest);
+            mWalletConnectHelper.signSessionRequest(sessionRequest);
             finish();
         });
     }
