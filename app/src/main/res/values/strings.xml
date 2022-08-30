@@ -190,7 +190,6 @@
     <string name="label_account_removed">Your account is removed.</string>
 
     <!-- Wallet Connect -->
-    <string name="wallet_connect_description">1Kosmos WalletConnect Demo</string>
     <string name="label_wallet_connect">WalletConnect</string>
     <string name="label_connect_to_dapp">Connect to DApp</string>
     <string name="label_disconnect">Disconnect</string>
