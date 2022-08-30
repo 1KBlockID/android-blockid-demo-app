@@ -239,7 +239,7 @@
         android:textColor="@color/white"
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_approve_sign_transaction"
+        app:layout_constraintEnd_toStartOf="@+id/btn_approve_session"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
