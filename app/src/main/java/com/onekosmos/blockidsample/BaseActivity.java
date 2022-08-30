@@ -59,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSessionDelete(Sign.Model.DeletedSession deletedSession) {
+        public void onSessionDisconnect(Sign.Model.DeletedSession deletedSession) {
             getSessionList();
         }
 
@@ -76,11 +76,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                         error.getThrowable().getMessage(),
                         Toast.LENGTH_SHORT).show());
             }
-        }
-
-        @Override
-        public void onSessionUpdateResponse(Sign.Model.SessionUpdateResponse sessionUpdateResponse) {
-            getSessionList();
         }
     };
 
@@ -124,7 +119,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         } else {
             mSessionList.clear();
         }
-        mSessionList.addAll(mWalletConnectHelper.getConnectedSessions());
+        mSessionList.addAll(mWalletConnectHelper.getActiveSessions());
         mViewModel.update(mSessionList);
     }
 

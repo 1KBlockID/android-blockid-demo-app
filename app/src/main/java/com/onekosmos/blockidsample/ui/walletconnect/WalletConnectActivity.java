@@ -155,7 +155,7 @@ public class WalletConnectActivity extends AppCompatActivity {
                     errorDialog.dismiss();
                     // call disconnect
                     mWalletConnectHelper.disconnect(session);
-                    updateSessionList(mWalletConnectHelper.getConnectedSessions());
+                    updateSessionList(mWalletConnectHelper.getActiveSessions());
                 });
     }
 
