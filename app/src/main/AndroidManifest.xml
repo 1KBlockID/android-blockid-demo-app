@@ -119,5 +119,17 @@
             android:name=".ui.adduser.AddUserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
+            android:name=".ui.walletconnect.WalletConnectActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
+            android:name=".ui.walletconnect.SignConsentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
+            android:name=".ui.walletconnect.ConnectConsentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>
 </manifest>

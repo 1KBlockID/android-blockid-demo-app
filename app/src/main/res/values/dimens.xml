@@ -54,6 +54,7 @@
     <dimen name="dimen_100dp">100dp</dimen>
     <dimen name="dimen_120dp">120dp</dimen>
     <dimen name="dimen_150dp">150dp</dimen>
+    <dimen name="dimen_170dp">170dp</dimen>
     <dimen name="dimen_200dp">200dp</dimen>
     <dimen name="dimen_214dp">214dp</dimen>
     <dimen name="dimen_320dp">320dp</dimen>

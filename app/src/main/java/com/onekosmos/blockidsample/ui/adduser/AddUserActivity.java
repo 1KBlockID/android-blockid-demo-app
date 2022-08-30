@@ -6,8 +6,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_EXPIRED;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_REDEEMED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_EXPIRED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_REDEEMED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -242,7 +242,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 MagicLinkData.class);
         BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
                 magicLinkDataModel.api, magicLinkDataModel.community,
-                (status, error, response, userId) -> {
+                (status, response, userId, error) -> {
                     if (!status) {
                         hideProgress();
                         showError(error);
@@ -430,7 +430,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Add user data in SDK
         BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                userData.scep_privatekey, userData.origin, userData.account, (status, error) -> {
+                userData.scep_privatekey, userData.scep_expiry, userData.origin,
+                userData.account, (status, error) -> {
                     if (!status) {
                         showError(error);
                         return;
@@ -470,7 +471,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     /**
-     * Show error dialog after
+     * Show error dialog
      *
      * @param message String message of dialog
      */
@@ -593,6 +594,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         String userId;
         String scep_hash;
         String scep_privatekey;
+        String scep_expiry;
         boolean isLinked;
         BIDOrigin origin;
         BIDAccount account;

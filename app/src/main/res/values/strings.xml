@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BlockID Demo</string>
+    <string name="app_project_id">932edbeee51ba767c6e1fb7947b92c39</string>
     <string name="label_register_default_tenant">Register Default Tenant</string>
     <string name="label_device_auth">Device Auth</string>
     <string name="label_device_auth_enrolled">Device auth enrolled</string>
@@ -187,4 +188,32 @@
     <string name="label_code_already_redeemed">Code already redeemed.</string>
     <string name="label_remove_user">Do you want to remove user?</string>
     <string name="label_account_removed">Your account is removed.</string>
+
+    <!-- Wallet Connect -->
+    <string name="label_wallet_connect">WalletConnect</string>
+    <string name="label_connect_to_dapp">Connect to DApp</string>
+    <string name="label_disconnect">Disconnect</string>
+    <string name="label_qr_code_scanning_canceled">QR code scanning canceled</string>
+    <string name="label_sign_transaction">Would you like to sign this transaction request from</string>
+    <string name="label_from_address">From Address:</string>
+    <string name="label_to_address">To Address:</string>
+    <string name="label_value">Value:</string>
+    <string name="label_gas_price">Gas Price:</string>
+    <string name="label_data">Data:</string>
+    <string name="label_nonce">Nonce:</string>
+    <string name="label_reject">Reject</string>
+    <string name="label_approve">Approve</string>
+    <string name="label_connect_wallet">Would you like to connect with your wallet</string>
+    <string name="label_wallet_address">Wallet Address:</string>
+    <string name="label_viw_your_wallet_balance">- View your wallet balance, activity</string>
+    <string name="label_request_approval_for_transactions">- Request approval for transactions</string>
+    <string name="label_invalid_session_request">Invalid session request.</string>
+    <string name="label_invalid_session_proposal">Invalid session proposal.</string>
+    <string name="label_are_you_sure">Are you sure?</string>
+    <string name="label_do_you_want_to_disconnect">Do you want to disconnect from %1$s</string>
+    <string name="label_wallet_has_been_connected">Your wallet has been connected to %1$s</string>
+    <string name="label_message">Message:</string>
+    <string name="label_invalid_qr_code">Invalid QR Code</string>
+    <string name="label_qr_code_scan_failed">QR Code scan failed.</string>
+
 </resources>
