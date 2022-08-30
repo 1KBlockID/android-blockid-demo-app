@@ -64,12 +64,12 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
         }
 
         btnReject.setOnClickListener(view -> {
-            walletConnectHelper.rejectConnectionRequest(sessionProposal);
+            walletConnectHelper.rejectConnection(sessionProposal);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            walletConnectHelper.approveConnectionRequest(sessionProposal);
+            walletConnectHelper.approveConnection(sessionProposal);
             finish();
         });
     }

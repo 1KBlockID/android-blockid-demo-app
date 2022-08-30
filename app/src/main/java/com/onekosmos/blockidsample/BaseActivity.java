@@ -109,7 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 iconList,
                 "kotlin-wallet-wc:/request");
 
-        mWalletConnectHelper.initializeWalletConnectSDK(getApplication(),
+        mWalletConnectHelper.initialize(getApplication(),
                 getString(R.string.app_project_id), metadata, walletConnectCallback);
     }
 

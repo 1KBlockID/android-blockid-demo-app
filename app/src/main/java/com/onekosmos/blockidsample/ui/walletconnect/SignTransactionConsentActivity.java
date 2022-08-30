@@ -78,9 +78,9 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
             layoutSignTransaction.setVisibility(View.VISIBLE);
             String params = sessionRequest.getRequest().getParams().
                     replaceAll("[\\[\\]]", "");
-            WalletConnectHelper.SessionRequestParams requestParams =
+            WalletConnectHelper.SessionRequestParam requestParams =
                     BIDUtil.JSONStringToObject(params,
-                            WalletConnectHelper.SessionRequestParams.class);
+                            WalletConnectHelper.SessionRequestParam.class);
             if (requestParams == null)
                 return;
 
@@ -103,12 +103,12 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
         AppCompatButton btnApprove = findViewById(R.id.btn_approve_sign_transaction);
         WalletConnectHelper walletConnectHelper = WalletConnectHelper.getInstance();
         btnReject.setOnClickListener(view -> {
-            walletConnectHelper.rejectSessionRequest(sessionRequest);
+            walletConnectHelper.rejectSession(sessionRequest);
             finish();
         });
 
         btnApprove.setOnClickListener(view -> {
-            walletConnectHelper.signSessionRequest(sessionRequest);
+            walletConnectHelper.approveSession(sessionRequest);
             finish();
         });
     }
