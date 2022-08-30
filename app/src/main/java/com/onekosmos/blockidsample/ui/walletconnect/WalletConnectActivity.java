@@ -58,8 +58,8 @@ public class WalletConnectActivity extends AppCompatActivity {
             String qrData = result.getData() != null ?
                     result.getData().getStringExtra(WALLET_CONNECT_QR_DATA) : null;
             if (TextUtils.isEmpty(qrData)) {
-                showErrorDialog(getString(R.string.label_invalid_code),
-                        getString(R.string.label_unsupported_qr_code));
+                showErrorDialog(getString(R.string.label_invalid_qr_code),
+                        getString(R.string.label_qr_code_scan_failed));
             }
 
             mWalletConnectHelper.connect(Objects.requireNonNull(qrData));

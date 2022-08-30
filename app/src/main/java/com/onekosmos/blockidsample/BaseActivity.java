@@ -1,12 +1,11 @@
 package com.onekosmos.blockidsample;
 
 
-import static com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity.K_SESSION_PROPOSAL_DATA;
-import static com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity.K_SESSION_REQUEST_DATA;
+import static com.onekosmos.blockidsample.ui.walletconnect.ConnectConsentActivity.K_SESSION_PROPOSAL_DATA;
+import static com.onekosmos.blockidsample.ui.walletconnect.SignConsentActivity.K_SESSION_REQUEST_DATA;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockid.sdk.walletconnect.WalletConnectCallback;
 import com.onekosmos.blockid.sdk.walletconnect.WalletConnectHelper;
-import com.onekosmos.blockidsample.ui.walletconnect.ConnectDAppConsentActivity;
+import com.onekosmos.blockidsample.ui.walletconnect.ConnectConsentActivity;
 import com.onekosmos.blockidsample.ui.walletconnect.DAppViewModel;
-import com.onekosmos.blockidsample.ui.walletconnect.SignTransactionConsentActivity;
+import com.onekosmos.blockidsample.ui.walletconnect.SignConsentActivity;
 import com.walletconnect.sign.client.Sign;
 
 import java.util.ArrayList;
@@ -28,11 +27,11 @@ import java.util.List;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public abstract class BaseActivity extends AppCompatActivity {
-    private WalletConnectHelper mWalletConnectHelper;
     private static DAppViewModel mViewModel;
+    private WalletConnectHelper mWalletConnectHelper;
     private List<Sign.Model.Session> mSessionList;
 
-    private final WalletConnectCallback walletConnectCallback = new WalletConnectCallback() {
+    private final WalletConnectCallback mWalletConnectCallback = new WalletConnectCallback() {
         @Override
         public void onConnectionStateChange(Sign.Model.ConnectionState connectionState) {
             boolean isConnected = connectionState.isAvailable();
@@ -72,7 +71,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         @Override
         public void onError(Sign.Model.Error error) {
             if (error != null) {
-                Log.e("Error", error.getThrowable().getMessage());
+                runOnUiThread(() -> Toast.makeText(
+                        getApplicationContext(),
+                        error.getThrowable().getMessage(),
+                        Toast.LENGTH_SHORT).show());
             }
         }
 
@@ -104,13 +106,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         Sign.Model.AppMetaData metadata = new Sign.Model.AppMetaData(
                 getString(R.string.app_name),
-                getString(R.string.wallet_connect_description),
+                "1Kosmos-WalletConnect",
                 "example.wallet",
                 iconList,
                 "kotlin-wallet-wc:/request");
 
         mWalletConnectHelper.initialize(getApplication(),
-                getString(R.string.app_project_id), metadata, walletConnectCallback);
+                getString(R.string.app_project_id), metadata, mWalletConnectCallback);
     }
 
     /**
@@ -127,26 +129,26 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     /**
-     * Open {@link ConnectDAppConsentActivity} to approve/reject connection proposal for
+     * Open {@link ConnectConsentActivity} to approve/reject connection proposal for
      * decentralized app
      *
      * @param sessionProposal {@link Sign.Model.SessionProposal}
      */
     private void startConnectDAppConsentActivity(Sign.Model.SessionProposal sessionProposal) {
-        Intent connectDAppIntent = new Intent(this, ConnectDAppConsentActivity.class);
+        Intent connectDAppIntent = new Intent(this, ConnectConsentActivity.class);
         connectDAppIntent.putExtra(K_SESSION_PROPOSAL_DATA,
                 BIDUtil.objectToJSONString(sessionProposal, true));
         startActivity(connectDAppIntent);
     }
 
     /**
-     * Open {@link SignTransactionConsentActivity} to approve/reject session request
+     * Open {@link SignConsentActivity} to approve/reject session request
      *
      * @param sessionRequest {@link Sign.Model.SessionRequest}
      */
     private void startSignTransactionConsentActivity(Sign.Model.SessionRequest sessionRequest) {
         Intent connectSignTransaction = new Intent(this,
-                SignTransactionConsentActivity.class);
+                SignConsentActivity.class);
         connectSignTransaction.putExtra(K_SESSION_REQUEST_DATA,
                 BIDUtil.objectToJSONString(sessionRequest, true));
         startActivity(connectSignTransaction);

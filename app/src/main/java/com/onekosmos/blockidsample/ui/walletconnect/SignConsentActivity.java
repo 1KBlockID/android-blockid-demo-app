@@ -22,13 +22,13 @@ import org.bouncycastle.util.encoders.Hex;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class SignTransactionConsentActivity extends AppCompatActivity {
-    public static final String K_SESSION_REQUEST_DATA = "K_SESSION_PROPOSAL_DATA";
+public class SignConsentActivity extends AppCompatActivity {
+    public static final String K_SESSION_REQUEST_DATA = "K_SESSION_REQUEST_DATA";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_transaction_consent);
+        setContentView(R.layout.activity_sign_consent);
         initView();
     }
 
@@ -59,7 +59,7 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
 
         ConstraintLayout layoutSignTransaction = findViewById(R.id.layout_sign_transaction);
         ConstraintLayout layoutPersonalSign = findViewById(R.id.layout_personal_sign);
-        AppCompatTextView txtDAppURL = findViewById(R.id.txt_dapp_url_sign_transaction);
+        AppCompatTextView txtDAppURL = findViewById(R.id.txt_dapp_url_sign);
         AppCompatTextView txtFromAddress = findViewById(R.id.txt_from_address);
         AppCompatTextView txtToAddress = findViewById(R.id.txt_to_address);
         AppCompatTextView txtValue = findViewById(R.id.txt_value);
@@ -99,8 +99,8 @@ public class SignTransactionConsentActivity extends AppCompatActivity {
             txtMessage.setText(message);
         }
 
-        AppCompatButton btnReject = findViewById(R.id.btn_reject_sign_transaction);
-        AppCompatButton btnApprove = findViewById(R.id.btn_approve_sign_transaction);
+        AppCompatButton btnReject = findViewById(R.id.btn_reject_session);
+        AppCompatButton btnApprove = findViewById(R.id.btn_approve_session);
         WalletConnectHelper walletConnectHelper = WalletConnectHelper.getInstance();
         btnReject.setOnClickListener(view -> {
             walletConnectHelper.rejectSession(sessionRequest);

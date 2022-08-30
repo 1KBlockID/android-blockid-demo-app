@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.walletconnect.ConnectDAppConsentActivity">
+    tools:context=".ui.walletconnect.ConnectConsentActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_dapp_url"
@@ -94,7 +94,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_reject_dapp_consent"
+        android:id="@+id/btn_reject_connection"
         style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
@@ -106,11 +106,11 @@
         android:textColor="@color/white"
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_approve_dapp_consent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_approve_connection"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_approve_dapp_consent"
+        android:id="@+id/btn_approve_connection"
         style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
@@ -123,5 +123,5 @@
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_reject_dapp_consent" />
+        app:layout_constraintStart_toEndOf="@+id/btn_reject_connection" />
 </androidx.constraintlayout.widget.ConstraintLayout>

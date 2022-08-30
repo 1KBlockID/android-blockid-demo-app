@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.walletconnect.SignTransactionConsentActivity">
+    tools:context=".ui.walletconnect.SignConsentActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_title_sign_transaction"
+        android:id="@+id/txt_title_sign"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_24dp"
@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_dapp_url_sign_transaction"
+        android:id="@+id/txt_dapp_url_sign"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_24dp"
@@ -31,7 +31,7 @@
         android:textSize="@dimen/dimen_20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_title_sign_transaction" />
+        app:layout_constraintTop_toBottomOf="@id/txt_title_sign" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_personal_sign"
@@ -42,7 +42,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_dapp_url_sign_transaction">
+        app:layout_constraintTop_toBottomOf="@id/txt_dapp_url_sign">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txt_title_message"
@@ -78,7 +78,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_dapp_url_sign_transaction">
+        app:layout_constraintTop_toBottomOf="@id/txt_dapp_url_sign">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/txt_title_from_address"
@@ -227,7 +227,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_reject_sign_transaction"
+        android:id="@+id/btn_reject_session"
         style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
@@ -243,7 +243,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_approve_sign_transaction"
+        android:id="@+id/btn_approve_session"
         style="@style/AppTheme.MaterialAppTheme"
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="@dimen/dimen_48dp"
@@ -256,5 +256,5 @@
         android:textSize="@dimen/dimen_18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_reject_sign_transaction" />
+        app:layout_constraintStart_toEndOf="@+id/btn_reject_session" />
 </androidx.constraintlayout.widget.ConstraintLayout>

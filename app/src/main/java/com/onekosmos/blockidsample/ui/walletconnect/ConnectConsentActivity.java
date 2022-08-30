@@ -19,13 +19,13 @@ import com.walletconnect.sign.client.Sign;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class ConnectDAppConsentActivity extends AppCompatActivity {
+public class ConnectConsentActivity extends AppCompatActivity {
     public static final String K_SESSION_PROPOSAL_DATA = "K_SESSION_PROPOSAL_DATA";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect_dapp_consent);
+        setContentView(R.layout.activity_connect_consent);
         initView();
     }
 
@@ -43,12 +43,11 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
         AppCompatTextView txtWalletAddressValue = findViewById(R.id.txt_wallet_address);
         txtWalletAddressValue.setText(BlockIDSDK.getInstance().getDID());
 
-        AppCompatButton btnReject = findViewById(R.id.btn_reject_dapp_consent);
-        AppCompatButton btnApprove = findViewById(R.id.btn_approve_dapp_consent);
+        AppCompatButton btnReject = findViewById(R.id.btn_reject_connection);
+        AppCompatButton btnApprove = findViewById(R.id.btn_approve_connection);
         WalletConnectHelper walletConnectHelper = WalletConnectHelper.getInstance();
 
         if (sessionProposal == null) {
-
             ErrorDialog errorDialog = new ErrorDialog(this);
             DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
                 errorDialog.dismiss();
@@ -59,7 +58,6 @@ public class ConnectDAppConsentActivity extends AppCompatActivity {
                     getString(R.string.label_invalid_session_proposal),
                     getString(R.string.label_ok),
                     onDismissListener);
-
             return;
         }
 
