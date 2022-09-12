@@ -80,8 +80,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_add_user))) {
+        if (position == 0) {
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
