@@ -74,6 +74,7 @@ import webauthnkit.core.authenticator.internal.ui.UserConsentUI;
 import webauthnkit.core.authenticator.internal.ui.UserConsentUIFactory;
 import webauthnkit.core.client.WebAuthnClient;
 import webauthnkit.core.data.AuthenticatorAssertionResponse;
+import webauthnkit.core.data.AuthenticatorTransport;
 import webauthnkit.core.data.PublicKeyCredential;
 import webauthnkit.core.data.PublicKeyCredentialDescriptor;
 import webauthnkit.core.data.PublicKeyCredentialRequestOptions;
@@ -318,31 +319,48 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onDLClicked() {
-        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.showWithTwoButton(
-                    null,
-                    getString(R.string.label_remove_dl_title),
-                    getString(R.string.label_remove_dl),
-                    getString(R.string.label_yes), getString(R.string.label_no),
-                    (dialogInterface, i) -> errorDialog.dismiss(),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
-                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
-                            removeDocument(removeDLMap);
-                        } catch (JSONException e) {
-                            // do nothing
-                        }
-                    });
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
+
+        if (!response.getStatus()) {
             return;
         }
-        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+
+        List<BIDLinkedAccount> mLinkedAccountsList = response.getDataObject();
+        if (!(mLinkedAccountsList != null && mLinkedAccountsList.size() > 0)) {
+            return;
+        }
+
+//        BlockIDSDK.getInstance().callAssertionOption(this, mLinkedAccountsList.get(0));
+
+        String metadata = "{\"challenge\":\"ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUo5LmV5SnlZVzVrSWpvaU5qSmxhM3BRTFV0U1ZIVlNObXRsWTFFdGRrMUlMVGhHTjJKaGVtTmlTV1pIVjNjd1lWbFZOU0lzSW1GMVpDSTZJakZyTFdSbGRpNHhhMjl6Ylc5ekxtNWxkQ0lzSW5OMVlpSTZJa05PUFZCaGJtdDBhU0JOYVhOMGNua3NRMDQ5VlhObGNuTXNSRU05WW14dlkydHBaQ3hFUXoweGEyOXpiVzl6SWl3aWFXUWlPaUkxWm5kaGFFRnFYelJKVmtwNVYwdGFiRlpFVjJWdWRrSlpTMWswYUhsdWVtcGhOR3d4UmpVdE5FSnpJaXdpWlhod0lqb3hOall6TURreE5qVTRmUS5RNGV5RUNPVXRqVGlJMzRtN09ucEVFeWpKS1JqZFlOTFZ5LVdpSmROSE9F\",\"rpId\":\"1k-dev.1kosmos.net\",\"timeout\":60000,\"userVerification\":\"preferred\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"5nyo91EKTdmElLgfWZFP9Q\"},{\"type\":\"public-key\",\"id\":\"4Gn82snMSpyOCVAQGXrydw\"},{\"type\":\"public-key\",\"id\":\"y-z0u4lHSgiBRDm_vcjHSw\"},{\"type\":\"public-key\",\"id\":\"ve-twCp7T8eQNZV0H_ZHtA\"},{\"type\":\"public-key\",\"id\":\"3hDzaraWRdet4yQEYG2xWQ\"},{\"type\":\"public-key\",\"id\":\"iSLGnfGDTR6X3ICTLWudrQ\"},{\"type\":\"public-key\",\"id\":\"HMEOcCEQR5mIDJ6czVTSGA\"},{\"type\":\"public-key\",\"id\":\"omidPJYdRDeCRz4WhXLcXQ\"},{\"type\":\"public-key\",\"id\":\"BEtBgQ05QNunoN8aKNM_mQ\"},{\"type\":\"public-key\",\"id\":\"a05Oe6niSvS6QR6zxT8hHQ\"},{\"type\":\"public-key\",\"id\":\"oiEJczEHQW2QYXS-IAZGwg\"},{\"type\":\"public-key\",\"id\":\"gdzUO2pNTheR3tMMgGt05g\"},{\"type\":\"public-key\",\"id\":\"TuNKGRvfSOeJevTx5OSEaA\"},{\"type\":\"public-key\",\"id\":\"jLkxbTqqQKeWgwf4fbH9RA\"},{\"type\":\"public-key\",\"id\":\"NjrkRITfQ3u0637Rcq03-w\"}],\"status\":\"ok\",\"errorMessage\":\"\"}";
+        String data = signIn(this, mLinkedAccountsList.get(0), metadata);
+        Log.e("Data", "-->" + data);
+
+//        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
+//            ErrorDialog errorDialog = new ErrorDialog(this);
+//            errorDialog.showWithTwoButton(
+//                    null,
+//                    getString(R.string.label_remove_dl_title),
+//                    getString(R.string.label_remove_dl),
+//                    getString(R.string.label_yes), getString(R.string.label_no),
+//                    (dialogInterface, i) -> errorDialog.dismiss(),
+//                    dialog -> {
+//                        errorDialog.dismiss();
+//                        try {
+//                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
+//                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+//                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
+//                            }.getType());
+//                            removeDocument(removeDLMap);
+//                        } catch (JSONException e) {
+//                            // do nothing
+//                        }
+//                    });
+//            return;
+//        }
+//        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        startActivity(intent);
     }
 
     private void onPPClicked(int count) {
@@ -500,14 +518,16 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             ArrayList<PublicKeyCredentialDescriptor> credentialDescriptors = new ArrayList<>(
                     allowCredentials.size());
 
+            ArrayList<AuthenticatorTransport> descriptors = new ArrayList();
+            descriptors.add(AuthenticatorTransport.Internal);
             for (int index = 0; index < allowCredentials.size(); index++) {
                 credentialDescriptors.add(new PublicKeyCredentialDescriptor(
                         PublicKeyCredentialType.PublicKey,
                         Base64.decode(allowCredentials.get(index).id,
                                 Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE),
-                        new ArrayList<>()));
+                        descriptors));
             }
-//            builder.setAllowCredential(credentialDescriptors); // FIXME need to check
+            builder.setAllowCredential(credentialDescriptors);
             SignInResponse sign = new SignInResponse();
             client.get(builder, new Continuation<>() {
                 @NonNull
