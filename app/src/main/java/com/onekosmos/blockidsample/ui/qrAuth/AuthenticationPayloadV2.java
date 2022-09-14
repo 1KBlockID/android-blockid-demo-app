@@ -2,7 +2,10 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import androidx.annotation.Keep;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+
+import org.json.JSONObject;
 
 /**
  * Created by 1Kosmos Engineering
@@ -23,6 +26,7 @@ public class AuthenticationPayloadV2 {
     public String expiresDate;
     @SerializedName("__v")
     public String version;
+    public MetaData metadata;
 
     public AuthenticationPayloadV1 getAuthRequestModel(String sessionUrl) {
         AuthenticationPayloadV1 authenticationPayloadV1 = new AuthenticationPayloadV1();
@@ -36,6 +40,7 @@ public class AuthenticationPayloadV2 {
         authenticationPayloadV1.community = origin.communityName;
         authenticationPayloadV1.authPage = origin.authPage;
         authenticationPayloadV1.sessionURL = sessionUrl;
+        authenticationPayloadV1.metadata = metadata;
         return authenticationPayloadV1;
     }
 

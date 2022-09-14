@@ -28,6 +28,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -170,6 +171,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                     result.getData().getStringExtra(K_AUTH_REQUEST_MODEL),
                                     AuthenticationPayloadV1.class);
                             BIDGenericResponse response = BlockIDSDK.getInstance().getScopes(
+                                    this,
                                     null, mAuthenticationPayloadV1.scopes,
                                     mAuthenticationPayloadV1.creds,
                                     mAuthenticationPayloadV1.getOrigin(),
@@ -308,11 +310,17 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                          double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+
+        LinkedHashMap<String, Object> metadata = null;
+        if (mAuthenticationPayloadV1.metadata != null &&
+                mAuthenticationPayloadV1.metadata.webauthn_challenge != null) {
+            metadata = new LinkedHashMap<>();
+            metadata.put("webauthn_challenge", mAuthenticationPayloadV1.metadata.webauthn_challenge);
+        }
+        BlockIDSDK.getInstance().authenticateUser(this, null, authenticationPayloadV1.session,
                 mAuthenticationPayloadV1.sessionURL, authenticationPayloadV1.scopes,
-                null,
-                authenticationPayloadV1.creds,
-                authenticationPayloadV1.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
+                metadata, authenticationPayloadV1.creds, authenticationPayloadV1.getOrigin(),
+                String.valueOf(latitude), String.valueOf(longitude),
                 BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
