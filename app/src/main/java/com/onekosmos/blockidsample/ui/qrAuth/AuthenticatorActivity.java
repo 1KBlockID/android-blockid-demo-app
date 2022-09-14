@@ -171,7 +171,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                     result.getData().getStringExtra(K_AUTH_REQUEST_MODEL),
                                     AuthenticationPayloadV1.class);
                             BIDGenericResponse response = BlockIDSDK.getInstance().getScopes(
-                                    this,
                                     null, mAuthenticationPayloadV1.scopes,
                                     mAuthenticationPayloadV1.creds,
                                     mAuthenticationPayloadV1.getOrigin(),
