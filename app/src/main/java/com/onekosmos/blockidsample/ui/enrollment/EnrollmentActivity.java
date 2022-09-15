@@ -185,6 +185,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                 Toast.makeText(this, getString(R.string.label_account_removed),
                         Toast.LENGTH_SHORT).show();
                 refreshEnrollmentRecyclerView();
+                BlockIDSDK.getInstance().setSelectedAccount(null);
                 return;
             }
             ErrorDialog errorDialog = new ErrorDialog(this);
