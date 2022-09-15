@@ -7,19 +7,13 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.Keep;
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,13 +26,9 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
-import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
-import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
@@ -59,28 +49,11 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-
-import kotlin.Result;
-import kotlin.coroutines.Continuation;
-import kotlin.coroutines.CoroutineContext;
-import kotlin.coroutines.EmptyCoroutineContext;
-import webauthnkit.core.authenticator.internal.ui.UserConsentUI;
-import webauthnkit.core.authenticator.internal.ui.UserConsentUIFactory;
-import webauthnkit.core.client.WebAuthnClient;
-import webauthnkit.core.data.AuthenticatorAssertionResponse;
-import webauthnkit.core.data.AuthenticatorTransport;
-import webauthnkit.core.data.PublicKeyCredential;
-import webauthnkit.core.data.PublicKeyCredentialDescriptor;
-import webauthnkit.core.data.PublicKeyCredentialRequestOptions;
-import webauthnkit.core.data.PublicKeyCredentialType;
-import webauthnkit.core.data.UserVerificationRequirement;
-import webauthnkit.core.util.WAKLogger;
 
 
 /**
