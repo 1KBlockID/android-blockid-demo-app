@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 @Keep
 @SuppressWarnings("ALL")
-public class MetaData {
+public class AuthenticationMetaData {
     WebauthnChallenge webauthn_challenge;
 
     @Keep

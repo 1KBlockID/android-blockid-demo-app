@@ -2,12 +2,9 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import androidx.annotation.Keep;
 
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
-
-import org.json.JSONObject;
 
 /**
  * Created by 1Kosmos Engineering
@@ -27,7 +24,7 @@ public class AuthenticationPayloadV1 {
     public String authPage;
     public String name;
     public String sessionURL;
-    public MetaData metadata;
+    public AuthenticationMetaData metadata;
 
     public BIDOrigin getOrigin() {
         BIDOrigin bidOrigin = new BIDOrigin();
