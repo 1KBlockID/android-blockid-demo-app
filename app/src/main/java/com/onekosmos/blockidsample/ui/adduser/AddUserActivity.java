@@ -17,7 +17,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -448,12 +447,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private void registerFidoKey(BIDLinkedAccount linkedAccount) {
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccount,
                 FIDO2KeyType.PLATFORM, (status, errorResponse) -> {
-                    if (status) {
-                        Log.e("Fido", "Success");
-                    } else {
-                        Log.e("Fido Error", errorResponse.getMessage() + "(" + errorResponse.getCode() + ")");
-
-                    }
                     hideProgress();
                     Toast.makeText(this, getString(R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();
