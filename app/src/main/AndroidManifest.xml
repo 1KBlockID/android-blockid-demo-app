@@ -25,11 +25,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BlockIDSdkDemo"
         android:usesCleartextTraffic="true"
-        tools:replace="android:allowBackup,android:label,android:theme">
+        tools:ignore="DataExtractionRules"
+        tools:replace="android:allowBackup,android:label,android:theme"
+        tools:targetApi="n">
+
         <activity
             android:name=".ui.SplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -108,7 +112,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.fido2.Fido2BaseActivity"
+            android:name=".ui.fido2.FIDO2BaseActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity
