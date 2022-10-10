@@ -216,4 +216,10 @@
     <string name="label_invalid_qr_code">Invalid QR Code</string>
     <string name="label_qr_code_scan_failed">QR Code scan failed.</string>
 
+    <string name="label_remove_ssn_title">SSN Removal!</string>
+    <string name="label_remove_ssn">Do you want to remove SSN?</string>
+    <string name="label_enroll_dl">Please enroll Drivers License to
+        continue with SSN Verification.</string>
+    <string name="label_register_ssn">Do you want to register your verified SSN?</string>
+    <string name="label_enrolling_ssn">Enrolling SSN?</string>
 </resources>
