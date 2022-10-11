@@ -378,7 +378,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument("", SSN.getValue(),
+                                    getUserDocument(null, SSN.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeSSNMap = gson.fromJson(jsonArray.
