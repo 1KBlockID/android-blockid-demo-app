@@ -106,18 +106,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
 
-        DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
-            mCalendar.set(Calendar.YEAR, year);
-            mCalendar.set(Calendar.MONTH, month);
-            mCalendar.set(Calendar.DAY_OF_MONTH, day);
-            SimpleDateFormat dateFormat = new SimpleDateFormat(displayDateFormat, Locale.US);
-            mBirthDate.setText(dateFormat.format(mCalendar.getTime()));
-        };
-        mBirthDate.setOnClickListener(view -> {
-            DatePickerDialog dpDialog = new DatePickerDialog(VerifySSNActivity.this, date, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
-            dpDialog.getDatePicker().setMaxDate(new Date().getTime());
-            dpDialog.show();
-        });
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
                 mContinueBtn.setBackgroundColor(getColor(android.R.color.darker_gray));
