@@ -1,13 +1,11 @@
 package com.onekosmos.blockidsample.ui.verifySSN;
 
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -59,7 +57,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -79,8 +76,7 @@ public class VerifySSNActivity extends AppCompatActivity {
     private CheckBox mConsentCB;
     private Button mContinueBtn;
     private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
-    final Calendar mCalendar = Calendar.getInstance();
-    private String requiredDateFormat = "yyyy/MM/dd";
+    private String requiredDateFormat = "yyyyMMdd";
     private String displayDateFormat = "MM-dd-yyyy";
     private String mMaskData = "XXXXXX";
     private JSONArray maskedJsonArray = new JSONArray();
@@ -128,28 +124,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         });
     }
 
-    private JSONObject getDLData() {
-        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
-            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name());
-            try {
-                JSONArray dlDoc = new JSONArray(dlArrayList);
-                if (dlDoc != null && dlDoc.length() >= 0) {
-
-                    JSONObject dlObject = dlDoc.getJSONObject(0);
-
-                    if (dlObject.has("dob")) {
-                        mBirthDate.setText(changeDateFormat(dlObject.getString("dob"), "yyyymmdd", displayDateFormat));
-                    }
-
-                    return dlObject;
-                }
-            } catch (JSONException e) {
-                return null;
-            }
-        }
-        return null;
-    }
-
     @Override
     public void onBackPressed() {
         if (mWebLayout.getVisibility() == View.VISIBLE) {
@@ -190,54 +164,9 @@ public class VerifySSNActivity extends AppCompatActivity {
         ProgressDialog progressDialog = new ProgressDialog(this, getString(
                 R.string.label_verifying_ssn));
         progressDialog.show();
-
-        JSONObject dlObject = getDLData();
-
         mSSNMap.put("id", mSSN.getText().toString().trim());
         mSSNMap.put("type", SSN.getValue());
-        mSSNMap.put("category", misc_document.name());
-        mSSNMap.put("userConsent", mConsentCB.isChecked());
         mSSNMap.put("ssn", mSSN.getText().toString().trim());
-        if (dlObject != null) {
-            try {
-                if (dlObject.has("firstName")) {
-                    mSSNMap.put("firstName", dlObject.getString("firstName"));
-                }
-
-                if (dlObject.has("middleName")) {
-                    String middleName = dlObject.getString("middleName");
-                    if (!TextUtils.isEmpty(middleName)) {
-                        mSSNMap.put("middleName", middleName);
-                    }
-                }
-
-                if (dlObject.has("lastName")) {
-                    mSSNMap.put("lastName", dlObject.getString("lastName"));
-                }
-
-                if (dlObject.has("street")) {
-                    mSSNMap.put("street", dlObject.getString("street"));
-                }
-
-                if (dlObject.has("city")) {
-                    mSSNMap.put("city", dlObject.getString("city"));
-                }
-
-                if (dlObject.has("state")) {
-                    mSSNMap.put("state", dlObject.getString("state"));
-                }
-
-                if (dlObject.has("zipCode")) {
-                    mSSNMap.put("zipCode", dlObject.getString("zipCode"));
-                }
-
-                if (dlObject.has("country")) {
-                    mSSNMap.put("country", dlObject.getString("country"));
-                }
-            } catch (Exception e) {
-                return;
-            }
-        }
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mSSNMap,
