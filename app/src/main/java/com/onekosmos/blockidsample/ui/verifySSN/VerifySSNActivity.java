@@ -351,7 +351,6 @@ public class VerifySSNActivity extends AppCompatActivity {
                                     dialog -> {
                                         errorDialog.dismiss();
                                         finish();
-                                        registerSSN(dataObject);
                                     });
                         } else {
                             handleInvalidData();
@@ -393,8 +392,8 @@ public class VerifySSNActivity extends AppCompatActivity {
     private String addYearsToDate(String date) {
         try {
             Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
-            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyyMMdd");
+            SimpleDateFormat inputFormat = new SimpleDateFormat(requiredDateFormat);
+            SimpleDateFormat outputFormat = new SimpleDateFormat(requiredDateFormat);
             calendar.setTime(Objects.requireNonNull(inputFormat.parse(date)));
             calendar.add(Calendar.YEAR, 150);
             return outputFormat.format(calendar.getTime());
