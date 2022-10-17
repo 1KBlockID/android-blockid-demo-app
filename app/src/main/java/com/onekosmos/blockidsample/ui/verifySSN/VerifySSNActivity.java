@@ -86,7 +86,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_ssn);
 
-        getDLData();
+        
         mScrollView = findViewById(R.id.scrollView);
         mWebLayout = findViewById(R.id.webLayout);
         mBackBtn = findViewById(R.id.bckBtn);
@@ -102,6 +102,11 @@ public class VerifySSNActivity extends AppCompatActivity {
 
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
+        JSONObject dataObject = getDLData();
+        if (dataObject.has("dob")) {
+                    mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
+                            "yyyymmdd", displayDateFormat));
+                }
 
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
@@ -275,11 +280,6 @@ public class VerifySSNActivity extends AppCompatActivity {
             JSONArray docData = new JSONArray(dlArrayList);
             if (docData.length() >= 0) {
                 JSONObject dataObject = docData.getJSONObject(0);
-
-                if (dataObject.has("dob")) {
-                    mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
-                            "yyyymmdd", displayDateFormat));
-                }
                 return dataObject;
             }
         } catch (Exception e) {
