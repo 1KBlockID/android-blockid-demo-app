@@ -33,6 +33,10 @@ android {
         exclude 'lib/x86_64/darwin/libscrypt.dylib'
         exclude 'lib/x86_64/freebsd/libscrypt.so'
         exclude 'lib/x86_64/linux/libscrypt.so'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE.md'
         exclude 'AndroidManifest.xml'
     }
 }
@@ -85,6 +89,7 @@ dependencies {
     //generate mnemonics
     implementation('org.bitcoinj:bitcoinj-core:0.16.1') {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
+        exclude group: 'net.jcip', module: 'jcip-annotations'
     }
 
     implementation 'androidx.biometric:biometric:1.1.0'
@@ -127,7 +132,7 @@ dependencies {
 
     // LiveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:17.0.1'
-    implementation 'com.google.guava:guava:27.1-android'
+    implementation 'com.google.guava:guava:31.0.1-android'
 
     // Text recognition
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:18.0.0'
@@ -152,6 +157,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // wallet connect
-    implementation 'com.walletconnect:WalletConnectKotlinV2:2.0.0-rc.2'
+    implementation ("com.walletconnect:sign:2.0.0-rc.5")
+    implementation ("com.walletconnect:android-core:1.0.0")
     implementation 'org.web3j:utils:5.0.0'
 }
