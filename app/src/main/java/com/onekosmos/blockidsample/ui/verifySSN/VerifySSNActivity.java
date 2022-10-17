@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.verifySSN;
+Hupackage com.onekosmos.blockidsample.ui.verifySSN;
 
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
@@ -275,7 +275,7 @@ public class VerifySSNActivity extends AppCompatActivity {
 
     private JSONObject getDLData() {
         try {
-            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("",
+            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument(null,
                     DL.getValue(), identity_document.name());
             JSONArray docData = new JSONArray(dlArrayList);
             if (docData.length() >= 0) {
