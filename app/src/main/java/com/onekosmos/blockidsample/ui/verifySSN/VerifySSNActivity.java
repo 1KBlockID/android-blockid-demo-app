@@ -1,10 +1,12 @@
-Hupackage com.onekosmos.blockidsample.ui.verifySSN;
+package com.onekosmos.blockidsample.ui.verifySSN;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,7 +32,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
@@ -64,8 +65,8 @@ import java.util.Objects;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class VerifySSNActivity extends AppCompatActivity {
-
-    private final String[] K_STORAGE_PERMISSION = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+    private final String[] K_STORAGE_PERMISSION = new String[]{WRITE_EXTERNAL_STORAGE,
+            READ_EXTERNAL_STORAGE};
     private int K_STORAGE_PERMISSION_REQUEST_CODE = 1001;
     private ImageView mBackBtn, mWebShareButton, mWebCancelButton;
     private EditText mSSN, mBirthDate;
@@ -75,7 +76,6 @@ public class VerifySSNActivity extends AppCompatActivity {
     private TextView mBackText, mBackTextWebView;
     private CheckBox mConsentCB;
     private Button mContinueBtn;
-    private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
     private String requiredDateFormat = "yyyyMMdd";
     private String displayDateFormat = "MM-dd-yyyy";
     private String mMaskData = "XXXXXX";
@@ -86,7 +86,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_ssn);
 
-        
         mScrollView = findViewById(R.id.scrollView);
         mWebLayout = findViewById(R.id.webLayout);
         mBackBtn = findViewById(R.id.bckBtn);
@@ -103,10 +102,13 @@ public class VerifySSNActivity extends AppCompatActivity {
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
         JSONObject dataObject = getDLData();
-        if (dataObject.has("dob")) {
-                    mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
-                            "yyyymmdd", displayDateFormat));
-                }
+        try {
+            if (dataObject != null && dataObject.has("dob")) {
+                mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
+                        "yyyymmdd", displayDateFormat));
+            }
+        } catch (Exception ignore) {
+        }
 
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
@@ -153,8 +155,10 @@ public class VerifySSNActivity extends AppCompatActivity {
     public String changeDateFormat(String time, String inputFormatDate, String outputFormatDate) {
         String inputPattern = inputFormatDate;
         String outputPattern = outputFormatDate;
-        SimpleDateFormat inputFormat = new SimpleDateFormat(inputPattern);
-        SimpleDateFormat outputFormat = new SimpleDateFormat(outputPattern);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat inputFormat =
+                new SimpleDateFormat(inputPattern);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat outputFormat =
+                new SimpleDateFormat(outputPattern);
 
         Date date = null;
 
@@ -167,12 +171,14 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     private void verifySSN() {
-        ProgressDialog progressDialog = new ProgressDialog(this, getString(
-                R.string.label_verifying_ssn));
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_verifying_ssn));
         progressDialog.show();
-        mSSNMap.put("id", mSSN.getText().toString().trim());
+        LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
+        String ssnNumber = mSSN.getText().toString().trim();
+        mSSNMap.put("id", BIDUtil.getSha256Hash(ssnNumber));
         mSSNMap.put("type", SSN.getValue());
-        mSSNMap.put("ssn", mSSN.getText().toString().trim());
+        mSSNMap.put("ssn", ssnNumber);
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mSSNMap,
@@ -217,8 +223,7 @@ public class VerifySSNActivity extends AppCompatActivity {
                                         .getString("authority"));
                                 handleSuccessSSNVerification(verifiedPersonObject);
                             }
-                        } catch (JSONException e) {
-                            return;
+                        } catch (JSONException ignore) {
                         }
                     } else {
                         progressDialog.dismiss();
@@ -227,11 +232,12 @@ public class VerifySSNActivity extends AppCompatActivity {
                             errorDialog.dismiss();
                             finish();
                         };
-                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
                             errorDialog.showNoInternetDialog(onDismissListener);
                             return;
                         }
-                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage(), onDismissListener);
                     }
                 });
     }
@@ -321,14 +327,12 @@ public class VerifySSNActivity extends AppCompatActivity {
                 getString(R.string.label_yes),
                 getString(R.string.label_no),
                 (dialogInterface, i) -> errorDialog.dismiss(),
-                dialog -> {
-                    registerSSN(dataObject);
-                });
+                dialog -> registerSSN(dataObject));
     }
 
     private void registerSSN(JSONObject dataObject) {
-        ProgressDialog progressDialog = new ProgressDialog(this, getString(
-                R.string.label_enrolling_ssn));
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_enrolling_ssn));
         progressDialog.show();
         try {
             LinkedHashMap<String, Object> ssnMap = new LinkedHashMap<>();
@@ -422,7 +426,8 @@ public class VerifySSNActivity extends AppCompatActivity {
         String requiredDateFormat;
         try {
             String day = numberConversion(dateObject.getJSONObject("day").getString("value"));
-            String month = numberConversion(dateObject.getJSONObject("month").getString("value"));
+            String month = numberConversion(dateObject.getJSONObject("month").
+                    getString("value"));
             String year = dateObject.getJSONObject("year").getString("value");
             requiredDateFormat = year.concat(month).concat(day);
         } catch (JSONException ignored) {
@@ -460,9 +465,7 @@ public class VerifySSNActivity extends AppCompatActivity {
                 getString(R.string.label_error),
                 getString(R.string.bad_data),
                 getString(R.string.label_retry),
-                dialog -> {
-                    errorDialog.dismiss();
-                });
+                dialog -> errorDialog.dismiss());
     }
 
     private void maskSSNResponse(JSONObject responseObject) {
@@ -474,18 +477,22 @@ public class VerifySSNActivity extends AppCompatActivity {
                                 has("verifiedPeople")) {
                     JSONArray verifiedPeopleArray = certifications.getJSONObject(index).
                             getJSONObject("metadata").getJSONArray("verifiedPeople");
-                    for (int verifiedPeopleIndex = 0; verifiedPeopleIndex < verifiedPeopleArray.length(); verifiedPeopleIndex++) {
+                    for (int verifiedPeopleIndex = 0; verifiedPeopleIndex <
+                            verifiedPeopleArray.length(); verifiedPeopleIndex++) {
                         JSONObject data = verifiedPeopleArray.getJSONObject(verifiedPeopleIndex);
 
-                        if (data.has("firstName") && data.getJSONObject("firstName").has("value")) {
+                        if (data.has("firstName") && data.getJSONObject("firstName").
+                                has("value")) {
                             data.getJSONObject("firstName").put("value", mMaskData);
                         }
 
-                        if (data.has("middleName") && data.getJSONObject("middleName").has("value")) {
+                        if (data.has("middleName") && data.getJSONObject("middleName").
+                                has("value")) {
                             data.getJSONObject("middleName").put("value", mMaskData);
                         }
 
-                        if (data.has("lastName") && data.getJSONObject("lastName").has("value")) {
+                        if (data.has("lastName") && data.getJSONObject("lastName").
+                                has("value")) {
                             data.getJSONObject("lastName").put("value", mMaskData);
                         }
 
@@ -495,15 +502,18 @@ public class VerifySSNActivity extends AppCompatActivity {
 
                         if (data.has("dateOfBirth")) {
                             if (data.getJSONObject("dateOfBirth").has("month")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("month").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("month").
+                                        put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("day")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("day").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("day").
+                                        put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("year")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("year").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("year").
+                                        put("value", mMaskData);
                             }
                         }
 
@@ -512,20 +522,26 @@ public class VerifySSNActivity extends AppCompatActivity {
                         }
 
                         if (data.has("addresses")) {
-                            for (int addIndex = 0; addIndex < data.getJSONArray("addresses").length(); addIndex++) {
-                                data.getJSONArray("addresses").getJSONObject(addIndex).put("value", mMaskData);
+                            for (int addIndex = 0; addIndex < data.getJSONArray("addresses").
+                                    length(); addIndex++) {
+                                data.getJSONArray("addresses").getJSONObject(addIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
                         if (data.has("emails")) {
-                            for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").length(); emailIndex++) {
-                                data.getJSONArray("emails").getJSONObject(emailIndex).put("value", mMaskData);
+                            for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").
+                                    length(); emailIndex++) {
+                                data.getJSONArray("emails").getJSONObject(emailIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
                         if (data.has("phones")) {
-                            for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").length(); phoneIndex++) {
-                                data.getJSONArray("phones").getJSONObject(phoneIndex).put("value", mMaskData);
+                            for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").
+                                    length(); phoneIndex++) {
+                                data.getJSONArray("phones").getJSONObject(phoneIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
@@ -544,7 +560,8 @@ public class VerifySSNActivity extends AppCompatActivity {
         int currentAPIVersion = Build.VERSION.SDK_INT;
         if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
             if (!AppPermissionUtils.isPermissionGiven(K_STORAGE_PERMISSION, this)) {
-                AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE, K_STORAGE_PERMISSION);
+                AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE,
+                        K_STORAGE_PERMISSION);
             } else {
                 shareMaskedResponse();
             }
@@ -554,15 +571,16 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_STORAGE_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_STORAGE_PERMISSION)) {
             shareMaskedResponse();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
+            errorDialog.show(null, "",
                     getString(R.string.label_storage_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
@@ -584,7 +602,8 @@ public class VerifySSNActivity extends AppCompatActivity {
             outStream.writeBytes(maskedRespStr);
             outStream.close();
             File file = new File(filePath);
-            Uri uri = FileProvider.getUriForFile(VerifySSNActivity.this, "com.onekosmos.blockidsample.provider", file);
+            Uri uri = FileProvider.getUriForFile(VerifySSNActivity.this,
+                    "com.onekosmos.blockidsample.provider", file);
             String[] to = {"ssn-crowd-test@1kosmos.com"};
 
             Intent intent = new Intent(Intent.ACTION_SEND);
