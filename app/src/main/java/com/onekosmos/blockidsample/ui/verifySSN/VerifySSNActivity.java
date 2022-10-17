@@ -86,6 +86,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_ssn);
 
+        getDLData();
         mScrollView = findViewById(R.id.scrollView);
         mWebLayout = findViewById(R.id.webLayout);
         mBackBtn = findViewById(R.id.bckBtn);
@@ -257,19 +258,34 @@ public class VerifySSNActivity extends AppCompatActivity {
     private String returnDataFromEnrolledDocument(String detailType) {
         String value = null;
         try {
-            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("",
-                    DL.getValue(), identity_document.name());
-            JSONArray docData = new JSONArray(dlArrayList);
-            if (docData.length() >= 0) {
-                JSONObject dataObject = docData.getJSONObject(0);
-                if (dataObject.has(detailType)) {
-                    value = dataObject.getString(detailType);
-                }
+            JSONObject dataObject = getDLData();
+            if (dataObject.has(detailType)) {
+                value = dataObject.getString(detailType);
             }
         } catch (JSONException e) {
             return null;
         }
         return value;
+    }
+
+    private JSONObject getDLData() {
+        try {
+            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("",
+                    DL.getValue(), identity_document.name());
+            JSONArray docData = new JSONArray(dlArrayList);
+            if (docData.length() >= 0) {
+                JSONObject dataObject = docData.getJSONObject(0);
+
+                if (dataObject.has("dob")) {
+                    mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
+                            "yyyymmdd", displayDateFormat));
+                }
+                return dataObject;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
     }
 
     private void handleFailedSSNVerification(JSONObject responseObject) {
