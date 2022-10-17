@@ -5,6 +5,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -365,6 +366,40 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onVerifySSNClicked() {
+        if (BlockIDSDK.getInstance().isSSNEnrolled()) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithTwoButton(
+                    null,
+                    getString(R.string.label_remove_ssn_title),
+                    getString(R.string.label_remove_ssn),
+                    getString(R.string.label_yes), getString(R.string.label_no),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        try {
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, SSN.getValue(),
+                                            identity_document.name()));
+                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                            LinkedHashMap<String, Object> removeSSNMap = gson.fromJson(jsonArray.
+                                            getString(0),
+                                    new TypeToken<LinkedHashMap<String, Object>>() {
+                                    }.getType());
+                            removeDocument(removeSSNMap);
+                        } catch (JSONException e) {
+                            // do nothing
+                        }
+                    });
+            return;
+        } else if (!BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithOneButton(null, null,
+                    getString(R.string.label_enroll_dl),
+                    getString(R.string.label_ok), dialog -> {
+                        errorDialog.dismiss();
+                    });
+            return;
+        }
         Intent intent = new Intent(this, VerifySSNActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);

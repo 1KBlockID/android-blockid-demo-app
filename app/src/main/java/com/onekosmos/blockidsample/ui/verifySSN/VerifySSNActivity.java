@@ -1,13 +1,21 @@
 package com.onekosmos.blockidsample.ui.verifySSN;
 
-import android.Manifest;
-import android.app.DatePickerDialog;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
+
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -24,9 +32,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.document.RegisterDocType;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -38,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,33 +58,25 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Locale;
-
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.misc_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class VerifySSNActivity extends AppCompatActivity {
-
-    private final String[] K_STORAGE_PERMISSION = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+    private final String[] K_STORAGE_PERMISSION = new String[]{WRITE_EXTERNAL_STORAGE,
+            READ_EXTERNAL_STORAGE};
     private int K_STORAGE_PERMISSION_REQUEST_CODE = 1001;
     private ImageView mBackBtn, mWebShareButton, mWebCancelButton;
-    private EditText mSSN, mFirstName, mMiddleName, mLastName, mBirthDate, mStreet, mCity, mState,
-            mZipCode, mPhone, mEmail, mCountry;
+    private EditText mSSN, mBirthDate;
     private ScrollView mScrollView;
     private RelativeLayout mWebLayout;
     private WebView mWebView;
     private TextView mBackText, mBackTextWebView;
     private CheckBox mConsentCB;
     private Button mContinueBtn;
-    private LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
-    final Calendar mCalendar = Calendar.getInstance();
-    private String requiredDateFormat = "yyyy/MM/dd";
+    private String requiredDateFormat = "yyyyMMdd";
     private String displayDateFormat = "MM-dd-yyyy";
     private String mMaskData = "XXXXXX";
     private JSONArray maskedJsonArray = new JSONArray();
@@ -87,17 +90,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mWebLayout = findViewById(R.id.webLayout);
         mBackBtn = findViewById(R.id.bckBtn);
         mSSN = findViewById(R.id.ssn_text);
-        mFirstName = findViewById(R.id.firstname_text);
-        mMiddleName = findViewById(R.id.middlename_text);
-        mLastName = findViewById(R.id.lastname_text);
         mBirthDate = findViewById(R.id.bdate_text);
-        mStreet = findViewById(R.id.address_text);
-        mCity = findViewById(R.id.city_text);
-        mState = findViewById(R.id.state_text);
-        mZipCode = findViewById(R.id.zip_text);
-        mCountry = findViewById(R.id.country);
-        mPhone = findViewById(R.id.phone_text);
-        mEmail = findViewById(R.id.email_text);
         mConsentCB = findViewById(R.id.consent_cb);
         mContinueBtn = findViewById(R.id.btn_continue);
         mBackText = findViewById(R.id.txt_back);
@@ -108,21 +101,15 @@ public class VerifySSNActivity extends AppCompatActivity {
 
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
+        JSONObject dataObject = getDLData();
+        try {
+            if (dataObject != null && dataObject.has("dob")) {
+                mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
+                        "yyyymmdd", displayDateFormat));
+            }
+        } catch (Exception ignore) {
+        }
 
-        populateDLData();
-
-        DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
-            mCalendar.set(Calendar.YEAR, year);
-            mCalendar.set(Calendar.MONTH, month);
-            mCalendar.set(Calendar.DAY_OF_MONTH, day);
-            SimpleDateFormat dateFormat = new SimpleDateFormat(displayDateFormat, Locale.US);
-            mBirthDate.setText(dateFormat.format(mCalendar.getTime()));
-        };
-        mBirthDate.setOnClickListener(view -> {
-            DatePickerDialog dpDialog = new DatePickerDialog(VerifySSNActivity.this, date, mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH));
-            dpDialog.getDatePicker().setMaxDate(new Date().getTime());
-            dpDialog.show();
-        });
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
                 mContinueBtn.setBackgroundColor(getColor(android.R.color.darker_gray));
@@ -145,57 +132,6 @@ public class VerifySSNActivity extends AppCompatActivity {
         });
     }
 
-    private void populateDLData() {
-        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
-            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name());
-            try {
-                JSONArray dlDoc = new JSONArray(dlArrayList);
-                if (dlDoc != null && dlDoc.length() >= 0) {
-
-                    JSONObject dlObject = dlDoc.getJSONObject(0);
-
-                    if (dlObject.has("firstName")) {
-                        mFirstName.setText(dlObject.getString("firstName"));
-                    }
-
-                    if (dlObject.has("middleName")) {
-                        mMiddleName.setText(dlObject.getString("middleName"));
-                    }
-
-                    if (dlObject.has("lastName")) {
-                        mLastName.setText(dlObject.getString("lastName"));
-                    }
-
-                    if (dlObject.has("dob")) {
-                        mBirthDate.setText(changeDateFormat(dlObject.getString("dob"), "yyyymmdd", displayDateFormat));
-                    }
-
-                    if (dlObject.has("street")) {
-                        mStreet.setText(dlObject.getString("street"));
-                    }
-
-                    if (dlObject.has("city")) {
-                        mCity.setText(dlObject.getString("city"));
-                    }
-
-                    if (dlObject.has("state")) {
-                        mState.setText(dlObject.getString("state"));
-                    }
-
-                    if (dlObject.has("zipCode")) {
-                        mZipCode.setText(dlObject.getString("zipCode"));
-                    }
-
-                    if (dlObject.has("country")) {
-                        mCountry.setText(dlObject.getString("country"));
-                    }
-                }
-            } catch (JSONException e) {
-                return;
-            }
-        }
-    }
-
     @Override
     public void onBackPressed() {
         if (mWebLayout.getVisibility() == View.VISIBLE) {
@@ -209,22 +145,8 @@ public class VerifySSNActivity extends AppCompatActivity {
     private void validateAndVerifySSN() {
         if (TextUtils.isEmpty(mSSN.getText().toString().trim())) {
             Toast.makeText(this, "Enter SSN", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mFirstName.getText().toString().trim())) {
-            Toast.makeText(this, "Enter First Name", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mLastName.getText().toString().trim())) {
-            Toast.makeText(this, "Enter Last Name", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(mBirthDate.getText().toString().trim())) {
             Toast.makeText(this, "Enter Birth Date", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mStreet.getText().toString().trim())) {
-            Toast.makeText(this, "Enter Address", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mCity.getText().toString().trim())) {
-            Toast.makeText(this, "Enter City", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mState.getText().toString().trim())) {
-            Toast.makeText(this, "Enter State", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mZipCode.getText().toString().trim())) {
-            Toast.makeText(this, "Enter Zip Code", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(mCountry.getText().toString().trim())) {
-            Toast.makeText(this, "Enter Country", Toast.LENGTH_SHORT).show();
         } else {
             verifySSN();
         }
@@ -233,8 +155,10 @@ public class VerifySSNActivity extends AppCompatActivity {
     public String changeDateFormat(String time, String inputFormatDate, String outputFormatDate) {
         String inputPattern = inputFormatDate;
         String outputPattern = outputFormatDate;
-        SimpleDateFormat inputFormat = new SimpleDateFormat(inputPattern);
-        SimpleDateFormat outputFormat = new SimpleDateFormat(outputPattern);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat inputFormat =
+                new SimpleDateFormat(inputPattern);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat outputFormat =
+                new SimpleDateFormat(outputPattern);
 
         Date date = null;
 
@@ -247,37 +171,16 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     private void verifySSN() {
-        ProgressDialog progressDialog = new ProgressDialog(this, getString(
-                R.string.label_verifying_ssn));
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_verifying_ssn));
         progressDialog.show();
-
-        mSSNMap.put("id", mSSN.getText().toString().trim());
+        LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
+        String ssnNumber = mSSN.getText().toString().trim();
+        mSSNMap.put("id", BIDUtil.getSha256Hash(ssnNumber));
         mSSNMap.put("type", SSN.getValue());
-        mSSNMap.put("category", misc_document.name());
-        mSSNMap.put("userConsent", mConsentCB.isChecked());
-        mSSNMap.put("ssn", mSSN.getText().toString().trim());
-
-        mSSNMap.put("firstName", mFirstName.getText().toString().trim());
-        String middleName = mMiddleName.getText().toString().trim();
-        if (!TextUtils.isEmpty(middleName)) {
-            mSSNMap.put("middleName", middleName);
-        }
-        mSSNMap.put("lastName", mLastName.getText().toString().trim());
-        mSSNMap.put("street", mStreet.getText().toString().trim());
-        mSSNMap.put("city", mCity.getText().toString().trim());
-        mSSNMap.put("state", mState.getText().toString().trim());
-        mSSNMap.put("zipCode", mZipCode.getText().toString().trim());
-        mSSNMap.put("country", mCountry.getText().toString().trim());
-        mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(), displayDateFormat, requiredDateFormat));
-        String email = mEmail.getText().toString().trim();
-        if (!TextUtils.isEmpty(email)) {
-            mSSNMap.put("email", email);
-        }
-        String phone = mPhone.getText().toString().trim();
-        if (!TextUtils.isEmpty(phone)) {
-            mSSNMap.put("phone", phone);
-        }
-
+        mSSNMap.put("ssn", ssnNumber);
+        mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
+                displayDateFormat, requiredDateFormat));
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mSSNMap,
                 new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
                     if (status) {
@@ -285,29 +188,42 @@ public class VerifySSNActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(documentVerification);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
+                            JSONObject certificate = certificates.length() > 0 ?
+                                    certificates.getJSONObject(0) : null;
 
-                            boolean isVerified = false;
+                            if (certificate == null) {
+                                progressDialog.dismiss();
+                                handleInvalidData();
+                                return;
+                            }
 
-                            for (int index = 0; index < certificates.length(); index++) {
-                                if (certificates.getJSONObject(index).has("status") && certificates.getJSONObject(index).getInt("status") == 400) {
-                                    handleInvalidData();
-                                    break;
-                                }
 
-                                if (certificates.getJSONObject(index).has("verified") && certificates.getJSONObject(index).getBoolean("verified")) {
-                                    isVerified = true;
-                                } else {
-                                    isVerified = false;
+                            if (!certificate.getBoolean("verified") ||
+                                    certificate.getJSONObject("metadata").
+                                            getJSONArray("verifiedPeople")
+                                            .length() != 1) {
+                                progressDialog.dismiss();
+                                handleFailedSSNVerification(jsonObject);
+                            } else {
+                                JSONObject verifiedPersonObject = certificate.
+                                        getJSONObject("metadata")
+                                        .getJSONArray("verifiedPeople").getJSONObject(0);
+
+                                if (!isDataTriangulationSuccessful(verifiedPersonObject)) {
+                                    progressDialog.dismiss();
                                     handleFailedSSNVerification(jsonObject);
-                                    break;
+                                    return;
                                 }
+                                verifiedPersonObject.put("ssn", mSSN.getText().
+                                        toString().trim());
+                                verifiedPersonObject.put("certificate_token_value",
+                                        certificate
+                                                .getString("token"));
+                                verifiedPersonObject.put("proofedBy", certificate
+                                        .getString("authority"));
+                                handleSuccessSSNVerification(verifiedPersonObject);
                             }
-
-                            if (isVerified) {
-                                handleSuccessSSNVerification();
-                            }
-                        } catch (JSONException e) {
-                            return;
+                        } catch (JSONException ignore) {
                         }
                     } else {
                         progressDialog.dismiss();
@@ -316,13 +232,66 @@ public class VerifySSNActivity extends AppCompatActivity {
                             errorDialog.dismiss();
                             finish();
                         };
-                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
                             errorDialog.showNoInternetDialog(onDismissListener);
                             return;
                         }
-                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage(), onDismissListener);
                     }
                 });
+    }
+
+    private boolean isDataTriangulationSuccessful(JSONObject verifiedPersonObject) {
+        boolean isDataTriangulationSuccessful = false;
+        try {
+            String ssnFirstName = verifiedPersonObject.getJSONObject("firstName")
+                    .getString("value").toLowerCase();
+            String ssnLastName = verifiedPersonObject.getJSONObject("lastName")
+                    .getString("value").toLowerCase();
+            String docFirstName = Objects.requireNonNull(
+                    returnDataFromEnrolledDocument("firstName")).toLowerCase();
+            String docLastName = Objects.requireNonNull(
+                    returnDataFromEnrolledDocument("lastName")).toLowerCase();
+
+            if ((ssnFirstName.equals(docFirstName) &&
+                    ssnLastName.equals(docLastName) ||
+                    (ssnFirstName.equals(docLastName)
+                            && ssnLastName.equals(docFirstName)))) {
+                isDataTriangulationSuccessful = true;
+            }
+        } catch (JSONException e) {
+            return false;
+        }
+        return isDataTriangulationSuccessful;
+    }
+
+    private String returnDataFromEnrolledDocument(String detailType) {
+        String value = null;
+        try {
+            JSONObject dataObject = getDLData();
+            if (dataObject.has(detailType)) {
+                value = dataObject.getString(detailType);
+            }
+        } catch (JSONException e) {
+            return null;
+        }
+        return value;
+    }
+
+    private JSONObject getDLData() {
+        try {
+            String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument(null,
+                    DL.getValue(), identity_document.name());
+            JSONArray docData = new JSONArray(dlArrayList);
+            if (docData.length() >= 0) {
+                JSONObject dataObject = docData.getJSONObject(0);
+                return dataObject;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
     }
 
     private void handleFailedSSNVerification(JSONObject responseObject) {
@@ -350,16 +319,143 @@ public class VerifySSNActivity extends AppCompatActivity {
         mWebView.loadData(respObjStr, "text/json", "utf-8");
     }
 
-    private void handleSuccessSSNVerification() {
+    private void handleSuccessSSNVerification(JSONObject dataObject) {
         ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
-        errorDialog.showWithOneButton(null,
+        errorDialog.showWithTwoButton(null,
                 getString(R.string.label_success),
-                getString(R.string.ssn_verification_success),
-                getString(R.string.label_ok),
-                dialog -> {
-                    errorDialog.dismiss();
-                    finish();
-                });
+                getString(R.string.label_register_ssn),
+                getString(R.string.label_yes),
+                getString(R.string.label_no),
+                (dialogInterface, i) -> errorDialog.dismiss(),
+                dialog -> registerSSN(dataObject));
+    }
+
+    private void registerSSN(JSONObject dataObject) {
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_enrolling_ssn));
+        progressDialog.show();
+        try {
+            LinkedHashMap<String, Object> ssnMap = new LinkedHashMap<>();
+            ssnMap.put("id", BIDUtil.getSha256Hash(dataObject.getString("ssn")));
+            ssnMap.put("type", RegisterDocType.SSN.getValue());
+            ssnMap.put("documentId", BIDUtil.getSha256Hash(dataObject.getString("ssn")));
+            ssnMap.put("documentType", RegisterDocType.SSN.name());
+            ssnMap.put("image", getSSNImage());
+            ssnMap.put("category", identity_document.name());
+            ssnMap.put("ssn", dataObject.getString("ssn"));
+            ssnMap.put("proofedBy", dataObject.getString("proofedBy"));
+            ssnMap.put("firstName", dataObject.getJSONObject("firstName")
+                    .getString("value"));
+            ssnMap.put("middleName", dataObject.getJSONObject("middleName")
+                    .getString("value"));
+            ssnMap.put("lastName", dataObject.getJSONObject("lastName")
+                    .getString("value"));
+            ssnMap.put("dateOfBirth", parseDate(dataObject.getJSONObject("dateOfBirth")));
+            ssnMap.put("doe", addYearsToDate(parseDate(dataObject.getJSONObject("doe"))));
+            ssnMap.put("face", getBitMapToBase64(Objects
+                    .requireNonNull(getUserImage())));
+            ssnMap.put("addresses", getAddressArray(dataObject.getJSONArray("addresses")));
+            ssnMap.put("doi", parseDate(dataObject.getJSONObject("doi")));
+            ssnMap.put("verifiedScan", true);
+            ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
+
+            BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
+                    (status, error) -> {
+                        progressDialog.dismiss();
+                        if (status) {
+                            ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
+                            errorDialog.showWithOneButton(null,
+                                    getString(R.string.label_success),
+                                    getString(R.string.label_ssn_enrolled_successfully),
+                                    getString(R.string.label_ok),
+                                    dialog -> {
+                                        errorDialog.dismiss();
+                                        finish();
+                                    });
+                        } else {
+                            handleInvalidData();
+                        }
+                    });
+
+        } catch (Exception e) {
+            progressDialog.dismiss();
+            handleInvalidData();
+        }
+    }
+
+    private String[] getAddressArray(JSONArray addresses) {
+        int addressesLength = addresses.length();
+        String[] addressList = new String[addressesLength];
+        for (int addressIndex = 0; addressIndex < addresses.length(); addressIndex++) {
+            try {
+                addressList[addressIndex] = (addresses.getJSONObject(addressIndex)
+                        .getString("value"));
+            } catch (JSONException e) {
+                return addressList;
+            }
+        }
+        return addressList;
+    }
+
+    private Bitmap getUserImage() {
+        BIDGenericResponse response = BlockIDSDK.getInstance().getLiveIdImage();
+        if (response == null)
+            return null;
+
+        if (response.getDataObject() == null)
+            return null;
+
+        return response.getDataObject();
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String addYearsToDate(String date) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat inputFormat = new SimpleDateFormat(requiredDateFormat);
+            SimpleDateFormat outputFormat = new SimpleDateFormat(requiredDateFormat);
+            calendar.setTime(Objects.requireNonNull(inputFormat.parse(date)));
+            calendar.add(Calendar.YEAR, 150);
+            return outputFormat.format(calendar.getTime());
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    private String parseDate(JSONObject dateObject) {
+        String requiredDateFormat;
+        try {
+            String day = numberConversion(dateObject.getJSONObject("day").getString("value"));
+            String month = numberConversion(dateObject.getJSONObject("month").
+                    getString("value"));
+            String year = dateObject.getJSONObject("year").getString("value");
+            requiredDateFormat = year.concat(month).concat(day);
+        } catch (JSONException ignored) {
+            return null;
+        }
+        return requiredDateFormat;
+    }
+
+    private String numberConversion(String value) {
+        String formattedValue;
+        if (Integer.parseInt(value) > 9) {
+            formattedValue = value;
+        } else {
+            formattedValue = "0".concat(value);
+        }
+        return formattedValue;
+    }
+
+    private String getSSNImage() {
+        Bitmap ssnImage = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        return getBitMapToBase64(ssnImage);
+    }
+
+    private static String getBitMapToBase64(Bitmap bmp) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
     private void handleInvalidData() {
@@ -369,9 +465,7 @@ public class VerifySSNActivity extends AppCompatActivity {
                 getString(R.string.label_error),
                 getString(R.string.bad_data),
                 getString(R.string.label_retry),
-                dialog -> {
-                    errorDialog.dismiss();
-                });
+                dialog -> errorDialog.dismiss());
     }
 
     private void maskSSNResponse(JSONObject responseObject) {
@@ -383,18 +477,22 @@ public class VerifySSNActivity extends AppCompatActivity {
                                 has("verifiedPeople")) {
                     JSONArray verifiedPeopleArray = certifications.getJSONObject(index).
                             getJSONObject("metadata").getJSONArray("verifiedPeople");
-                    for (int verifiedPeopleIndex = 0; verifiedPeopleIndex < verifiedPeopleArray.length(); verifiedPeopleIndex++) {
+                    for (int verifiedPeopleIndex = 0; verifiedPeopleIndex <
+                            verifiedPeopleArray.length(); verifiedPeopleIndex++) {
                         JSONObject data = verifiedPeopleArray.getJSONObject(verifiedPeopleIndex);
 
-                        if (data.has("firstName") && data.getJSONObject("firstName").has("value")) {
+                        if (data.has("firstName") && data.getJSONObject("firstName").
+                                has("value")) {
                             data.getJSONObject("firstName").put("value", mMaskData);
                         }
 
-                        if (data.has("middleName") && data.getJSONObject("middleName").has("value")) {
+                        if (data.has("middleName") && data.getJSONObject("middleName").
+                                has("value")) {
                             data.getJSONObject("middleName").put("value", mMaskData);
                         }
 
-                        if (data.has("lastName") && data.getJSONObject("lastName").has("value")) {
+                        if (data.has("lastName") && data.getJSONObject("lastName").
+                                has("value")) {
                             data.getJSONObject("lastName").put("value", mMaskData);
                         }
 
@@ -404,15 +502,18 @@ public class VerifySSNActivity extends AppCompatActivity {
 
                         if (data.has("dateOfBirth")) {
                             if (data.getJSONObject("dateOfBirth").has("month")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("month").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("month").
+                                        put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("day")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("day").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("day").
+                                        put("value", mMaskData);
                             }
 
                             if (data.getJSONObject("dateOfBirth").has("year")) {
-                                data.getJSONObject("dateOfBirth").getJSONObject("year").put("value", mMaskData);
+                                data.getJSONObject("dateOfBirth").getJSONObject("year").
+                                        put("value", mMaskData);
                             }
                         }
 
@@ -421,20 +522,26 @@ public class VerifySSNActivity extends AppCompatActivity {
                         }
 
                         if (data.has("addresses")) {
-                            for (int addIndex = 0; addIndex < data.getJSONArray("addresses").length(); addIndex++) {
-                                data.getJSONArray("addresses").getJSONObject(addIndex).put("value", mMaskData);
+                            for (int addIndex = 0; addIndex < data.getJSONArray("addresses").
+                                    length(); addIndex++) {
+                                data.getJSONArray("addresses").getJSONObject(addIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
                         if (data.has("emails")) {
-                            for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").length(); emailIndex++) {
-                                data.getJSONArray("emails").getJSONObject(emailIndex).put("value", mMaskData);
+                            for (int emailIndex = 0; emailIndex < data.getJSONArray("emails").
+                                    length(); emailIndex++) {
+                                data.getJSONArray("emails").getJSONObject(emailIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
                         if (data.has("phones")) {
-                            for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").length(); phoneIndex++) {
-                                data.getJSONArray("phones").getJSONObject(phoneIndex).put("value", mMaskData);
+                            for (int phoneIndex = 0; phoneIndex < data.getJSONArray("phones").
+                                    length(); phoneIndex++) {
+                                data.getJSONArray("phones").getJSONObject(phoneIndex).
+                                        put("value", mMaskData);
                             }
                         }
 
@@ -453,7 +560,8 @@ public class VerifySSNActivity extends AppCompatActivity {
         int currentAPIVersion = Build.VERSION.SDK_INT;
         if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
             if (!AppPermissionUtils.isPermissionGiven(K_STORAGE_PERMISSION, this)) {
-                AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE, K_STORAGE_PERMISSION);
+                AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE,
+                        K_STORAGE_PERMISSION);
             } else {
                 shareMaskedResponse();
             }
@@ -463,15 +571,16 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_STORAGE_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_STORAGE_PERMISSION)) {
             shareMaskedResponse();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
+            errorDialog.show(null, "",
                     getString(R.string.label_storage_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
@@ -493,7 +602,8 @@ public class VerifySSNActivity extends AppCompatActivity {
             outStream.writeBytes(maskedRespStr);
             outStream.close();
             File file = new File(filePath);
-            Uri uri = FileProvider.getUriForFile(VerifySSNActivity.this, "com.onekosmos.blockidsample.provider", file);
+            Uri uri = FileProvider.getUriForFile(VerifySSNActivity.this,
+                    "com.onekosmos.blockidsample.provider", file);
             String[] to = {"ssn-crowd-test@1kosmos.com"};
 
             Intent intent = new Intent(Intent.ACTION_SEND);
