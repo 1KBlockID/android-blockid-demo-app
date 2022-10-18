@@ -37,7 +37,6 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
-import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -79,6 +78,7 @@ public class VerifySSNActivity extends AppCompatActivity {
     private String requiredDateFormat = "yyyyMMdd";
     private String displayDateFormat = "MM-dd-yyyy";
     private String mMaskData = "XXXXXX";
+    private JSONObject mDLObject;
     private JSONArray maskedJsonArray = new JSONArray();
 
     @Override
@@ -101,14 +101,8 @@ public class VerifySSNActivity extends AppCompatActivity {
 
         mScrollView.setVisibility(View.VISIBLE);
         mWebLayout.setVisibility(View.GONE);
-        JSONObject dataObject = getDLData();
-        try {
-            if (dataObject != null && dataObject.has("dob")) {
-                mBirthDate.setText(changeDateFormat(dataObject.getString("dob"),
-                        "yyyymmdd", displayDateFormat));
-            }
-        } catch (Exception ignore) {
-        }
+        String dlDob = returnDataFromEnrolledDocument("dob");
+        mBirthDate.setText(changeDateFormat(dlDob, requiredDateFormat, displayDateFormat));
 
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
@@ -181,7 +175,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mSSNMap.put("ssn", ssnNumber);
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
-        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mSSNMap,
+        BlockIDSDK.getInstance().verifyDocument(mSSNMap,
                 new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();
@@ -280,13 +274,17 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     private JSONObject getDLData() {
+        if (mDLObject != null) {
+            return mDLObject;
+        }
+
         try {
             String dlArrayList = BIDDocumentProvider.getInstance().getUserDocument(null,
                     DL.getValue(), identity_document.name());
             JSONArray docData = new JSONArray(dlArrayList);
             if (docData.length() >= 0) {
-                JSONObject dataObject = docData.getJSONObject(0);
-                return dataObject;
+                mDLObject = docData.getJSONObject(0);
+                return mDLObject;
             }
         } catch (Exception e) {
             return null;
@@ -350,12 +348,12 @@ public class VerifySSNActivity extends AppCompatActivity {
                     .getString("value"));
             ssnMap.put("lastName", dataObject.getJSONObject("lastName")
                     .getString("value"));
-            ssnMap.put("dateOfBirth", parseDate(dataObject.getJSONObject("dateOfBirth")));
-            ssnMap.put("doe", addYearsToDate(parseDate(dataObject.getJSONObject("doe"))));
+            ssnMap.put("dob", parseDate(dataObject.getJSONObject("dateOfBirth")));
+            ssnMap.put("doe", addYearsToDate(parseDate(dataObject.getJSONObject("dateOfBirth"))));
             ssnMap.put("face", getBitMapToBase64(Objects
                     .requireNonNull(getUserImage())));
             ssnMap.put("addresses", getAddressArray(dataObject.getJSONArray("addresses")));
-            ssnMap.put("doi", parseDate(dataObject.getJSONObject("doi")));
+            ssnMap.put("doi", parseDate(dataObject.getJSONObject("dateOfBirth")));
             ssnMap.put("verifiedScan", true);
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
 
