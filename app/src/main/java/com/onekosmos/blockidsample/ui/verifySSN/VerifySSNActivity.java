@@ -175,8 +175,8 @@ public class VerifySSNActivity extends AppCompatActivity {
         mSSNMap.put("ssn", ssnNumber);
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
-        BlockIDSDK.getInstance().verifyDocument(mSSNMap,
-                new String[]{"ssn_verify"}, (status, documentVerification, error) -> {
+        BlockIDSDK.getInstance().verifyDocument(mSSNMap, new String[]{"ssn_verify"},
+                (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();
                         try {
