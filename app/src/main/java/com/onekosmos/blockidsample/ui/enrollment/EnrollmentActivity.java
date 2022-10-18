@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatTextView;
@@ -71,12 +70,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
         initView();
-
-        BlockIDSDK.getInstance().getKYCHash((status, error) -> {
-            if (status) {
-                Log.e("", "");
-            }
-        });
     }
 
     @Override
