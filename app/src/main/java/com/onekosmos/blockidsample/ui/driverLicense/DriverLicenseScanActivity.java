@@ -312,14 +312,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                         try {
                             JSONObject jsonObject = new JSONObject(documentVerification);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
-                            JSONObject certificate = certificates.length() > 0 ?
-                                    certificates.getJSONObject(0) : null;
                             String[] tokens = new String[certificates.length()];
                             for (int index = 0; index < certificates.length(); index++) {
                                 tokens[index] = certificates.getJSONObject(index).getString("token");
                             }
-                            mDriverLicenseMap.put("proof_of_verification", certificate
-                                    .getString("proof_jwt"));
                             mDriverLicenseMap.put("tokens", tokens);
                         } catch (Exception e) {
                             // do nothing
