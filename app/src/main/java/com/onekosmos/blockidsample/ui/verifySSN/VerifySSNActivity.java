@@ -191,7 +191,6 @@ public class VerifySSNActivity extends AppCompatActivity {
                                 return;
                             }
 
-
                             if (!certificate.getBoolean("verified") ||
                                     certificate.getJSONObject("metadata").
                                             getJSONArray("verifiedPeople")
@@ -215,6 +214,8 @@ public class VerifySSNActivity extends AppCompatActivity {
                                                 .getString("token"));
                                 verifiedPersonObject.put("proofedBy", certificate
                                         .getString("authority"));
+                                verifiedPersonObject.put("proof_of_verification", certificate
+                                        .getString("proof_jwt"));
                                 handleSuccessSSNVerification(verifiedPersonObject);
                             }
                         } catch (JSONException ignore) {
@@ -356,12 +357,15 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("doi", parseDate(dataObject.getJSONObject("dateOfBirth")));
             ssnMap.put("verifiedScan", true);
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
+            ssnMap.put("proof_of_verification",
+                    dataObject.getString("proof_of_verification"));
 
             BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
                     (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
-                            ErrorDialog errorDialog = new ErrorDialog(VerifySSNActivity.this);
+                            ErrorDialog errorDialog = new ErrorDialog(
+                                    VerifySSNActivity.this);
                             errorDialog.showWithOneButton(null,
                                     getString(R.string.label_success),
                                     getString(R.string.label_ssn_enrolled_successfully),
@@ -374,7 +378,6 @@ public class VerifySSNActivity extends AppCompatActivity {
                             handleInvalidData();
                         }
                     });
-
         } catch (Exception e) {
             progressDialog.dismiss();
             handleInvalidData();
