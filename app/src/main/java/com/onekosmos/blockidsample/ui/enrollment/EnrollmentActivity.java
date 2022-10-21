@@ -313,6 +313,25 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onMyKYCClicked() {
+        String userDocument = BIDDocumentProvider.getInstance().getUserDocument(null,
+                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ? DL.getValue() :
+                        BlockIDSDK.getInstance().isPassportEnrolled() ? PPT.getValue() :
+                                BlockIDSDK.getInstance().isNationalIDEnrolled() ?
+                                        NATIONAL_ID.getValue() : null,
+                identity_document.name());
+        String dob = null;
+
+        try {
+            JSONArray documentArray = new JSONArray(userDocument);
+            JSONObject documentObject = documentArray.getJSONObject(0);
+            dob = documentObject.getString("dob").replace(",", "");
+        } catch (JSONException e) {
+        }
+        BlockIDSDK.getInstance().getKYC(dob, (status, error) -> {
+            if (status) {
+
+            }
+        });
     }
 
     private void onPPClicked(int count) {
