@@ -17,7 +17,6 @@
     <string name="label_error">Error</string>
     <string name="label_retry">Retry</string>
     <string name="label_liveid">LiveID</string>
-    <string name="label_my_kyc">My KYC</string>
     <string name="label_liveid_with_liveness_check">LiveID (with liveness check)</string>
     <string name="label_enroll_liveid">Enroll LiveID</string>
     <string name="label_enroll_liveid_with_liveness_check">Enroll LiveID (with liveness check)</string>

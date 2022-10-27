@@ -50,7 +50,6 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -94,8 +93,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onPinClicked();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_driver_license_1))) {
             onDLClicked();
-        } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_my_kyc))) {
-            onMyKYCClicked();
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport1))) {
             onPPClicked(1);
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_passport2))) {
@@ -310,28 +307,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         Intent intent = new Intent(this, DriverLicenseScanActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-    }
-
-    private void onMyKYCClicked() {
-        String userDocument = BIDDocumentProvider.getInstance().getUserDocument(null,
-                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ? DL.getValue() :
-                        BlockIDSDK.getInstance().isPassportEnrolled() ? PPT.getValue() :
-                                BlockIDSDK.getInstance().isNationalIDEnrolled() ?
-                                        NATIONAL_ID.getValue() : null,
-                identity_document.name());
-        String dob = null;
-
-        try {
-            JSONArray documentArray = new JSONArray(userDocument);
-            JSONObject documentObject = documentArray.getJSONObject(0);
-            dob = documentObject.getString("dob").replace(",", "");
-        } catch (JSONException e) {
-        }
-        BlockIDSDK.getInstance().getKYC(dob, (status, error) -> {
-            if (status) {
-
-            }
-        });
     }
 
     private void onPPClicked(int count) {

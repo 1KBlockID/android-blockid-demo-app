@@ -43,7 +43,6 @@ public class EnrollmentsDataSource {
         ASSET_FIDO2,
         ASSET_WALLET_CONNECT,
         ASSET_RESET_SDK,
-        ASSET_KYC
     }
 
     private EnrollmentsDataSource() {
@@ -59,7 +58,6 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
-        arr.add(EnrollmentAssetEnum.ASSET_KYC);
         arr.add(EnrollmentAssetEnum.ASSET_PP1);
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
@@ -97,11 +95,6 @@ public class EnrollmentsDataSource {
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
                         context.getResources().getString(R.string.label_driver_license_1) + dlID1, null);
-                break;
-
-            case ASSET_KYC:
-                enrollmentAsset = new EnrollmentAsset(false,
-                        context.getResources().getString(R.string.label_my_kyc), null);
                 break;
 
             case ASSET_PP1:
