@@ -159,7 +159,7 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_wallet_connect), null);
                 break;
             case ASSET_SSN:
-                enrollmentAsset = new EnrollmentAsset(false,
+                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
                 break;
         }
