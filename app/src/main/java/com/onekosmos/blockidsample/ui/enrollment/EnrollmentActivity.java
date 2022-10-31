@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.AppCompatTextView;
@@ -50,6 +51,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -466,5 +468,48 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         Intent intent = new Intent(this, WalletConnectActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+    }
+
+    /**
+     * Get KYC Hash
+     * <p>
+     * Prerequisite
+     * Any Identity document(DL, PPT, NationalID) should be registered
+     * Verified SSN should be registered
+     */
+    private void getKYC() {
+        String userDocument = BIDDocumentProvider.getInstance().getUserDocument(null,
+                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ? DL.getValue() :
+                        BlockIDSDK.getInstance().isPassportEnrolled() ? PPT.getValue() :
+                                BlockIDSDK.getInstance().isNationalIDEnrolled() ?
+                                        NATIONAL_ID.getValue() : null, identity_document.name());
+        if (TextUtils.isEmpty(userDocument)) {
+            return;
+        }
+
+        String dob;
+        try {
+            JSONArray documentArray = new JSONArray(userDocument);
+            JSONObject documentObject = documentArray.getJSONObject(0);
+            dob = documentObject.getString("dob");
+        } catch (Exception e) {
+            return;
+        }
+        if (TextUtils.isEmpty(dob)) {
+            return;
+        }
+
+        if (!BlockIDSDK.getInstance().isSSNEnrolled()) {
+            return;
+        }
+
+        BlockIDSDK.getInstance().getKYC(dob, (status, kyc, errorResponse) -> {
+            if (status) {
+                Log.d("KYC", kyc);
+            } else {
+                Log.d("KYC Error", "(" + errorResponse.getCode() + ") " +
+                        errorResponse.getMessage());
+            }
+        });
     }
 }
