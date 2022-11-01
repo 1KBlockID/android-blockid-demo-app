@@ -503,6 +503,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             return;
         }
 
+        // dob format = yyyyMMdd
         BlockIDSDK.getInstance().getKYC(dob, (status, kyc, errorResponse) -> {
             if (status) {
                 Log.d("KYC", kyc);
