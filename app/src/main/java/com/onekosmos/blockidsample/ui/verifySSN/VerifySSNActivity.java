@@ -214,7 +214,7 @@ public class VerifySSNActivity extends AppCompatActivity {
                                                 .getString("token"));
                                 verifiedPersonObject.put("proofedBy", certificate
                                         .getString("authority"));
-                                verifiedPersonObject.put("proof_of_verification", certificate
+                                verifiedPersonObject.put("proof", certificate
                                         .getString("proof_jwt"));
                                 handleSuccessSSNVerification(verifiedPersonObject);
                             }
@@ -357,8 +357,7 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("doi", parseDate(dataObject.getJSONObject("dateOfBirth")));
             ssnMap.put("verifiedScan", true);
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
-            ssnMap.put("proof_of_verification",
-                    dataObject.getString("proof_of_verification"));
+            ssnMap.put("proof", dataObject.getString("proof"));
 
             BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
                     (status, error) -> {
