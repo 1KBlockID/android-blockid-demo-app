@@ -51,7 +51,6 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -78,6 +77,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     protected void onResume() {
         super.onResume();
         refreshEnrollmentRecyclerView();
+        getKYC();
     }
 
     @Override
@@ -472,39 +472,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     /**
      * Get KYC Hash
-     * <p>
-     * Prerequisite
-     * Any Identity document(DL, PPT, NationalID) should be registered
-     * Verified SSN should be registered
      */
     private void getKYC() {
-        String userDocument = BIDDocumentProvider.getInstance().getUserDocument(null,
-                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ? DL.getValue() :
-                        BlockIDSDK.getInstance().isPassportEnrolled() ? PPT.getValue() :
-                                BlockIDSDK.getInstance().isNationalIDEnrolled() ?
-                                        NATIONAL_ID.getValue() : null, identity_document.name());
-        if (TextUtils.isEmpty(userDocument)) {
-            return;
-        }
-
-        String dob;
-        try {
-            JSONArray documentArray = new JSONArray(userDocument);
-            JSONObject documentObject = documentArray.getJSONObject(0);
-            dob = documentObject.getString("dob");
-        } catch (Exception e) {
-            return;
-        }
-        if (TextUtils.isEmpty(dob)) {
-            return;
-        }
-
-        if (!BlockIDSDK.getInstance().isSSNEnrolled()) {
-            return;
-        }
-
-        // dob format = yyyyMMdd
-        BlockIDSDK.getInstance().getKYC(dob, (status, kyc, errorResponse) -> {
+        BlockIDSDK.getInstance().getKYC((status, kyc, errorResponse) -> {
             if (status) {
                 Log.d("KYC", kyc);
             } else {
