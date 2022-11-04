@@ -296,7 +296,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument("", RegisterDocType.DL.getValue(),
+                                    getUserDocument(null, RegisterDocType.DL.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
@@ -328,7 +328,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument("", RegisterDocType.PPT.getValue(),
+                                    getUserDocument(null, RegisterDocType.PPT.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
@@ -362,7 +362,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument("", RegisterDocType.NATIONAL_ID.getValue(),
+                                    getUserDocument(null, RegisterDocType.NATIONAL_ID.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
