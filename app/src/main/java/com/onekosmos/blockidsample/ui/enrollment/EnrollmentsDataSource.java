@@ -12,6 +12,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.R;
 
 import org.json.JSONArray;
@@ -93,7 +94,8 @@ public class EnrollmentsDataSource {
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(DL.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_driver_license_1) + dlID1, null);
                 break;
 
@@ -134,7 +136,8 @@ public class EnrollmentsDataSource {
             case ASSET_NATIONAL_ID:
                 String nID1 = getNationalID(1);
                 nID1 = TextUtils.isEmpty(nID1) ? "" : " (# " + nID1 + ")";
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isNationalIDEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(NATIONAL_ID.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_national_id_1) + nID1, null);
                 break;
 
@@ -159,7 +162,9 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_wallet_connect), null);
                 break;
             case ASSET_SSN:
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(RegisterDocType.SSN.getValue(),
+                                identity_document.name()),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
                 break;
         }

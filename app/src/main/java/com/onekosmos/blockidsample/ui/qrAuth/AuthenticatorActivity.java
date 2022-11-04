@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
@@ -28,6 +29,8 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -89,7 +92,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
         if (mGoogleApiClient != null && checkSelfPermission(
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED)
+        {
             mGoogleApiClient.connect();
             setLocation();
         }
@@ -101,17 +105,20 @@ public class AuthenticatorActivity extends AppCompatActivity {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+                PackageManager.PERMISSION_GRANTED)
+        {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
-                K_LOCATION_PERMISSION)) {
+                K_LOCATION_PERMISSION))
+        {
             mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
             setLocation();
         }
@@ -251,7 +258,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 new IBiometricResponseListener() {
                     @Override
                     public void onBiometricAuthResult(boolean status,
-                                                      ErrorManager.ErrorResponse errorResponse) {
+                                                      ErrorManager.ErrorResponse errorResponse)
+                    {
                         if (status)
                             onSuccessFullVerification();
                         else
@@ -305,7 +313,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     // authenticate user with scope
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1, double latitude,
-                                         double longitude) {
+                                         double longitude)
+    {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
@@ -321,7 +330,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
     // authenticate user with pre-set data
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
                                          LinkedHashMap<String, Object> dataObject,
-                                         double latitude, double longitude) {
+                                         double latitude, double longitude)
+    {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
@@ -362,7 +372,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private LinkedHashMap<String, Object> changeDisplayName
-            (HashMap<String, Object> scopesMap) {
+            (HashMap<String, Object> scopesMap)
+    {
         LinkedHashMap<String, Object> pScopesMap = new LinkedHashMap<>();
         try {
             if (scopesMap != null) {
@@ -412,8 +423,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        return BlockIDSDK.getInstance().isPassportEnrolled() ||
-                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ||
-                BlockIDSDK.getInstance().isNationalIDEnrolled();
+        return BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.PPT.getValue(),
+                identity_document.name()) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.DL.getValue(),
+                        identity_document.name()) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.NATIONAL_ID
+                        .getValue(), identity_document.name());
     }
 }
