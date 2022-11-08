@@ -11,7 +11,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
-import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
@@ -32,27 +31,33 @@ public class AboutActivity extends AppCompatActivity {
 
         BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
         AppCompatTextView txtTenantDNS = findViewById(R.id.txt_about_tenant_info);
-        txtTenantDNS.setText("Tenant Information: " + BIDUtil.objectToJSONString(tenant,
-                true));
 
+        String tenantInfo = getString(R.string.label_tenant_info) + ":\n"
+                + getString(R.string.label_dns) + ": " + tenant.getDns() + "\n"
+                + getString(R.string.label_tag) + ": " + tenant.getTenantTag()
+                + " (" + tenant.getTenantId() + ")" + "\n"
+                + getString(R.string.label_community) + ": " + tenant.getCommunity()
+                + " (" + tenant.getCommunityId() + ")";
+        txtTenantDNS.setText(tenantInfo);
         AppCompatTextView txtLicenseKey = findViewById(R.id.txt_about_license_key);
         String licenseKey = AppConstant.licenseKey;
-        licenseKey = licenseKey.replaceAll(licenseKey.substring(0, licenseKey.length() - 4),
-                "X");
-        txtLicenseKey.setText("License Key: " + licenseKey);
+        licenseKey = licenseKey.replace(licenseKey.substring(8, licenseKey.length() - 4),
+                "-xxxx-xxxx-xxxx-xxxxxxxx");
+        txtLicenseKey.setText(getString(R.string.label_license_key) + ":\n" + licenseKey);
 
         AppCompatTextView txtDid = findViewById(R.id.txt_about_did);
-        txtDid.setText("DID: " + BlockIDSDK.getInstance().getDID());
+        txtDid.setText(getString(R.string.label_did) + ":\n" + BlockIDSDK.getInstance().getDID());
 
         AppCompatTextView txtPublicKey = findViewById(R.id.txt_about_public_key);
-        txtPublicKey.setText("Public Key: " + BlockIDSDK.getInstance().getPublicKey());
+        txtPublicKey.setText(getString(R.string.label_public_key) + ":\n"
+                + BlockIDSDK.getInstance().getPublicKey());
 
         AppCompatTextView txtSDKVersion = findViewById(R.id.txt_about_sdk_version);
-        txtSDKVersion.setText(getString(R.string.label_sdk_version) + ": "
+        txtSDKVersion.setText(getString(R.string.label_sdk_version) + ":\n"
                 + getVersionText(BlockIDSDK.getInstance().getVersion()));
 
         AppCompatTextView txtAppVersion = findViewById(R.id.txt_about_app_version);
-        txtAppVersion.setText(getString(R.string.label_app_version) + ": "
+        txtAppVersion.setText(getString(R.string.label_app_version) + ":\n"
                 + getVersionText(BuildConfig.VERSION_NAME));
 
         String copy = txtTenantDNS.getText() + "\n"
