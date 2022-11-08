@@ -42,6 +42,8 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
         ASSET_WALLET_CONNECT,
+        ASSET_ABOUT,
+        ASSET_KYC,
         ASSET_RESET_SDK,
     }
 
@@ -55,6 +57,8 @@ public class EnrollmentsDataSource {
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<>();
 
+        arr.add(EnrollmentAssetEnum.ASSET_ABOUT);
+
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
@@ -62,6 +66,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
         arr.add(EnrollmentAssetEnum.ASSET_SSN);
+        arr.add(EnrollmentAssetEnum.ASSET_KYC);
 
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
@@ -161,6 +166,14 @@ public class EnrollmentsDataSource {
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
+                break;
+            case ASSET_ABOUT:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_about), null);
+                break;
+            case ASSET_KYC:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_my_kyc), null);
                 break;
         }
         return enrollmentAsset;

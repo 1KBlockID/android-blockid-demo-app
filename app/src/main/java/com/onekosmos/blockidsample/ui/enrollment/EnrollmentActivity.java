@@ -12,10 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +33,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -77,13 +76,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     protected void onResume() {
         super.onResume();
         refreshEnrollmentRecyclerView();
-        getKYC();
     }
 
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (position == 0) {
+        if (position == 1) {
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
@@ -116,6 +114,10 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
+            onAboutClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
+            getKYC();
         }
     }
 
@@ -128,16 +130,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
-        AppCompatTextView mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
-        String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
-        StringBuilder version = new StringBuilder();
-        for (int index = 0; index < splitVersion.length - 1; index++) {
-            version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
-        }
-        String hexCode = splitVersion[splitVersion.length - 1];
-        String versionText = getString(R.string.label_sdk_version) + ": " + version +
-                " (" + hexCode + ")";
-        mTxtSdkVersion.setText(versionText);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -397,9 +389,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithOneButton(null, null,
                     getString(R.string.label_enroll_dl),
-                    getString(R.string.label_ok), dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    getString(R.string.label_ok), dialog -> errorDialog.dismiss());
             return;
         }
         Intent intent = new Intent(this, VerifySSNActivity.class);
@@ -470,17 +460,27 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         startActivity(intent);
     }
 
+    private void onAboutClicked() {
+        Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
     /**
      * Get KYC Hash
      */
     private void getKYC() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
         BlockIDSDK.getInstance().getKYC((status, kyc, errorResponse) -> {
-            if (status) {
-                Log.d("KYC", kyc);
-            } else {
-                Log.d("KYC Error", "(" + errorResponse.getCode() + ") " +
-                        errorResponse.getMessage());
-            }
+            progressDialog.dismiss();
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener listener = DialogInterface::dismiss;
+            String message = status ? kyc : "(" + errorResponse.getCode() + ") " +
+                    errorResponse.getMessage();
+            errorDialog.showWithOneButton(null, getString(R.string.label_my_kyc),
+                    message, getString(R.string.label_ok), listener);
+
         });
     }
 }
