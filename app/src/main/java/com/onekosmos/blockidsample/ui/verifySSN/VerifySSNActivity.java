@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -170,6 +171,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         progressDialog.show();
         LinkedHashMap<String, Object> mSSNMap = new LinkedHashMap<String, Object>();
         String ssnNumber = mSSN.getText().toString().trim();
+        Log.e("SSN", ssnNumber);
         mSSNMap.put("id", BIDUtil.getSha256Hash(ssnNumber));
         mSSNMap.put("type", SSN.getValue());
         mSSNMap.put("ssn", ssnNumber);
