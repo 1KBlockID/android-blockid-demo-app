@@ -212,7 +212,7 @@
     <string name="label_enroll_dl">Please enroll Drivers License to
         continue with SSN Verification.</string>
     <string name="label_register_ssn">Do you want to register your verified SSN?</string>
-    <string name="label_enrolling_ssn">Enrolling SSN?</string>
+    <string name="label_enrolling_ssn">Enrolling SSN</string>
 
     <!-- About -->
     <string name="label_about">About</string>

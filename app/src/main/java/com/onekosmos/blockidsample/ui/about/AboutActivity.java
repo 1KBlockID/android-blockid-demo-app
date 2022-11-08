@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui.about;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -73,10 +75,9 @@ public class AboutActivity extends AppCompatActivity {
 
     public void copyToClipboard(Context context, String text) {
         try {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context
-                    .getSystemService(CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData
-                    .newPlainText("msg", text);
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(
+                    CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("msg", text);
             clipboard.setPrimaryClip(clip);
         } catch (Exception ignored) {
         }
