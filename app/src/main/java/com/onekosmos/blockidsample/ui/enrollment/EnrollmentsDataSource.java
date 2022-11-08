@@ -13,7 +13,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.R;
 
 import org.json.JSONArray;

@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.enrollment;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.*;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -26,7 +27,6 @@ import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseList
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
@@ -107,8 +107,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                 getString(R.string.label_fido2))) {
             onFido2Clicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_enroll_ssn)))
-        {
+                getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
@@ -280,9 +279,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onDLClicked() {
-        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.DL.getValue(),
-                identity_document.name()))
-        {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
+                identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -294,7 +292,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument(null, RegisterDocType.DL.getValue(),
+                                    getUserDocument(null, DL.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
@@ -326,7 +324,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument(null, RegisterDocType.PPT.getValue(),
+                                    getUserDocument(null, PPT.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
@@ -346,9 +344,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onNationalIDClick() {
-        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.NATIONAL_ID
-                .getValue(), identity_document.name()))
-        {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID
+                .getValue(), identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -360,7 +357,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument(null, RegisterDocType.NATIONAL_ID.getValue(),
+                                    getUserDocument(null, NATIONAL_ID.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
@@ -380,9 +377,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onVerifySSNClicked() {
-        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.SSN.getValue(),
-                identity_document.name()))
-        {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(SSN.getValue(),
+                identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -394,7 +390,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         errorDialog.dismiss();
                         try {
                             JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
-                                    getUserDocument(null, RegisterDocType.SSN.getValue(),
+                                    getUserDocument(null, SSN.getValue(),
                                             identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                             LinkedHashMap<String, Object> removeSSNMap = gson.fromJson(jsonArray.
@@ -407,15 +403,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         }
                     });
             return;
-        } else if (!BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.DL
-                .getValue(), identity_document.name()))
-        {
+        } else if (!BIDDocumentProvider.getInstance().isDocumentEnrolled(DL
+                .getValue(), identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithOneButton(null, null,
                     getString(R.string.label_enroll_dl),
-                    getString(R.string.label_ok), dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    getString(R.string.label_ok), dialog -> errorDialog.dismiss());
             return;
         }
         Intent intent = new Intent(this, VerifySSNActivity.class);

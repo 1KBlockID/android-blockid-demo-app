@@ -2,6 +2,7 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.*;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
@@ -30,7 +31,6 @@ import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -415,11 +415,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        return BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.PPT.getValue(),
+        return BIDDocumentProvider.getInstance().isDocumentEnrolled(PPT.getValue(),
                 identity_document.name()) ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.DL.getValue(),
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
                         identity_document.name()) ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled(RegisterDocType.NATIONAL_ID
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID
                         .getValue(), identity_document.name());
     }
 }
