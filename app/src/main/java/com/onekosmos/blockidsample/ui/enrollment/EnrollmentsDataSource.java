@@ -4,6 +4,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -163,8 +164,7 @@ public class EnrollmentsDataSource {
                 break;
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
-                        isDocumentEnrolled(RegisterDocType.SSN.getValue(),
-                                identity_document.name()),
+                        isDocumentEnrolled(SSN.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
                 break;
         }
