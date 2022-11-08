@@ -1,6 +1,5 @@
 package com.onekosmos.blockidsample.ui.about;
 
-import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -26,7 +25,6 @@ public class AboutActivity extends AppCompatActivity {
         initView();
     }
 
-    @SuppressLint("SetTextI18n")
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_about);
         mImgBack.setOnClickListener(view -> onBackPressed());
@@ -41,26 +39,32 @@ public class AboutActivity extends AppCompatActivity {
                 + getString(R.string.label_community) + ": " + tenant.getCommunity()
                 + " (" + tenant.getCommunityId() + ")";
         txtTenantDNS.setText(tenantInfo);
+
         AppCompatTextView txtLicenseKey = findViewById(R.id.txt_about_license_key);
         String licenseKey = AppConstant.licenseKey;
         licenseKey = licenseKey.replace(licenseKey.substring(8, licenseKey.length() - 4),
                 "-xxxx-xxxx-xxxx-xxxxxxxx");
-        txtLicenseKey.setText(getString(R.string.label_license_key) + ":\n" + licenseKey);
+        licenseKey = getString(R.string.label_license_key) + ":\n" + licenseKey;
+        txtLicenseKey.setText(licenseKey);
 
+        String did = getString(R.string.label_did) + ":\n" + BlockIDSDK.getInstance().getDID();
         AppCompatTextView txtDid = findViewById(R.id.txt_about_did);
-        txtDid.setText(getString(R.string.label_did) + ":\n" + BlockIDSDK.getInstance().getDID());
+        txtDid.setText(did);
 
+        String publicKey = getString(R.string.label_public_key) + ":\n"
+                + BlockIDSDK.getInstance().getPublicKey();
         AppCompatTextView txtPublicKey = findViewById(R.id.txt_about_public_key);
-        txtPublicKey.setText(getString(R.string.label_public_key) + ":\n"
-                + BlockIDSDK.getInstance().getPublicKey());
+        txtPublicKey.setText(publicKey);
 
+        String sdkVersion = getString(R.string.label_sdk_version) + ":\n"
+                + getVersionText(BlockIDSDK.getInstance().getVersion());
         AppCompatTextView txtSDKVersion = findViewById(R.id.txt_about_sdk_version);
-        txtSDKVersion.setText(getString(R.string.label_sdk_version) + ":\n"
-                + getVersionText(BlockIDSDK.getInstance().getVersion()));
+        txtSDKVersion.setText(sdkVersion);
 
+        String appVersion = getString(R.string.label_app_version) + ":\n"
+                + getVersionText(BuildConfig.VERSION_NAME);
         AppCompatTextView txtAppVersion = findViewById(R.id.txt_about_app_version);
-        txtAppVersion.setText(getString(R.string.label_app_version) + ":\n"
-                + getVersionText(BuildConfig.VERSION_NAME));
+        txtAppVersion.setText(appVersion);
 
         String copy = txtTenantDNS.getText() + "\n"
                 + txtLicenseKey.getText()
