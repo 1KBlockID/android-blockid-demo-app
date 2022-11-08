@@ -139,8 +139,6 @@
         write any of your documents with BlockID Sample into your storage.</string>
     <string name="label_share">Share</string>
     <string name="label_verify_liveid">Verifying LiveID</string>
-    <string name="label_sdk_version">SDK Version</string>
-    <string name="label_app_version">APP Version</string>
 
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
@@ -224,4 +222,6 @@
     <string name="label_dns">DNS</string>
     <string name="label_tag">Tag</string>
     <string name="label_community">Community</string>
+    <string name="label_sdk_version">SDK Version</string>
+    <string name="label_app_version">APP Version</string>
 </resources>
