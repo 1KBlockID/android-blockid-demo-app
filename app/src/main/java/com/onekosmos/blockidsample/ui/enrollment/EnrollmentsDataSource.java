@@ -42,6 +42,7 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
         ASSET_WALLET_CONNECT,
+        ASSET_ABOUT,
         ASSET_RESET_SDK,
     }
 
@@ -72,6 +73,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
         arr.add(EnrollmentAssetEnum.ASSET_WALLET_CONNECT);
+        arr.add(EnrollmentAssetEnum.ASSET_ABOUT);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
     }
@@ -161,6 +163,10 @@ public class EnrollmentsDataSource {
             case ASSET_SSN:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
+                break;
+            case ASSET_ABOUT:
+                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
+                        context.getResources().getString(R.string.label_about), null);
                 break;
         }
         return enrollmentAsset;

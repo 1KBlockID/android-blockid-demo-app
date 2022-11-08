@@ -34,6 +34,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -114,6 +115,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
+            onAbout();
         }
     }
 
@@ -464,6 +467,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onWalletConnectClicked() {
         Intent intent = new Intent(this, WalletConnectActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onAbout() {
+        Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
