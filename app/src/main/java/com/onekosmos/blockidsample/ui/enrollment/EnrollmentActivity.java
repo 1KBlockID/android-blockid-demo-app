@@ -116,7 +116,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
-            onAbout();
+            onAboutClicked();
         }
     }
 
@@ -398,9 +398,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithOneButton(null, null,
                     getString(R.string.label_enroll_dl),
-                    getString(R.string.label_ok), dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    getString(R.string.label_ok), dialog -> errorDialog.dismiss());
             return;
         }
         Intent intent = new Intent(this, VerifySSNActivity.class);
@@ -471,7 +469,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         startActivity(intent);
     }
 
-    private void onAbout() {
+    private void onAboutClicked() {
         Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);

@@ -37,7 +37,7 @@ public class AboutActivity extends AppCompatActivity {
 
         AppCompatTextView txtLicenseKey = findViewById(R.id.txt_about_license_key);
         String licenseKey = AppConstant.licenseKey;
-        licenseKey = licenseKey.replace(licenseKey.substring(0, licenseKey.length() - 4),
+        licenseKey = licenseKey.replaceAll(licenseKey.substring(0, licenseKey.length() - 4),
                 "X");
         txtLicenseKey.setText("License Key: " + licenseKey);
 
@@ -46,7 +46,6 @@ public class AboutActivity extends AppCompatActivity {
 
         AppCompatTextView txtPublicKey = findViewById(R.id.txt_about_public_key);
         txtPublicKey.setText("Public Key: " + BlockIDSDK.getInstance().getPublicKey());
-
 
         AppCompatTextView txtSDKVersion = findViewById(R.id.txt_about_sdk_version);
         txtSDKVersion.setText(getString(R.string.label_sdk_version) + ": "

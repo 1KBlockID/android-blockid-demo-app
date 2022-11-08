@@ -28,11 +28,12 @@
         tools:ignore="DataExtractionRules"
         tools:replace="android:allowBackup,android:label,android:theme"
         tools:targetApi="n">
+
         <activity
             android:name=".ui.SplashActivity"
-            android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -135,5 +136,4 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
     </application>
-
 </manifest>
