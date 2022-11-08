@@ -2,7 +2,9 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.*;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;

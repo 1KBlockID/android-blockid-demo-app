@@ -2,7 +2,10 @@ package com.onekosmos.blockidsample.ui.enrollment;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.*;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -106,8 +109,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_fido2))) {
             onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_enroll_ssn))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
