@@ -304,16 +304,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with scope
-    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1, double latitude,
-                                         double longitude) {
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
+                                         double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, authenticationPayloadV1.sessionURL,
                 authenticationPayloadV1.scopes, null, authenticationPayloadV1.creds,
-                authenticationPayloadV1.getOrigin(),
-                String.valueOf(latitude), String.valueOf(longitude),
-                BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
