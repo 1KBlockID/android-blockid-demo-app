@@ -25,6 +25,9 @@ public class AboutActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * Initialize and update UI
+     */
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_about);
         mImgBack.setOnClickListener(view -> onBackPressed());
@@ -32,6 +35,7 @@ public class AboutActivity extends AppCompatActivity {
         BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
         AppCompatTextView txtTenantDNS = findViewById(R.id.txt_about_tenant_info);
 
+        // Get and set tenant info
         String tenantInfo = getString(R.string.label_tenant_info) + ":\n"
                 + getString(R.string.label_dns) + ": " + tenant.getDns() + "\n"
                 + getString(R.string.label_tag) + ": " + tenant.getTenantTag()
@@ -40,6 +44,7 @@ public class AboutActivity extends AppCompatActivity {
                 + " (" + tenant.getCommunityId() + ")";
         txtTenantDNS.setText(tenantInfo);
 
+        // Get and set license key
         AppCompatTextView txtLicenseKey = findViewById(R.id.txt_about_license_key);
         String licenseKey = AppConstant.licenseKey;
         licenseKey = licenseKey.replace(licenseKey.substring(8, licenseKey.length() - 4),
@@ -47,25 +52,30 @@ public class AboutActivity extends AppCompatActivity {
         licenseKey = getString(R.string.label_license_key) + ":\n" + licenseKey;
         txtLicenseKey.setText(licenseKey);
 
+        // Get and set DID
         String did = getString(R.string.label_did) + ":\n" + BlockIDSDK.getInstance().getDID();
         AppCompatTextView txtDid = findViewById(R.id.txt_about_did);
         txtDid.setText(did);
 
+        // Get and set public key
         String publicKey = getString(R.string.label_public_key) + ":\n"
                 + BlockIDSDK.getInstance().getPublicKey();
         AppCompatTextView txtPublicKey = findViewById(R.id.txt_about_public_key);
         txtPublicKey.setText(publicKey);
 
+        // Get and set SDK version
         String sdkVersion = getString(R.string.label_sdk_version) + ":\n"
                 + getVersionText(BlockIDSDK.getInstance().getVersion());
         AppCompatTextView txtSDKVersion = findViewById(R.id.txt_about_sdk_version);
         txtSDKVersion.setText(sdkVersion);
 
+        // Get and set APP version
         String appVersion = getString(R.string.label_app_version) + ":\n"
                 + getVersionText(BuildConfig.VERSION_NAME);
         AppCompatTextView txtAppVersion = findViewById(R.id.txt_about_app_version);
         txtAppVersion.setText(appVersion);
 
+        // Prepare content for copying to clipboard
         String copy = txtTenantDNS.getText() + "\n"
                 + txtLicenseKey.getText()
                 + txtDid.getText() + "\n"
@@ -73,11 +83,16 @@ public class AboutActivity extends AppCompatActivity {
                 + txtSDKVersion.getText() + "\n"
                 + txtAppVersion.getText() + "\n";
 
+        // Button click copy the content
         AppCompatButton btnCopy = findViewById(R.id.btn_about_copy);
         btnCopy.setOnClickListener(view -> copyToClipboard(AboutActivity.this, copy));
     }
 
-    public void copyToClipboard(Context context, String text) {
+    /**
+     * @param context Activity context
+     * @param text    Content to be copy
+     */
+    private void copyToClipboard(Context context, String text) {
         try {
             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(
                     CLIPBOARD_SERVICE);
@@ -87,6 +102,10 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @param inputVersion version number
+     * @return Return formatted version text
+     */
     private String getVersionText(String inputVersion) {
         String[] splitVersion = inputVersion.split("\\.");
         StringBuilder version = new StringBuilder();
