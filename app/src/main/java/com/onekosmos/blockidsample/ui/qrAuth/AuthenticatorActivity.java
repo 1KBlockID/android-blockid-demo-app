@@ -308,7 +308,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                          double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
+        BlockIDSDK.getInstance().authenticateUser(this, authenticationPayloadV1.session,
                 mAuthenticationPayloadV1.sessionURL, authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
                 BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
