@@ -167,9 +167,14 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
                     return;
                 }
                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
-                        AuthenticationPayloadV2.class);
-                processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
+                try {
+                    AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
+                            AuthenticationPayloadV2.class);
+                    processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
+                } catch (Exception e) {
+                    errorDialog.show(null, getString(R.string.label_error),
+                            getString(R.string.label_unsupported_qr_code), onDismissListener);
+                }
             });
         }
         // UWL 1

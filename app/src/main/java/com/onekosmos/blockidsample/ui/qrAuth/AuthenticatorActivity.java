@@ -58,10 +58,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_FACE = "face";
     private static final String K_PIN = "pin";
     private static final String K_FINGERPRINT = "fingerprint";
-    private CurrentLocationHelper mCurrentLocationHelper;
+    private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
+    private CurrentLocationHelper mCurrentLocationHelper;
     private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private AppCompatButton mBtnQRScope, mBtnQRPresetData, mBtnAuthenticate;
@@ -313,9 +314,17 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                          double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
+
+        LinkedHashMap<String, Object> metadata = null;
+        if (mAuthenticationPayloadV1.metadata != null &&
+                mAuthenticationPayloadV1.metadata.webauthn_challenge != null) {
+            metadata = new LinkedHashMap<>();
+            metadata.put(K_WEBAUTHN_CHALLENGE,
+                    mAuthenticationPayloadV1.metadata.webauthn_challenge);
+        }
         BlockIDSDK.getInstance().authenticateUser(this, null,
-                authenticationPayloadV1.session, authenticationPayloadV1.sessionURL,
-                authenticationPayloadV1.scopes, null, authenticationPayloadV1.creds,
+                authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
+                authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
                 String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
@@ -422,7 +431,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 identity_document.name()) ||
                 BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
                         identity_document.name()) ||
-                BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID
-                        .getValue(), identity_document.name());
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID.getValue(),
+                        identity_document.name());
     }
 }
