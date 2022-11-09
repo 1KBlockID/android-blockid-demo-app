@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +33,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -81,7 +81,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (position == 0) {
+        if (position == 1) {
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
@@ -109,11 +109,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_fido2))) {
             onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_enroll_ssn))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
+            onAboutClicked();
         }
     }
 
@@ -126,16 +127,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
-        AppCompatTextView mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
-        String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
-        StringBuilder version = new StringBuilder();
-        for (int index = 0; index < splitVersion.length - 1; index++) {
-            version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
-        }
-        String hexCode = splitVersion[splitVersion.length - 1];
-        String versionText = getString(R.string.label_sdk_version) + ": " + version +
-                " (" + hexCode + ")";
-        mTxtSdkVersion.setText(versionText);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -283,7 +274,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onDLClicked() {
-        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
+                identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -294,10 +286,14 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, DL.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(0), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -322,10 +318,14 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, PPT.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(count - 1), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(count - 1), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -339,7 +339,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onNationalIDClick() {
-        if (BlockIDSDK.getInstance().isNationalIDEnrolled()) {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID
+                .getValue(), identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -350,10 +351,14 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", NATIONAL_ID.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, NATIONAL_ID.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(0), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -367,7 +372,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
     }
 
     private void onVerifySSNClicked() {
-        if (BlockIDSDK.getInstance().isSSNEnrolled()) {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(SSN.getValue(),
+                identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -392,13 +398,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                         }
                     });
             return;
-        } else if (!BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
+        } else if (!BIDDocumentProvider.getInstance().isDocumentEnrolled(DL
+                .getValue(), identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithOneButton(null, null,
                     getString(R.string.label_enroll_dl),
-                    getString(R.string.label_ok), dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    getString(R.string.label_ok), dialog -> errorDialog.dismiss());
             return;
         }
         Intent intent = new Intent(this, VerifySSNActivity.class);
@@ -465,6 +470,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onWalletConnectClicked() {
         Intent intent = new Intent(this, WalletConnectActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onAboutClicked() {
+        Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

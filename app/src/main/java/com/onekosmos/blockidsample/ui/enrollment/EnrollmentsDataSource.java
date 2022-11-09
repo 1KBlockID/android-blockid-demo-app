@@ -4,6 +4,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -42,6 +43,7 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
         ASSET_WALLET_CONNECT,
+        ASSET_ABOUT,
         ASSET_RESET_SDK,
     }
 
@@ -54,6 +56,8 @@ public class EnrollmentsDataSource {
 
     public ArrayList<EnrollmentAssetEnum> prepareAssetsList() {
         ArrayList<EnrollmentAssetEnum> arr = new ArrayList<>();
+
+        arr.add(EnrollmentAssetEnum.ASSET_ABOUT);
 
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
 
@@ -93,7 +97,8 @@ public class EnrollmentsDataSource {
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDriversLicenseEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(DL.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_driver_license_1) + dlID1, null);
                 break;
 
@@ -134,7 +139,8 @@ public class EnrollmentsDataSource {
             case ASSET_NATIONAL_ID:
                 String nID1 = getNationalID(1);
                 nID1 = TextUtils.isEmpty(nID1) ? "" : " (# " + nID1 + ")";
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isNationalIDEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(NATIONAL_ID.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_national_id_1) + nID1, null);
                 break;
 
@@ -159,8 +165,13 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_wallet_connect), null);
                 break;
             case ASSET_SSN:
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isSSNEnrolled(),
+                enrollmentAsset = new EnrollmentAsset(BIDDocumentProvider.getInstance().
+                        isDocumentEnrolled(SSN.getValue(), identity_document.name()),
                         context.getResources().getString(R.string.label_enroll_ssn), null);
+                break;
+            case ASSET_ABOUT:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_about), null);
                 break;
         }
         return enrollmentAsset;
