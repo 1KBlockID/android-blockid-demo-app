@@ -81,7 +81,7 @@ public class AboutActivity extends AppCompatActivity {
                 + txtDid.getText() + "\n"
                 + txtPublicKey.getText() + "\n"
                 + txtSDKVersion.getText() + "\n"
-                + txtAppVersion.getText() + "\n";
+                + txtAppVersion.getText();
 
         // Button click copy the content
         AppCompatButton btnCopy = findViewById(R.id.btn_about_copy);
