@@ -77,7 +77,7 @@ public class AboutActivity extends AppCompatActivity {
 
         // Prepare content for copying to clipboard
         String copy = txtTenantDNS.getText() + "\n"
-                + txtLicenseKey.getText()
+                + txtLicenseKey.getText() + "\n"
                 + txtDid.getText() + "\n"
                 + txtPublicKey.getText() + "\n"
                 + txtSDKVersion.getText() + "\n"
