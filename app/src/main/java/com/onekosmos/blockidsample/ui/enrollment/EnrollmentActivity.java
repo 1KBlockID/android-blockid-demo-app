@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -29,6 +30,8 @@ import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseList
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
+import com.onekosmos.blockid.sdk.fido2.FidoObserver;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
@@ -64,6 +67,7 @@ import java.util.Objects;
 public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
+    private FidoObserver observer = new FidoObserver(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,14 +162,18 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             return;
         }
 
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
-                getString(R.string.label_yes), getString(R.string.label_no),
-                (dialogInterface, which) -> errorDialog.dismiss(),
-                dialog -> {
-                    errorDialog.dismiss();
-                    unlinkAccount(mLinkedAccountsList.get(0));
+        BlockIDSDK.getInstance().registerFIDO2Key(this, mLinkedAccountsList.get(0),
+                FIDO2KeyType.CROSS_PLATFORM,observer, (status, errorResponse) -> {
+                    Log.e("status", "" + status);
                 });
+//        ErrorDialog errorDialog = new ErrorDialog(this);
+//        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
+//                getString(R.string.label_yes), getString(R.string.label_no),
+//                (dialogInterface, which) -> errorDialog.dismiss(),
+//                dialog -> {
+//                    errorDialog.dismiss();
+//                    unlinkAccount(mLinkedAccountsList.get(0));
+//                });
     }
 
     private void unlinkAccount(BIDLinkedAccount linkedAccount) {

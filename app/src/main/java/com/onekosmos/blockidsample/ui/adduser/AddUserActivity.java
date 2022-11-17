@@ -446,7 +446,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
     private void registerFidoKey(BIDLinkedAccount linkedAccount) {
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccount,
-                FIDO2KeyType.PLATFORM, (status, errorResponse) -> {
+                FIDO2KeyType.PLATFORM,null, (status, errorResponse) -> {
                     hideProgress();
                     Toast.makeText(this, getString(R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();
