@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.fido.fido2.Fido2ApiClient
 import com.google.android.gms.fido.fido2.api.common.*
 import com.onekosmos.blockid.sdk.BlockIDSDK
+import com.onekosmos.blockidsample.AppConstant
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -575,7 +576,7 @@ class FidoViewModel : ViewModel() {
     }
 
     companion object {
-        private const val LICENSE_KEY = "3f2282e9-3d46-4961-b103-a9319ad4560c"
+        private const val LICENSE_KEY = AppConstant.licenseKey
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE
     }
 }
