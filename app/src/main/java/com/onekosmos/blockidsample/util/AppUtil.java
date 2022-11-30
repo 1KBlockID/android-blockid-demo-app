@@ -31,11 +31,23 @@ public class AppUtil {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
+    /**
+     * @param img base64 of image
+     * @return bitmap of image
+     */
     public static Bitmap convertBase64ToBitmap(String img) {
         if (TextUtils.isEmpty(img)) {
             return null;
         }
         byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * @param byteArrayImage byte array of image
+     * @return base64 string of byte array
+     */
+    public static String getBase64FromBytes(byte[] byteArrayImage) {
+        return Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
     }
 }

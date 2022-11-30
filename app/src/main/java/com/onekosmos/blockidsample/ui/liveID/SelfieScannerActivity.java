@@ -20,7 +20,7 @@ import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.VerifyDocument;
-import com.onekosmos.blockidsample.util.scanner.SelfieScannerHelper;
+import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -77,7 +77,7 @@ public class SelfieScannerActivity extends AppCompatActivity {
 
     private void startLiveIDScan() {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
-        selfieScannerHelper.scanSelfie(false, new SelfieScannerHelper
+        selfieScannerHelper.scanSelfie(new SelfieScannerHelper
                 .SelfieScanCallback() {
             @Override
             public void onCancelSelfieScan() {
