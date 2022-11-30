@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.liveID.SelfieScanningActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_back_selfie"
+        android:layout_width="@dimen/dimen_25dp"
+        android:layout_height="@dimen/dimen_25dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:padding="@dimen/dimen_5dp"
+        android:src="@drawable/icon_backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title_add_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text="@string/label_liveid"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/img_back_selfie"
+        app:layout_constraintStart_toEndOf="@id/img_back_selfie"
+        app:layout_constraintTop_toTopOf="@id/img_back_selfie" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

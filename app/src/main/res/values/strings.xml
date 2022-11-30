@@ -227,4 +227,9 @@
 
     <!-- KYC -->
     <string name="label_my_kyc">My KYC</string>
+
+    <!-- Selfie Scan -->
+    <string name="label_validating_liveness">Validating liveness</string>
+    <string name="label_completing_your_registration">Completing your registration</string>
+
 </resources>
