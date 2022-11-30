@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.liveID;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -33,11 +34,15 @@ public class SelfieScannerActivity extends AppCompatActivity {
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private ProgressDialog mProgressDialog;
+    private boolean mIsFromAuthentication;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selfie_scanning);
+        mIsFromAuthentication = getIntent().hasExtra(IS_FROM_AUTHENTICATE) &&
+                getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         initView();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
@@ -99,7 +104,12 @@ public class SelfieScannerActivity extends AppCompatActivity {
 
             @Override
             public void onFinishSelfieScan(LinkedHashMap<String, Object> selfieScanData) {
-                checkLiveness(Objects.requireNonNull(selfieScanData.get("liveId")).toString());
+                if (mIsFromAuthentication) {
+                    verifyLiveID(AppUtil.imageBase64ToBitmap(
+                            Objects.requireNonNull(selfieScanData.get("liveId")).toString()));
+                } else {
+                    checkLiveness(Objects.requireNonNull(selfieScanData.get("liveId")).toString());
+                }
             }
         });
     }
@@ -116,6 +126,24 @@ public class SelfieScannerActivity extends AppCompatActivity {
                 registerLiveID(AppUtil.imageBase64ToBitmap(liveIdBase64));
             } else {
                 mProgressDialog.dismiss();
+                showError(errorResponse);
+            }
+        });
+    }
+
+    /**
+     * Verify LiveID
+     *
+     * @param bitmap Bitmap image
+     */
+    private void verifyLiveID(Bitmap bitmap) {
+        mProgressDialog.show(getString(R.string.label_validating_liveness));
+        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (success, errorResponse) -> {
+            mProgressDialog.dismiss();
+            if (success) {
+                setResult(RESULT_OK);
+                finish();
+            } else {
                 showError(errorResponse);
             }
         });
