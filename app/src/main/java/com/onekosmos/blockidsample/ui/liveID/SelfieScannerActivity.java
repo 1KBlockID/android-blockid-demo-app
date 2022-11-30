@@ -164,21 +164,7 @@ public class SelfieScannerActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            if (error == null)
-                error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                        K_SOMETHING_WENT_WRONG.getMessage());
-
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-                finish();
-            };
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error), error.getMessage(),
-                    onDismissListener);
+            showError(error);
         });
     }
 
@@ -203,7 +189,9 @@ public class SelfieScannerActivity extends AppCompatActivity {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
-        errorDialog.show(null, getString(R.string.label_error),
-                error.getMessage(), onDismissListener);
+        errorDialog.showWithOneButton(null,
+                getString(R.string.label_error),
+                error.getMessage(),
+                getString(R.string.label_ok), onDismissListener);
     }
 }
