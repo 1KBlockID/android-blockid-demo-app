@@ -17,15 +17,15 @@ import java.util.LinkedHashMap;
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class SelfieScannerHelper {
-    private final Context mContext;
     private static final String K_LIVEID = "liveId";
 
     // set default image compression quality
-    private final int mImageCompressionQuality = 90;
+    private static final int mImageCompressionQuality = 90;
 
     // set default image capture mode
-    private final CFASelfieCaptureMode mCaptureMode = CFASelfieCaptureMode.MANUAL;
+    private static final CFASelfieCaptureMode mCaptureMode = CFASelfieCaptureMode.MANUAL;
 
+    private final Context mContext;
 
     /**
      * @param context activity context, on which scanner will start
@@ -56,6 +56,7 @@ public class SelfieScannerHelper {
 
         // do not show an option to switch camera for taking selfie
         settings.setEnableSwitchCamera(false);
+
         CFASelfieController selfieController = CFASelfieController.getInstance(mContext);
         selfieController.scanSelfie(settings, new CFASelfieScanListener() {
             @Override

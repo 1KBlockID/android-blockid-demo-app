@@ -69,12 +69,18 @@ public class SelfieScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initialise UI Objects
+     */
     private void initView() {
         mProgressDialog = new ProgressDialog(this);
         AppCompatImageView mImgBack = findViewById(R.id.img_back_selfie);
         mImgBack.setOnClickListener(v -> onBackPressed());
     }
 
+    /**
+     * Start Live ID Scanning
+     */
     private void startLiveIDScan() {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
         selfieScannerHelper.scanSelfie(new SelfieScannerHelper
@@ -96,11 +102,16 @@ public class SelfieScannerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Check LiveID Liveness
+     *
+     * @param liveIdBase64 base64 for image
+     */
     private void checkLiveness(String liveIdBase64) {
         mProgressDialog.show(getString(R.string.label_validating_liveness));
         VerifyDocument.getInstance().checkLiveness(liveIdBase64, (status, errorResponse) -> {
             if (status) {
-                registerLiveID(AppUtil.convertBase64ToBitmap(liveIdBase64));
+                registerLiveID(AppUtil.imageBase64ToBitmap(liveIdBase64));
             } else {
                 mProgressDialog.dismiss();
                 showError(errorResponse);
@@ -108,6 +119,11 @@ public class SelfieScannerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Register LiveID
+     *
+     * @param livIdBitmap Bitmap image
+     */
     private void registerLiveID(Bitmap livIdBitmap) {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
         BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
@@ -136,6 +152,11 @@ public class SelfieScannerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Show Error Dialog
+     *
+     * @param error {@link ErrorManager.ErrorResponse}
+     */
     private void showError(ErrorManager.ErrorResponse error) {
         if (error == null)
             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),

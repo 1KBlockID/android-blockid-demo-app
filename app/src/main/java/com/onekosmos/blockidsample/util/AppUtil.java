@@ -12,13 +12,17 @@ import java.io.ByteArrayOutputStream;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class AppUtil {
+
+    /**
+     * @param img base64 of image
+     * @return bitmap of image
+     */
     public static Bitmap imageBase64ToBitmap(String img) {
         if (TextUtils.isEmpty(img))
             return null;
 
         byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        return decodedByte;
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
     public static String bitmapToBase64(Bitmap bitmap) {
@@ -29,18 +33,6 @@ public class AppUtil {
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    /**
-     * @param img base64 of image
-     * @return bitmap of image
-     */
-    public static Bitmap convertBase64ToBitmap(String img) {
-        if (TextUtils.isEmpty(img)) {
-            return null;
-        }
-        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
     /**
