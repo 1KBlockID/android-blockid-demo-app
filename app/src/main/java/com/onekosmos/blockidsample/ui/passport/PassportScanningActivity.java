@@ -32,7 +32,7 @@ import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
-import com.onekosmos.blockidsample.ui.liveID.SelfieScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.SelfieScannerActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -208,7 +208,7 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
                             DocumentHolder.setData(mPassportMap, null);
-                            Intent intent = new Intent(this, SelfieScanningActivity.class);
+                            Intent intent = new Intent(this, SelfieScannerActivity.class);
                             intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);

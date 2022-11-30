@@ -29,7 +29,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class SelfieScanningActivity extends AppCompatActivity {
+public class SelfieScannerActivity extends AppCompatActivity {
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private ProgressDialog mProgressDialog;
@@ -58,6 +58,14 @@ public class SelfieScanningActivity extends AppCompatActivity {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null, "",
                     getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.cancel();
         }
     }
 
