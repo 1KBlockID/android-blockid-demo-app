@@ -124,10 +124,10 @@ public class SelfieScannerActivity extends AppCompatActivity {
         VerifyDocument.getInstance().checkLiveness(liveIdBase64, (status, errorResponse) -> {
             if (status) {
                 registerLiveID(AppUtil.imageBase64ToBitmap(liveIdBase64));
-            } else {
-                mProgressDialog.dismiss();
-                showError(errorResponse);
+                return;
             }
+            mProgressDialog.dismiss();
+            showError(errorResponse);
         });
     }
 
@@ -143,9 +143,9 @@ public class SelfieScannerActivity extends AppCompatActivity {
             if (success) {
                 setResult(RESULT_OK);
                 finish();
-            } else {
-                showError(errorResponse);
             }
+            showError(errorResponse);
+
         });
     }
 
