@@ -32,6 +32,7 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class FIDO2Fragment extends Fragment {
+    private final String K_FIDO_FILE_NAME = "fido3_legacy_vault.html";
     private AppCompatButton mBtnRegister, mBtnAuthenticate;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
@@ -65,6 +66,7 @@ public class FIDO2Fragment extends Fragment {
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
                             tenant.getCommunity(),
+                            "",
                             (status, errorResponse) -> {
                                 mProgressDialog.dismiss();
                                 mBtnRegisterClicked = false;
@@ -92,6 +94,7 @@ public class FIDO2Fragment extends Fragment {
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
                             tenant.getCommunity(),
+                            K_FIDO_FILE_NAME,
                             (status, errorResponse) -> {
                                 mProgressDialog.dismiss();
                                 mBtnAuthenticateClicked = false;
