@@ -143,6 +143,7 @@ public class SelfieScannerActivity extends AppCompatActivity {
             if (success) {
                 setResult(RESULT_OK);
                 finish();
+                return;
             }
             showError(errorResponse);
 
