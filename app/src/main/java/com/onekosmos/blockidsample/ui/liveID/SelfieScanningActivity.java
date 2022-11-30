@@ -69,7 +69,8 @@ public class SelfieScanningActivity extends AppCompatActivity {
 
     private void startLiveIDScan() {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
-        selfieScannerHelper.scanSelfie(false, new SelfieScannerHelper.SelfieScanCallback() {
+        selfieScannerHelper.scanSelfie(false, new SelfieScannerHelper
+                .SelfieScanCallback() {
             @Override
             public void onCancelSelfieScan() {
                 finish();
