@@ -104,7 +104,8 @@ public class VerifyDocument {
      * @param base64Image2 base64 image of document
      * @param callback     {@link CompareFaceCallback }
      */
-    public void compareFace(String base64Image1, String base64Image2, CompareFaceCallback callback) {
+    public void compareFace(String base64Image1, String base64Image2,
+                            CompareFaceCallback callback) {
         LinkedHashMap<String, Object> faceCompareMap = new LinkedHashMap<>();
         faceCompareMap.put(K_ID, BlockIDSDK.getInstance().getDID() + "." + K_FACE_COMPARE);
         faceCompareMap.put(K_TYPE, K_FACE_COMPARE);

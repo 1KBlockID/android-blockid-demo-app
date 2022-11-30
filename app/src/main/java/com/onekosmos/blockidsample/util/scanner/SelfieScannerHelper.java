@@ -1,9 +1,5 @@
 package com.onekosmos.blockidsample.util.scanner;
 
-/**
- * Created by 1Kosmos Engineering
- * Copyright © 2022 1Kosmos. All rights reserved.
- */
 import android.content.Context;
 import android.util.Base64;
 
@@ -16,7 +12,7 @@ import com.idmetrics.catfishair.utils.CFASelfieSettings;
 import java.util.LinkedHashMap;
 
 /**
- * Created by Sarthak Mishra on 30/11/22.
+ * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 @SuppressWarnings("FieldCanBeLocal")
