@@ -162,9 +162,16 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             return;
         }
 
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
         BlockIDSDK.getInstance().registerFIDO2Key(this, mLinkedAccountsList.get(0),
                 FIDO2KeyType.CROSS_PLATFORM,observer, (status, errorResponse) -> {
-                    Log.e("status", "" + status);
+                    progressDialog.dismiss();
+                    if(status){
+                        Log.e("FIDO","success");
+                    }else {
+                        Log.e("Error", errorResponse.getMessage());
+                    }
                 });
 //        ErrorDialog errorDialog = new ErrorDialog(this);
 //        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
