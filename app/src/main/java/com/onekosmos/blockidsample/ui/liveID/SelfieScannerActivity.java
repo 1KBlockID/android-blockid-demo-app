@@ -30,8 +30,8 @@ import java.util.Objects;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class SelfieScannerActivity extends AppCompatActivity {
-    private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
+    private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -48,6 +48,14 @@ public class SelfieScannerActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.cancel();
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -56,16 +64,8 @@ public class SelfieScannerActivity extends AppCompatActivity {
             startLiveIDScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null, "",
+            errorDialog.show(null, null,
                     getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.cancel();
         }
     }
 
@@ -75,7 +75,10 @@ public class SelfieScannerActivity extends AppCompatActivity {
     private void initView() {
         mProgressDialog = new ProgressDialog(this);
         AppCompatImageView mImgBack = findViewById(R.id.img_back_selfie);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(v -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
     }
 
     /**
@@ -83,8 +86,7 @@ public class SelfieScannerActivity extends AppCompatActivity {
      */
     private void startLiveIDScan() {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
-        selfieScannerHelper.scanSelfie(new SelfieScannerHelper
-                .SelfieScanCallback() {
+        selfieScannerHelper.scanSelfie(new SelfieScannerHelper.SelfieScanCallback() {
             @Override
             public void onCancelSelfieScan() {
                 finish();
