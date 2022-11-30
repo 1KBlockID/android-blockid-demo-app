@@ -137,7 +137,7 @@ public class SelfieScannerActivity extends AppCompatActivity {
      * @param bitmap Bitmap image
      */
     private void verifyLiveID(Bitmap bitmap) {
-        mProgressDialog.show(getString(R.string.label_validating_liveness));
+        mProgressDialog.show(getString(R.string.label_verify_liveid));
         BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (success, errorResponse) -> {
             mProgressDialog.dismiss();
             if (success) {
