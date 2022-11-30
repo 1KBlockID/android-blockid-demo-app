@@ -224,4 +224,9 @@
     <string name="label_community">Community</string>
     <string name="label_sdk_version">SDK Version</string>
     <string name="label_app_version">APP Version</string>
+
+    <!--Live ID-->
+    <string name="label_validating_liveness">Validating liveness</string>
+    <string name="label_completing_your_registration">Completing your registration</string>
+
 </resources>

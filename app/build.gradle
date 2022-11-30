@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
-        versionName "1.8.20" + "." + getCurrentTimestampHexValue()
+        versionName "1.8.30" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -62,9 +62,14 @@ dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Start AuthenticID
+    implementation files('libs/selfie-scanner.aar')
+    // End AuthenticID
+
     implementation project(path: ':BlockIDSDK-release')
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.6.1'
@@ -130,6 +135,12 @@ dependencies {
     implementation 'androidx.camera:camera-lifecycle:1.2.0-alpha03'
     implementation 'androidx.camera:camera-view:1.2.0-alpha03'
 
+    // AUID
+    implementation 'androidx.camera:camera-core:1.1.0'
+    implementation 'androidx.camera:camera-extensions:1.2.0-alpha03'
+    implementation 'androidx.window:window:1.1.0-alpha02'
+    implementation 'org.apache.commons:commons-imaging:1.0-alpha2'
+
     // LiveID
     implementation 'com.google.android.gms:play-services-mlkit-face-detection:17.0.1'
     implementation 'com.google.guava:guava:31.0.1-android'
@@ -148,6 +159,8 @@ dependencies {
 
     // kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.1'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform

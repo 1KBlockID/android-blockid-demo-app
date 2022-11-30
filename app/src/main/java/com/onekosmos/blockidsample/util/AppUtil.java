@@ -30,4 +30,12 @@ public class AppUtil {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
+
+    public static Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
 }

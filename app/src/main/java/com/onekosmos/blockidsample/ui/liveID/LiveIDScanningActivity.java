@@ -21,17 +21,19 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
-import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
+import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.VerifyDocument;
+import com.onekosmos.blockidsample.util.documentScanner.SelfieScanner;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
@@ -61,11 +63,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -75,9 +72,14 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
-        mLiveIDScannerHelper.stopLiveIDScanning();
+//        mLiveIDScannerHelper.stopLiveIDScanning();
     }
 
     @Override
@@ -213,19 +215,51 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-        mBIDScannerView.setVisibility(View.VISIBLE);
-        mScannerOverlay.setVisibility(View.VISIBLE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-                ScanningMode.SCAN_LIVE,
-                mBIDScannerView,
-                mScannerOverlay,
-                false,
-                this);
-        if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
-        else
-            mLiveIDScannerHelper.startLiveIDScanning();
+        SelfieScanner selfieScanner = new SelfieScanner(this);
+        selfieScanner.scanSelfie(false, new SelfieScanner.SelfieScanCallback() {
+            @Override
+            public void onCancelSelfieScan() {
+                finish();
+            }
+
+            @Override
+            public void onErrorSelfieScan(int errorCode, String errorMessage) {
+                showError(new ErrorManager.ErrorResponse(errorCode, errorMessage));
+            }
+
+            @Override
+            public void onFinishSelfieScan(LinkedHashMap<String, Object> selfieScanData) {
+                checkLiveness(Objects.requireNonNull(selfieScanData.get("liveId")).toString());
+            }
+        });
     }
+
+    private void checkLiveness(String liveIdBase64) {
+        mProgressDialog.show(getString(R.string.label_validating_liveness));
+        VerifyDocument.getInstance().checkLiveness(liveIdBase64, (status, errorResponse) -> {
+            if (status) {
+                registerLiveID(AppUtil.convertBase64ToBitmap(liveIdBase64));
+            } else {
+                mProgressDialog.dismiss();
+                showError(errorResponse);
+            }
+        });
+    }
+
+//    private void startLiveIDScan() {
+//        mBIDScannerView.setVisibility(View.VISIBLE);
+//        mScannerOverlay.setVisibility(View.VISIBLE);
+//        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
+//                ScanningMode.SCAN_LIVE,
+//                mBIDScannerView,
+//                mScannerOverlay,
+//                false,
+//                this);
+//        if (mIsLivenessNeeded)
+//            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
+//        else
+//            mLiveIDScannerHelper.startLiveIDScanning();
+//    }
 
     private void showFaceNotFocusedViews(String expression) {
         mScannerOverlay.setImageResource(R.drawable.group_3);
@@ -263,10 +297,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void registerLiveID(Bitmap livIdBitmap) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
+        mProgressDialog.show(getString(R.string.label_completing_your_registration));
         BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null, (status, msg, error) -> {
-            progressDialog.dismiss();
+            mProgressDialog.dismiss();
             if (status) {
                 Toast.makeText(this, getString(R.string.label_liveid_enrolled_successfully), Toast.LENGTH_LONG).show();
                 finish();
