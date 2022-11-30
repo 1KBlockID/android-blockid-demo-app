@@ -14,7 +14,6 @@
         android:padding="@dimen/dimen_5dp"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/img_enrollment_status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
