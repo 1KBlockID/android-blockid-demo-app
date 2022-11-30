@@ -38,7 +38,7 @@ import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
-import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.SelfieScannerActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
@@ -202,7 +202,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onLiveIdClicked(boolean withLivenessCheck) {
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
-            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            // commenting old liveid scanner
+            // Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            Intent intent = new Intent(this, SelfieScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra("liveness_check", withLivenessCheck);
             startActivity(intent);

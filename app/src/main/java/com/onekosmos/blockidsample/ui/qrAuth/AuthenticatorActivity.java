@@ -30,7 +30,7 @@ import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseList
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.SelfieScannerActivity;
 import com.onekosmos.blockidsample.ui.login.PinVerificationActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.CurrentLocationHelper;
@@ -286,7 +286,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void startLiveIDVerification() {
-        Intent scanLiveIdIntent = new Intent(this, LiveIDScanningActivity.class);
+        Intent scanLiveIdIntent = new Intent(this, SelfieScannerActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
         verifyAuthResultLauncher.launch(scanLiveIdIntent);

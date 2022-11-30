@@ -71,7 +71,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
         arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
-        arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID_WITH_LIVENESS);
+//        arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID_WITH_LIVENESS);
 
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
