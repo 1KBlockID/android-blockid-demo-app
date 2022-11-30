@@ -202,7 +202,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onLiveIdClicked(boolean withLivenessCheck) {
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
-//            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            // commenting old liveid scanner
+            // Intent intent = new Intent(this, LiveIDScanningActivity.class);
             Intent intent = new Intent(this, SelfieScannerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra("liveness_check", withLivenessCheck);

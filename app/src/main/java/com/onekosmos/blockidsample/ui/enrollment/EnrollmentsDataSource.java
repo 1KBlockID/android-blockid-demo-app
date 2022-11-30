@@ -30,7 +30,7 @@ public class EnrollmentsDataSource {
     public enum EnrollmentAssetEnum {
         ASSET_ADD_USER,
         ASSET_LIVE_ID,
-//        ASSET_LIVE_ID_WITH_LIVENESS,
+        ASSET_LIVE_ID_WITH_LIVENESS,
         ASSET_PIN,
         ASSET_DEVICE_AUTH,
         ASSET_DL,
@@ -121,10 +121,10 @@ public class EnrollmentsDataSource {
                         context.getResources().getString(R.string.label_liveid), null);
                 break;
 
-//            case ASSET_LIVE_ID_WITH_LIVENESS:
-//                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
-//                        context.getResources().getString(R.string.label_liveid_with_liveness_check), null);
-//                break;
+            case ASSET_LIVE_ID_WITH_LIVENESS:
+                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
+                        context.getResources().getString(R.string.label_liveid_with_liveness_check), null);
+                break;
 
             case ASSET_DEVICE_AUTH:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isDeviceAuthEnrolled(),
