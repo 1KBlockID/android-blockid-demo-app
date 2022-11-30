@@ -11,4 +11,5 @@ public class AppConstant {
     public static final String dvcId = "default_config";
     public static final BIDTenant defaultTenant = new BIDTenant("1kosmos", "default",
             "https://1k-dev.1kosmos.net");
+    public static final String documentScannerLicense = "AwEpN8bqpYsM38c19HW2T6/W8OuW+DxiMHlowro13y0o3Td68zqWA4bkl15omB5c9AsDpB32QPm79nQoyrpPfU+TBpHiwu9hL0Lp9J/vfGpaUz2GqEnBTcQs6uv4Xa84+iRMOyJ/nrExwwJBl9gRugVt";
 }

@@ -7,7 +7,7 @@
     tools:context=".ui.documentScanner.DocumentScannerActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/img_back_selfie"
+        android:id="@+id/img_back_document"
         android:layout_width="@dimen/dimen_25dp"
         android:layout_height="@dimen/dimen_25dp"
         android:layout_marginStart="@dimen/dimen_10dp"
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_20dp"
-        android:text="@string/label_enroll_dl"
+        android:text="@string/label_enroll_driver_license"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_28sp"
         app:layout_constraintBottom_toBottomOf="@id/img_back_selfie"
