@@ -103,8 +103,9 @@ public class DocumentScannerActivity extends AppCompatActivity {
                     public void captureError(DSError dsError) {
                         ErrorDialog errorDialog = new ErrorDialog(
                                 DocumentScannerActivity.this);
-                        errorDialog.show(null, getString(R.string.label_error),
+                        errorDialog.showWithOneButton(null, getString(R.string.label_error),
                                 dsError.message,
+                                getString(R.string.label_ok),
                                 dialog -> {
                                     errorDialog.dismiss();
                                     finish();
@@ -232,7 +233,6 @@ public class DocumentScannerActivity extends AppCompatActivity {
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
-            setResult(RESULT_CANCELED);
             finish();
         };
 
