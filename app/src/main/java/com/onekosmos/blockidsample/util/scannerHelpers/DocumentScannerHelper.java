@@ -33,7 +33,6 @@ public class DocumentScannerHelper {
     private static final String K_FRONT_IMAGE = "front_image";
     private static final String K_FRONT_IMAGE_FLASH = "front_image_flash";
 
-
     /**
      * @param context activity context, on which scanner will start
      */
@@ -43,45 +42,13 @@ public class DocumentScannerHelper {
 
     /**
      * @param docType  which doc type need to be scanned
-     * @param callback type of AUIDDocumentScanCallback to return document data, error
+     * @param callback type of DocumentScanCallback to return document data, error
      *                 and cancellation of scanner
      */
-    public void startAUIDDocumentScan(DocumentScannerType docType, DocumentScanCallback callback) {
+    public void startDocumentScan(DocumentScannerType docType, DocumentScanCallback callback) {
         mCallback = callback;
         if (docType.equals(DocumentScannerType.DL))
             startDLScan(DSSide.Front);
-        if (docType.equals(DocumentScannerType.PPT))
-            startPPScan();
-    }
-
-    /**
-     * Start passport Scanning.
-     */
-    private void startPPScan() {
-        DSHandler.staticLicenseKey = K_LICENSE_KEY;
-        DSHandler dsHandler = DSHandler.getInstance(mContext);
-        dsHandler.options = getDSPassportOption();
-        dsHandler.init(DSCaptureMode.Manual, new DSHandlerListener() {
-            @Override
-            public void handleScan(DSResult dsResult) {
-                if (mDocumentMap == null)
-                    mDocumentMap = new LinkedHashMap<>();
-                mDocumentMap.put(K_FRONT_IMAGE, getBase64FromBytes(dsResult.image));
-                mDocumentMap.put(K_FRONT_IMAGE_FLASH, getBase64FromBytes(dsResult.flashImage));
-                mCallback.handleScan(mDocumentMap);
-            }
-
-            @Override
-            public void scanWasCancelled() {
-                mCallback.scanWasCancelled();
-            }
-
-            @Override
-            public void captureError(DSError dsError) {
-                mCallback.captureError(dsError);
-            }
-        });
-        dsHandler.start();
     }
 
     /**
@@ -187,11 +154,11 @@ public class DocumentScannerHelper {
     }
 
     /**
-     * Enum for AuthenticID document Type.
+     * Enum for document Type.
+     * Currently enum is only for DL
      */
     public enum DocumentScannerType {
-        DL,
-        PPT
+        DL
     }
 
     /**
@@ -203,7 +170,7 @@ public class DocumentScannerHelper {
     }
 
     /**
-     * Authentic ID Scanner callback
+     * Document Scan callback
      */
     public interface DocumentScanCallback {
         void scanWasCancelled();

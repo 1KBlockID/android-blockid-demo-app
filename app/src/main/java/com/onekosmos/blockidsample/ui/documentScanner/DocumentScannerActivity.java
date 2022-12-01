@@ -6,16 +6,12 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.idmetrics.dc.utils.DSError;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -28,9 +24,6 @@ import com.onekosmos.blockidsample.util.VerifyDocument;
 import com.onekosmos.blockidsample.util.scannerHelpers.DocumentScannerHelper;
 import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -41,14 +34,8 @@ import java.util.Objects;
 public class DocumentScannerActivity extends AppCompatActivity {
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_CAMERA_PERMISSION_REQUEST_CODE = 1009;
-    private static final String K_DL_AUTHENTICATE = "dl_authenticate";
     private static final String K_TYPE = "type";
     private static final String K_ID = "id";
-    private static final String K_CERTIFICATIONS = "certifications";
-    private static final String K_RESULT = "result";
-    private static final String K_STATUS = "status";
-    private static final String K_MESSAGE = "message";
-    private static final String K_VERIFIED = "verified";
     private LinkedHashMap<String, Object> mSelfieMap, mDocumentMap;
     private ProgressDialog mProgressDialog;
 
@@ -94,7 +81,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void startDocumentScan() {
         DocumentScannerHelper documentScannerHelper = new DocumentScannerHelper(this);
-        documentScannerHelper.startAUIDDocumentScan(DocumentScannerHelper.DocumentScannerType.DL,
+        documentScannerHelper.startDocumentScan(DocumentScannerHelper.DocumentScannerType.DL,
                 new DocumentScannerHelper.DocumentScanCallback() {
                     @Override
                     public void handleScan(LinkedHashMap<String, Object> documentMap) {
@@ -155,61 +142,15 @@ public class DocumentScannerActivity extends AppCompatActivity {
         mProgressDialog.show(getString(R.string.label_extracting_identity_data));
         documentMap.put(K_TYPE, "dl");
         documentMap.put(K_ID, BlockIDSDK.getInstance().getDID() + ".dl");
-        BlockIDSDK.getInstance().verifyDocument(
-                documentMap, new String[]{K_DL_AUTHENTICATE},
-                (status, result, errorResponse) -> {
-                    if (!status) {
-                        mProgressDialog.dismiss();
-                        showError(errorResponse);
-                        return;
-                    }
-
-                    try {
-                        JSONObject resultObject = new JSONObject(result);
-                        JSONArray certificates = resultObject.getJSONArray(K_CERTIFICATIONS);
-                        String documentData = certificates.length() > 0 &&
-                                certificates.getJSONObject(0).has(K_RESULT) ?
-                                certificates.getJSONObject(0).getString(K_RESULT) : null;
-
-                        if (TextUtils.isEmpty(documentData)) {
-                            int code = K_SOMETHING_WENT_WRONG.getCode();
-                            String message = K_SOMETHING_WENT_WRONG.getMessage();
-                            if (certificates.length() > 0) {
-                                JSONObject errorObject = certificates.getJSONObject(0);
-                                if (errorObject.has(K_STATUS)) {
-                                    code = errorObject.getInt(K_STATUS);
-                                }
-                                if (errorObject.has(K_MESSAGE)) {
-                                    message = errorObject.getString(K_MESSAGE);
-                                }
-                            }
-                            mProgressDialog.dismiss();
-                            showError(new ErrorManager.ErrorResponse(code, message));
-                            return;
-                        }
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mDocumentMap = gson.fromJson(documentData,
-                                new TypeToken<LinkedHashMap<String, Object>>() {
-                                }.getType());
-
-                        if (certificates.getJSONObject(0).getBoolean(K_VERIFIED)) {
-                            if (BlockIDSDK.getInstance().isLiveIDRegistered())
-                                compareFace();
-                            else
-                                checkLiveness();
-                        } else {
-                            mProgressDialog.dismiss();
-                            showError(new ErrorManager.ErrorResponse(
-                                    0, getString(
-                                    R.string.label_we_are_unable_to_verify_your_document)));
-                        }
-                    } catch (Exception e) {
-                        mProgressDialog.dismiss();
-                        showError(new ErrorManager.ErrorResponse(
-                                K_SOMETHING_WENT_WRONG.getCode(),
-                                K_SOMETHING_WENT_WRONG.getMessage()));
-                    }
-                });
+        VerifyDocument.getInstance().verifyDL(documentMap, (response, documentData, error) -> {
+            if (!response) {
+                mProgressDialog.dismiss();
+                showError(error);
+                return;
+            }
+            mDocumentMap = documentData;
+            compareFace();
+        });
     }
 
     /**
@@ -229,22 +170,6 @@ public class DocumentScannerActivity extends AppCompatActivity {
                         showError(errorResponse);
                     }
                 });
-    }
-
-    /**
-     * check liveness of selfie
-     */
-    private void checkLiveness() {
-        mProgressDialog.show(getString(R.string.label_validating_liveness));
-        String liveIdBase64 = Objects.requireNonNull(mSelfieMap.get("liveId")).toString();
-        VerifyDocument.getInstance().checkLiveness(liveIdBase64, (status, errorResponse) -> {
-            if (status) {
-                registerDocumentWithLiveID();
-            } else {
-                mProgressDialog.dismiss();
-                showError(errorResponse);
-            }
-        });
     }
 
     /**
