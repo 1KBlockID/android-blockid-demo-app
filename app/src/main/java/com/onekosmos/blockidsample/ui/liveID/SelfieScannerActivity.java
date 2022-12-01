@@ -20,7 +20,6 @@ import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-import com.onekosmos.blockidsample.util.VerifyDocument;
 import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
 import java.util.LinkedHashMap;
@@ -108,26 +107,10 @@ public class SelfieScannerActivity extends AppCompatActivity {
                     verifyLiveID(AppUtil.imageBase64ToBitmap(
                             Objects.requireNonNull(selfieScanData.get("liveId")).toString()));
                 } else {
-                    checkLiveness(Objects.requireNonNull(selfieScanData.get("liveId")).toString());
+                    registerLiveID(AppUtil.imageBase64ToBitmap(
+                            Objects.requireNonNull(selfieScanData.get("liveId")).toString()));
                 }
             }
-        });
-    }
-
-    /**
-     * Check LiveID Liveness
-     *
-     * @param liveIdBase64 base64 for image
-     */
-    private void checkLiveness(String liveIdBase64) {
-        mProgressDialog.show(getString(R.string.label_validating_liveness));
-        VerifyDocument.getInstance().checkLiveness(liveIdBase64, (status, errorResponse) -> {
-            if (status) {
-                registerLiveID(AppUtil.imageBase64ToBitmap(liveIdBase64));
-                return;
-            }
-            mProgressDialog.dismiss();
-            showError(errorResponse);
         });
     }
 
