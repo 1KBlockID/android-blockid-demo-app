@@ -36,7 +36,6 @@ import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.documentScanner.DocumentScannerActivity;
-import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
 import com.onekosmos.blockidsample.ui.liveID.SelfieScannerActivity;

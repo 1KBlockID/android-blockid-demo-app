@@ -36,6 +36,7 @@ public class VerifyDocument {
     private static final String K_RESULT = "result";
     private static final String K_STATUS = "status";
     private static final String K_MESSAGE = "message";
+    private static final String K_DL = "dl";
     private LinkedHashMap<String, Object> mDocumentMap;
 
 
@@ -116,16 +117,16 @@ public class VerifyDocument {
     /**
      * Call verify document api to get DL document data
      *
-     * @param documentMap DL Object with front_image, front_image_flash and back_image,
+     * @param documentMap DL Object with front_image, front_image_flash and back_image
      */
-    public void verifyDL(LinkedHashMap<String, Object> documentMap, VerifyDLCallback callback) {
-        documentMap.put(K_TYPE, "dl");
-        documentMap.put(K_ID, BlockIDSDK.getInstance().getDID() + ".dl");
-        BlockIDSDK.getInstance().verifyDocument(
-                documentMap, new String[]{K_DL_AUTHENTICATE},
+    public void authenticateDocument(LinkedHashMap<String, Object> documentMap,
+                                     AuthenticateDocumentCallback callback) {
+        documentMap.put(K_TYPE, K_DL);
+        documentMap.put(K_ID, BlockIDSDK.getInstance().getDID() + "." + K_DL);
+        BlockIDSDK.getInstance().verifyDocument(documentMap, new String[]{K_DL_AUTHENTICATE},
                 (status, result, errorResponse) -> {
                     if (!status) {
-                        callback.onVerifyDL(false, null, errorResponse);
+                        callback.onAuthenticateDocument(false, null, errorResponse);
                         return;
                     }
 
@@ -148,26 +149,36 @@ public class VerifyDocument {
                                     message = errorObject.getString(K_MESSAGE);
                                 }
                             }
-                            callback.onVerifyDL(false, null,
+                            callback.onAuthenticateDocument(false, null,
                                     new ErrorManager.ErrorResponse(code, message));
                             return;
                         }
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mDocumentMap = gson.fromJson(documentData,
-                                new TypeToken<LinkedHashMap<String, Object>>() {
-                                }.getType());
 
-                        if (certificates.getJSONObject(0).getBoolean(K_VERIFIED)) {
-                            callback.onVerifyDL(true, mDocumentMap, null);
-                        } else {
-                            callback.onVerifyDL(false, null,
+                        JSONObject certificate = certificates.length() > 0
+                                ? certificates.getJSONObject(0) : null;
+                        boolean verified = false;
+                        if (certificate != null && certificate.has(K_VERIFIED)) {
+                            verified = certificate.getBoolean(K_VERIFIED);
+                        }
+
+                        if (!verified) {
+                            /// FIXME : Need to define Error code & Error Message
+                            callback.onAuthenticateDocument(false, null,
                                     new ErrorManager.ErrorResponse(
                                             K_DOCUMENT_VERIFICATION_FAILED.getCode(),
                                             K_DOCUMENT_VERIFICATION_FAILED.getMessage()
                                     ));
+                            return;
                         }
+
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mDocumentMap = gson.fromJson(documentData,
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+                        callback.onAuthenticateDocument(true, mDocumentMap, null);
                     } catch (Exception e) {
-                        callback.onVerifyDL(false, null,
+                        /// FIXME : Need to define Error code & Error Message
+                        callback.onAuthenticateDocument(false, null,
                                 new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                         K_SOMETHING_WENT_WRONG.getMessage()));
                     }
@@ -177,14 +188,14 @@ public class VerifyDocument {
     /**
      * Interface to handle DL Verify response
      */
-    public interface VerifyDLCallback {
+    public interface AuthenticateDocumentCallback {
         /**
          * @param status        true when verification is successful else false
          * @param documentData  data received as response from VerifyDocument API
          * @param errorResponse {@link ErrorManager.ErrorResponse }
          */
-        void onVerifyDL(boolean status,
-                        LinkedHashMap<String, Object> documentData,
-                        ErrorManager.ErrorResponse errorResponse);
+        void onAuthenticateDocument(boolean status,
+                                    LinkedHashMap<String, Object> documentData,
+                                    ErrorManager.ErrorResponse errorResponse);
     }
 }

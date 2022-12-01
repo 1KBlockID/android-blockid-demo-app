@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.util.scannerHelpers;
 
 import android.content.Context;
-import android.util.Base64;
 
 import com.idmetrics.dc.DSHandler;
 import com.idmetrics.dc.utils.DSCaptureMode;
@@ -9,11 +8,11 @@ import com.idmetrics.dc.utils.DSError;
 import com.idmetrics.dc.utils.DSHandlerListener;
 import com.idmetrics.dc.utils.DSID1Options;
 import com.idmetrics.dc.utils.DSID1Type;
-import com.idmetrics.dc.utils.DSPassportOptions;
 import com.idmetrics.dc.utils.DSResult;
 import com.idmetrics.dc.utils.DSSide;
 import com.idmetrics.dc.utils.FlashCapture;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.util.AppUtil;
 
 import java.util.LinkedHashMap;
 
@@ -24,14 +23,14 @@ import java.util.LinkedHashMap;
 @SuppressWarnings("FieldCanBeLocal")
 public class DocumentScannerHelper {
     private static final String K_LICENSE_KEY = AppConstant.documentScannerLicense;
+    private static final String K_BACK_IMAGE = "back_image";
+    private static final String K_FRONT_IMAGE = "front_image";
+    private static final String K_FRONT_IMAGE_FLASH = "front_image_flash";
+    private final double mImageCompressionQuality = 0.5;
     private final Context mContext;
     private DocumentScanCallback mCallback;
     private LinkedHashMap<String, Object> mDocumentMap;
     private DSSide mSide;
-    private final double mImageCompressionQuality = 0.5;
-    private static final String K_BACK_IMAGE = "back_image";
-    private static final String K_FRONT_IMAGE = "front_image";
-    private static final String K_FRONT_IMAGE_FLASH = "front_image_flash";
 
     /**
      * @param context activity context, on which scanner will start
@@ -65,7 +64,6 @@ public class DocumentScannerHelper {
 
     /**
      * @param side initialize DSID1Options for side
-     * @return DSID1Options
      */
     private DSID1Options getDSIDOption(DSSide side) {
         DSID1Options dsid1Options = new DSID1Options();
@@ -76,16 +74,6 @@ public class DocumentScannerHelper {
         dsid1Options.showReviewScreen = true;
         dsid1Options.imageCompressionQuality = mImageCompressionQuality;
         return dsid1Options;
-    }
-
-    private DSPassportOptions getDSPassportOption() {
-        DSPassportOptions dsPassportOptions = new DSPassportOptions();
-        dsPassportOptions.detectMRZ = true;
-        dsPassportOptions.enableFlashCapture = FlashCapture.Both;
-        dsPassportOptions.targetDPI = 600;
-        dsPassportOptions.imageCompressionQuality = mImageCompressionQuality;
-        dsPassportOptions.showReviewScreen = true;
-        return dsPassportOptions;
     }
 
     /**
@@ -100,8 +88,8 @@ public class DocumentScannerHelper {
             public void handleScan(DSResult dsResult) {
                 if (mDocumentMap == null)
                     mDocumentMap = new LinkedHashMap<>();
-                mDocumentMap.put(K_FRONT_IMAGE, getBase64FromBytes(dsResult.image));
-                mDocumentMap.put(K_FRONT_IMAGE_FLASH, getBase64FromBytes(dsResult.flashImage));
+                mDocumentMap.put(K_FRONT_IMAGE, AppUtil.getBase64FromBytes(dsResult.image));
+                mDocumentMap.put(K_FRONT_IMAGE_FLASH, AppUtil.getBase64FromBytes(dsResult.flashImage));
                 if (mSide == DSSide.Front)
                     scanDLBackSide();
                 else
@@ -133,7 +121,7 @@ public class DocumentScannerHelper {
             public void handleScan(DSResult dsResult) {
                 if (mDocumentMap == null)
                     mDocumentMap = new LinkedHashMap<>();
-                mDocumentMap.put(K_BACK_IMAGE, getBase64FromBytes(dsResult.image));
+                mDocumentMap.put(K_BACK_IMAGE, AppUtil.getBase64FromBytes(dsResult.image));
                 if (mSide == DSSide.Back)
                     scanDLFrontSide();
                 else
@@ -159,14 +147,6 @@ public class DocumentScannerHelper {
      */
     public enum DocumentScannerType {
         DL
-    }
-
-    /**
-     * @param byteArrayImage byte array of image
-     * @return base64 string of byte array
-     */
-    private String getBase64FromBytes(byte[] byteArrayImage) {
-        return Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
     }
 
     /**

@@ -147,7 +147,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void verifyDocument(LinkedHashMap<String, Object> documentMap) {
         mProgressDialog.show(getString(R.string.label_extracting_identity_data));
-        VerifyDocument.getInstance().verifyDL(documentMap, (response, documentData, error) -> {
+        VerifyDocument.getInstance().authenticateDocument(documentMap, (response, documentData, error) -> {
             if (!response) {
                 mProgressDialog.dismiss();
                 showError(error);
