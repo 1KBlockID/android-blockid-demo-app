@@ -235,6 +235,5 @@
     <!-- Document Scan -->
     <string name="label_extracting_identity_data">Extracting identity data</string>
     <string name="label_matching_selfie">Matching selfie</string>
-    <string name="label_we_are_unable_to_verify_your_document">We are unable to verify your document</string>
 
 </resources>

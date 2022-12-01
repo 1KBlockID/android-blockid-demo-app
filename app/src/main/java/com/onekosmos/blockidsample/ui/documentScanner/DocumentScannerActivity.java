@@ -20,7 +20,7 @@ import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-import com.onekosmos.blockidsample.util.VerifyDocument;
+import com.onekosmos.blockidsample.util.VerifyDocumentHelper;
 import com.onekosmos.blockidsample.util.scannerHelpers.DocumentScannerHelper;
 import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
@@ -147,7 +147,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void verifyDocument(LinkedHashMap<String, Object> documentMap) {
         mProgressDialog.show(getString(R.string.label_extracting_identity_data));
-        VerifyDocument.getInstance().authenticateDocument(documentMap, (response, documentData, error) -> {
+        VerifyDocumentHelper.getInstance().authenticateDocument(documentMap, (response, documentData, error) -> {
             if (!response) {
                 mProgressDialog.dismiss();
                 showError(error);
@@ -168,7 +168,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
         mProgressDialog.show(getString(R.string.label_matching_selfie));
         String liveIdBase64 = Objects.requireNonNull(mSelfieMap.get("liveId")).toString();
         String documentFaceBase64 = Objects.requireNonNull(mDocumentMap.get("face")).toString();
-        VerifyDocument.getInstance().compareFace(liveIdBase64, documentFaceBase64,
+        VerifyDocumentHelper.getInstance().compareFace(liveIdBase64, documentFaceBase64,
                 (status, errorResponse) -> {
                     if (!status) {
                         mProgressDialog.dismiss();

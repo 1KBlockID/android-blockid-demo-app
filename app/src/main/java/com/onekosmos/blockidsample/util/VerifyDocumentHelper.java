@@ -1,9 +1,5 @@
 package com.onekosmos.blockidsample.util;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_DOCUMENT_VERIFICATION_FAILED;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_DOC_FACE_NOT_MATCH;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -21,8 +17,12 @@ import java.util.LinkedHashMap;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class VerifyDocument {
-    private static VerifyDocument mSharedInstance;
+public class VerifyDocumentHelper {
+    private static VerifyDocumentHelper mSharedInstance;
+    private static final int K_COMPARE_FACE_FAILED_CODE = 101;
+    private static final int K_AUTHENTICATE_DOCUMENT_FAILED_CODE = 102;
+    private static final String K_COMPARE_FACE_FAILED_MESSAGE = "Failed to match the selfie";
+    private static final String K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE = "We are unable to verify your document.";
     private static final String K_FACE_COMPARE = "face_compare";
     private static final String K_ID = "id";
     private static final String K_TYPE = "type";
@@ -39,23 +39,22 @@ public class VerifyDocument {
     private static final String K_DL = "dl";
     private LinkedHashMap<String, Object> mDocumentMap;
 
-
     /**
      * private constructor
      * restricted this class itself
      */
-    private VerifyDocument() {
+    private VerifyDocumentHelper() {
 
     }
 
     /**
-     * create instance of Singleton class {@link VerifyDocument }
+     * create instance of Singleton class {@link VerifyDocumentHelper }
      *
-     * @return {@link VerifyDocument }
+     * @return {@link VerifyDocumentHelper }
      */
-    public static VerifyDocument getInstance() {
+    public static VerifyDocumentHelper getInstance() {
         if (mSharedInstance == null)
-            mSharedInstance = new VerifyDocument();
+            mSharedInstance = new VerifyDocumentHelper();
         return mSharedInstance;
     }
 
@@ -95,8 +94,8 @@ public class VerifyDocument {
 
                     if (!verified) {
                         callback.onCompareFace(false, new ErrorManager.ErrorResponse(
-                                K_LIVEID_DOC_FACE_NOT_MATCH.getCode(),
-                                K_LIVEID_DOC_FACE_NOT_MATCH.getMessage(), result));
+                                K_COMPARE_FACE_FAILED_CODE,
+                                K_COMPARE_FACE_FAILED_MESSAGE, result));
                         return;
                     }
                     callback.onCompareFace(true, null);
@@ -126,7 +125,8 @@ public class VerifyDocument {
         BlockIDSDK.getInstance().verifyDocument(documentMap, new String[]{K_DL_AUTHENTICATE},
                 (status, result, errorResponse) -> {
                     if (!status) {
-                        callback.onAuthenticateDocument(false, null, errorResponse);
+                        callback.onAuthenticateDocument(false, null,
+                                errorResponse);
                         return;
                     }
 
@@ -138,8 +138,8 @@ public class VerifyDocument {
                                 certificates.getJSONObject(0).getString(K_RESULT) : null;
 
                         if (TextUtils.isEmpty(documentData)) {
-                            int code = K_SOMETHING_WENT_WRONG.getCode();
-                            String message = K_SOMETHING_WENT_WRONG.getMessage();
+                            int code = K_AUTHENTICATE_DOCUMENT_FAILED_CODE;
+                            String message = K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE;
                             if (certificates.length() > 0) {
                                 JSONObject errorObject = certificates.getJSONObject(0);
                                 if (errorObject.has(K_STATUS)) {
@@ -162,11 +162,10 @@ public class VerifyDocument {
                         }
 
                         if (!verified) {
-                            /// FIXME : Need to define Error code & Error Message
                             callback.onAuthenticateDocument(false, null,
                                     new ErrorManager.ErrorResponse(
-                                            K_DOCUMENT_VERIFICATION_FAILED.getCode(),
-                                            K_DOCUMENT_VERIFICATION_FAILED.getMessage()
+                                            K_AUTHENTICATE_DOCUMENT_FAILED_CODE,
+                                            K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE
                                     ));
                             return;
                         }
@@ -175,12 +174,12 @@ public class VerifyDocument {
                         mDocumentMap = gson.fromJson(documentData,
                                 new TypeToken<LinkedHashMap<String, Object>>() {
                                 }.getType());
-                        callback.onAuthenticateDocument(true, mDocumentMap, null);
+                        callback.onAuthenticateDocument(true, mDocumentMap,
+                                null);
                     } catch (Exception e) {
-                        /// FIXME : Need to define Error code & Error Message
                         callback.onAuthenticateDocument(false, null,
-                                new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                new ErrorManager.ErrorResponse(K_AUTHENTICATE_DOCUMENT_FAILED_CODE,
+                                        K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE));
                     }
                 });
     }
