@@ -192,8 +192,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
                                 new TypeToken<LinkedHashMap<String, Object>>() {
                                 }.getType());
 
-                        if (Boolean.parseBoolean(Objects.requireNonNull(mDriverLicenseMap
-                                .get(K_VERIFIED)).toString())) {
+                        if (certificates.getJSONObject(0).getBoolean(K_VERIFIED)) {
                             if (BlockIDSDK.getInstance().isLiveIDRegistered())
                                 compareFace();
                             else
@@ -250,6 +249,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
 
     /**
      * Register Document
+     *
      * @param dlMap {@link LinkedHashMap}
      */
     private void registerDocument(LinkedHashMap<String, Object> dlMap) {
@@ -290,6 +290,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
 
     /**
      * Show Error Dialog
+     *
      * @param error {@link ErrorManager.ErrorResponse}
      */
     private void showError(ErrorManager.ErrorResponse error) {
