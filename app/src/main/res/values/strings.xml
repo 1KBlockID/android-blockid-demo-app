@@ -232,4 +232,8 @@
     <string name="label_validating_liveness">Validating liveness</string>
     <string name="label_completing_your_registration">Completing your registration</string>
 
+    <!-- Document Scan -->
+    <string name="label_extracting_identity_data">Extracting identity data</string>
+    <string name="label_matching_selfie">Matching selfie</string>
+
 </resources>

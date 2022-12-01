@@ -69,7 +69,8 @@ public class SelfieScannerActivity extends AppCompatActivity {
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null, null,
-                    getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
+                    getString(R.string.label_liveid_camera_permission_alert),
+                    dialog -> finish());
         }
     }
 
