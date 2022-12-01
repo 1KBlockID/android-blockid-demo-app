@@ -49,7 +49,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
     private static final String K_STATUS = "status";
     private static final String K_MESSAGE = "message";
     private static final String K_VERIFIED = "verified";
-    private LinkedHashMap<String, Object> mSelfieMap, mDriverLicenseMap;
+    private LinkedHashMap<String, Object> mSelfieMap, mDocumentMap;
     private ProgressDialog mProgressDialog;
 
 
@@ -123,7 +123,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
     /**
      * Start authentic id Selfie scan
      *
-     * @param documentMap DL object from authenticId scanner
+     * @param documentMap object from authenticId scanner
      */
     private void startSelfieScan(LinkedHashMap<String, Object> documentMap) {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
@@ -167,11 +167,11 @@ public class DocumentScannerActivity extends AppCompatActivity {
                     try {
                         JSONObject resultObject = new JSONObject(result);
                         JSONArray certificates = resultObject.getJSONArray(K_CERTIFICATIONS);
-                        String dlData = certificates.length() > 0 &&
+                        String documentData = certificates.length() > 0 &&
                                 certificates.getJSONObject(0).has(K_RESULT) ?
                                 certificates.getJSONObject(0).getString(K_RESULT) : null;
 
-                        if (TextUtils.isEmpty(dlData)) {
+                        if (TextUtils.isEmpty(documentData)) {
                             int code = K_SOMETHING_WENT_WRONG.getCode();
                             String message = K_SOMETHING_WENT_WRONG.getMessage();
                             if (certificates.length() > 0) {
@@ -188,7 +188,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
                             return;
                         }
                         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mDriverLicenseMap = gson.fromJson(dlData,
+                        mDocumentMap = gson.fromJson(documentData,
                                 new TypeToken<LinkedHashMap<String, Object>>() {
                                 }.getType());
 
@@ -219,11 +219,11 @@ public class DocumentScannerActivity extends AppCompatActivity {
         mProgressDialog.show(getString(R.string.label_matching_selfie));
         String liveIdBase64 = Objects.requireNonNull(mSelfieMap.get("liveId")).toString();
         String documentFaceBase64 = Objects.requireNonNull(
-                mDriverLicenseMap.get("face")).toString();
+                mDocumentMap.get("face")).toString();
         VerifyDocument.getInstance().compareFace(liveIdBase64, documentFaceBase64,
                 (status, errorResponse) -> {
                     if (status) {
-                        registerDocument(mDriverLicenseMap);
+                        registerDocument(mDocumentMap);
                     } else {
                         mProgressDialog.dismiss();
                         showError(errorResponse);
@@ -276,7 +276,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
         Bitmap liveIdBitmap = AppUtil.imageBase64ToBitmap(
                 Objects.requireNonNull(mSelfieMap.get("liveId")).toString());
-        BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIdBitmap,
+        BlockIDSDK.getInstance().registerDocument(this, mDocumentMap, liveIdBitmap,
                 "blockid", null, null, (status, error) -> {
                     mProgressDialog.dismiss();
                     if (status) {
