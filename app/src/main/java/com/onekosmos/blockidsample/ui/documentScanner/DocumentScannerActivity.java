@@ -116,9 +116,9 @@ public class DocumentScannerActivity extends AppCompatActivity {
     }
 
     /**
-     * Start authentic id Selfie scan
+     * Start Selfie scan
      *
-     * @param documentMap object from authenticId scanner
+     * @param documentMap object from document scanner
      */
     private void startSelfieScan(LinkedHashMap<String, Object> documentMap) {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
