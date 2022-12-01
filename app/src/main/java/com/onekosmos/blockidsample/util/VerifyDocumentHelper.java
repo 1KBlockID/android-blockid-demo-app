@@ -22,7 +22,8 @@ public class VerifyDocumentHelper {
     private static final int K_COMPARE_FACE_FAILED_CODE = 101;
     private static final int K_AUTHENTICATE_DOCUMENT_FAILED_CODE = 102;
     private static final String K_COMPARE_FACE_FAILED_MESSAGE = "Failed to match the selfie";
-    private static final String K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE = "We are unable to verify your document.";
+    private static final String K_AUTHENTICATE_DOCUMENT_FAILED_MESSAGE =
+            "We are unable to verify your document.";
     private static final String K_FACE_COMPARE = "face_compare";
     private static final String K_ID = "id";
     private static final String K_TYPE = "type";
