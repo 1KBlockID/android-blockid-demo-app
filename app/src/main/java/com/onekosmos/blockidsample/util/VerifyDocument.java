@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.util;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_DOC_FACE_NOT_MATCH;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVENESS_CHECK_FAILED;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -47,45 +46,6 @@ public class VerifyDocument {
         if (mSharedInstance == null)
             mSharedInstance = new VerifyDocument();
         return mSharedInstance;
-    }
-
-    /**
-     * @param liveIDBase64 base64 image of liveId
-     * @param callback     {@link LivenessCheckCallback }
-     */
-    public void checkLiveness(String liveIDBase64, LivenessCheckCallback callback) {
-        LinkedHashMap<String, Object> livenessCheckMap = new LinkedHashMap<>();
-        livenessCheckMap.put(K_ID, BlockIDSDK.getInstance().getDID() + "." + K_TYPE_LIVE_ID);
-        livenessCheckMap.put(K_TYPE, K_TYPE_LIVE_ID);
-        livenessCheckMap.put(K_LIVEID, liveIDBase64);
-        BlockIDSDK.getInstance().verifyDocument(livenessCheckMap,
-                new String[]{K_FACE_LIVENESS}, (status, result, errorResponse) -> {
-                    if (!status) {
-                        callback.onLivenessCheck(false, errorResponse);
-                        return;
-                    }
-
-                    boolean verified = false;
-                    try {
-                        JSONObject resultObject = new JSONObject(result);
-                        JSONArray certificates = resultObject.getJSONArray(K_CERTIFICATIONS);
-                        JSONObject certificate = certificates.length() > 0
-                                ? certificates.getJSONObject(0) : null;
-
-                        if (certificate != null && certificate.has(K_VERIFIED)) {
-                            verified = certificate.getBoolean(K_VERIFIED);
-                        }
-                    } catch (Exception ignored) {
-                    }
-
-                    if (!verified) {
-                        callback.onLivenessCheck(false, new ErrorManager.ErrorResponse(
-                                K_LIVENESS_CHECK_FAILED.getCode(),
-                                K_LIVENESS_CHECK_FAILED.getMessage(), result));
-                        return;
-                    }
-                    callback.onLivenessCheck(true, null);
-                });
     }
 
     /**
