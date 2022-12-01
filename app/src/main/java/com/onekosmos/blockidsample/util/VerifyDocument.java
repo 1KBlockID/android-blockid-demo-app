@@ -16,12 +16,9 @@ import java.util.LinkedHashMap;
  */
 public class VerifyDocument {
     private static VerifyDocument mSharedInstance;
-    private static final String K_FACE_LIVENESS = "face_liveness";
     private static final String K_FACE_COMPARE = "face_compare";
     private static final String K_ID = "id";
     private static final String K_TYPE = "type";
-    private static final String K_TYPE_LIVE_ID = "liveid";
-    private static final String K_LIVEID = "liveId";
     private static final String K_IMAGE1 = "image1";
     private static final String K_IMAGE2 = "image2";
     public static final String K_PURPOSE = "purpose";
@@ -46,17 +43,6 @@ public class VerifyDocument {
         if (mSharedInstance == null)
             mSharedInstance = new VerifyDocument();
         return mSharedInstance;
-    }
-
-    /**
-     * interface to handle face liveness check response
-     */
-    public interface LivenessCheckCallback {
-        /**
-         * @param status        true when given face is live and not spoofed one
-         * @param errorResponse {@link ErrorManager.ErrorResponse }
-         */
-        void onLivenessCheck(boolean status, ErrorManager.ErrorResponse errorResponse);
     }
 
     /**
