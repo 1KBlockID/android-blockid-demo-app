@@ -75,7 +75,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
             startDocumentScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null, "",
+            errorDialog.show(null, null,
                     getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
         }
     }
@@ -250,12 +250,12 @@ public class DocumentScannerActivity extends AppCompatActivity {
     /**
      * Register Document
      *
-     * @param dlMap {@link LinkedHashMap}
+     * @param documentMap {@link LinkedHashMap}
      */
-    private void registerDocument(LinkedHashMap<String, Object> dlMap) {
+    private void registerDocument(LinkedHashMap<String, Object> documentMap) {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
-        if (dlMap != null) {
-            BlockIDSDK.getInstance().registerDocument(this, dlMap,
+        if (documentMap != null) {
+            BlockIDSDK.getInstance().registerDocument(this, documentMap,
                     null, (enroll_status, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (enroll_status) {
