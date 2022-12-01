@@ -25,8 +25,8 @@ import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.VerifyDocument;
-import com.onekosmos.blockidsample.util.scanner.DocumentScannerHelper;
-import com.onekosmos.blockidsample.util.scanner.SelfieScannerHelper;
+import com.onekosmos.blockidsample.util.scannerHelpers.DocumentScannerHelper;
+import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,12 +80,18 @@ public class DocumentScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initialise UI Objects
+     */
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_document);
         mImgBack.setOnClickListener(v -> onBackPressed());
         mProgressDialog = new ProgressDialog(this);
     }
 
+    /**
+     * Start Document Scan
+     */
     private void startDocumentScan() {
         DocumentScannerHelper documentScannerHelper = new DocumentScannerHelper(this);
         documentScannerHelper.startAUIDDocumentScan(DocumentScannerHelper.DocumentScannerType.DL,
@@ -121,24 +127,23 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void startSelfieScan(LinkedHashMap<String, Object> documentMap) {
         SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
-        selfieScannerHelper.scanSelfie(false,
-                new SelfieScannerHelper.SelfieScanCallback() {
-                    @Override
-                    public void onFinishSelfieScan(LinkedHashMap<String, Object> selfieScanData) {
-                        mSelfieMap = selfieScanData;
-                        verifyDocument(documentMap);
-                    }
+        selfieScannerHelper.scanSelfie(new SelfieScannerHelper.SelfieScanCallback() {
+            @Override
+            public void onFinishSelfieScan(LinkedHashMap<String, Object> selfieScanData) {
+                mSelfieMap = selfieScanData;
+                verifyDocument(documentMap);
+            }
 
-                    @Override
-                    public void onCancelSelfieScan() {
-                        finish();
-                    }
+            @Override
+            public void onCancelSelfieScan() {
+                finish();
+            }
 
-                    @Override
-                    public void onErrorSelfieScan(int errorCode, String errorMessage) {
-                        showError(new ErrorManager.ErrorResponse(errorCode, errorMessage));
-                    }
-                });
+            @Override
+            public void onErrorSelfieScan(int errorCode, String errorMessage) {
+                showError(new ErrorManager.ErrorResponse(errorCode, errorMessage));
+            }
+        });
     }
 
     /**
@@ -219,7 +224,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
         VerifyDocument.getInstance().compareFace(liveIdBase64, documentFaceBase64,
                 (status, errorResponse) -> {
                     if (status) {
-                        registerDriverLicense(mDriverLicenseMap);
+                        registerDocument(mDriverLicenseMap);
                     } else {
                         mProgressDialog.dismiss();
                         showError(errorResponse);
@@ -243,7 +248,11 @@ public class DocumentScannerActivity extends AppCompatActivity {
         });
     }
 
-    private void registerDriverLicense(LinkedHashMap<String, Object> dlMap) {
+    /**
+     * Register Document
+     * @param dlMap {@link LinkedHashMap}
+     */
+    private void registerDocument(LinkedHashMap<String, Object> dlMap) {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
         if (dlMap != null) {
             BlockIDSDK.getInstance().registerDocument(this, dlMap,
@@ -255,7 +264,6 @@ public class DocumentScannerActivity extends AppCompatActivity {
                             finish();
                             return;
                         }
-
                         showError(errorResponse);
                     });
         }
@@ -266,7 +274,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void registerDocumentWithLiveID() {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
-        Bitmap liveIdBitmap = AppUtil.convertBase64ToBitmap(
+        Bitmap liveIdBitmap = AppUtil.imageBase64ToBitmap(
                 Objects.requireNonNull(mSelfieMap.get("liveId")).toString());
         BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIdBitmap,
                 "blockid", null, null, (status, error) -> {
@@ -274,12 +282,16 @@ public class DocumentScannerActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
-                    } else {
-                        showError(error);
+                        return;
                     }
+                    showError(error);
                 });
     }
 
+    /**
+     * Show Error Dialog
+     * @param error {@link ErrorManager.ErrorResponse}
+     */
     private void showError(ErrorManager.ErrorResponse error) {
         if (error == null)
             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),

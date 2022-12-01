@@ -35,6 +35,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
+import com.onekosmos.blockidsample.ui.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
@@ -300,7 +301,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     });
             return;
         }
-        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+        Intent intent = new Intent(this, DocumentScannerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

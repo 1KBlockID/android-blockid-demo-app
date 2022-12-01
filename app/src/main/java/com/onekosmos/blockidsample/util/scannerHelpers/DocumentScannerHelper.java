@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.util.scanner;
+package com.onekosmos.blockidsample.util.scannerHelpers;
 
 import android.content.Context;
 import android.util.Base64;

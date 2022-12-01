@@ -25,8 +25,8 @@
         android:text="@string/label_enroll_driver_license"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_28sp"
-        app:layout_constraintBottom_toBottomOf="@id/img_back_selfie"
-        app:layout_constraintStart_toEndOf="@id/img_back_selfie"
-        app:layout_constraintTop_toTopOf="@id/img_back_selfie" />
+        app:layout_constraintBottom_toBottomOf="@id/img_back_document"
+        app:layout_constraintStart_toEndOf="@id/img_back_document"
+        app:layout_constraintTop_toTopOf="@id/img_back_document" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

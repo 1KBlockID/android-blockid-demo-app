@@ -29,13 +29,6 @@
         tools:replace="android:allowBackup,android:label,android:theme"
         tools:targetApi="n">
         <activity
-            android:name=".DocumentScannerActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".ui.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -143,6 +136,10 @@
             android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity
             android:name=".ui.liveID.SelfieScannerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.documentScanner.DocumentScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
