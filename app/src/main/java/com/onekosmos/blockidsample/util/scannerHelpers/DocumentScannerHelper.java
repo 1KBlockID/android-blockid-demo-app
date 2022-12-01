@@ -26,6 +26,8 @@ public class DocumentScannerHelper {
     private static final String K_BACK_IMAGE = "back_image";
     private static final String K_FRONT_IMAGE = "front_image";
     private static final String K_FRONT_IMAGE_FLASH = "front_image_flash";
+
+    // set default image compression quality
     private final double mImageCompressionQuality = 0.5;
     private final Context mContext;
     private DocumentScanCallback mCallback;
@@ -68,10 +70,13 @@ public class DocumentScannerHelper {
     private DSID1Options getDSIDOption(DSSide side) {
         DSID1Options dsid1Options = new DSID1Options();
         dsid1Options.type = DSID1Type.License;
+        // Side of the Document
         dsid1Options.side = side;
-        dsid1Options.detectFace = true;
+        // Enable Camera Flash
         dsid1Options.enableFlashCapture = FlashCapture.Both;
+        // Show preview Of captured document
         dsid1Options.showReviewScreen = true;
+        // Set Image compression quality
         dsid1Options.imageCompressionQuality = mImageCompressionQuality;
         return dsid1Options;
     }
@@ -89,7 +94,8 @@ public class DocumentScannerHelper {
                 if (mDocumentMap == null)
                     mDocumentMap = new LinkedHashMap<>();
                 mDocumentMap.put(K_FRONT_IMAGE, AppUtil.getBase64FromBytes(dsResult.image));
-                mDocumentMap.put(K_FRONT_IMAGE_FLASH, AppUtil.getBase64FromBytes(dsResult.flashImage));
+                mDocumentMap.put(K_FRONT_IMAGE_FLASH,
+                        AppUtil.getBase64FromBytes(dsResult.flashImage));
                 if (mSide == DSSide.Front)
                     scanDLBackSide();
                 else
