@@ -214,6 +214,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
+                        finish();
                         return;
                     }
                     showError(error);
