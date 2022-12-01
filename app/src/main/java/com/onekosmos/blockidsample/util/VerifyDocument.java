@@ -2,7 +2,6 @@ package com.onekosmos.blockidsample.util;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_DOCUMENT_VERIFICATION_FAILED;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_DOC_FACE_NOT_MATCH;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVENESS_CHECK_FAILED;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
 import android.text.TextUtils;
@@ -176,7 +175,7 @@ public class VerifyDocument {
     }
 
     /**
-     * interface to handle DL Verify response
+     * Interface to handle DL Verify response
      */
     public interface VerifyDLCallback {
         /**

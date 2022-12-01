@@ -34,8 +34,6 @@ import java.util.Objects;
 public class DocumentScannerActivity extends AppCompatActivity {
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int K_CAMERA_PERMISSION_REQUEST_CODE = 1009;
-    private static final String K_TYPE = "type";
-    private static final String K_ID = "id";
     private LinkedHashMap<String, Object> mSelfieMap, mDocumentMap;
     private ProgressDialog mProgressDialog;
 
@@ -144,12 +142,10 @@ public class DocumentScannerActivity extends AppCompatActivity {
     /**
      * Call verify document api to get DL document data
      *
-     * @param documentMap DL Object with front_image, front_image_flash and back_image,
+     * @param documentMap DL Object with front_image, front_image_flash and back_image
      */
     private void verifyDocument(LinkedHashMap<String, Object> documentMap) {
         mProgressDialog.show(getString(R.string.label_extracting_identity_data));
-        documentMap.put(K_TYPE, "dl");
-        documentMap.put(K_ID, BlockIDSDK.getInstance().getDID() + ".dl");
         VerifyDocument.getInstance().verifyDL(documentMap, (response, documentData, error) -> {
             if (!response) {
                 mProgressDialog.dismiss();
@@ -157,26 +153,28 @@ public class DocumentScannerActivity extends AppCompatActivity {
                 return;
             }
             mDocumentMap = documentData;
-            compareFace();
+            if (BlockIDSDK.getInstance().isLiveIDRegistered())
+                compareFace();
+            else
+                registerDocumentWithLiveID();
         });
     }
 
     /**
-     * compare driver license face and selfie
+     * Compare driver license face and selfie
      */
     private void compareFace() {
         mProgressDialog.show(getString(R.string.label_matching_selfie));
         String liveIdBase64 = Objects.requireNonNull(mSelfieMap.get("liveId")).toString();
-        String documentFaceBase64 = Objects.requireNonNull(
-                mDocumentMap.get("face")).toString();
+        String documentFaceBase64 = Objects.requireNonNull(mDocumentMap.get("face")).toString();
         VerifyDocument.getInstance().compareFace(liveIdBase64, documentFaceBase64,
                 (status, errorResponse) -> {
-                    if (status) {
-                        registerDocument(mDocumentMap);
-                    } else {
+                    if (!status) {
                         mProgressDialog.dismiss();
                         showError(errorResponse);
+                        return;
                     }
+                    registerDocument(mDocumentMap);
                 });
     }
 
@@ -191,19 +189,19 @@ public class DocumentScannerActivity extends AppCompatActivity {
             BlockIDSDK.getInstance().registerDocument(this, documentMap,
                     null, (enroll_status, errorResponse) -> {
                         mProgressDialog.dismiss();
-                        if (enroll_status) {
-                            Toast.makeText(this, R.string.label_dl_enrolled_successfully,
-                                    Toast.LENGTH_LONG).show();
-                            finish();
+                        if (!enroll_status) {
+                            showError(errorResponse);
                             return;
                         }
-                        showError(errorResponse);
+                        Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
                     });
         }
     }
 
     /**
-     * register document with liveid, when liveid is not enrolled
+     * Register document with liveid, when liveid is not enrolled
      */
     private void registerDocumentWithLiveID() {
         mProgressDialog.show(getString(R.string.label_completing_your_registration));
@@ -242,7 +240,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
-        errorDialog.show(null, getString(R.string.label_error),
-                error.getMessage(), onDismissListener);
+        errorDialog.showWithOneButton(null, getString(R.string.label_error),
+                error.getMessage(), getString(R.string.label_ok), onDismissListener);
     }
 }

@@ -301,6 +301,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     });
             return;
         }
+        // commenting old Driver License scanner
+        // Intent intent = new Intent(this, DriverLicenseScanActivity.class);
         Intent intent = new Intent(this, DocumentScannerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
