@@ -209,7 +209,7 @@ public class DocumentScannerActivity extends AppCompatActivity {
         Bitmap liveIdBitmap = AppUtil.imageBase64ToBitmap(
                 Objects.requireNonNull(mSelfieMap.get("liveId")).toString());
         BlockIDSDK.getInstance().registerDocument(this, mDocumentMap, liveIdBitmap,
-                "blockid", null, null, (status, error) -> {
+                null, null, null, (status, error) -> {
                     mProgressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this, R.string.label_dl_enrolled_successfully,
