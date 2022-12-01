@@ -1,13 +1,13 @@
-package com.onekosmos.blockidsample.util.scanner;
+package com.onekosmos.blockidsample.util.scannerHelpers;
 
 import android.content.Context;
-import android.util.Base64;
 
 import com.idmetrics.catfishair.CFASelfieController;
 import com.idmetrics.catfishair.CFASelfieScanListener;
 import com.idmetrics.catfishair.utils.CFASelfieCaptureMode;
 import com.idmetrics.catfishair.utils.CFASelfieScanData;
 import com.idmetrics.catfishair.utils.CFASelfieSettings;
+import com.onekosmos.blockidsample.util.AppUtil;
 
 import java.util.LinkedHashMap;
 
@@ -17,9 +17,15 @@ import java.util.LinkedHashMap;
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class SelfieScannerHelper {
-    private final Context mContext;
     private static final String K_LIVEID = "liveId";
-    private final int mImageCompressionQuality = 90;
+
+    // set default image compression quality
+    private static final int mImageCompressionQuality = 90;
+
+    // set default image capture mode
+    private static final CFASelfieCaptureMode mCaptureMode = CFASelfieCaptureMode.MANUAL;
+
+    private final Context mContext;
 
     /**
      * @param context activity context, on which scanner will start
@@ -34,21 +40,30 @@ public class SelfieScannerHelper {
      * @param callback type of AuthenticIDLiveIDScanCallback to return liveId data, error
      *                 and cancellation of scanner
      */
-    public void scanSelfie(boolean shouldAutoCapture, SelfieScanCallback callback) {
+    public void scanSelfie(SelfieScanCallback callback) {
+        // create and configure selfie settings
         CFASelfieSettings settings = new CFASelfieSettings();
-        if (!shouldAutoCapture)
-            settings.setSelfieCaptureMode(CFASelfieCaptureMode.MANUAL);
-        else
-            settings.setSelfieCaptureMode(CFASelfieCaptureMode.AUTO);
+
+        // capture mode is set to Manual mode
+        // can change to auto mode
+        settings.setSelfieCaptureMode(mCaptureMode);
+
+        // disable far-selfie option
         settings.setEnableFarSelfie(false);
+
+        // set compression quality for selfie image
         settings.setCompressionQuality(mImageCompressionQuality);
+
+        // do not show an option to switch camera for taking selfie
         settings.setEnableSwitchCamera(false);
+
         CFASelfieController selfieController = CFASelfieController.getInstance(mContext);
         selfieController.scanSelfie(settings, new CFASelfieScanListener() {
             @Override
             public void onFinishSelfieScan(CFASelfieScanData selfieScanData) {
                 LinkedHashMap<String, Object> mLiveIDMap = new LinkedHashMap<>();
-                mLiveIDMap.put(K_LIVEID, getBase64FromBytes(selfieScanData.getSelfieData()));
+                mLiveIDMap.put(K_LIVEID,
+                        AppUtil.getBase64FromBytes(selfieScanData.getSelfieData()));
                 callback.onFinishSelfieScan(mLiveIDMap);
             }
 
@@ -64,19 +79,11 @@ public class SelfieScannerHelper {
         });
     }
 
-    /**
-     * @param byteArrayImage byte array of image
-     * @return base64 string of byte array
-     */
-    private String getBase64FromBytes(byte[] byteArrayImage) {
-        return Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
-    }
-
     public interface SelfieScanCallback {
-        void onCancelSelfieScan();
+        void onFinishSelfieScan(LinkedHashMap<String, Object> documentData);
 
         void onErrorSelfieScan(int errorCode, String errorMessage);
 
-        void onFinishSelfieScan(LinkedHashMap<String, Object> documentData);
+        void onCancelSelfieScan();
     }
 }

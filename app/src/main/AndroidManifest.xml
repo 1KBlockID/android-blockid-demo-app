@@ -142,7 +142,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity
-            android:name=".ui.liveID.SelfieScanningActivity"
+            android:name=".ui.liveID.SelfieScannerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
