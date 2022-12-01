@@ -103,7 +103,8 @@ public class DocumentScannerActivity extends AppCompatActivity {
                     public void captureError(DSError dsError) {
                         ErrorDialog errorDialog = new ErrorDialog(
                                 DocumentScannerActivity.this);
-                        errorDialog.showWithOneButton(null, getString(R.string.label_error),
+                        errorDialog.showWithOneButton(null,
+                                getString(R.string.label_error),
                                 dsError.message,
                                 getString(R.string.label_ok),
                                 dialog -> {
@@ -147,7 +148,8 @@ public class DocumentScannerActivity extends AppCompatActivity {
      */
     private void verifyDocument(LinkedHashMap<String, Object> documentMap) {
         mProgressDialog.show(getString(R.string.label_extracting_identity_data));
-        VerifyDocumentHelper.getInstance().authenticateDocument(documentMap, (response, documentData, error) -> {
+        VerifyDocumentHelper.getInstance().authenticateDocument(documentMap,
+                (response, documentData, error) -> {
             if (!response) {
                 mProgressDialog.dismiss();
                 showError(error);
