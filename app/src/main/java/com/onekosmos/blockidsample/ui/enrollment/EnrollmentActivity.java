@@ -170,7 +170,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     if(status){
                         Log.e("FIDO","success");
                     }else {
-                        Log.e("Error", errorResponse.getMessage());
+                        Log.e("Error","-->"+ errorResponse.getMessage());
                     }
                 });
 //        ErrorDialog errorDialog = new ErrorDialog(this);

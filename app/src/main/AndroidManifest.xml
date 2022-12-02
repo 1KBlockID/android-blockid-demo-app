@@ -135,8 +135,5 @@
             android:name=".ui.about.AboutActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme" />
-
-        <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
-
     </application>
 </manifest>

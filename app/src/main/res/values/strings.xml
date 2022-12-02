@@ -224,10 +224,4 @@
     <string name="label_community">Community</string>
     <string name="label_sdk_version">SDK Version</string>
     <string name="label_app_version">APP Version</string>
-
-    <string name="asset_statements" translatable="false">
-[{
-  \"include\": \"https://1k-dev.1kosmos.net/.well-known/assetlinks.json\"
-}]
-</string>
 </resources>
