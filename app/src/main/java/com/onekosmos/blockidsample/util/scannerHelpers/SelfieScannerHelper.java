@@ -1,14 +1,17 @@
 package com.onekosmos.blockidsample.util.scannerHelpers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import com.idmetrics.catfishair.CFASelfieController;
 import com.idmetrics.catfishair.CFASelfieScanListener;
 import com.idmetrics.catfishair.utils.CFASelfieCaptureMode;
 import com.idmetrics.catfishair.utils.CFASelfieScanData;
 import com.idmetrics.catfishair.utils.CFASelfieSettings;
-import com.onekosmos.blockidsample.util.AppUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.util.LinkedHashMap;
 
 /**
@@ -18,9 +21,6 @@ import java.util.LinkedHashMap;
 @SuppressWarnings("FieldCanBeLocal")
 public class SelfieScannerHelper {
     private static final String K_LIVEID = "liveId";
-
-    // set default image compression quality
-    private static final int mImageCompressionQuality = 90;
 
     // set default image capture mode
     private static final CFASelfieCaptureMode mCaptureMode = CFASelfieCaptureMode.MANUAL;
@@ -51,9 +51,6 @@ public class SelfieScannerHelper {
         // disable far-selfie option
         settings.setEnableFarSelfie(false);
 
-        // set compression quality for selfie image
-        settings.setCompressionQuality(mImageCompressionQuality);
-
         // do not show an option to switch camera for taking selfie
         settings.setEnableSwitchCamera(false);
 
@@ -61,9 +58,15 @@ public class SelfieScannerHelper {
         selfieController.scanSelfie(settings, new CFASelfieScanListener() {
             @Override
             public void onFinishSelfieScan(CFASelfieScanData selfieScanData) {
+                byte[] imageBytes = selfieScanData.getSelfieData();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0,
+                        imageBytes.length);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                String outputBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
                 LinkedHashMap<String, Object> mLiveIDMap = new LinkedHashMap<>();
-                mLiveIDMap.put(K_LIVEID,
-                        AppUtil.getBase64FromBytes(selfieScanData.getSelfieData()));
+                mLiveIDMap.put(K_LIVEID, outputBase64);
                 callback.onFinishSelfieScan(mLiveIDMap);
             }
 
