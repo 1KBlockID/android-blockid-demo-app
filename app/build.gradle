@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
-        versionName "1.8.20" + "." + getCurrentTimestampHexValue()
+        versionName "1.8.30" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -62,9 +62,7 @@ dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
-//    implementation project(path: ':BlockIDSDK-release')
-    implementation project(path: ':android-kernel-sdk')
-    implementation project(path: ':webauthnkit')
+    implementation project(path: ':BlockIDSDK-release')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.2'
@@ -95,7 +93,7 @@ dependencies {
     }
 
     implementation 'androidx.biometric:biometric:1.1.0'
-//    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.jetbrains:annotations:23.0.0'
     // For Base32 encode/decode
     implementation 'commons-codec:commons-codec:1.11'
 
@@ -159,8 +157,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // wallet connect
-    implementation ("com.walletconnect:sign:2.0.0-rc.5")
-    implementation ("com.walletconnect:android-core:1.0.0")
+    implementation("com.walletconnect:sign:2.0.0-rc.5")
+    implementation("com.walletconnect:android-core:1.0.0")
     implementation 'org.web3j:utils:5.0.0'
 
     // Native FIDO2 External

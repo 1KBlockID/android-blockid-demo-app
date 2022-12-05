@@ -31,7 +31,7 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.fido2.FidoObserver;
+import com.onekosmos.blockid.sdk.fido2.FIDO2Observer;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
@@ -67,7 +67,7 @@ import java.util.Objects;
 public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
-    private FidoObserver observer = new FidoObserver(this);
+    private FIDO2Observer observer = new FIDO2Observer(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,12 +165,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         BlockIDSDK.getInstance().registerFIDO2Key(this, mLinkedAccountsList.get(0),
-                FIDO2KeyType.CROSS_PLATFORM,observer, (status, errorResponse) -> {
+                FIDO2KeyType.CROSS_PLATFORM, observer, (status, errorResponse) -> {
                     progressDialog.dismiss();
-                    if(status){
-                        Log.e("FIDO","success");
-                    }else {
-                        Log.e("Error","-->"+ errorResponse.getMessage());
+                    if (status) {
+                        Log.e("FIDO", "success");
+                    } else {
+                        Log.e("Error", "-->" + errorResponse.getMessage());
                     }
                 });
 //        ErrorDialog errorDialog = new ErrorDialog(this);
