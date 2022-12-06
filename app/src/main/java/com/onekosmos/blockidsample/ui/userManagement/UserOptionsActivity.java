@@ -135,11 +135,11 @@ public class UserOptionsActivity extends AppCompatActivity {
     }
 
     private void authenticatePlatformAuthenticator() {
-
+        // TODO
     }
 
     private void authenticateExternalAuthenticator() {
-
+        // TODO
     }
 
     /**
