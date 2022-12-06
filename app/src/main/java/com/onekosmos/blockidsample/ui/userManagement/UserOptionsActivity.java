@@ -25,6 +25,10 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2021 1Kosmos. All rights reserved.
+ */
 public class UserOptionsActivity extends AppCompatActivity {
     // FIDO2Observer must initialize before onCreate()
     private final FIDO2Observer observer = new FIDO2Observer(this);
