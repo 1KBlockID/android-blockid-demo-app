@@ -37,7 +37,7 @@ public class SelfieScannerHelper {
     /**
      * initialize CFASelfieController and start selfie scan
      *
-     * @param callback type of AuthenticIDLiveIDScanCallback to return liveId data, error
+     * @param callback type of SelfieScanCallback to return liveId data, error
      *                 and cancellation of scanner
      */
     public void scanSelfie(SelfieScanCallback callback) {
