@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -30,14 +29,11 @@ import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseList
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
-import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.fido2.FIDO2Observer;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
-import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
@@ -46,6 +42,8 @@ import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
+import com.onekosmos.blockidsample.ui.userManagement.AddUserActivity;
+import com.onekosmos.blockidsample.ui.userManagement.UserOptionsActivity;
 import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -67,7 +65,6 @@ import java.util.Objects;
 public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
-    private FIDO2Observer observer = new FIDO2Observer(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,49 +159,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             return;
         }
 
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
-        BlockIDSDK.getInstance().registerFIDO2Key(this, mLinkedAccountsList.get(0),
-                FIDO2KeyType.CROSS_PLATFORM, observer, (status, errorResponse) -> {
-                    progressDialog.dismiss();
-                    if (status) {
-                        Log.e("FIDO", "success");
-                    } else {
-                        Log.e("Error", "-->" + errorResponse.getMessage());
-                    }
-                });
-//        ErrorDialog errorDialog = new ErrorDialog(this);
-//        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
-//                getString(R.string.label_yes), getString(R.string.label_no),
-//                (dialogInterface, which) -> errorDialog.dismiss(),
-//                dialog -> {
-//                    errorDialog.dismiss();
-//                    unlinkAccount(mLinkedAccountsList.get(0));
-//                });
-    }
-
-    private void unlinkAccount(BIDLinkedAccount linkedAccount) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
-        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
-            progressDialog.dismiss();
-            if (status) {
-                Toast.makeText(this, getString(R.string.label_account_removed),
-                        Toast.LENGTH_SHORT).show();
-                refreshEnrollmentRecyclerView();
-                BlockIDSDK.getInstance().setSelectedAccount(null);
-                return;
-            }
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
-                    errorDialog.dismiss();
-            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error),
-                    Objects.requireNonNull(error).getMessage(), onDismissListener);
-        });
+        Intent intent = new Intent(this, UserOptionsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void startAddUserActivity() {

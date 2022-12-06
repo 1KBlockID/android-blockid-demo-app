@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.adduser;
+package com.onekosmos.blockidsample.ui.userManagement;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
