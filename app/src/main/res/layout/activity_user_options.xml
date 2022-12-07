@@ -74,7 +74,6 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="@dimen/dimen_16sp"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_register_external_authenticator" />
 
@@ -91,7 +90,6 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="@dimen/dimen_16sp"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_authenticate_platform_authenticator" />
 

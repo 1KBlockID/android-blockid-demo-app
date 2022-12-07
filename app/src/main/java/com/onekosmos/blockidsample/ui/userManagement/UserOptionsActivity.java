@@ -4,24 +4,32 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
 import com.onekosmos.blockid.sdk.fido2.FIDO2Observer;
+import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.ui.qrAuth.AuthenticationPayloadV1;
+import com.onekosmos.blockidsample.ui.qrAuth.ScanQRCodeActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,8 +38,22 @@ import java.util.Objects;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class UserOptionsActivity extends AppCompatActivity {
+    private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     // FIDO2Observer must initialize before onCreate()
     private final FIDO2Observer observer = new FIDO2Observer(this);
+    private FIDO2KeyType mAuthenticationFido2KeyType;
+
+    private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            AuthenticationPayloadV1 authenticationPayload = new Gson().fromJson(
+                                    result.getData().getStringExtra("K_AUTH_REQUEST_MODEL"),
+                                    AuthenticationPayloadV1.class);
+                            authenticate(authenticationPayload);
+                        }
+                    });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,11 +157,45 @@ public class UserOptionsActivity extends AppCompatActivity {
     }
 
     private void authenticatePlatformAuthenticator() {
-        // TODO
+        mAuthenticationFido2KeyType = FIDO2KeyType.PLATFORM;
+        startScanQRActivity();
     }
 
     private void authenticateExternalAuthenticator() {
-        // TODO
+        mAuthenticationFido2KeyType = FIDO2KeyType.CROSS_PLATFORM;
+        startScanQRActivity();
+    }
+
+    /**
+     * Start Scan QR code activity for result
+     */
+    private void startScanQRActivity() {
+        Intent scanQRCodeIntent = new Intent(this, ScanQRCodeActivity.class);
+        scanQRCodeIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        scanQRActivityResultLauncher.launch(scanQRCodeIntent);
+    }
+
+    private void authenticate(AuthenticationPayloadV1 payload) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        LinkedHashMap<String, Object> metadata = null;
+        if (payload.metadata != null && payload.metadata.webauthn_challenge != null) {
+            metadata = new LinkedHashMap<>();
+            metadata.put(K_WEBAUTHN_CHALLENGE, payload.metadata.webauthn_challenge);
+        }
+        BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
+                observer, null, payload.session, payload.sessionURL, payload.scopes, metadata,
+                payload.creds, payload.getOrigin(), null, null,
+                BuildConfig.VERSION_NAME, (status, error) -> {
+                    progressDialog.dismiss();
+                    if (status) {
+                        Toast.makeText(this,
+                                R.string.label_you_have_successfully_authenticated_to_log_in,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    showError(error);
+                });
     }
 
     /**

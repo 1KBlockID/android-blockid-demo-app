@@ -62,7 +62,10 @@ dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
-    implementation project(path: ':BlockIDSDK-release')
+//    implementation project(path: ':BlockIDSDK-release')
+    implementation project(path: ':android-kernel-sdk')
+    implementation project(path: ':webauthnkit')
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.2'
@@ -93,7 +96,7 @@ dependencies {
     }
 
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'org.jetbrains:annotations:23.0.0'
+//    implementation 'org.jetbrains:annotations:23.0.0'
     // For Base32 encode/decode
     implementation 'commons-codec:commons-codec:1.11'
 
