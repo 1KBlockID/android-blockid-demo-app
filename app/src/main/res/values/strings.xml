@@ -185,8 +185,8 @@
     <string name="label_authenticate_platform_authenticator">Authenticate (Platform Authenticator)</string>
     <string name="label_authenticate_external_authenticator">Authenticate (External Authenticator)</string>
     <string name="label_remove_account">Remove Account</string>
-    <string name="label_register_platform_authenticator_successful">Platform Authenticator registered successful.</string>
-    <string name="label_register_external_authenticator_successful">External Authenticator registered successful.</string>
+    <string name="label_register_platform_authenticator_successful">Your account is registered as platform authenticator successfully.</string>
+    <string name="label_register_external_authenticator_successful">Your account is registered as external authenticator successfully.</string>
 
     <!-- Wallet Connect -->
     <string name="label_wallet_connect">WalletConnect</string>
