@@ -178,6 +178,16 @@
     <string name="label_remove_user">Do you want to remove user?</string>
     <string name="label_account_removed">Your account is removed.</string>
 
+    <!-- User Options -->
+    <string name="label_welcome">Welcome</string>
+    <string name="label_register_platform_authenticator">Register (Platform Authenticator)</string>
+    <string name="label_register_external_authenticator">Register (External Authenticator)</string>
+    <string name="label_authenticate_platform_authenticator">Authenticate (Platform Authenticator)</string>
+    <string name="label_authenticate_external_authenticator">Authenticate (External Authenticator)</string>
+    <string name="label_remove_account">Remove Account</string>
+    <string name="label_register_platform_authenticator_successful">Your account is registered as platform authenticator successfully.</string>
+    <string name="label_register_external_authenticator_successful">Your account is registered as external authenticator successfully.</string>
+
     <!-- Wallet Connect -->
     <string name="label_wallet_connect">WalletConnect</string>
     <string name="label_connect_to_dapp">Connect to DApp</string>

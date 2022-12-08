@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.adduser;
+package com.onekosmos.blockidsample.ui.userManagement;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -48,9 +48,7 @@ import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanRespo
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
-import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
-import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
@@ -60,7 +58,6 @@ import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * Created by 1Kosmos Engineering
@@ -437,18 +434,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                         return;
                     }
 
-                    BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
-                    List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
-
-                    registerFidoKey(linkedAccounts.get(0));
-                });
-    }
-
-    private void registerFidoKey(BIDLinkedAccount linkedAccount) {
-        BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccount,
-                FIDO2KeyType.PLATFORM, (status, errorResponse) -> {
                     hideProgress();
-                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                    Toast.makeText(this, getString(
+                                    R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();
                     finish();
                 });
