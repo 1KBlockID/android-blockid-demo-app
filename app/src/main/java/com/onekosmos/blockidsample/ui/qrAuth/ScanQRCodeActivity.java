@@ -22,7 +22,6 @@ import com.google.gson.GsonBuilder;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -65,8 +64,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         else if (!(mProgressBar.getVisibility() == View.VISIBLE)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                    this, mBIDScannerView);
+            mQRScannerHelper = new QRScannerHelper(this, this,
+                    mBIDScannerView);
             mQRScannerHelper.startQRScanning();
         }
     }
@@ -79,8 +78,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
 
         if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION,
                 this)) {
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                    this, mBIDScannerView);
+            mQRScannerHelper = new QRScannerHelper(this, this, mBIDScannerView);
             mQRScannerHelper.startQRScanning();
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);

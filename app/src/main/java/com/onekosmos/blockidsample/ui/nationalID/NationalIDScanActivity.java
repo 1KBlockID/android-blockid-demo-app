@@ -20,7 +20,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.nationalID.INationalIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.nationalID.NationalIDScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -241,9 +240,8 @@ public class NationalIDScanActivity extends AppCompatActivity implements View.On
     private void startScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mNationalIdScannerHelper = new NationalIDScannerHelper(this, ScanningMode.SCAN_LIVE,
-                FIRST_BACK_THEN_FRONT, mBIDScannerView, mScannerOverlay,
-                K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
+        mNationalIdScannerHelper = new NationalIDScannerHelper(this, FIRST_BACK_THEN_FRONT,
+                mBIDScannerView, mScannerOverlay, K_NATIONAL_ID_EXPIRY_GRACE_DAYS, this);
         mNationalIdScannerHelper.startNationalIDScanning();
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scanning);
