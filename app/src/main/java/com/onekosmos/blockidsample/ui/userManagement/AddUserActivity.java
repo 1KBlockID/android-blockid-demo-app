@@ -43,7 +43,6 @@ import com.onekosmos.blockid.sdk.BIDAPIs.publicip.GetPublicIP;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
@@ -182,8 +181,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Start QR code scanner
      */
     private void startQRCodeScanning() {
-        mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                this, mBIDScannerView);
+        mQRScannerHelper = new QRScannerHelper(this, this, mBIDScannerView);
         mQRScannerHelper.startQRScanning();
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
