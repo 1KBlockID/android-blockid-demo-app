@@ -15,12 +15,12 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.scannerHelpers.SelfieScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.AppUtil;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
-import com.onekosmos.blockidsample.util.scannerHelpers.SelfieScannerHelper;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;

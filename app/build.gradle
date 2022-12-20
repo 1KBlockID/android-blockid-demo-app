@@ -164,12 +164,12 @@ dependencies {
     implementation 'org.web3j:utils:5.0.0'
 
     // Selfie Scanner
-    implementation files('libs/selfie-scanner.aar')
+//    implementation files('libs/selfie-scanner.aar')
     implementation 'androidx.camera:camera-core:1.1.0'
     implementation 'androidx.camera:camera-extensions:1.2.0-alpha03'
     implementation 'androidx.window:window:1.1.0-alpha02'
     implementation 'org.apache.commons:commons-imaging:1.0-alpha2'
 
     // Document Scanner
-    implementation files('libs/document-scanner.aar')
+//    implementation files('libs/document-scanner.aar')
 }
