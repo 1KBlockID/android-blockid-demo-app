@@ -37,7 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_20dp"
         android:layout_marginTop="@dimen/dimen_94dp"
-        android:padding="@dimen/dimen_5dp"
         android:hint="@string/label_user_name"
         app:boxCornerRadiusBottomEnd="@dimen/dimen_5dp"
         app:boxCornerRadiusBottomStart="@dimen/dimen_5dp"
@@ -52,7 +51,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_user_name"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dimen_50dp"
+            android:layout_height="@dimen/dimen_60dp"
             android:inputType="text"
             android:maxLength="50"
             android:singleLine="true"
