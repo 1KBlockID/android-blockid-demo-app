@@ -64,7 +64,7 @@
     <string name="label_hold_your_mobile">Hold your mobile near the Passport</string>
     <string name="label_you_have_successfully_authenticated_to_log_in">You have successfully
         authenticated.</string>
-    <string name="label_authenticate">Authenticate</string>
+    <string name="label_authenticate">Authenticate (Web)</string>
     <string name="label_invalid_code">Invalid Code</string>
     <string name="label_unsupported_qr_code">Unsupported QR code detected.</string>
     <string name="label_scan_qr_code">Scan QR Code</string>
@@ -143,15 +143,22 @@
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
     <string name="label_user_name">Username</string>
-    <string name="label_register">Register</string>
+    <string name="label_register">Register (Web)</string>
     <string name="label_enter_username">Enter username</string>
     <string name="label_fido2_key_has_been_successfully_registered">Your FIDO2 key has been
         successfully registered.</string>
     <string name="label_fido2_key_registration_failed">FIDO2 key registration
         failed.</string>
-    <string name="label_successfully_authenticated_with_your_fido2_key">Your have successfully
+    <string name="label_successfully_authenticated_with_your_fido2_key">You have successfully
         authenticated with your FIDO2 key.</string>
     <string name="label_authentication_failed">Authentication failed</string>
+    <string name="label_platform_key_registered">Platform key registered successfully.</string>
+    <string name="label_security_key_registered">Security key registered successfully.</string>
+    <string name="label_platform_key_authenticated">Platform key authenticated successfully.</string>
+    <string name="label_security_key_authenticated">Security key is authenticated successfully.</string>
+
+    <string name="label_register_security_key">Register (Security Key)</string>
+    <string name="label_authenticate_security_key">Authenticate (Security Key)</string>
 
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
