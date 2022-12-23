@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -32,12 +31,13 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
-public class FIDO2BaseActivity extends AppCompatActivity implements View.OnClickListener {
+public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     // html file to show UI/UX as per app design
     private final String K_FILE_NAME = "fido3.html";
     private AppCompatButton mBtnRegister, mBtnAuthenticate, mBtnRegisterPlatformAuthenticator,
-            mBtnRegisterExternalAuthenticator;
+            mBtnRegisterExternalAuthenticator, mBtnAuthenticatePlatformAuthenticator,
+            mBtnAuthenticateExternalAuthenticator;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
@@ -51,7 +51,7 @@ public class FIDO2BaseActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_fido2_base);
 
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(view -> onBackPressed());
 
         String storedUserName = SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME);
         mEtUserName = findViewById(R.id.edt_user_name);
@@ -59,8 +59,8 @@ public class FIDO2BaseActivity extends AppCompatActivity implements View.OnClick
             mEtUserName.setText(storedUserName);
         }
 
-        mBtnRegister = findViewById(R.id.btn_register);
-        mBtnAuthenticate = findViewById(R.id.btn_authenticate);
+        mBtnRegister = findViewById(R.id.btn_register_web);
+        mBtnAuthenticate = findViewById(R.id.btn_authenticate_web);
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
 
         mBtnRegister.setOnClickListener(v -> {
@@ -119,11 +119,23 @@ public class FIDO2BaseActivity extends AppCompatActivity implements View.OnClick
 
         mBtnRegisterPlatformAuthenticator = findViewById(
                 R.id.btn_register_platform_authenticator);
+        mBtnRegisterPlatformAuthenticator.setOnClickListener(
+                view -> registerFIDO2(FIDO2KeyType.PLATFORM));
+
         mBtnRegisterExternalAuthenticator = findViewById(
                 R.id.btn_register_external_authenticator);
+        mBtnRegisterExternalAuthenticator.setOnClickListener(
+                view -> registerFIDO2(FIDO2KeyType.CROSS_PLATFORM));
 
-        mBtnRegisterExternalAuthenticator.setOnClickListener(this);
-        mBtnRegisterPlatformAuthenticator.setOnClickListener(this);
+        mBtnAuthenticatePlatformAuthenticator = findViewById(
+                R.id.btn_authenticate_platform_authenticator);
+        mBtnAuthenticatePlatformAuthenticator.setOnClickListener(
+                view -> authenticateFIDO2(FIDO2KeyType.PLATFORM));
+
+        mBtnAuthenticateExternalAuthenticator = findViewById(
+                R.id.btn_authenticate_external_authenticator);
+        mBtnAuthenticateExternalAuthenticator.setOnClickListener(
+                view -> authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM));
     }
 
     /**
@@ -172,51 +184,71 @@ public class FIDO2BaseActivity extends AppCompatActivity implements View.OnClick
         ResultDialog dialog = new ResultDialog(this, imageId,
                 SharedPreferenceUtil.getInstance().getString(K_PREF_FIDO2_USERNAME), subMessage);
         dialog.show();
-        new Handler().postDelayed(() -> dialog.dismiss(), 2000);
+        new Handler().postDelayed(dialog::dismiss, 2000);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_register_platform_authenticator:
-                mProgressDialog.show();
-                BlockIDSDK.getInstance().registerFIDO2Key(this,
-                        mEtUserName.getText().toString(),
-                        AppConstant.defaultTenant,
-                        FIDO2KeyType.PLATFORM,
-                        null,
-                        (status, errorResponse) -> {
-                            mProgressDialog.dismiss();
-                            if (!status) {
-                                showError(errorResponse);
-                            } else {
-                                SharedPreferenceUtil.getInstance().setString(
-                                        K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
-                                showResultDialog(R.drawable.icon_dialog_success,
-                                        getString(R.string.label_fido2_key_has_been_successfully_registered));
-                            }
-                        });
-                break;
-
-            case R.id.btn_register_external_authenticator:
-                mProgressDialog.show();
-                BlockIDSDK.getInstance().registerFIDO2Key(this,
-                        mEtUserName.getText().toString(),
-                        AppConstant.defaultTenant,
-                        FIDO2KeyType.CROSS_PLATFORM,
-                        observer,
-                        (status, errorResponse) -> {
-                            mProgressDialog.dismiss();
-                            if (!status) {
-                                showError(errorResponse);
-                            } else {
-                                SharedPreferenceUtil.getInstance().setString(
-                                        K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
-                                showResultDialog(R.drawable.icon_dialog_success,
-                                        getString(R.string.label_fido2_key_has_been_successfully_registered));
-                            }
-                        });
-                break;
+    /**
+     * Register FIDO2 key
+     */
+    private void registerFIDO2(FIDO2KeyType keyType) {
+        if (!validateUserName(mEtUserName.getText().toString())) {
+            return;
         }
+
+        mProgressDialog.show();
+        BlockIDSDK.getInstance().registerFIDO2Key(this,
+                mEtUserName.getText().toString(),
+                AppConstant.defaultTenant.getDns(),
+                AppConstant.defaultTenant.getCommunity(),
+                keyType,
+                observer,
+                (status, errorResponse) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        showError(errorResponse);
+                        return;
+                    }
+                    SharedPreferenceUtil.getInstance().setString(
+                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
+
+                    String message = keyType.getValue().equalsIgnoreCase(
+                            FIDO2KeyType.PLATFORM.getValue()) ?
+                            getString(R.string.label_platform_key_registered) :
+                            getString(R.string.label_security_key_registered);
+                    showResultDialog(R.drawable.icon_dialog_success, message);
+                });
+    }
+
+    /**
+     * Authenticate FIDO2 key
+     */
+    private void authenticateFIDO2(FIDO2KeyType keyType) {
+        if (!validateUserName(mEtUserName.getText().toString())) {
+            return;
+        }
+
+        mProgressDialog.show();
+        BlockIDSDK.getInstance().authenticateFIDO2Key(this,
+                mEtUserName.getText().toString(),
+                AppConstant.defaultTenant.getDns(),
+                AppConstant.defaultTenant.getCommunity(),
+                keyType,
+                observer,
+                (status, errorResponse) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        runOnUiThread(() -> showError(errorResponse));
+                        return;
+                    }
+
+                    SharedPreferenceUtil.getInstance().setString(
+                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
+                    String message = keyType.getValue().equalsIgnoreCase(
+                            FIDO2KeyType.PLATFORM.getValue()) ?
+                            getString(R.string.label_platform_key_authenticated) :
+                            getString(R.string.label_security_key_authenticated);
+
+                    showResultDialog(R.drawable.icon_dialog_success, message);
+                });
     }
 }

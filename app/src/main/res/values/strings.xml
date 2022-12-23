@@ -149,9 +149,16 @@
         successfully registered.</string>
     <string name="label_fido2_key_registration_failed">FIDO2 key registration
         failed.</string>
-    <string name="label_successfully_authenticated_with_your_fido2_key">Your have successfully
+    <string name="label_successfully_authenticated_with_your_fido2_key">You have successfully
         authenticated with your FIDO2 key.</string>
     <string name="label_authentication_failed">Authentication failed</string>
+    <string name="label_platform_key_registered">Platform key registered successfully.</string>
+    <string name="label_security_key_registered">Security key registered successfully.</string>
+    <string name="label_platform_key_authenticated">Platform key authenticated successfully.</string>
+    <string name="label_security_key_authenticated">Security key is authenticated successfully.</string>
+
+    <string name="label_register_security_key">Register (Security Key)</string>
+    <string name="label_authenticate_security_key">Authenticate (Security Key)</string>
 
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
