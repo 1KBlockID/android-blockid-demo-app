@@ -164,8 +164,9 @@ public class FIDO2BaseActivity extends AppCompatActivity {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
-        errorDialog.show(null, getString(R.string.label_error),
-                error.getMessage() + " (" + error.getCode() + ")",
+        errorDialog.showWithOneButton(null, getString(R.string.label_error),
+                error.getMessage() + " (" + error.getCode() + ").",
+                getString(R.string.label_ok),
                 onDismissListener);
     }
 

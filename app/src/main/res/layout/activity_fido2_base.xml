@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_20dp"
         android:layout_marginTop="@dimen/dimen_94dp"
+        android:padding="@dimen/dimen_5dp"
         android:hint="@string/label_user_name"
         app:boxCornerRadiusBottomEnd="@dimen/dimen_5dp"
         app:boxCornerRadiusBottomStart="@dimen/dimen_5dp"
