@@ -5,6 +5,14 @@ dependencyResolutionManagement {
         //noinspection JcenterRepositoryObsolete
         jcenter()
         mavenCentral()
+        maven {
+            allowInsecureProtocol true
+            url 'http://34.139.253.136:8081//repository/maven-releases/'
+            credentials {
+                username = "sdk-read"
+                password = "1Kosmos123@"
+            }
+        }
         maven { url "https://jitpack.io" }
         maven {
             url 'http://www.baka.sk/maven2'
@@ -13,6 +21,5 @@ dependencyResolutionManagement {
     }
 }
 
-include ':BlockIDSDK-release'
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
