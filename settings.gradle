@@ -7,9 +7,9 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             allowInsecureProtocol true
-            url 'http://34.139.253.136:8081//repository/maven-releases/'
+            url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
             credentials {
-                username = "sdk-read"
+                username = "bidsdk"
                 password = "1Kosmos123@"
             }
         }
