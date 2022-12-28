@@ -62,7 +62,9 @@ dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
-    implementation project(path: ':BlockIDSDK-release')
+//    implementation project(path: ':BlockIDSDK-release')
+    implementation project(path: ':android-kernel-sdk')
+    implementation project(path: ':webauthnkit')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.2'
@@ -93,7 +95,7 @@ dependencies {
     }
 
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'org.jetbrains:annotations:23.0.0'
+//    implementation 'org.jetbrains:annotations:23.0.0'
     // For Base32 encode/decode
     implementation 'commons-codec:commons-codec:1.11'
 
@@ -148,6 +150,8 @@ dependencies {
 
     // kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.1'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform
@@ -160,4 +164,10 @@ dependencies {
     implementation ("com.walletconnect:sign:2.0.0-rc.5")
     implementation ("com.walletconnect:android-core:1.0.0")
     implementation 'org.web3j:utils:5.0.0'
+
+    // selfie scanner
+    implementation 'androidx.camera:camera-core:1.1.0'
+    implementation 'androidx.camera:camera-extensions:1.2.0-alpha03'
+    implementation 'androidx.window:window:1.1.0-alpha02'
+    implementation 'org.apache.commons:commons-imaging:1.0-alpha2'
 }

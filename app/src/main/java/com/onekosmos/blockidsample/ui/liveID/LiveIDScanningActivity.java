@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
@@ -61,11 +60,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -121,16 +116,16 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         }
     }
 
-    @Override
-    public void onFaceFocusChanged(boolean isFocused, String expression) {
-        if (isFocused) {
-            showFaceFocusedViews();
-            mLayoutMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(getMessageForExpression(expression));
-        } else
-            showFaceNotFocusedViews("");
-    }
+//    @Override
+//    public void onFaceFocusChanged(boolean isFocused, String expression) {
+//        if (isFocused) {
+//            showFaceFocusedViews();
+//            mLayoutMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setText(getMessageForExpression(expression));
+//        } else
+//            showFaceNotFocusedViews("");
+//    }
 
     @Override
     public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken,
@@ -170,6 +165,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             verifyLiveID(liveIDBitmap);
             return;
         }
+
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) &&
                 getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
@@ -178,10 +174,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         registerLiveID(liveIDBitmap);
     }
 
-    @Override
-    public void expressionDidReset(String message) {
-        showFaceNotFocusedViews(message);
-    }
+//    @Override
+//    public void expressionDidReset(String message) {
+//        showFaceNotFocusedViews(message);
+//    }
 
     private void initViews() {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
@@ -213,13 +209,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-        mBIDScannerView.setVisibility(View.VISIBLE);
-        mScannerOverlay.setVisibility(View.VISIBLE);
+        mBIDScannerView.setVisibility(View.GONE);
+        mScannerOverlay.setVisibility(View.GONE);
         mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-                ScanningMode.SCAN_LIVE,
-                mBIDScannerView,
-                mScannerOverlay,
-                false,
+//                ScanningMode.SCAN_LIVE,
+//                mBIDScannerView,
+//                mScannerOverlay,
+//                false,
                 this);
         if (mIsLivenessNeeded)
             mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
