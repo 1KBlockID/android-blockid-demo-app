@@ -6,7 +6,6 @@ dependencyResolutionManagement {
         jcenter()
         mavenCentral()
         maven {
-            allowInsecureProtocol true
             url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
             credentials {
                 username = "bidsdk"
