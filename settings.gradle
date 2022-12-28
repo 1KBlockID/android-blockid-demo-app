@@ -8,8 +8,8 @@ dependencyResolutionManagement {
         maven {
             url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
             credentials {
-                username = "bidsdk"
-                password = "1Kosmos123@"
+                username = "blockidsdk"
+                password = "Do%H773NJSV!"
             }
         }
         maven { url "https://jitpack.io" }
