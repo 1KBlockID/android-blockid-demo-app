@@ -174,10 +174,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         registerLiveID(liveIDBitmap);
     }
 
-//    @Override
-//    public void expressionDidReset(String message) {
-//        showFaceNotFocusedViews(message);
-//    }
+    @Override
+    public void expressionDidReset(String message) {
+        showFaceNotFocusedViews(message);
+    }
 
     private void initViews() {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
