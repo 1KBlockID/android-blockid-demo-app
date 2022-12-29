@@ -20,7 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-//include ':BlockIDSDK-release'
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
 
