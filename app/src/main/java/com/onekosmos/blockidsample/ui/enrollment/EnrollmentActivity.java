@@ -26,6 +26,8 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
+import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.dlScanner.LiveDLScannerHelper;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
@@ -35,7 +37,6 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
-import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -61,7 +62,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
+public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener, LiveDLScannerHelper.DocumentScanCallback {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
 
@@ -298,10 +299,72 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     });
             return;
         }
-        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
+        startDocumentScan();
+//        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        startActivity(intent);
     }
+
+
+    /**
+     * Start Document Scan
+     */
+    private void startDocumentScan() {
+        DLScannerHelper documentScannerHelper = new DLScannerHelper(this, this);
+        //documentScannerHelper.startDocumentScan(LiveDLScannerHelper.DocumentScannerType.DL);
+//        ,
+//                new LiveDLScannerHelper.DocumentScanCallback() {
+////                    @Override
+//                    public void handleScan(LinkedHashMap<String, Object> documentMap) {
+//                      //  startSelfieScan(documentMap);
+//                    }
+//
+//                    @Override
+//                    public void scanWasCancelled() {
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    public void captureError(DSError dsError) {
+//                        ErrorDialog errorDialog = new ErrorDialog(
+//                                EnrollmentActivity.this);
+//                        errorDialog.showWithOneButton(null,
+//                                getString(R.string.label_error),
+//                                dsError.message,
+//                                getString(R.string.label_ok),
+//                                dialog -> {
+//                                    errorDialog.dismiss();
+//                                    finish();
+//                                });
+//                    }
+               // });
+    }
+
+
+    /**
+     * Start Selfie scan
+     *
+     */
+//    private void startSelfieScan(LinkedHashMap<String, Object> documentMap) {
+//        SelfieScannerHelper selfieScannerHelper = new SelfieScannerHelper(this);
+//        selfieScannerHelper.scanSelfie(new SelfieScannerHelper.SelfieScanCallback() {
+//            @Override
+//            public void onFinishSelfieScan(LinkedHashMap<String, Object> selfieScanData) {
+//                mSelfieMap = selfieScanData;
+//                verifyDocument(documentMap);
+//            }
+//
+//            @Override
+//            public void onCancelSelfieScan() {
+//                finish();
+//            }
+//
+//            @Override
+//            public void onErrorSelfieScan(int errorCode, String errorMessage) {
+//                showError(new ErrorManager.ErrorResponse(errorCode, errorMessage));
+//            }
+//        });
+//    }
 
     private void onPPClicked(int count) {
         if (EnrollmentsDataSource.getInstance().isPassportEnrolled(count)) {
@@ -482,5 +545,15 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     message, getString(R.string.label_ok), listener);
 
         });
+    }
+
+    @Override
+    public void scanWasCancelled() {
+
+    }
+
+    @Override
+    public void handleScan(LinkedHashMap<String, Object> documentData) {
+
     }
 }

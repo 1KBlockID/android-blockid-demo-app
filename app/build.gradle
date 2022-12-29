@@ -161,5 +161,7 @@ dependencies {
     implementation 'org.web3j:utils:5.0.0'
 
     // BlockIDSDK
-    implementation 'com.onekosmos.blockid.sdk:android-sdk:1.9.00.63AD5420'
+  //  implementation 'com.onekosmos.blockid.sdk:android-sdk:1.9.00.63AD5420'
+    implementation project(path: ':android-kernel-sdk')
+    implementation project(path: ':webauthnkit')
 }

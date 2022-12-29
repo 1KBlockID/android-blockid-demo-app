@@ -22,6 +22,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.dlScanner.LiveDLScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -36,7 +37,6 @@ import org.json.JSONObject;
 import java.util.LinkedHashMap;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
@@ -46,7 +46,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class DriverLicenseScanActivity extends AppCompatActivity implements View.OnClickListener,
-        IDriverLicenseResponseListener {
+        IDriverLicenseResponseListener, LiveDLScannerHelper.DocumentScanCallback {
     private static final int K_DL_PERMISSION_REQUEST_CODE = 1011;
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
@@ -133,8 +133,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     @Override
     public void onStop() {
         super.onStop();
-        mDriverLicenseScannerHelper.stopScanning();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
+      //  mDriverLicenseScannerHelper.stopScanning();
+       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
     }
 
     @Override
@@ -247,14 +247,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
 
     private void startScan() {
         if (!isRegistrationInProgress) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
-                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
-            mDriverLicenseScannerHelper.startScanning();
-            mLayoutMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(R.string.label_scanning);
+        //    mDriverLicenseScannerHelper = new DLScannerHelper(this);
+//            mBIDScannerView.setVisibility(View.VISIBLE);
+//            mScannerOverlay.setVisibility(View.VISIBLE);
+//            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
+//                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
+//            mDriverLicenseScannerHelper.startScanning();
+//            mLayoutMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setText(R.string.label_scanning);
         }
     }
 
@@ -263,7 +264,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scan_complete);
         mImgSuccess.setVisibility(View.VISIBLE);
-        mDriverLicenseScannerHelper.stopScanning();
+       // mDriverLicenseScannerHelper.stopScanning();
     }
 
     private void onCancelEnrollment() {
@@ -332,5 +333,20 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                                 onDismissListener);
                     }
                 });
+    }
+
+    @Override
+    public void scanWasCancelled() {
+
+    }
+
+    @Override
+    public void handleScan(LinkedHashMap<String, Object> documentData) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
     }
 }
