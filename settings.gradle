@@ -5,6 +5,13 @@ dependencyResolutionManagement {
         //noinspection JcenterRepositoryObsolete
         jcenter()
         mavenCentral()
+        maven {
+            url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
+            credentials {
+                username = "blockidsdk"
+                password = "Do%H773NJSV!"
+            }
+        }
         maven { url "https://jitpack.io" }
         maven {
             url 'http://www.baka.sk/maven2'
@@ -13,6 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-include ':BlockIDSDK-release'
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
