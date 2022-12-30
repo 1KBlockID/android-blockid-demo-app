@@ -38,10 +38,10 @@ import java.util.LinkedHashMap;
  */
 public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener,
         ILiveIDResponseListener {
+    private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
-    private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtTitle;
     private AppCompatButton mBtnCancel;
@@ -116,16 +116,16 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         }
     }
 
-//    @Override
-//    public void onFaceFocusChanged(boolean isFocused, String expression) {
-//        if (isFocused) {
-//            showFaceFocusedViews();
-//            mLayoutMessage.setVisibility(View.VISIBLE);
-//            mTxtMessage.setVisibility(View.VISIBLE);
-//            mTxtMessage.setText(getMessageForExpression(expression));
-//        } else
-//            showFaceNotFocusedViews("");
-//    }
+    @Override
+    public void onFaceFocusChanged(boolean isFocused, String expression) {
+        if (isFocused) {
+            showFaceFocusedViews();
+            mLayoutMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setText(getMessageForExpression(expression));
+        } else
+            showFaceNotFocusedViews("");
+    }
 
     @Override
     public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken,
@@ -211,12 +211,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     private void startLiveIDScan() {
         mBIDScannerView.setVisibility(View.GONE);
         mScannerOverlay.setVisibility(View.GONE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-//                ScanningMode.SCAN_LIVE,
-//                mBIDScannerView,
-//                mScannerOverlay,
-//                false,
-                this);
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
         if (mIsLivenessNeeded)
             mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
         else
