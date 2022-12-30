@@ -150,6 +150,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         };
 
         if (liveIDBitmap == null) {
+            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+                finish();
+            }
+
             if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
@@ -212,7 +216,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         mBIDScannerView.setVisibility(View.GONE);
         mScannerOverlay.setVisibility(View.GONE);
 
-        // NOTE: Uncomment below code for scan liveId with expression detection
+//        NOTE: Uncomment below code for scan liveId with expression detection
 //        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
 //                ScanningMode.SCAN_LIVE,
 //                mBIDScannerView,
