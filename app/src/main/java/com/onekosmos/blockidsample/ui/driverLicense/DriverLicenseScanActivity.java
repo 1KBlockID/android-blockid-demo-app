@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -22,7 +23,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.dlScanner.LiveDLScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.supportingScanner.LiveDLScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -84,16 +85,16 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
         initView();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
         else
             startScan();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -133,8 +134,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     @Override
     public void onStop() {
         super.onStop();
-      //  mDriverLicenseScannerHelper.stopScanning();
-       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
+        //  mDriverLicenseScannerHelper.stopScanning();
+        // LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
     }
 
     @Override
@@ -247,15 +248,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
 
     private void startScan() {
         if (!isRegistrationInProgress) {
-        //    mDriverLicenseScannerHelper = new DLScannerHelper(this);
-//            mBIDScannerView.setVisibility(View.VISIBLE);
-//            mScannerOverlay.setVisibility(View.VISIBLE);
+            DLScannerHelper documentScannerHelper = new DLScannerHelper(this, this);
+            mBIDScannerView.setVisibility(View.VISIBLE);
+            mScannerOverlay.setVisibility(View.VISIBLE);
 //            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
 //                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
-//            mDriverLicenseScannerHelper.startScanning();
-//            mLayoutMessage.setVisibility(View.VISIBLE);
-//            mTxtMessage.setVisibility(View.VISIBLE);
-//            mTxtMessage.setText(R.string.label_scanning);
+            //    mDriverLicenseScannerHelper.startScanning();
+            mLayoutMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setText(R.string.label_scanning);
         }
     }
 
@@ -264,7 +265,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scan_complete);
         mImgSuccess.setVisibility(View.VISIBLE);
-       // mDriverLicenseScannerHelper.stopScanning();
+        // mDriverLicenseScannerHelper.stopScanning();
     }
 
     private void onCancelEnrollment() {
@@ -336,17 +337,17 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     }
 
     @Override
-    public void scanWasCancelled() {
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
+    }
+
+    @Override
+    public void verifyDocument(boolean status, ErrorManager.ErrorResponse errorResponse) {
 
     }
 
     @Override
     public void handleScan(LinkedHashMap<String, Object> documentData) {
-
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
+        Log.e("DLV", "back start DLScanningActivity");
     }
 }
