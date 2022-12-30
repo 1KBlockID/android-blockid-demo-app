@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
+import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
@@ -38,10 +39,10 @@ import java.util.LinkedHashMap;
  */
 public class LiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener,
         ILiveIDResponseListener {
-    private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
+    private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack, mTxtMessage, mTxtTitle;
     private AppCompatButton mBtnCancel;
@@ -169,7 +170,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
             verifyLiveID(liveIDBitmap);
             return;
         }
-
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) &&
                 getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
             registerLiveIDWithDocument(liveIDBitmap);
