@@ -213,10 +213,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-        mBIDScannerView.setVisibility(View.GONE);
-        mScannerOverlay.setVisibility(View.GONE);
-
 //        NOTE: Uncomment below code for scan liveId with expression detection
+//        mBIDScannerView.setVisibility(View.VISIBLE);
+//        mScannerOverlay.setVisibility(View.VISIBLE);
 //        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
 //                ScanningMode.SCAN_LIVE,
 //                mBIDScannerView,
