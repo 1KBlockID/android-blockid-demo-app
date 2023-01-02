@@ -23,7 +23,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.supportingScanner.LiveDLScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.supportingScanner.DocumentScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -47,7 +47,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class DriverLicenseScanActivity extends AppCompatActivity implements View.OnClickListener,
-        IDriverLicenseResponseListener, LiveDLScannerHelper.DocumentScanCallback {
+        IDriverLicenseResponseListener {
     private static final int K_DL_PERMISSION_REQUEST_CODE = 1011;
     private static int K_DL_EXPIRY_GRACE_DAYS = 90;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
@@ -339,15 +339,5 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
-    }
-
-    @Override
-    public void verifyDocument(boolean status, ErrorManager.ErrorResponse errorResponse) {
-
-    }
-
-    @Override
-    public void handleScan(LinkedHashMap<String, Object> documentData) {
-        Log.e("DLV", "back start DLScanningActivity");
     }
 }
