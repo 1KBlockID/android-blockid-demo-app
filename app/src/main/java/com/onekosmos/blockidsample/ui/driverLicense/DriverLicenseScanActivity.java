@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -23,7 +22,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.dlModule.IDriverLicenseResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.supportingScanner.DocumentScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -40,7 +38,6 @@ import java.util.LinkedHashMap;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
-
 
 /**
  * Created by 1Kosmos Engineering
@@ -135,7 +132,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     public void onStop() {
         super.onStop();
         //  mDriverLicenseScannerHelper.stopScanning();
-        // LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
     }
 
     @Override
@@ -251,9 +248,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
             DLScannerHelper documentScannerHelper = new DLScannerHelper(this, this);
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-//            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
-//                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
-            //    mDriverLicenseScannerHelper.startScanning();
+            // TODO -- Note -- Commenting out below LOC because of AUID scanner integration
+        /*    mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
+                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
+            mDriverLicenseScannerHelper.startScanning();*/
             mLayoutMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setVisibility(View.VISIBLE);
             mTxtMessage.setText(R.string.label_scanning);
@@ -265,6 +263,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(R.string.label_scan_complete);
         mImgSuccess.setVisibility(View.VISIBLE);
+        // TODO -- Note -- Commenting out below LOC because of AUID scanner integration
         // mDriverLicenseScannerHelper.stopScanning();
     }
 
@@ -334,10 +333,5 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
                                 onDismissListener);
                     }
                 });
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
     }
 }
