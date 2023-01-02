@@ -138,7 +138,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     @Override
     public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap,
                                         String signatureToken, ErrorManager.ErrorResponse error) {
-        stopScan();
+        stopScan(error);
         if (driverLicenseMap != null) {
             mDriverLicenseMap = driverLicenseMap;
             mSigToken = signatureToken;
@@ -172,6 +172,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     public void scanBackSide() {
         mScanSide = getString(R.string.label_scan_back);
         mTxtScanSide.setText(mScanSide);
+    }
+
+    @Override
+    public void verifyingDocument() {
+        IDriverLicenseResponseListener.super.verifyingDocument();
     }
 
     private void initView() {
@@ -258,11 +263,13 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         }
     }
 
-    private void stopScan() {
+    private void stopScan(ErrorManager.ErrorResponse error) {
         mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
-        mTxtMessage.setText(R.string.label_scan_complete);
-        mImgSuccess.setVisibility(View.VISIBLE);
+        if (error.getMessage() == null) {
+            mTxtMessage.setText(R.string.label_scan_complete);
+            mImgSuccess.setVisibility(View.VISIBLE);
+        }
         // TODO -- Note -- Commenting out below LOC because of AUID scanner integration
         // mDriverLicenseScannerHelper.stopScanning();
     }
