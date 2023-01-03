@@ -22,9 +22,3 @@ dependencyResolutionManagement {
 
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
-def sdk='C:\\Users\\Vaishali Sharma\\AndroidStudioProjects\\sdk\\android-kernel-sdk'
-include ':android-kernel-sdk'
-project(':android-kernel-sdk').projectDir = new File(sdk + '\\app')
-
-include ':webauthnkit'
-project(':webauthnkit').projectDir = new File('C:\\Users\\Vaishali Sharma\\AndroidStudioProjects\\sdk\\android-kernel-sdk\\webauthnkit')
