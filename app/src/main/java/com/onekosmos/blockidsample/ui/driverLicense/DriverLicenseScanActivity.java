@@ -1,5 +1,10 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,10 +40,6 @@ import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.cameramodule.dlScanner.DLScanningOrder.FIRST_BACK_THEN_FRONT;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 
 /**
  * Created by 1Kosmos Engineering
@@ -91,11 +92,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -132,14 +128,14 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     @Override
     public void onStop() {
         super.onStop();
-        //  mDriverLicenseScannerHelper.stopScanning();
+        mDriverLicenseScannerHelper.stopScanning();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDLScanReceiver);
     }
 
     @Override
     public void onDriverLicenseResponse(LinkedHashMap<String, Object> driverLicenseMap,
                                         String signatureToken, ErrorManager.ErrorResponse error) {
-        stopScan(error);
+        stopScan();
         if (driverLicenseMap != null) {
             mDriverLicenseMap = driverLicenseMap;
             mSigToken = signatureToken;
@@ -159,6 +155,9 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
+        }
+        if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+            finish();
         }
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
     }
@@ -265,30 +264,14 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
             mDriverLicenseScannerHelper = new DLScannerHelper(this, this);
             mDriverLicenseScannerHelper.startScanning();
         }
-/*        if (!isRegistrationInProgress) {
-            DLScannerHelper documentScannerHelper = new DLScannerHelper(this, this);
-
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-            // TODO -- Note -- Commenting out below LOC because of AUID scanner integration
-        *//*    mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
-                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
-            mDriverLicenseScannerHelper.startScanning();*//*
-            mLayoutMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(R.string.label_scanning);
-        }*/
     }
 
-    private void stopScan(ErrorManager.ErrorResponse error) {
+    private void stopScan() {
         mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
-        if (error.getMessage() == null) {
-            mTxtMessage.setText(R.string.label_scan_complete);
-            mImgSuccess.setVisibility(View.VISIBLE);
-        }
-        // TODO -- Note -- Commenting out below LOC because of AUID scanner integration
-        // mDriverLicenseScannerHelper.stopScanning();
+        mTxtMessage.setText(R.string.label_scan_complete);
+        mImgSuccess.setVisibility(View.VISIBLE);
+        mDriverLicenseScannerHelper.stopScanning();
     }
 
     private void onCancelEnrollment() {
