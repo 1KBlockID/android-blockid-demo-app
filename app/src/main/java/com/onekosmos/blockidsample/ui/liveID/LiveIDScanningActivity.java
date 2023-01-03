@@ -61,11 +61,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -155,6 +151,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         };
 
         if (liveIDBitmap == null) {
+            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+                finish();
+            }
+
             if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
@@ -213,14 +213,17 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-        mBIDScannerView.setVisibility(View.VISIBLE);
-        mScannerOverlay.setVisibility(View.VISIBLE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-                ScanningMode.SCAN_LIVE,
-                mBIDScannerView,
-                mScannerOverlay,
-                false,
-                this);
+//        NOTE: Uncomment below code for scan liveId with expression detection
+//        mBIDScannerView.setVisibility(View.VISIBLE);
+//        mScannerOverlay.setVisibility(View.VISIBLE);
+//        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
+//                ScanningMode.SCAN_LIVE,
+//                mBIDScannerView,
+//                mScannerOverlay,
+//                false,
+//                this);
+
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
         if (mIsLivenessNeeded)
             mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
         else
