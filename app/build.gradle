@@ -161,5 +161,5 @@ dependencies {
     implementation 'org.web3j:utils:5.0.0'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:android-sdk:1.9.00.63B42985'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.00.63B4464A'
 }
