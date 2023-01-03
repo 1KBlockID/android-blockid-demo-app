@@ -84,11 +84,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
         initView();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -161,6 +156,9 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
+        if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+            finish();
+        }
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
     }
 
@@ -174,6 +172,14 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
     public void scanBackSide() {
         mScanSide = getString(R.string.label_scan_back);
         mTxtScanSide.setText(mScanSide);
+    }
+
+    @Override
+    public void verifyingDocument() {
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_verifying_driver_license));
+        progressDialog.show();
+        isRegistrationInProgress = true;
     }
 
     private void initView() {
@@ -247,14 +253,18 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
 
     private void startScan() {
         if (!isRegistrationInProgress) {
-            mBIDScannerView.setVisibility(View.VISIBLE);
-            mScannerOverlay.setVisibility(View.VISIBLE);
-            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
-                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
+//            mBIDScannerView.setVisibility(View.VISIBLE);
+//            mScannerOverlay.setVisibility(View.VISIBLE);
+//            mDriverLicenseScannerHelper = new DLScannerHelper(this, FIRST_BACK_THEN_FRONT,
+//                    mBIDScannerView, K_DL_EXPIRY_GRACE_DAYS, this);
+//            mDriverLicenseScannerHelper.startScanning();
+//            mLayoutMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setVisibility(View.VISIBLE);
+//            mTxtMessage.setText(R.string.label_scanning);
+            mDriverLicenseScannerHelper = new DLScannerHelper(this,
+                    FIRST_BACK_THEN_FRONT,
+                    this);
             mDriverLicenseScannerHelper.startScanning();
-            mLayoutMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(R.string.label_scanning);
         }
     }
 
