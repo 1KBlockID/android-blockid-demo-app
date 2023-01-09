@@ -156,7 +156,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity implements View
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
-        if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+        if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELLED.getCode()) {
             finish();
         }
         errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
