@@ -214,10 +214,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
 
     private void startLiveIDScan() {
         mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
-        if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
-        else
-            mLiveIDScannerHelper.startLiveIDScanning();
+        mLiveIDScannerHelper.startLiveIDScanning();
     }
 
     private void showFaceNotFocusedViews(String expression) {
