@@ -21,10 +21,8 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
-import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -151,7 +149,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         };
 
         if (liveIDBitmap == null) {
-            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELLED.getCode()) {
                 finish();
             }
 
@@ -213,21 +211,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-//        NOTE: Uncomment below code for scan liveId with expression detection
-//        mBIDScannerView.setVisibility(View.VISIBLE);
-//        mScannerOverlay.setVisibility(View.VISIBLE);
-//        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-//                ScanningMode.SCAN_LIVE,
-//                mBIDScannerView,
-//                mScannerOverlay,
-//                false,
-//                this);
-
         mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
-        if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
-        else
-            mLiveIDScannerHelper.startLiveIDScanning();
+        mLiveIDScannerHelper.startLiveIDScanning();
     }
 
     private void showFaceNotFocusedViews(String expression) {
