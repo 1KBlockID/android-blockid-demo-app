@@ -151,7 +151,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         };
 
         if (liveIDBitmap == null) {
-            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELED.getCode()) {
+            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELLED.getCode()) {
                 finish();
             }
 
