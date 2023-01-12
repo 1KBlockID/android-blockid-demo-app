@@ -115,6 +115,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onWalletConnectClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
             onAboutClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
+            getKYC();
         }
     }
 
@@ -478,5 +480,23 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+    }
+
+    /**
+     * Get KYC Hash
+     */
+    private void getKYC() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().getKYC((status, kyc, errorResponse) -> {
+            progressDialog.dismiss();
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener listener = DialogInterface::dismiss;
+            String message = status ? kyc : "(" + errorResponse.getCode() + ") " +
+                    errorResponse.getMessage();
+            errorDialog.showWithOneButton(null, getString(R.string.label_my_kyc),
+                    message, getString(R.string.label_ok), listener);
+
+        });
     }
 }

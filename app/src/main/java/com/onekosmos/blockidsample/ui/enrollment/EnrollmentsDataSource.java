@@ -44,6 +44,7 @@ public class EnrollmentsDataSource {
         ASSET_FIDO2,
         ASSET_WALLET_CONNECT,
         ASSET_ABOUT,
+        ASSET_KYC,
         ASSET_RESET_SDK,
     }
 
@@ -66,6 +67,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_PP2);
         arr.add(EnrollmentAssetEnum.ASSET_NATIONAL_ID);
         arr.add(EnrollmentAssetEnum.ASSET_SSN);
+        arr.add(EnrollmentAssetEnum.ASSET_KYC);
 
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
@@ -172,6 +174,10 @@ public class EnrollmentsDataSource {
             case ASSET_ABOUT:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_about), null);
+                break;
+            case ASSET_KYC:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_my_kyc), null);
                 break;
         }
         return enrollmentAsset;

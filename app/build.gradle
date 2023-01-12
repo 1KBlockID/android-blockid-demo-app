@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
-        versionName "1.8.30" + "." + getCurrentTimestampHexValue()
+        versionName "1.9.00" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -62,7 +62,6 @@ dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
-    implementation project(path: ':BlockIDSDK-release')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.4.2'
@@ -164,4 +163,7 @@ dependencies {
     // Native FIDO2 External
     implementation 'com.google.android.gms:play-services-fido:19.0.0'
     implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
+
+    // BlockID SDK
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.00.63BFBEB4'
 }
