@@ -23,6 +23,7 @@ public class AuthenticationPayloadV2 {
     public String expiresDate;
     @SerializedName("__v")
     public String version;
+    public AuthenticationMetaData metadata;
 
     public AuthenticationPayloadV1 getAuthRequestModel(String sessionUrl) {
         AuthenticationPayloadV1 authenticationPayloadV1 = new AuthenticationPayloadV1();
@@ -36,6 +37,7 @@ public class AuthenticationPayloadV2 {
         authenticationPayloadV1.community = origin.communityName;
         authenticationPayloadV1.authPage = origin.authPage;
         authenticationPayloadV1.sessionURL = sessionUrl;
+        authenticationPayloadV1.metadata = metadata;
         return authenticationPayloadV1;
     }
 

@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;

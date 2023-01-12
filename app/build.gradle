@@ -156,9 +156,13 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // wallet connect
-    implementation ("com.walletconnect:sign:2.0.0-rc.5")
-    implementation ("com.walletconnect:android-core:1.0.0")
+    implementation("com.walletconnect:sign:2.0.0-rc.5")
+    implementation("com.walletconnect:android-core:1.0.0")
     implementation 'org.web3j:utils:5.0.0'
+
+    // Native FIDO2 External
+    implementation 'com.google.android.gms:play-services-fido:19.0.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     // BlockID SDK
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.00.63BBEB41'

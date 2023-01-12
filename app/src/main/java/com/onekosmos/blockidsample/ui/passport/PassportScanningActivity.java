@@ -26,7 +26,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -232,7 +231,8 @@ public class PassportScanningActivity extends AppCompatActivity implements View.
     private void startScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mPassportScannerHelper = new PassportScannerHelper(this, ScanningMode.SCAN_LIVE, mBIDScannerView, mScannerOverlay, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
+        mPassportScannerHelper = new PassportScannerHelper(this, mBIDScannerView,
+                mScannerOverlay, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
         mPassportScannerHelper.startPassportScanning();
         mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
