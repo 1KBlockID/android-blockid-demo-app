@@ -241,4 +241,7 @@
     <string name="label_community">Community</string>
     <string name="label_sdk_version">SDK Version</string>
     <string name="label_app_version">APP Version</string>
+
+    <!-- KYC -->
+    <string name="label_my_kyc">My KYC</string>
 </resources>
