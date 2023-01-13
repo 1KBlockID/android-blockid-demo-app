@@ -83,7 +83,7 @@
         android:layout_marginTop="40dp"
         android:background="@color/black"
         android:paddingHorizontal="@dimen/dimen_20dp"
-        android:text="@string/label_authenticate"
+        android:text="@string/label_authenticate_web"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="@dimen/dimen_16sp"
