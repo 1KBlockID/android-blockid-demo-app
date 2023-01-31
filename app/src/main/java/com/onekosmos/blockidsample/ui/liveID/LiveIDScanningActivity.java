@@ -21,7 +21,6 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
 import com.onekosmos.blockidsample.AppConstant;
@@ -61,11 +60,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLivenessNeeded = getIntent().getBooleanExtra("liveness_check", false);
         initViews();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -155,6 +150,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
         };
 
         if (liveIDBitmap == null) {
+            if (error.getCode() == ErrorManager.CustomErrors.K_SCAN_CANCELLED.getCode()) {
+                finish();
+            }
+
             if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
@@ -213,18 +212,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements View.On
     }
 
     private void startLiveIDScan() {
-        mBIDScannerView.setVisibility(View.VISIBLE);
-        mScannerOverlay.setVisibility(View.VISIBLE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this,
-                ScanningMode.SCAN_LIVE,
-                mBIDScannerView,
-                mScannerOverlay,
-                false,
-                this);
-        if (mIsLivenessNeeded)
-            mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
-        else
-            mLiveIDScannerHelper.startLiveIDScanning();
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
+        mLiveIDScannerHelper.startLiveIDScanning();
     }
 
     private void showFaceNotFocusedViews(String expression) {

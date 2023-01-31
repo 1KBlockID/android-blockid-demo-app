@@ -1,6 +1,10 @@
 package com.onekosmos.blockidsample.ui.qrAuth;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
@@ -28,6 +32,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -53,10 +58,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_FACE = "face";
     private static final String K_PIN = "pin";
     private static final String K_FINGERPRINT = "fingerprint";
-    private CurrentLocationHelper mCurrentLocationHelper;
+    private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
+    private CurrentLocationHelper mCurrentLocationHelper;
     private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private AppCompatButton mBtnQRScope, mBtnQRPresetData, mBtnAuthenticate;
@@ -304,14 +310,23 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     // authenticate user with scope
-    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1, double latitude,
-                                         double longitude) {
+    private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
+                                         double latitude, double longitude) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
-                mAuthenticationPayloadV1.sessionURL, authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
-                authenticationPayloadV1.getOrigin(), String.valueOf(latitude), String.valueOf(longitude),
-                BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
+
+        LinkedHashMap<String, Object> metadata = null;
+        if (mAuthenticationPayloadV1.metadata != null &&
+                mAuthenticationPayloadV1.metadata.webauthn_challenge != null) {
+            metadata = new LinkedHashMap<>();
+            metadata.put(K_WEBAUTHN_CHALLENGE,
+                    mAuthenticationPayloadV1.metadata.webauthn_challenge);
+        }
+        BlockIDSDK.getInstance().authenticateUser(this, null,
+                authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
+                authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
+                authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -412,8 +427,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private boolean isAnyDocumentEnrolled() {
-        return BlockIDSDK.getInstance().isPassportEnrolled() ||
-                BlockIDSDK.getInstance().isDriversLicenseEnrolled() ||
-                BlockIDSDK.getInstance().isNationalIDEnrolled();
+        return BIDDocumentProvider.getInstance().isDocumentEnrolled(PPT.getValue(),
+                identity_document.name()) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
+                        identity_document.name()) ||
+                BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID.getValue(),
+                        identity_document.name());
     }
 }

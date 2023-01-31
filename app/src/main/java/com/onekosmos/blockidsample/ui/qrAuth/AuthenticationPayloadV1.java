@@ -24,6 +24,7 @@ public class AuthenticationPayloadV1 {
     public String authPage;
     public String name;
     public String sessionURL;
+    public AuthenticationMetaData metadata;
 
     public BIDOrigin getOrigin() {
         BIDOrigin bidOrigin = new BIDOrigin();

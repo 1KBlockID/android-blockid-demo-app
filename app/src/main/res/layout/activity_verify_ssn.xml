@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -120,38 +121,21 @@
                 android:layout_marginStart="@dimen/dimen_24dp"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/ssn_text"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etPasswordLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/ssn_required_text"
-                    android:inputType="number"
-                    android:lines="1"
-                    android:maxLength="9" />
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/firstname_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/first_name_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/middlename_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/middle_name_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/lastname_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/last_name_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/ssn_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dimen_60dp"
+                        android:hint="@string/ssn_required_text"
+                        android:inputType="numberPassword"
+                        android:lines="1"
+                        android:maxLength="9" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/bdate_text"
@@ -163,61 +147,6 @@
                     android:focusableInTouchMode="false"
                     android:hint="@string/birth_date_required_text"
                     android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/address_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/street_required_text"
-                    android:inputType="text" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/city_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/city_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/state_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/state_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/zip_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/zip_code_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/country"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/country_required_text"
-                    android:inputType="text"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/phone_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/phone_number_text"
-                    android:inputType="number"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/email_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_60dp"
-                    android:hint="@string/email_text"
-                    android:inputType="textEmailAddress"
                     android:maxLines="1" />
 
                 <LinearLayout

@@ -5,6 +5,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -13,8 +14,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,9 +30,10 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
-import com.onekosmos.blockidsample.ui.adduser.AddUserActivity;
+import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
@@ -42,7 +42,10 @@ import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
+import com.onekosmos.blockidsample.ui.userManagement.AddUserActivity;
+import com.onekosmos.blockidsample.ui.userManagement.UserOptionsActivity;
 import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
+import com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -59,7 +62,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
+public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
 
@@ -79,7 +82,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     @Override
     public void onclick(List<EnrollmentAsset> enrollmentAssets, int position) {
         EnrollmentAsset asset = enrollmentAssets.get(position);
-        if (position == 0) {
+        if (position == 1) {
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked(false);
@@ -107,9 +110,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_fido2))) {
             onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_enroll_ssn))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
+            onWalletConnectClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
+            onAboutClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
+            getKYC();
         }
     }
 
@@ -122,16 +130,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         mRvEnrollmentAssets.setItemAnimator(new DefaultItemAnimator());
         mRvEnrollmentAssets.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRvEnrollmentAssets.setAdapter(mEnrollmentAdapter);
-        AppCompatTextView mTxtSdkVersion = findViewById(R.id.txt_sdk_version);
-        String[] splitVersion = BlockIDSDK.getInstance().getVersion().split("\\.");
-        StringBuilder version = new StringBuilder();
-        for (int index = 0; index < splitVersion.length - 1; index++) {
-            version.append(index == 0 ? splitVersion[index] : "." + splitVersion[index]);
-        }
-        String hexCode = splitVersion[splitVersion.length - 1];
-        String versionText = getString(R.string.label_sdk_version) + ": " + version +
-                " (" + hexCode + ")";
-        mTxtSdkVersion.setText(versionText);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -163,37 +161,9 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             return;
         }
 
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.showWithTwoButton(null, null, getString(R.string.label_remove_user),
-                getString(R.string.label_yes), getString(R.string.label_no),
-                (dialogInterface, which) -> errorDialog.dismiss(),
-                dialog -> {
-                    errorDialog.dismiss();
-                    unlinkAccount(mLinkedAccountsList.get(0));
-                });
-    }
-
-    private void unlinkAccount(BIDLinkedAccount linkedAccount) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.show();
-        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
-            progressDialog.dismiss();
-            if (status) {
-                Toast.makeText(this, getString(R.string.label_account_removed),
-                        Toast.LENGTH_SHORT).show();
-                refreshEnrollmentRecyclerView();
-                return;
-            }
-            ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
-                    errorDialog.dismiss();
-            if (error != null && error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                errorDialog.showNoInternetDialog(onDismissListener);
-                return;
-            }
-            errorDialog.show(null, getString(R.string.label_error),
-                    Objects.requireNonNull(error).getMessage(), onDismissListener);
-        });
+        Intent intent = new Intent(this, UserOptionsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void startAddUserActivity() {
@@ -278,7 +248,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onDLClicked() {
-        if (BlockIDSDK.getInstance().isDriversLicenseEnrolled()) {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(DL.getValue(),
+                identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -289,10 +260,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", DL.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, DL.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(0), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -317,10 +292,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", PPT.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, PPT.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(count - 1), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(count - 1), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -334,7 +313,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onNationalIDClick() {
-        if (BlockIDSDK.getInstance().isNationalIDEnrolled()) {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(NATIONAL_ID
+                .getValue(), identity_document.name())) {
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.showWithTwoButton(
                     null,
@@ -345,10 +325,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     dialog -> {
                         errorDialog.dismiss();
                         try {
-                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().getUserDocument("", NATIONAL_ID.getValue(), identity_document.name()));
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, NATIONAL_ID.getValue(),
+                                            identity_document.name()));
                             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(jsonArray.getString(0), new TypeToken<LinkedHashMap<String, Object>>() {
-                            }.getType());
+                            LinkedHashMap<String, Object> removeDLMap = gson.fromJson(
+                                    jsonArray.getString(0), new
+                                            TypeToken<LinkedHashMap<String, Object>>() {
+                                            }.getType());
                             removeDocument(removeDLMap);
                         } catch (JSONException e) {
                             // do nothing
@@ -362,6 +346,40 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onVerifySSNClicked() {
+        if (BIDDocumentProvider.getInstance().isDocumentEnrolled(SSN.getValue(),
+                identity_document.name())) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithTwoButton(
+                    null,
+                    getString(R.string.label_remove_ssn_title),
+                    getString(R.string.label_remove_ssn),
+                    getString(R.string.label_yes), getString(R.string.label_no),
+                    (dialogInterface, i) -> errorDialog.dismiss(),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        try {
+                            JSONArray jsonArray = new JSONArray(BIDDocumentProvider.getInstance().
+                                    getUserDocument(null, SSN.getValue(),
+                                            identity_document.name()));
+                            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                            LinkedHashMap<String, Object> removeSSNMap = gson.fromJson(jsonArray.
+                                            getString(0),
+                                    new TypeToken<LinkedHashMap<String, Object>>() {
+                                    }.getType());
+                            removeDocument(removeSSNMap);
+                        } catch (JSONException e) {
+                            // do nothing
+                        }
+                    });
+            return;
+        } else if (!BIDDocumentProvider.getInstance().isDocumentEnrolled(DL
+                .getValue(), identity_document.name())) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithOneButton(null, null,
+                    getString(R.string.label_enroll_dl),
+                    getString(R.string.label_ok), dialog -> errorDialog.dismiss());
+            return;
+        }
         Intent intent = new Intent(this, VerifySSNActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
@@ -422,5 +440,35 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         Intent intent = new Intent(this, FIDO2BaseActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+    }
+
+    private void onWalletConnectClicked() {
+        Intent intent = new Intent(this, WalletConnectActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onAboutClicked() {
+        Intent intent = new Intent(EnrollmentActivity.this, AboutActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    /**
+     * Get KYC Hash
+     */
+    private void getKYC() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        BlockIDSDK.getInstance().getKYC((status, kyc, errorResponse) -> {
+            progressDialog.dismiss();
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            DialogInterface.OnDismissListener listener = DialogInterface::dismiss;
+            String message = status ? kyc : "(" + errorResponse.getCode() + ") " +
+                    errorResponse.getMessage();
+            errorDialog.showWithOneButton(null, getString(R.string.label_my_kyc),
+                    message, getString(R.string.label_ok), listener);
+
+        });
     }
 }

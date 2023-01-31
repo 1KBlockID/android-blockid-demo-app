@@ -1,4 +1,4 @@
-package com.onekosmos.blockidsample.ui.adduser;
+package com.onekosmos.blockidsample.ui.userManagement;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -6,8 +6,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.provider.Settings.Secure;
 import static android.provider.Settings.Secure.ANDROID_ID;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_EXPIRED;
-import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeApi.RESPONSE_CODE_LINK_REDEEMED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_EXPIRED;
+import static com.onekosmos.blockid.sdk.BIDAPIs.accessCode.AccessCodeAPIs.RESPONSE_CODE_LINK_REDEEMED;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -43,14 +43,11 @@ import com.onekosmos.blockid.sdk.BIDAPIs.publicip.GetPublicIP;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
-import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
-import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BuildConfig;
@@ -60,7 +57,6 @@ import com.onekosmos.blockidsample.util.CurrentLocationHelper;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * Created by 1Kosmos Engineering
@@ -185,8 +181,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Start QR code scanner
      */
     private void startQRCodeScanning() {
-        mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                this, mBIDScannerView);
+        mQRScannerHelper = new QRScannerHelper(this, this, mBIDScannerView);
         mQRScannerHelper.startQRScanning();
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
@@ -242,7 +237,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 MagicLinkData.class);
         BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
                 magicLinkDataModel.api, magicLinkDataModel.community,
-                (status, error, response, userId) -> {
+                (status, response, userId, error) -> {
                     if (!status) {
                         hideProgress();
                         showError(error);
@@ -430,25 +425,16 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Add user data in SDK
         BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                userData.scep_privatekey, userData.scep_expiry, userData.origin, userData.account,
-                (status, error) -> {
+                userData.scep_privatekey, userData.scep_expiry, userData.origin,
+                userData.account, (status, error) -> {
                     if (!status) {
                         showError(error);
                         return;
                     }
 
-                    BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
-                    List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
-
-                    registerFidoKey(linkedAccounts.get(0));
-                });
-    }
-
-    private void registerFidoKey(BIDLinkedAccount linkedAccount) {
-        BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccount,
-                FIDO2KeyType.PLATFORM, (status, errorResponse) -> {
                     hideProgress();
-                    Toast.makeText(this, getString(R.string.label_user_registration_successful),
+                    Toast.makeText(this, getString(
+                                    R.string.label_user_registration_successful),
                             Toast.LENGTH_SHORT).show();
                     finish();
                 });
@@ -471,7 +457,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     }
 
     /**
-     * Show error dialog after
+     * Show error dialog
      *
      * @param message String message of dialog
      */

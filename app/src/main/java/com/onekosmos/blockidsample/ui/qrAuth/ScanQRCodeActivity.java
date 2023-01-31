@@ -22,7 +22,6 @@ import com.google.gson.GsonBuilder;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.ScanningMode;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -33,6 +32,8 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanResponseListener {
+    public static final String IS_FROM_WALLET_CONNECT = "IS_FROM_WALLET_CONNECT";
+    public static final String WALLET_CONNECT_QR_DATA = "WALLET_CONNECT_QR_DATA";
     private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private final String[] K_CAMERA_PERMISSION = new String[]{
@@ -43,11 +44,14 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private RelativeLayout mScannerOverlay;
     private LinearLayout mScannerView;
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
+    private boolean isFromWalletConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_qrcode);
+        isFromWalletConnect = getIntent().hasExtra(IS_FROM_WALLET_CONNECT) &&
+                getIntent().getBooleanExtra(IS_FROM_WALLET_CONNECT, false);
         initView();
     }
 
@@ -60,8 +64,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         else if (!(mProgressBar.getVisibility() == View.VISIBLE)) {
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                    this, mBIDScannerView);
+            mQRScannerHelper = new QRScannerHelper(this, this,
+                    mBIDScannerView);
             mQRScannerHelper.startQRScanning();
         }
     }
@@ -74,8 +78,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
 
         if (AppPermissionUtils.isGrantedPermission(requestCode, grantResults, K_CAMERA_PERMISSION,
                 this)) {
-            mQRScannerHelper = new QRScannerHelper(this, ScanningMode.SCAN_LIVE,
-                    this, mBIDScannerView);
+            mQRScannerHelper = new QRScannerHelper(this, this, mBIDScannerView);
             mQRScannerHelper.startQRScanning();
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
@@ -106,12 +109,10 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
             mBIDScannerView.setVisibility(View.VISIBLE);
             mScannerOverlay.setVisibility(View.VISIBLE);
         }
-        AppCompatTextView mTxtBack = findViewById(R.id.txt_back);
         mTxtPleaseWait = findViewById(R.id.txt_please_wait);
         mProgressBar = findViewById(R.id.progress_bar_register);
 
-        AppCompatImageView mImgBack = findViewById(R.id.img_back);
-        mTxtBack.setOnClickListener(view -> onBackPressed());
+        AppCompatImageView mImgBack = findViewById(R.id.img_back_scan_qr);
         mImgBack.setOnClickListener(view -> onBackPressed());
     }
 
@@ -121,6 +122,17 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mScannerView.setVisibility(View.INVISIBLE);
         mProgressBar.setVisibility(View.VISIBLE);
         mTxtPleaseWait.setVisibility(View.VISIBLE);
+
+        // wallet connect
+        if (isFromWalletConnect) {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(WALLET_CONNECT_QR_DATA, qrResponse);
+            setResult(RESULT_OK, resultIntent);
+            this.finish();
+            return;
+        }
+
+        // uwl1.0 and uwl 2.0
         processQRData(qrResponse);
     }
 
@@ -153,9 +165,14 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
                     return;
                 }
                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
-                        AuthenticationPayloadV2.class);
-                processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
+                try {
+                    AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
+                            AuthenticationPayloadV2.class);
+                    processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
+                } catch (Exception e) {
+                    errorDialog.show(null, getString(R.string.label_error),
+                            getString(R.string.label_unsupported_qr_code), onDismissListener);
+                }
             });
         }
         // UWL 1
