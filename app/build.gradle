@@ -165,5 +165,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.00.63CAAF60'
+//    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.00.63CAAF60'
+    implementation project(path: ':android-kernel-sdk')
+    implementation project(path: ':webauthnkit')
+
 }
