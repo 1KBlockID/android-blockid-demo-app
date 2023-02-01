@@ -13,9 +13,4 @@ public class AppConstant {
             "https://1k-qa.1kosmos.net");
     public static final BIDTenant clientTenant = new BIDTenant("acme", "default",
             "https://blockid-qa.1kosmos.net");
-
-//    WHERE IS MY ROOT
-//    open my SD (always at {dns}/caas/sd)
-//    open global_caas SD › {my SD}.global_caas + “/sd”
-//    Root = “{my SD}.global_caas” + “/sd” . adminconsole
 }
