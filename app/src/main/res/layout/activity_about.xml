@@ -100,7 +100,7 @@
         android:layout_width="@dimen/dimen_150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_20dp"
-        android:layout_marginBottom="@dimen/dimen_74dp"
+        android:layout_marginBottom="@dimen/dimen_30dp"
         android:background="@color/black"
         android:paddingHorizontal="@dimen/dimen_20dp"
         android:text="@string/label_copy"
