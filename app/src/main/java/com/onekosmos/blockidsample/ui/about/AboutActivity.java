@@ -37,8 +37,7 @@ public class AboutActivity extends AppCompatActivity {
         AppCompatTextView txtTenantDNS = findViewById(R.id.txt_about_tenant_info);
 
         // Get and set tenant info
-        String tenantInfo = getString(R.string.label_tenant_info) + "\n\n"
-                + getString(R.string.label_default_tenant) + ":\n"
+        String tenantInfo = getString(R.string.label_default_tenant) + ":\n"
                 + getString(R.string.label_dns) + ": " + tenant.getDns() + "\n"
                 + getString(R.string.label_tag) + ": " + tenant.getTenantTag()
                 + " (" + tenant.getTenantId() + ")" + "\n"
