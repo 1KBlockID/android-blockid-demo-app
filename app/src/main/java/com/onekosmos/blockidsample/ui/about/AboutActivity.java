@@ -33,15 +33,21 @@ public class AboutActivity extends AppCompatActivity {
         mImgBack.setOnClickListener(view -> onBackPressed());
 
         BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
+        BIDTenant clientTenant = AppConstant.clientTenant;
         AppCompatTextView txtTenantDNS = findViewById(R.id.txt_about_tenant_info);
 
         // Get and set tenant info
-        String tenantInfo = getString(R.string.label_tenant_info) + ":\n"
+        String tenantInfo = getString(R.string.label_tenant_info) + "\n\n"
+                + getString(R.string.label_default_tenant) + ":\n"
                 + getString(R.string.label_dns) + ": " + tenant.getDns() + "\n"
                 + getString(R.string.label_tag) + ": " + tenant.getTenantTag()
                 + " (" + tenant.getTenantId() + ")" + "\n"
                 + getString(R.string.label_community) + ": " + tenant.getCommunity()
-                + " (" + tenant.getCommunityId() + ")";
+                + " (" + tenant.getCommunityId() + ")" + "\n\n"
+                + getString(R.string.label_client_tenant) + ":\n"
+                + getString(R.string.label_dns) + ": " + clientTenant.getDns() + "\n"
+                + getString(R.string.label_tag) + ": " + clientTenant.getTenantTag() + "\n"
+                + getString(R.string.label_community) + ": " + clientTenant.getCommunity();
         txtTenantDNS.setText(tenantInfo);
 
         // Get and set license key
