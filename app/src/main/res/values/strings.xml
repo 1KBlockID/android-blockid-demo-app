@@ -236,7 +236,7 @@
     <string name="label_public_key">Public Key</string>
     <string name="label_did">DID</string>
     <string name="label_license_key">License Key</string>
-    <string name="label_default_tenant">Default Tenant</string>
+    <string name="label_root_tenant">Root Tenant</string>
     <string name="label_client_tenant">Client Tenant</string>
     <string name="label_dns">DNS</string>
     <string name="label_tag">Tag</string>
