@@ -113,7 +113,17 @@
         <activity
             android:name=".ui.fido2.FIDO2BaseActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
+            android:theme="@style/AppTheme.MaterialAppTheme"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
         <activity
             android:name=".ui.userManagement.AddUserActivity"
             android:screenOrientation="portrait"

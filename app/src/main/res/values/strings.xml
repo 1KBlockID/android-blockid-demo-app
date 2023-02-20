@@ -161,6 +161,9 @@
     <string name="label_register_security_key">Register (Security Key)</string>
     <string name="label_authenticate_security_key">Authenticate (Security Key)</string>
 
+    <string name="label_register_custom_security_key">Register custom(Security Key)</string>
+    <string name="label_authenticate_custom_security_key">Authenticate custom(Security Key)</string>
+
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
         scope data)</string>

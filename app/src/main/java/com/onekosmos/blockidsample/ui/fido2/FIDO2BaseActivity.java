@@ -26,6 +26,7 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
+import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper;
 
 /**
  * Created by 1Kosmos Engineering
@@ -37,7 +38,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     private final String K_FILE_NAME = "fido3.html";
     private AppCompatButton mBtnRegister, mBtnAuthenticate, mBtnRegisterPlatformAuthenticator,
             mBtnRegisterExternalAuthenticator, mBtnAuthenticatePlatformAuthenticator,
-            mBtnAuthenticateExternalAuthenticator;
+            mBtnAuthenticateExternalAuthenticator, mBtnCustomRegister, mBtnCustomAuthenticate;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
@@ -61,6 +62,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
         mBtnRegister = findViewById(R.id.btn_register_web);
         mBtnAuthenticate = findViewById(R.id.btn_authenticate_web);
+
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
 
         mBtnRegister.setOnClickListener(v -> {
@@ -136,6 +138,12 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 R.id.btn_authenticate_external_authenticator);
         mBtnAuthenticateExternalAuthenticator.setOnClickListener(
                 view -> authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM));
+
+        mBtnCustomRegister = findViewById(R.id.btn_register_custom_authenticator);
+        mBtnCustomRegister.setOnClickListener(v -> {
+            Fido2AuthenticatorHelper.getInstance().registerFido2Key(this);
+        });
+        mBtnCustomAuthenticate = findViewById(R.id.btn_authenticate_custom_authenticator);
     }
 
     /**
