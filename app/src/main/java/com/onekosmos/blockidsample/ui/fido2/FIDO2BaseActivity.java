@@ -68,7 +68,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 if (validateUserName(mEtUserName.getText().toString())) {
                     mProgressDialog.show();
                     mBtnRegisterClicked = true;
-                    BIDTenant tenant = AppConstant.defaultTenant;
+                    BIDTenant tenant = AppConstant.clientTenant;
                     BlockIDSDK.getInstance().registerFIDO2Key(this,
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
@@ -95,7 +95,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 if (validateUserName(mEtUserName.getText().toString())) {
                     mProgressDialog.show();
                     mBtnAuthenticateClicked = true;
-                    BIDTenant tenant = AppConstant.defaultTenant;
+                    BIDTenant tenant = AppConstant.clientTenant;
                     BlockIDSDK.getInstance().authenticateFIDO2Key(this,
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
@@ -199,8 +199,8 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         mProgressDialog.show();
         BlockIDSDK.getInstance().registerFIDO2Key(this,
                 mEtUserName.getText().toString(),
-                AppConstant.defaultTenant.getDns(),
-                AppConstant.defaultTenant.getCommunity(),
+                AppConstant.clientTenant.getDns(),
+                AppConstant.clientTenant.getCommunity(),
                 keyType,
                 observer,
                 (status, errorResponse) -> {
@@ -231,8 +231,8 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         mProgressDialog.show();
         BlockIDSDK.getInstance().authenticateFIDO2Key(this,
                 mEtUserName.getText().toString(),
-                AppConstant.defaultTenant.getDns(),
-                AppConstant.defaultTenant.getCommunity(),
+                AppConstant.clientTenant.getDns(),
+                AppConstant.clientTenant.getCommunity(),
                 keyType,
                 observer,
                 (status, errorResponse) -> {
