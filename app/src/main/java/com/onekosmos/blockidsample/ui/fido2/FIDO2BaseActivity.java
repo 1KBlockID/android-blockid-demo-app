@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper;
+import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper.Fido2AuthenticatorListner;
 
 /**
  * Created by 1Kosmos Engineering
@@ -141,9 +143,48 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
         mBtnCustomRegister = findViewById(R.id.btn_register_custom_authenticator);
         mBtnCustomRegister.setOnClickListener(v -> {
-            Fido2AuthenticatorHelper.getInstance().registerFido2Key(this);
+            String optionsJsonString = "{\"rp\":{\"name\":\"1k-dev.1kosmos.net\",\"id\":\"1k-dev.1kosmos.net\"},\"user\":{\"id\":\"KiC5KMxK5wiEe8kFFhLRf-20l-1xpuKJCjN1izoe5RM\",\"name\":\"gaurav\",\"displayName\":\"gaurav\"},\"attestation\":\"direct\",\"pubKeyCredParams\":[{\"type\":\"public-key\",\"alg\":-7}],\"timeout\":60000,\"authenticatorSelection\":{\"userVerification\":\"required\",\"requireResidentKey\":false},\"challenge\":\"ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUo5LmV5SnlZVzVrSWpvaU56bEVXR3hPYVV0dmFtb3lObmRmTkhsT1VXdElhVkJ1YUdGdVlVZFhjVE5JVDNoNFRUZzFMU0lzSW1GMVpDSTZJakZyTFdSbGRpNHhhMjl6Ylc5ekxtNWxkQ0lzSW5OMVlpSTZJbWQxY21GMklpd2lZWFYwYUhObGJHVmpkR2x2YmlJNklpSXNJbUYwZEdWemRHRjBhVzl1SWpvaVpHbHlaV04wSWl3aWFXUWlPaUpMYVVNMVMwMTRTelYzYVVWbE9HdEdSbWhNVW1ZdE1qQnNMVEY0Y0hWTFNrTnFUakZwZW05bE5WSk5JaXdpWlhod0lqb3hOamMyTlRZMU16UTJmUS43YW1nVXJybnFCLXNiWTJ2TEVySkpUeUMwcDZKWE9rUUJ5NW5aVHVfNFc4\",\"excludeCredentials\":[],\"status\":\"ok\",\"errorMessage\":\"\"}";
+            Fido2AuthenticatorHelper.getInstance().
+                    registerFido2Key(this, "https://1k-dev.1kosmos.net",
+
+                            optionsJsonString, true, new Fido2AuthenticatorListner() {
+                                @Override
+                                public void onSuccess(String success) {
+                                    Toast.makeText(getApplicationContext(),
+                                            success
+                                            , Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onFailure(String message) {
+                                    Toast.makeText(getApplicationContext(),
+                                            message
+                                            , Toast.LENGTH_LONG).show();
+                                }
+                            });
         });
         mBtnCustomAuthenticate = findViewById(R.id.btn_authenticate_custom_authenticator);
+        mBtnCustomAuthenticate.setOnClickListener(v -> {
+            String optionsJsonString = "{\"challenge\":\"ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUo5LmV5SnlZVzVrSWpvaVducEpOMGR1VjA5bmNsUTJjWFpMVkdSeldFMXlRVlV5Tm10ak9WTjBNemxQUmpoQmFYUnplQ0lzSW1GMVpDSTZJakZyTFdSbGRpNHhhMjl6Ylc5ekxtNWxkQ0lzSW5OMVlpSTZJbWRoZFhKaGRpSXNJbWxrSWpvaU1IZHBSalp2UW1aSlVTMVlSSFI2YzFoT2MzRjVUMkUxWW1aNlNtbGtMVEl5WWpKS1luZGpiemhyUlNJc0ltVjRjQ0k2TVRZM056VTVOekEyT0gwLllmeHo0WmV5T1Z5aUV2NTE0b0ZXSXZfbG8xRkQtcjFCYUJkNmJuS1pPczg\",\"rpId\":\"1k-dev.1kosmos.net\",\"timeout\":60000,\"userVerification\":\"preferred\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"ShMYAcxmNPtprIEzb5YjV5F91C5Eb15ocIANFteToGG9P1dK3juyoLG51YoZ3nmSHgpc2oWWN-_UzeGn6JMN2A\"},{\"type\":\"public-key\",\"id\":\"dwIGA-saJeLndkNDFTSyqsH8EiQCaVIU3yRurpykX1SWo5EyYo9h7U8b3IPSWRvVvc13v3uUllvQ45F1FTgkAMLK5cxUg2VbEXHAeLH6PaG4ULVD3DqxdzHwhJoQLywwuic-KuZIRvfZ1vd_8qFKV5pbCsLQ93iM\"},{\"type\":\"public-key\",\"id\":\"L2E-azldNpWUkLEl2YreOWfzEt7JhvcGDJZilcF0c-D5ic_ZSSEMrVn4SQvu5DDsZ4x1hn4k3r0nHHU61vXNSw\"}],\"status\":\"ok\",\"errorMessage\":\"\"}";
+            Fido2AuthenticatorHelper.getInstance().
+                    authenticateFido2Key(this, "https://1k-dev.1kosmos.net",
+                            optionsJsonString, true,new Fido2AuthenticatorListner() {
+                                @Override
+                                public void onSuccess(String success) {
+                                    Toast.makeText(getApplicationContext(),
+                                            success
+                                            , Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onFailure(String message) {
+                                    Log.d("message:-", message);
+                                    Toast.makeText(getApplicationContext(),
+                                            message
+                                            , Toast.LENGTH_LONG).show();
+                                }
+                            });
+        });
     }
 
     /**
