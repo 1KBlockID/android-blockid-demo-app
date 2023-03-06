@@ -29,6 +29,7 @@ import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper;
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper.Fido2AuthenticatorListner;
+import com.onekosmos.fido2authenticator.utils.ErrorManager.ErrorResponse;
 
 /**
  * Created by 1Kosmos Engineering
@@ -157,9 +158,9 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(String message) {
+                                public void onFailure(ErrorResponse message) {
                                     Toast.makeText(getApplicationContext(),
-                                            message
+                                            message.getMessage()
                                             , Toast.LENGTH_LONG).show();
                                 }
                             });
@@ -178,10 +179,10 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(String message) {
-                                    Log.d("message:-", message);
+                                public void onFailure(ErrorResponse message) {
+                                    Log.d("message:-", message.getMessage());
                                     Toast.makeText(getApplicationContext(),
-                                            message
+                                            message.getMessage()
                                             , Toast.LENGTH_LONG).show();
                                 }
                             });
