@@ -29,7 +29,7 @@ import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper;
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper.Fido2AuthenticatorListner;
-import com.onekosmos.fido2authenticator.utils.ErrorManager.ErrorResponse;
+import com.onekosmos.fido2authenticator.utils.ErrorManager.FidoAuthnErrorResponse;
 
 /**
  * Created by 1Kosmos Engineering
@@ -158,7 +158,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(ErrorResponse message) {
+                                public void onFailure(FidoAuthnErrorResponse message) {
                                     Toast.makeText(getApplicationContext(),
                                             message.getMessage()
                                             , Toast.LENGTH_LONG).show();
@@ -179,7 +179,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(ErrorResponse message) {
+                                public void onFailure(FidoAuthnErrorResponse message) {
                                     Log.d("message:-", message.getMessage());
                                     Toast.makeText(getApplicationContext(),
                                             message.getMessage()
