@@ -31,7 +31,6 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
-import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
@@ -175,27 +174,40 @@ public class AuthenticatorActivity extends AppCompatActivity {
                             mAuthenticationPayloadV1 = new Gson().fromJson(
                                     result.getData().getStringExtra(K_AUTH_REQUEST_MODEL),
                                     AuthenticationPayloadV1.class);
-                            BIDGenericResponse response = BlockIDSDK.getInstance().getScopes(
+                            ProgressDialog progressDialog = new ProgressDialog(this);
+                            progressDialog.show();
+                            BlockIDSDK.getInstance().getScopes(
                                     null, mAuthenticationPayloadV1.scopes,
                                     mAuthenticationPayloadV1.creds,
                                     mAuthenticationPayloadV1.getOrigin(),
-                                    String.valueOf(mLatitude), String.valueOf(mLongitude));
-
-                            if (response != null) {
-                                LinkedHashMap<String, Object> mDisplayScopes = changeDisplayName(
-                                        response.getDataObject());
-                                if (mDisplayScopes != null) {
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    for (String key : mDisplayScopes.keySet()) {
-                                        stringBuilder.append(key).append(" : ").
-                                                append(mDisplayScopes.get(key)).
-                                                append("\n");
-                                    }
-                                    UserScopeAdapter mUserScopeAdapter = new UserScopeAdapter(
-                                            mDisplayScopes);
-                                    mRvUserScope.setAdapter(mUserScopeAdapter);
-                                }
-                            }
+                                    String.valueOf(mLatitude), String.valueOf(mLongitude),
+                                    (linkedHashMap, errorResponse) -> {
+                                        progressDialog.dismiss();
+                                        if (linkedHashMap != null) {
+                                            LinkedHashMap<String, Object> mDisplayScopes =
+                                                    changeDisplayName(linkedHashMap);
+                                            if (mDisplayScopes != null) {
+                                                StringBuilder stringBuilder = new StringBuilder();
+                                                for (String key : mDisplayScopes.keySet()) {
+                                                    stringBuilder.append(key).append(" : ").
+                                                            append(mDisplayScopes.get(key)).
+                                                            append("\n");
+                                                }
+                                                UserScopeAdapter mUserScopeAdapter =
+                                                        new UserScopeAdapter(mDisplayScopes);
+                                                mRvUserScope.setAdapter(mUserScopeAdapter);
+                                            }
+                                            return;
+                                        }
+                                        ErrorDialog errorDialog = new ErrorDialog(
+                                                AuthenticatorActivity.this);
+                                        errorDialog.show(null,
+                                                getString(R.string.label_error),
+                                                errorResponse.getMessage(), dialogInterface -> {
+                                                    errorDialog.dismiss();
+                                                    finish();
+                                                });
+                                    });
                         } else {
                             finish();
                         }
@@ -326,7 +338,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
                 authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
