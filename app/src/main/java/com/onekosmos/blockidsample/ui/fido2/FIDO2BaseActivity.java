@@ -148,7 +148,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
             Fido2AuthenticatorHelper.getInstance().
                     registerFido2Key(this, "https://1k-dev.1kosmos.net",
 
-                            optionsJsonString, new Fido2AuthenticatorListener() {
+                            optionsJsonString, "1111", new Fido2AuthenticatorListener() {
                                 @Override
                                 public void onSuccess(PublicKeyCREDS success) {
                                     Log.d("Sucess:-", success.getType());
@@ -159,6 +159,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onFailure(FidoAuthnErrorResponse message) {
+                                    Log.d("Failure:-", message.getMessage());
                                     Toast.makeText(getApplicationContext(),
                                             message.getMessage()
                                             , Toast.LENGTH_LONG).show();
@@ -170,7 +171,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
             String optionsJsonString = "{\"challenge\":\"ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUo5LmV5SnlZVzVrSWpvaVducEpOMGR1VjA5bmNsUTJjWFpMVkdSeldFMXlRVlV5Tm10ak9WTjBNemxQUmpoQmFYUnplQ0lzSW1GMVpDSTZJakZyTFdSbGRpNHhhMjl6Ylc5ekxtNWxkQ0lzSW5OMVlpSTZJbWRoZFhKaGRpSXNJbWxrSWpvaU1IZHBSalp2UW1aSlVTMVlSSFI2YzFoT2MzRjVUMkUxWW1aNlNtbGtMVEl5WWpKS1luZGpiemhyUlNJc0ltVjRjQ0k2TVRZM056VTVOekEyT0gwLllmeHo0WmV5T1Z5aUV2NTE0b0ZXSXZfbG8xRkQtcjFCYUJkNmJuS1pPczg\",\"rpId\":\"1k-dev.1kosmos.net\",\"timeout\":60000,\"userVerification\":\"preferred\",\"allowCredentials\":[{\"type\":\"public-key\",\"id\":\"ShMYAcxmNPtprIEzb5YjV5F91C5Eb15ocIANFteToGG9P1dK3juyoLG51YoZ3nmSHgpc2oWWN-_UzeGn6JMN2A\"},{\"type\":\"public-key\",\"id\":\"dwIGA-saJeLndkNDFTSyqsH8EiQCaVIU3yRurpykX1SWo5EyYo9h7U8b3IPSWRvVvc13v3uUllvQ45F1FTgkAMLK5cxUg2VbEXHAeLH6PaG4ULVD3DqxdzHwhJoQLywwuic-KuZIRvfZ1vd_8qFKV5pbCsLQ93iM\"},{\"type\":\"public-key\",\"id\":\"L2E-azldNpWUkLEl2YreOWfzEt7JhvcGDJZilcF0c-D5ic_ZSSEMrVn4SQvu5DDsZ4x1hn4k3r0nHHU61vXNSw\"},{\"type\":\"public-key\",\"id\":\"Bpfxe2O3qN73R0h-RszIARcFkZlVqQfaNWHjWzhc9TXeWLScou2AkVZyzZPK1FgRdyEe943pXIz-S3G3N8vxkw\"}],\"status\":\"ok\",\"errorMessage\":\"\"}";
             Fido2AuthenticatorHelper.getInstance().
                     authenticateFido2Key(this, "https://1k-dev.1kosmos.net",
-                            optionsJsonString, new Fido2AuthenticatorListener() {
+                            optionsJsonString, "1111", new Fido2AuthenticatorListener() {
                                 @Override
                                 public void onSuccess(PublicKeyCREDS success) {
                                     Log.d("Autheticate success:", success.getType());
