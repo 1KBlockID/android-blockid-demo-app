@@ -32,6 +32,8 @@ import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper.Fido2Auth
 import com.onekosmos.fido2authenticator.fido2.Fido2AuthenticatorHelper.PublicKeyCREDS;
 import com.onekosmos.fido2authenticator.utils.FidoErrorManager.FidoAuthnErrorResponse;
 
+import timber.log.Timber;
+
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
@@ -148,7 +150,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
             Fido2AuthenticatorHelper.getInstance().
                     registerFido2Key(this, "https://1k-dev.1kosmos.net",
 
-                            optionsJsonString, "1111", new Fido2AuthenticatorListener() {
+                            optionsJsonString,"1111",  new Fido2AuthenticatorListener() {
                                 @Override
                                 public void onSuccess(PublicKeyCREDS success) {
                                     Log.d("Sucess:-", success.getType());
@@ -174,7 +176,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                             optionsJsonString, "1111", new Fido2AuthenticatorListener() {
                                 @Override
                                 public void onSuccess(PublicKeyCREDS success) {
-                                    Log.d("Autheticate success:", success.getType());
+                                    Timber.tag("Authenticate success:").d(success.getType());
                                     Toast.makeText(getApplicationContext(),
                                             success.getId()
                                             , Toast.LENGTH_LONG).show();
@@ -182,7 +184,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onFailure(FidoAuthnErrorResponse message) {
-                                    Log.d("message:-", message.getMessage());
+                                    Timber.tag("message:-").d(message.getMessage());
                                     Toast.makeText(getApplicationContext(),
                                             message.getMessage()
                                             , Toast.LENGTH_LONG).show();

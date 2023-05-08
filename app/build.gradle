@@ -59,7 +59,6 @@ configurations.all {
 }
 
 dependencies {
-    implementation fileTree(dir: 'C:\\Users\\Gaurav Rane\\StudioProjects\\android-blockid-demo-app\\fido-release', include: ['*.aar', '*.jar'], exclude: [])
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
@@ -169,4 +168,7 @@ dependencies {
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.10.63F71431'
     // Animation
     implementation 'com.airbnb.android:lottie:3.7.0'
+
+    //fido2Authenticator
+    implementation "com.onekosmos.fido2authenticator:fido2authensdk:1.0.1.644FAE75"
 }

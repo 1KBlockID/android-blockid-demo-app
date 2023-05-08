@@ -20,6 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-include ':fido-release'
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
