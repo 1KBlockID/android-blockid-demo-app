@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
-        versionName "1.9.10" + "." + getCurrentTimestampHexValue()
+        versionName "1.9.30" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -165,5 +165,5 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.10.63F71431'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.30.6459F5DB'
 }

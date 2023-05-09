@@ -46,7 +46,6 @@ import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.AccountAuthConstants;
 import com.onekosmos.blockid.sdk.datamodel.BIDAccount;
-import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDOrigin;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
@@ -76,7 +75,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private QRScannerHelper mQRScannerHelper;
-    private String mMagicLink, mAcrPublicKey;
+    private String mMagicLink, mAcrPublicKey, mIAL;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -175,6 +174,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         mTxtPleaseWait = findViewById(R.id.txt_please_wait_add_user);
         mProgressBar = findViewById(R.id.progress_bar_add_user);
+
+        // Get IAL
+        BlockIDSDK.getInstance().getIAL((status, ialValue, error) -> mIAL = ialValue);
     }
 
     /**
@@ -294,13 +296,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         } catch (Exception ignored) {
         }
 
-        // Get IAL
-        String ial = null;
-        BIDGenericResponse bidGenericResponse = BlockIDSDK.getInstance().getIAL();
-        if (bidGenericResponse.getStatus()) {
-            ial = BlockIDSDK.getInstance().getIAL().getDataObject().toString();
-        }
-
         // Generate event data
         EventData eventData = new EventData();
         eventData.license_hash = BIDUtil.getSha256Hash(AppConstant.licenseKey);
@@ -310,7 +305,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         eventData.authenticator_os = "android";
         eventData.person_id = BlockIDSDK.getInstance().getDID();
         eventData.person_publickey = BlockIDSDK.getInstance().getPublicKey();
-        eventData.person_ial = ial;
+        eventData.person_ial = mIAL;
         eventData.user_ial = "";
         eventData.user_lat = String.valueOf(mLatitude);
         eventData.user_lon = String.valueOf(mLongitude);
@@ -331,7 +326,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         acrRequest.sender = AccountAuthConstants.K_AUTH_SENDER;
         acrRequest.code = code;
         acrRequest.os = "android";
-        acrRequest.ial = ial;
+        acrRequest.ial = mIAL;
         acrRequest.eventData = encryptEventData;
 
         String acrRequestString = BIDUtil.objectToJSONString(acrRequest, true);
