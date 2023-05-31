@@ -252,4 +252,11 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                     showResultDialog(R.drawable.icon_dialog_success, message);
                 });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
+    }
 }
