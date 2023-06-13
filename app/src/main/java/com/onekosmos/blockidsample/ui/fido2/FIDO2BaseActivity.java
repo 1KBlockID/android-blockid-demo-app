@@ -3,15 +3,18 @@ package com.onekosmos.blockidsample.ui.fido2;
 import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -37,10 +40,12 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     private final String K_FILE_NAME = "fido3.html";
     private AppCompatButton mBtnRegister, mBtnAuthenticate, mBtnRegisterPlatformAuthenticator,
             mBtnRegisterExternalAuthenticator, mBtnAuthenticatePlatformAuthenticator,
-            mBtnAuthenticateExternalAuthenticator;
+            mBtnAuthenticateExternalAuthenticator, mBtnRegisterExternalAuthenticatorWithPin,
+            mBtnAuthenticateExternalAuthenticatorWithPin;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
+
 
     // FIDO2Observer must initialize before onCreate()
     private final FIDO2Observer observer = new FIDO2Observer(this);
@@ -120,22 +125,60 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         mBtnRegisterPlatformAuthenticator = findViewById(
                 R.id.btn_register_platform_authenticator);
         mBtnRegisterPlatformAuthenticator.setOnClickListener(
-                view -> registerFIDO2(FIDO2KeyType.PLATFORM));
+                view -> registerFIDO2(FIDO2KeyType.PLATFORM, null));
 
         mBtnRegisterExternalAuthenticator = findViewById(
                 R.id.btn_register_external_authenticator);
         mBtnRegisterExternalAuthenticator.setOnClickListener(
-                view -> registerFIDO2(FIDO2KeyType.CROSS_PLATFORM));
+                view -> registerFIDO2(FIDO2KeyType.CROSS_PLATFORM, null));
 
         mBtnAuthenticatePlatformAuthenticator = findViewById(
                 R.id.btn_authenticate_platform_authenticator);
         mBtnAuthenticatePlatformAuthenticator.setOnClickListener(
-                view -> authenticateFIDO2(FIDO2KeyType.PLATFORM));
+                view -> authenticateFIDO2(FIDO2KeyType.PLATFORM, null));
 
         mBtnAuthenticateExternalAuthenticator = findViewById(
                 R.id.btn_authenticate_external_authenticator);
         mBtnAuthenticateExternalAuthenticator.setOnClickListener(
-                view -> authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM));
+                view -> authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM, null));
+
+        mBtnRegisterExternalAuthenticatorWithPin = findViewById(
+                R.id.btn_register_external_authenticator_with_pin);
+        mBtnRegisterExternalAuthenticatorWithPin.setOnClickListener(v -> {
+            openPasswordDailog(Fido2Operation.REGISTER);
+        });
+
+        mBtnAuthenticateExternalAuthenticatorWithPin = findViewById(
+                R.id.btn_authenticate_external_authenticator_with_pin);
+        mBtnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(v -> {
+            openPasswordDailog(Fido2Operation.AUTHENTICATE);
+        });
+    }
+
+    private void openPasswordDailog(Fido2Operation operation) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle(R.string.label_security_key_password);
+        dialogBuilder.setCancelable(false);
+        dialogBuilder.setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        AlertDialog alertDialog = dialogBuilder.create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        alertDialog.setView(inflater.inflate(R.layout.alert_label_editor, null));
+        alertDialog.show();
+        alertDialog.setOnDismissListener(dialog -> {
+            AppCompatEditText passwordEditText = alertDialog.findViewById(R.id.edtxt_password);
+            String password = passwordEditText.getText().toString();
+            if (operation.equals(Fido2Operation.REGISTER))
+                registerFIDO2(FIDO2KeyType.CROSS_PLATFORM, password);
+            else
+                authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM, password);
+        });
+    }
+
+    private enum Fido2Operation {
+        REGISTER,
+        AUTHENTICATE
     }
 
     /**
@@ -160,7 +203,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
         };
-        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+        if (error.getMessage() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getMessage()) {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
@@ -191,7 +234,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     /**
      * Register FIDO2 key
      */
-    private void registerFIDO2(FIDO2KeyType keyType) {
+    private void registerFIDO2(FIDO2KeyType keyType, String securityKeyPin) {
         if (!validateUserName(mEtUserName.getText().toString())) {
             return;
         }
@@ -203,6 +246,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 AppConstant.clientTenant.getCommunity(),
                 keyType,
                 observer,
+                securityKeyPin,
                 (status, errorResponse) -> {
                     mProgressDialog.dismiss();
                     if (!status) {
@@ -223,7 +267,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     /**
      * Authenticate FIDO2 key
      */
-    private void authenticateFIDO2(FIDO2KeyType keyType) {
+    private void authenticateFIDO2(FIDO2KeyType keyType, String securityKeyPin) {
         if (!validateUserName(mEtUserName.getText().toString())) {
             return;
         }
@@ -235,6 +279,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 AppConstant.clientTenant.getCommunity(),
                 keyType,
                 observer,
+                securityKeyPin,
                 (status, errorResponse) -> {
                     mProgressDialog.dismiss();
                     if (!status) {

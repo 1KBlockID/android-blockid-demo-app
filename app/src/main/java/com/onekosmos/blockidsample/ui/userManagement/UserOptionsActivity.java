@@ -3,15 +3,18 @@ package com.onekosmos.blockidsample.ui.userManagement;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
@@ -42,6 +45,7 @@ public class UserOptionsActivity extends AppCompatActivity {
     // FIDO2Observer must initialize before onCreate()
     private final FIDO2Observer observer = new FIDO2Observer(this);
     private FIDO2KeyType mAuthenticationFido2KeyType;
+    private boolean isPinRequired;
 
     private final ActivityResultLauncher<Intent> scanQRActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -50,7 +54,10 @@ public class UserOptionsActivity extends AppCompatActivity {
                             AuthenticationPayloadV1 authenticationPayload = new Gson().fromJson(
                                     result.getData().getStringExtra("K_AUTH_REQUEST_MODEL"),
                                     AuthenticationPayloadV1.class);
-                            authenticate(authenticationPayload);
+                            if (isPinRequired)
+                                openPasswordDailog(authenticationPayload, Fido2Operation.AUTHENTICATE);
+                            else
+                                authenticate(authenticationPayload, null);
                         }
                     });
 
@@ -91,7 +98,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         AppCompatButton btnRegisterExternalAuthenticator = findViewById(
                 R.id.btn_register_external_authenticator);
         btnRegisterExternalAuthenticator.setOnClickListener(
-                view -> registerExternalAuthenticator());
+                view -> registerExternalAuthenticator(null));
 
         AppCompatButton btnAuthenticatePlatformAuthenticator = findViewById(
                 R.id.btn_authenticate_platform_authenticator);
@@ -101,10 +108,54 @@ public class UserOptionsActivity extends AppCompatActivity {
         AppCompatButton btnAuthenticateExternalAuthenticator = findViewById(
                 R.id.btn_authenticate_external_authenticator);
         btnAuthenticateExternalAuthenticator.setOnClickListener(
-                view -> authenticateExternalAuthenticator());
+                view -> {
+                    isPinRequired = false;
+                    authenticateExternalAuthenticator();
+                });
+
+        AppCompatButton btnRegisterExternalAuthenticatorWithPin = findViewById(
+                R.id.btn_register_external_authenticator_with_pin);
+        btnRegisterExternalAuthenticatorWithPin.setOnClickListener(
+                view -> openPasswordDailog(null, Fido2Operation.REGISTER));
+
+        AppCompatButton btnAuthenticateExternalAuthenticatorWithPin = findViewById(
+                R.id.btn_authenticate_external_authenticator_with_pin);
+        btnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(
+                view -> {
+                    isPinRequired = true;
+                    authenticateExternalAuthenticator();
+                });
 
         AppCompatButton btnRemoveAccount = findViewById(R.id.btn_remove_account);
         btnRemoveAccount.setOnClickListener(view -> removeAccount());
+    }
+
+    private void openPasswordDailog(AuthenticationPayloadV1 authenticationPayload,
+                                    Fido2Operation operation)
+    {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle(R.string.label_security_key_password);
+        dialogBuilder.setCancelable(false);
+        dialogBuilder.setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        AlertDialog alertDialog = dialogBuilder.create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        alertDialog.setView(inflater.inflate(R.layout.alert_label_editor, null));
+        alertDialog.show();
+        alertDialog.setOnDismissListener(dialog -> {
+            AppCompatEditText passwordEditText = alertDialog.findViewById(R.id.edtxt_password);
+            String password = passwordEditText.getText().toString();
+            if (operation.equals(Fido2Operation.REGISTER))
+                registerExternalAuthenticator(password);
+            else
+                authenticate(authenticationPayload, password);
+        });
+    }
+
+    private enum Fido2Operation {
+        REGISTER,
+        AUTHENTICATE
     }
 
     /**
@@ -118,7 +169,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
 
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccounts.get(0),
-                FIDO2KeyType.PLATFORM, null, (status, error) -> {
+                FIDO2KeyType.PLATFORM, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this, getString(
@@ -133,7 +184,7 @@ public class UserOptionsActivity extends AppCompatActivity {
     /**
      * Register FIDO2 external authenticator
      */
-    private void registerExternalAuthenticator() {
+    private void registerExternalAuthenticator(String securityKeyPin) {
         BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
         List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
 
@@ -143,7 +194,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         // FIDO2Observer must initialize before onCreate()
         // FIDO2Observer must not null
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccounts.get(0),
-                FIDO2KeyType.CROSS_PLATFORM, observer, (status, error) -> {
+                FIDO2KeyType.CROSS_PLATFORM, securityKeyPin, observer, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this, getString(
@@ -174,7 +225,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
-    private void authenticate(AuthenticationPayloadV1 payload) {
+    private void authenticate(AuthenticationPayloadV1 payload, String securityKeyPin) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         LinkedHashMap<String, Object> metadata = null;
@@ -185,7 +236,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
                 observer, null, payload.session, payload.sessionURL, payload.scopes, metadata,
                 payload.creds, payload.getOrigin(), null, null,
-                BuildConfig.VERSION_NAME, (status, error) -> {
+                BuildConfig.VERSION_NAME, securityKeyPin, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this,
