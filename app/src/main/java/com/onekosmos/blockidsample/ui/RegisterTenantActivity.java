@@ -65,7 +65,6 @@ public class RegisterTenantActivity extends AppCompatActivity {
             progressDialog.dismiss();
             mBtnRegisterTenant.setClickable(true);
             if (status) {
-                BlockIDSDK.getInstance().setDvcId(AppConstant.dvcId);
                 BlockIDSDK.getInstance().commitApplicationWallet();
                 updateAuthUi();
                 return;

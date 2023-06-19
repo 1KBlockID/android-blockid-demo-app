@@ -6,40 +6,38 @@
     android:layout_height="match_parent"
     tools:context=".ui.liveID.PassiveLiveIDScanningActivity">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_liveid_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dimen_15dp"
-        android:layout_marginTop="@dimen/dimen_10dp"
-        android:text="@string/label_enroll_liveid"
-        android:textColor="@color/black"
-        android:textSize="@dimen/dimen_28sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_back"
-        tools:ignore="MissingConstraints" />
-
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/img_back"
+        android:id="@+id/img_back_liveid_passive"
         android:layout_width="@dimen/dimen_25dp"
         android:layout_height="@dimen/dimen_25dp"
         android:layout_marginStart="@dimen/dimen_10dp"
         android:layout_marginTop="@dimen/dimen_15dp"
         android:padding="@dimen/dimen_5dp"
         android:src="@drawable/icon_backarrow"
-        android:tint="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_back"
+        android:id="@+id/txt_back_liveid_passive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_15dp"
         android:text="@string/label_back"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_16sp"
-        app:layout_constraintBottom_toBottomOf="@id/img_back"
-        app:layout_constraintStart_toEndOf="@id/img_back"
-        app:layout_constraintTop_toTopOf="@id/img_back" />
+        app:layout_constraintBottom_toBottomOf="@id/img_back_liveid_passive"
+        app:layout_constraintStart_toEndOf="@id/img_back_liveid_passive"
+        app:layout_constraintTop_toTopOf="@id/img_back_liveid_passive" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title_liveid_passive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text="@string/label_enroll_liveid"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/txt_back_liveid_passive"
+        app:layout_constraintStart_toEndOf="@id/txt_back_liveid_passive"
+        app:layout_constraintTop_toTopOf="@id/txt_back_liveid_passive" />
 </androidx.constraintlayout.widget.ConstraintLayout>

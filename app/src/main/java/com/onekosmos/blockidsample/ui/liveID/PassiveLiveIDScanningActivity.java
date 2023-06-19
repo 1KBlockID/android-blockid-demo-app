@@ -87,10 +87,10 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
      */
     private void initView() {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
-        mImgBack = findViewById(R.id.img_back);
+        mImgBack = findViewById(R.id.img_back_liveid_passive);
         mImgBack.setOnClickListener(view -> onBackPressed());
 
-        mTxtBack = findViewById(R.id.txt_back);
+        mTxtBack = findViewById(R.id.txt_back_liveid_passive);
         mTxtBack.setOnClickListener(view -> onBackPressed());
     }
 
@@ -99,9 +99,7 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
      * Implement ILiveIDResponseListener interface for the Activity
      */
     private void startLiveIDScan() {
-        mLiveIDScannerHelper = new LiveIDScannerHelper(PassiveLiveIDScanningActivity.this, (bitmap, s, errorResponse) -> {
-
-        });
+        mLiveIDScannerHelper = new LiveIDScannerHelper(this, this);
         mLiveIDScannerHelper.startLiveIDScanning();
     }
 
@@ -135,7 +133,7 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
                 return;
             }
 
-            // LiveID liveness check failed, Get error object and show it
+            // LiveID liveness check failed, Get error message and code and show it
             String stringError = (error.getObject() != null) ? error.getObject() : "";
             errorDialog.show(null, getString(R.string.label_error), "(" + error.getCode() + ") " +
                     error.getMessage() + "\n" + stringError, onDismissListener);
