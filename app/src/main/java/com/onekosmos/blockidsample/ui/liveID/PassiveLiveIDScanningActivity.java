@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample.ui.liveID;
 
 import static android.Manifest.permission.CAMERA;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 import android.content.DialogInterface.OnDismissListener;
 import android.graphics.Bitmap;
@@ -129,7 +130,7 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
             }
 
             // Liveness check API call failed because of device is offline
-            if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
             }
@@ -166,7 +167,7 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
                         };
 
                         // show offline error
-                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+                        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
                             errorDialog.showNoInternetDialog(onDismissListener);
                             return;
                         }

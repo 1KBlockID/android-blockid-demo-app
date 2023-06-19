@@ -1,50 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_verify_liveId"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_liveid_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dimen_15dp"
-        android:layout_marginTop="@dimen/dimen_10dp"
-        android:text="@string/label_enroll_liveid"
-        android:textColor="@color/black"
-        android:textSize="@dimen/dimen_28sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_back"
-        tools:ignore="MissingConstraints" />
-
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/img_back"
+        android:id="@+id/img_back_liveid_active"
         android:layout_width="@dimen/dimen_25dp"
         android:layout_height="@dimen/dimen_25dp"
         android:layout_marginStart="@dimen/dimen_10dp"
         android:layout_marginTop="@dimen/dimen_15dp"
         android:padding="@dimen/dimen_5dp"
         android:src="@drawable/icon_backarrow"
-        android:tint="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_back"
+        android:id="@+id/txt_back_liveid_active"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_15dp"
         android:text="@string/label_back"
         android:textColor="@color/black"
         android:textSize="@dimen/dimen_16sp"
-        app:layout_constraintBottom_toBottomOf="@id/img_back"
-        app:layout_constraintStart_toEndOf="@id/img_back"
-        app:layout_constraintTop_toTopOf="@id/img_back" />
+        app:layout_constraintBottom_toBottomOf="@id/img_back_liveid_active"
+        app:layout_constraintStart_toEndOf="@id/img_back_liveid_active"
+        app:layout_constraintTop_toTopOf="@id/img_back_liveid_active" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title_liveid_active"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text="@string/label_enroll_liveid"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/txt_back_liveid_active"
+        app:layout_constraintStart_toEndOf="@id/txt_back_liveid_active"
+        app:layout_constraintTop_toTopOf="@id/txt_back_liveid_active" />
 
     <LinearLayout
-        android:id="@+id/layout_scanner_view"
+        android:id="@+id/layout_scanner_view_liveid_active"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_15dp"
@@ -54,26 +51,26 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
-            android:id="@+id/bid_scanner_view"
+            android:id="@+id/scanner_view_liveid_active"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/view_overlay"
+        android:id="@+id/view_overlay_liveid_active"
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="@dimen/dimen_0dp"
         android:scaleType="centerCrop"
         android:src="@drawable/group_3"
         android:tint="@color/misc2"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/layout_scanner_view"
-        app:layout_constraintEnd_toEndOf="@+id/layout_scanner_view"
-        app:layout_constraintStart_toStartOf="@+id/layout_scanner_view"
-        app:layout_constraintTop_toTopOf="@+id/layout_scanner_view" />
+        app:layout_constraintBottom_toBottomOf="@+id/layout_scanner_view_liveid_active"
+        app:layout_constraintEnd_toEndOf="@+id/layout_scanner_view_liveid_active"
+        app:layout_constraintStart_toStartOf="@+id/layout_scanner_view_liveid_active"
+        app:layout_constraintTop_toTopOf="@+id/layout_scanner_view_liveid_active" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_message"
+        android:id="@+id/txt_message_liveid_active"
         android:layout_width="@dimen/dimen_214dp"
         android:layout_height="@dimen/dimen_40dp"
         android:layout_marginBottom="@dimen/dimen_20dp"
@@ -82,12 +79,12 @@
         android:textAllCaps="false"
         android:textSize="@dimen/dimen_14sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/layout_scanner_view"
-        app:layout_constraintEnd_toEndOf="@+id/layout_scanner_view"
-        app:layout_constraintStart_toStartOf="@+id/layout_scanner_view" />
+        app:layout_constraintBottom_toBottomOf="@+id/layout_scanner_view_liveid_active"
+        app:layout_constraintEnd_toEndOf="@+id/layout_scanner_view_liveid_active"
+        app:layout_constraintStart_toStartOf="@+id/layout_scanner_view_liveid_active" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_cancel"
+        android:id="@+id/btn_cancel_liveid_active"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/dimen_20dp"

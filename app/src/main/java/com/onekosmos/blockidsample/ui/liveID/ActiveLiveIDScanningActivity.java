@@ -36,8 +36,8 @@ import java.util.LinkedHashMap;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-@SuppressWarnings("ALL")
-public class ActiveLiveIDScanningActivity extends AppCompatActivity implements View.OnClickListener,
+@SuppressWarnings("FieldCanBeLocal")
+public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
         ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
@@ -50,7 +50,7 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
     private BIDScannerView mBIDScannerView;
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private ProgressDialog mProgressDialog;
-    private boolean mIsFromAuthentication; // LiveID scanning started for authentication purpose
+    private boolean mIsFromAuthentication; // Is LiveID scanning started for authentication purpose
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,18 +86,6 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.img_back:
-            case R.id.txt_back:
-            case R.id.btn_cancel:
-                setResult(RESULT_CANCELED);
-                finish();
-                break;
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -109,7 +97,8 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
             // Show error camera permission is not granted
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null, null,
-                    getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
+                    getString(R.string.label_liveid_camera_permission_alert),
+                    dialog -> finish());
         }
     }
 
@@ -118,23 +107,32 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
      */
     private void initViews() {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
-        mBIDScannerView = findViewById(R.id.bid_scanner_view);
-        mScannerOverlay = findViewById(R.id.view_overlay);
+        mBIDScannerView = findViewById(R.id.scanner_view_liveid_active);
+        mScannerOverlay = findViewById(R.id.view_overlay_liveid_active);
         mBIDScannerView.setScannerWidthMargin(mScannerOverlayMargin, mScannerOverlay);
-        mTxtTitle = findViewById(R.id.txt_liveid_title);
+        mTxtTitle = findViewById(R.id.txt_title_liveid_active);
 
         if (mIsFromAuthentication)
             mTxtTitle.setText(R.string.label_verify_liveid);
 
-        mTxtMessage = findViewById(R.id.txt_message);
-        mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(this);
+        mTxtMessage = findViewById(R.id.txt_message_liveid_active);
+        mImgBack = findViewById(R.id.img_back_liveid_active);
+        mImgBack.setOnClickListener(view -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
 
-        mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(this);
+        mTxtBack = findViewById(R.id.txt_back_liveid_active);
+        mTxtBack.setOnClickListener(view -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
 
-        mBtnCancel = findViewById(R.id.btn_cancel);
-        mBtnCancel.setOnClickListener(this);
+        mBtnCancel = findViewById(R.id.btn_cancel_liveid_active);
+        mBtnCancel.setOnClickListener(view -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
     }
 
     /**
@@ -189,7 +187,7 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
 
         // LiveID scanned successful
 
-        // Activity started for authentication, call verify LiveID
+        // Activity started for authentication purpose, call verify LiveID
         if (mIsFromAuthentication) {
             verifyLiveID(liveIDBitmap);
             return;
@@ -211,7 +209,6 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
         // Show face expression message
         // show focused view
         showFaceFocusedViews();
-//        mLayoutMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setVisibility(View.VISIBLE);
         mTxtMessage.setText(getMessageForExpression(expression));
     }
@@ -345,12 +342,11 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements V
      * @param bitmap LiveID image received from LiveID scanner
      */
     private void verifyLiveID(Bitmap bitmap) {
-        mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
+        mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mProgressDialog.show();
         BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (status, error) -> {
             mProgressDialog.dismiss();
-
-            //  Verify LiveID failed
+            // LiveID verification failed
             if (!status) {
                 // show error
                 showError(error);
