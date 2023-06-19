@@ -78,7 +78,8 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
             // Show error camera permission is not granted
             ErrorDialog errorDialog = new ErrorDialog(this);
             errorDialog.show(null, null,
-                    getString(R.string.label_liveid_camera_permission_alert), dialog -> finish());
+                    getString(R.string.label_liveid_camera_permission_alert),
+                    dialog -> finish());
         }
     }
 
@@ -142,14 +143,6 @@ public class PassiveLiveIDScanningActivity extends AppCompatActivity
 
         // LiveID scanned successful and register LiveID
         registerLiveID(liveIDBitmap);
-    }
-
-    // LiveID Liveness check is in progress
-    @Override
-    public void onLivenessCheckStarted() {
-        if (!isFinishing()) {
-            mProgressDialog.show();
-        }
     }
 
     /**
