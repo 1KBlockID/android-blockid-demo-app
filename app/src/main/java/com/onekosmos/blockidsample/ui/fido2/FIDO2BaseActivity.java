@@ -22,7 +22,6 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.fido2.FIDO2Observer;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -45,10 +44,6 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
-
-
-    // FIDO2Observer must initialize before onCreate()
-    private final FIDO2Observer observer = new FIDO2Observer(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,17 +140,17 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         mBtnRegisterExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_register_external_authenticator_with_pin);
         mBtnRegisterExternalAuthenticatorWithPin.setOnClickListener(v -> {
-            openPasswordDailog(Fido2Operation.REGISTER);
+            openPasswordDialog(Fido2Operation.REGISTER);
         });
 
         mBtnAuthenticateExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_authenticate_external_authenticator_with_pin);
         mBtnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(v -> {
-            openPasswordDailog(Fido2Operation.AUTHENTICATE);
+            openPasswordDialog(Fido2Operation.AUTHENTICATE);
         });
     }
 
-    private void openPasswordDailog(Fido2Operation operation) {
+    private void openPasswordDialog(Fido2Operation operation) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.label_security_key_password);
         dialogBuilder.setCancelable(false);
@@ -245,7 +240,6 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 AppConstant.clientTenant.getDns(),
                 AppConstant.clientTenant.getCommunity(),
                 keyType,
-                observer,
                 securityKeyPin,
                 (status, errorResponse) -> {
                     mProgressDialog.dismiss();
@@ -273,12 +267,12 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         }
 
         mProgressDialog.show();
+
         BlockIDSDK.getInstance().authenticateFIDO2Key(this,
                 mEtUserName.getText().toString(),
                 AppConstant.clientTenant.getDns(),
                 AppConstant.clientTenant.getCommunity(),
                 keyType,
-                observer,
                 securityKeyPin,
                 (status, errorResponse) -> {
                     mProgressDialog.dismiss();

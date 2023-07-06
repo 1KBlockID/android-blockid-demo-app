@@ -42,8 +42,6 @@ import java.util.Objects;
  */
 public class UserOptionsActivity extends AppCompatActivity {
     private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
-    // FIDO2Observer must initialize before onCreate()
-    private final FIDO2Observer observer = new FIDO2Observer(this);
     private FIDO2KeyType mAuthenticationFido2KeyType;
     private boolean isPinRequired;
 
@@ -131,8 +129,7 @@ public class UserOptionsActivity extends AppCompatActivity {
     }
 
     private void openPasswordDailog(AuthenticationPayloadV1 authenticationPayload,
-                                    Fido2Operation operation)
-    {
+                                    Fido2Operation operation) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.label_security_key_password);
         dialogBuilder.setCancelable(false);
@@ -168,8 +165,9 @@ public class UserOptionsActivity extends AppCompatActivity {
         BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();
         List<BIDLinkedAccount> linkedAccounts = response.getDataObject();
 
+        // For platform authenticator security pin will be empty string
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccounts.get(0),
-                FIDO2KeyType.PLATFORM, null, null, (status, error) -> {
+                FIDO2KeyType.PLATFORM, "", (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this, getString(
@@ -191,10 +189,8 @@ public class UserOptionsActivity extends AppCompatActivity {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
 
-        // FIDO2Observer must initialize before onCreate()
-        // FIDO2Observer must not null
         BlockIDSDK.getInstance().registerFIDO2Key(this, linkedAccounts.get(0),
-                FIDO2KeyType.CROSS_PLATFORM, securityKeyPin, observer, (status, error) -> {
+                FIDO2KeyType.CROSS_PLATFORM, securityKeyPin, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this, getString(
@@ -233,10 +229,11 @@ public class UserOptionsActivity extends AppCompatActivity {
             metadata = new LinkedHashMap<>();
             metadata.put(K_WEBAUTHN_CHALLENGE, payload.metadata.webauthn_challenge);
         }
+
         BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
-                observer, null, payload.session, payload.sessionURL, payload.scopes, metadata,
-                payload.creds, payload.getOrigin(), null, null,
-                BuildConfig.VERSION_NAME, securityKeyPin, (status, error) -> {
+                securityKeyPin, null, payload.session, payload.sessionURL, payload.scopes,
+                metadata, payload.creds, payload.getOrigin(), null, null,
+                BuildConfig.VERSION_NAME, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this,

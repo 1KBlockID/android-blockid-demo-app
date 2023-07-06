@@ -175,5 +175,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.50.64A27686'
+//    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.50.64A27686'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.50.pankti.64A67403'
 }
