@@ -55,17 +55,6 @@ configurations.all {
         if (details.requested.group == 'org.bouncycastle') {
             details.useTarget 'org.bouncycastle:bcprov-jdk15to18:1.70'
         }
-
-        //For kotlin
-        def kotlinVersion = "1.8.10"
-        def requested = details.requested
-        if (requested.group == 'org.jetbrains.kotlin') {
-            List<String> list = ['kotlin-stdlib', 'kotlin-stdlib-jdk7', 'kotlin-stdlib-jdk8',
-                                 'kotlin-stdlib-common']
-            if (list.contains(requested.name)) {
-                details.useVersion kotlinVersion
-            }
-        }
     }
 }
 
@@ -170,9 +159,6 @@ dependencies {
     implementation("com.walletconnect:sign:2.0.0-rc.5")
     implementation("com.walletconnect:android-core:1.0.0")
     implementation 'org.web3j:utils:5.0.0'
-
-    // Native FIDO2 External
-    implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     // BlockID SDK
 //    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.50.64A27686'

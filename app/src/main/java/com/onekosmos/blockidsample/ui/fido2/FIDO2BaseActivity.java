@@ -1,20 +1,23 @@
 package com.onekosmos.blockidsample.ui.fido2;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
+import static org.apache.commons.codec.language.bm.Rule.ALL;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,6 +36,8 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
  * Created by 1Kosmos Engineering
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
+
+@SuppressWarnings(ALL)
 public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     // html file to show UI/UX as per app design
@@ -139,35 +144,38 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
         mBtnRegisterExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_register_external_authenticator_with_pin);
-        mBtnRegisterExternalAuthenticatorWithPin.setOnClickListener(v -> {
-            openPasswordDialog(Fido2Operation.REGISTER);
-        });
+        mBtnRegisterExternalAuthenticatorWithPin.setOnClickListener(
+                view -> showPINInputDialog(Fido2Operation.REGISTER));
 
         mBtnAuthenticateExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_authenticate_external_authenticator_with_pin);
-        mBtnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(v -> {
-            openPasswordDialog(Fido2Operation.AUTHENTICATE);
-        });
+        mBtnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(
+                view -> showPINInputDialog(Fido2Operation.AUTHENTICATE));
     }
 
-    private void openPasswordDialog(Fido2Operation operation) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.label_security_key_password);
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
-        });
-        AlertDialog alertDialog = dialogBuilder.create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        alertDialog.setView(inflater.inflate(R.layout.alert_label_editor, null));
-        alertDialog.show();
-        alertDialog.setOnDismissListener(dialog -> {
-            AppCompatEditText passwordEditText = alertDialog.findViewById(R.id.edtxt_password);
-            String password = passwordEditText.getText().toString();
+    /**
+     * Show Enter Security PIN Dialog
+     *
+     * @param operation {@link Fido2Operation}
+     */
+    private void showPINInputDialog(Fido2Operation operation) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_pin_input);
+
+        TextInputEditText edtEnterPin = dialog.findViewById(R.id.edt_enter_pin);
+        AppCompatButton btnCancel = dialog.findViewById(R.id.btn_dialog_pin_input_cancel);
+        btnCancel.setOnClickListener(view -> dialog.dismiss());
+        dialog.show();
+
+        AppCompatButton btnVerify = dialog.findViewById(R.id.btn_dialog_pin_input_verify);
+        btnVerify.setOnClickListener(view -> {
+            String securityPin = edtEnterPin.getEditableText().toString();
             if (operation.equals(Fido2Operation.REGISTER))
-                registerFIDO2(FIDO2KeyType.CROSS_PLATFORM, password);
+                registerFIDO2(FIDO2KeyType.CROSS_PLATFORM, securityPin);
             else
-                authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM, password);
+                authenticateFIDO2(FIDO2KeyType.CROSS_PLATFORM, securityPin);
+
+            dialog.dismiss();
         });
     }
 
@@ -195,10 +203,9 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
     private void showError(ErrorManager.ErrorResponse error) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-            errorDialog.dismiss();
-        };
-        if (error.getMessage() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getMessage()) {
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                errorDialog.dismiss();
+        if (error.getMessage().equalsIgnoreCase(K_CONNECTION_ERROR.getMessage())) {
             errorDialog.showNoInternetDialog(onDismissListener);
             return;
         }
@@ -214,9 +221,16 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     private void hideKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) this.
                 getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null && inputMethodManager.isAcceptingText())
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().
-                    getWindowToken(), 0);
+        View view = FIDO2BaseActivity.this.getCurrentFocus();
+        if (view == null) {
+            return;
+        }
+
+        if (inputMethodManager != null && inputMethodManager.isAcceptingText()) {
+            IBinder binder = view.getWindowToken();
+            if (binder != null)
+                inputMethodManager.hideSoftInputFromWindow(binder, 0);
+        }
     }
 
     private void showResultDialog(int imageId, String subMessage) {
@@ -229,7 +243,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     /**
      * Register FIDO2 key
      */
-    private void registerFIDO2(FIDO2KeyType keyType, String securityKeyPin) {
+    private void registerFIDO2(FIDO2KeyType keyType, @Nullable String securityKeyPin) {
         if (!validateUserName(mEtUserName.getText().toString())) {
             return;
         }
@@ -261,7 +275,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     /**
      * Authenticate FIDO2 key
      */
-    private void authenticateFIDO2(FIDO2KeyType keyType, String securityKeyPin) {
+    private void authenticateFIDO2(FIDO2KeyType keyType, @Nullable String securityKeyPin) {
         if (!validateUserName(mEtUserName.getText().toString())) {
             return;
         }
@@ -292,6 +306,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 });
     }
 
+    // FIXME TBD
     @Override
     protected void onResume() {
         super.onResume();

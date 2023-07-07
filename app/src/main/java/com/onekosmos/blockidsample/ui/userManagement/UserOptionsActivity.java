@@ -3,28 +3,27 @@ package com.onekosmos.blockidsample.ui.userManagement;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
-import com.onekosmos.blockid.sdk.fido2.FIDO2Observer;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticationPayloadV1;
@@ -53,7 +52,8 @@ public class UserOptionsActivity extends AppCompatActivity {
                                     result.getData().getStringExtra("K_AUTH_REQUEST_MODEL"),
                                     AuthenticationPayloadV1.class);
                             if (isPinRequired)
-                                openPasswordDailog(authenticationPayload, Fido2Operation.AUTHENTICATE);
+                                showPINInputDialog(authenticationPayload,
+                                        Fido2Operation.AUTHENTICATE);
                             else
                                 authenticate(authenticationPayload, null);
                         }
@@ -114,7 +114,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         AppCompatButton btnRegisterExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_register_external_authenticator_with_pin);
         btnRegisterExternalAuthenticatorWithPin.setOnClickListener(
-                view -> openPasswordDailog(null, Fido2Operation.REGISTER));
+                view -> showPINInputDialog(null, Fido2Operation.REGISTER));
 
         AppCompatButton btnAuthenticateExternalAuthenticatorWithPin = findViewById(
                 R.id.btn_authenticate_external_authenticator_with_pin);
@@ -128,25 +128,25 @@ public class UserOptionsActivity extends AppCompatActivity {
         btnRemoveAccount.setOnClickListener(view -> removeAccount());
     }
 
-    private void openPasswordDailog(AuthenticationPayloadV1 authenticationPayload,
+    private void showPINInputDialog(AuthenticationPayloadV1 authenticationPayload,
                                     Fido2Operation operation) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.label_security_key_password);
-        dialogBuilder.setCancelable(false);
-        dialogBuilder.setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
-        });
-        AlertDialog alertDialog = dialogBuilder.create();
-        LayoutInflater inflater = this.getLayoutInflater();
-        alertDialog.setView(inflater.inflate(R.layout.alert_label_editor, null));
-        alertDialog.show();
-        alertDialog.setOnDismissListener(dialog -> {
-            AppCompatEditText passwordEditText = alertDialog.findViewById(R.id.edtxt_password);
-            String password = passwordEditText.getText().toString();
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_pin_input);
+
+        TextInputEditText edtEnterPin = dialog.findViewById(R.id.edt_enter_pin);
+        AppCompatButton btnCancel = dialog.findViewById(R.id.btn_dialog_pin_input_cancel);
+        btnCancel.setOnClickListener(view -> dialog.dismiss());
+        dialog.show();
+
+        AppCompatButton btnVerify = dialog.findViewById(R.id.btn_dialog_pin_input_verify);
+        btnVerify.setOnClickListener(view -> {
+            String securityPin = edtEnterPin.getEditableText().toString();
             if (operation.equals(Fido2Operation.REGISTER))
-                registerExternalAuthenticator(password);
+                registerExternalAuthenticator(securityPin);
             else
-                authenticate(authenticationPayload, password);
+                authenticate(authenticationPayload, securityPin);
+
+            dialog.dismiss();
         });
     }
 
@@ -221,7 +221,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
-    private void authenticate(AuthenticationPayloadV1 payload, String securityKeyPin) {
+    private void authenticate(AuthenticationPayloadV1 payload, @Nullable String securityKeyPin) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         LinkedHashMap<String, Object> metadata = null;
@@ -229,7 +229,6 @@ public class UserOptionsActivity extends AppCompatActivity {
             metadata = new LinkedHashMap<>();
             metadata.put(K_WEBAUTHN_CHALLENGE, payload.metadata.webauthn_challenge);
         }
-
         BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
                 securityKeyPin, null, payload.session, payload.sessionURL, payload.scopes,
                 metadata, payload.creds, payload.getOrigin(), null, null,
