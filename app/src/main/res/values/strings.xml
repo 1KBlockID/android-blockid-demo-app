@@ -159,6 +159,11 @@
 
     <string name="label_register_security_key">Register (Security Key)</string>
     <string name="label_authenticate_security_key">Authenticate (Security Key)</string>
+    <string name="label_register_security_key_with_pin">Register (Security Key with Pin)</string>
+    <string name="label_authenticate_security_key_with_pin">Authenticate (Security Key with Pin)</string>
+    <string name="label_pin_verification_required">PIN Verification required</string>
+    <string name="label_enter_the_key_pin">Enter the key PIN</string>
+    <string name="label_verify">Verify</string>
 
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
@@ -189,8 +194,10 @@
     <string name="label_welcome">Welcome</string>
     <string name="label_register_platform_authenticator">Register (Platform Authenticator)</string>
     <string name="label_register_external_authenticator">Register (External Authenticator)</string>
+    <string name="label_register_external_authenticator_with_pin">Register (External Authenticator with PIN)</string>
     <string name="label_authenticate_platform_authenticator">Authenticate (Platform Authenticator)</string>
     <string name="label_authenticate_external_authenticator">Authenticate (External Authenticator)</string>
+    <string name="label_authenticate_external_authenticator_with_pin">Authenticate (External Authenticator with PIN)</string>
     <string name="label_remove_account">Remove Account</string>
     <string name="label_register_platform_authenticator_successful">Your account is registered as platform authenticator successfully.</string>
     <string name="label_register_external_authenticator_successful">Your account is registered as external authenticator successfully.</string>
