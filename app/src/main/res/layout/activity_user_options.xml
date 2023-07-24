@@ -94,6 +94,38 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_register_external_authenticator" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_register_external_authenticator_with_pin"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_25dp"
+        android:layout_marginTop="@dimen/dimen_30dp"
+        android:layout_marginBottom="@dimen/dimen_24dp"
+        android:background="@color/black"
+        android:text="@string/label_register_external_authenticator_with_pin"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_authenticate_external_authenticator" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_authenticate_external_authenticator_with_pin"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_25dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginBottom="@dimen/dimen_24dp"
+        android:background="@color/black"
+        android:text="@string/label_authenticate_external_authenticator_with_pin"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_register_external_authenticator_with_pin" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_remove_account"
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="wrap_content"
@@ -107,5 +139,5 @@
         android:textSize="@dimen/dimen_16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_authenticate_external_authenticator" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_authenticate_external_authenticator_with_pin" />
 </androidx.constraintlayout.widget.ConstraintLayout>

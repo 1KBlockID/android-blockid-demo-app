@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/dimen_320dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:paddingTop="@dimen/dimen_25dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_dialog_pin_input_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen_16dp"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:layout_marginRight="@dimen/dimen_16dp"
+        android:gravity="center"
+        android:text="@string/label_pin_verification_required"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_dialog_pin_input_message"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen_16dp"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:layout_marginRight="@dimen/dimen_16dp"
+        android:gravity="center"
+        android:text="@string/label_enter_the_key_pin"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_dialog_pin_input_title" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_dialog_pin"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_20dp"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        app:boxCornerRadiusBottomEnd="@dimen/dimen_5dp"
+        app:boxCornerRadiusBottomStart="@dimen/dimen_5dp"
+        app:boxCornerRadiusTopEnd="@dimen/dimen_5dp"
+        app:boxCornerRadiusTopStart="@dimen/dimen_5dp"
+        app:boxStrokeWidth="@dimen/dimen_0_5dp"
+        app:boxStrokeWidthFocused="@dimen/dimen_0_5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_dialog_pin_input_message">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_enter_pin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50dp"
+            android:inputType="textPassword"
+            android:maxLength="50"
+            android:singleLine="true"
+            android:textCursorDrawable="@null"
+            android:textSize="@dimen/dimen_16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:id="@+id/view_dialog_error"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:background="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_dialog_pin" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_dialog_pin_input_verify"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:text="@string/label_verify"
+        android:textAllCaps="false"
+        android:textSize="@dimen/dimen_18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/view_dialog_error_vertical"
+        app:layout_constraintTop_toBottomOf="@+id/view_dialog_error" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_dialog_pin_input_cancel"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:text="@string/label_cancel"
+        android:textAllCaps="false"
+        android:textSize="@dimen/dimen_18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/view_dialog_error_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_dialog_error" />
+
+    <View
+        android:id="@+id/view_dialog_error_vertical"
+        android:layout_width="@dimen/dimen_1dp"
+        android:layout_height="@dimen/dimen_0dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="@id/btn_dialog_pin_input_cancel"
+        app:layout_constraintEnd_toStartOf="@id/btn_dialog_pin_input_verify"
+        app:layout_constraintStart_toEndOf="@id/btn_dialog_pin_input_cancel"
+        app:layout_constraintTop_toTopOf="@id/btn_dialog_pin_input_cancel" />
+</androidx.constraintlayout.widget.ConstraintLayout>
