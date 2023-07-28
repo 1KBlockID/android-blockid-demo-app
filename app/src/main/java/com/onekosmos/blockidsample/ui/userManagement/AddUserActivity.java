@@ -237,8 +237,11 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         showProgress();
         MagicLinkData magicLinkDataModel = BIDUtil.JSONStringToObject(mMagicLinkData,
                 MagicLinkData.class);
-        BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
-                magicLinkDataModel.api, magicLinkDataModel.community,
+        BIDOrigin origin = new BIDOrigin();
+        origin.api = magicLinkDataModel.api;
+        origin.community = magicLinkDataModel.community;
+        origin.tag = magicLinkDataModel.tag;
+        BlockIDSDK.getInstance().validateAccessCode(magicLinkDataModel.code, origin,
                 (status, response, userId, error) -> {
                     if (!status) {
                         hideProgress();
