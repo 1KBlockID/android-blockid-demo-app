@@ -107,6 +107,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
+    // wallet connect
     implementation("com.walletconnect:sign:2.0.0-rc.5")
     implementation("com.walletconnect:android-core:1.0.0")
 
