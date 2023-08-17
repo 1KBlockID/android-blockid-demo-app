@@ -71,15 +71,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.5.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    implementation 'com.google.code.gson:gson:2.9.0'
-
     // Secure  Shared preference
     implementation 'androidx.security:security-crypto:1.1.0-alpha03'
 
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'org.jetbrains:annotations:23.0.0'
-    // For Base32 encode/decode
-    implementation 'commons-codec:commons-codec:1.11'
 
     // RecyclerView
     implementation "androidx.recyclerview:recyclerview:1.2.1"
@@ -90,9 +85,6 @@ dependencies {
     //Location
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
     implementation 'com.google.android.gms:play-services-location:20.0.0'
-
-    //for json array filters
-    implementation 'com.annimon:stream:1.2.2'
 
     // LiveID
     implementation 'com.google.guava:guava:31.0.1-android'

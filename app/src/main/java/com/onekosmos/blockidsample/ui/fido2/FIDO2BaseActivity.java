@@ -2,7 +2,6 @@ package com.onekosmos.blockidsample.ui.fido2;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2_USERNAME;
-import static org.apache.commons.codec.language.bm.Rule.ALL;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -37,7 +36,7 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 
-@SuppressWarnings(ALL)
+@SuppressWarnings("ALL")
 public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     // html file to show UI/UX as per app design
