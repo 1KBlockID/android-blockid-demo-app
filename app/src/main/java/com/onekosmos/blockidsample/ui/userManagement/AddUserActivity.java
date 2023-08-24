@@ -237,8 +237,11 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         showProgress();
         MagicLinkData magicLinkDataModel = BIDUtil.JSONStringToObject(mMagicLinkData,
                 MagicLinkData.class);
-        BlockIDSDK.getInstance().checkIfADRequired(magicLinkDataModel.code, magicLinkDataModel.tag,
-                magicLinkDataModel.api, magicLinkDataModel.community,
+        BIDOrigin origin = new BIDOrigin();
+        origin.api = magicLinkDataModel.api;
+        origin.community = magicLinkDataModel.community;
+        origin.tag = magicLinkDataModel.tag;
+        BlockIDSDK.getInstance().validateAccessCode(magicLinkDataModel.code, origin,
                 (status, response, userId, error) -> {
                     if (!status) {
                         hideProgress();
@@ -311,7 +314,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         eventData.user_lon = String.valueOf(mLongitude);
         eventData.device_id = Secure.getString(getContentResolver(), ANDROID_ID);
         eventData.user_agent = WebSettings.getDefaultUserAgent(AddUserActivity.this);
-        eventData.device_name = BIDUtil.getDeviceName();
+        eventData.device_name = BIDUtil.getDeviceName(this);
         eventData.network_info = publicIpAddress;
 
         String eventDataString = BIDUtil.objectToJSONString(eventData, true);
