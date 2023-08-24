@@ -104,7 +104,5 @@ dependencies {
     implementation("com.walletconnect:android-core:1.0.0")
 
     // BlockID SDK
-    implementation('com.onekosmos.blockid.sdk:blockidsdk:1.9.60.64E6978C') {
-        exclude group: 'webauthnkit.core'
-    }
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.60.64E71F3B'
 }
