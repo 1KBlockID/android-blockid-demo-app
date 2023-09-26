@@ -6,10 +6,12 @@ import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -30,6 +32,17 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.ResultDialog;
 import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
+import com.yubico.yubikit.android.YubiKitManager;
+import com.yubico.yubikit.android.transport.nfc.NfcConfiguration;
+import com.yubico.yubikit.core.application.ApplicationNotAvailableException;
+import com.yubico.yubikit.core.application.CommandException;
+import com.yubico.yubikit.core.smartcard.ApduException;
+import com.yubico.yubikit.core.smartcard.SmartCardConnection;
+import com.yubico.yubikit.core.smartcard.SmartCardProtocol;
+import com.yubico.yubikit.fido.client.BasicWebAuthnClient;
+import com.yubico.yubikit.fido.ctap.Ctap2Session;
+
+import java.io.IOException;
 
 /**
  * Created by 1Kosmos Engineering
@@ -44,7 +57,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatButton mBtnRegister, mBtnAuthenticate, mBtnRegisterPlatformAuthenticator,
             mBtnRegisterExternalAuthenticator, mBtnAuthenticatePlatformAuthenticator,
             mBtnAuthenticateExternalAuthenticator, mBtnRegisterExternalAuthenticatorWithPin,
-            mBtnAuthenticateExternalAuthenticatorWithPin;
+            mBtnAuthenticateExternalAuthenticatorWithPin,mBtnPinManagement;
     private TextInputEditText mEtUserName;
     private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
@@ -150,6 +163,16 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 R.id.btn_authenticate_external_authenticator_with_pin);
         mBtnAuthenticateExternalAuthenticatorWithPin.setOnClickListener(
                 view -> showPINInputDialog(Fido2Operation.AUTHENTICATE));
+
+        mBtnPinManagement=findViewById(R.id.btn_pin_management);
+        mBtnPinManagement.setOnClickListener(view->{
+           startPinManagementActivity();
+        });
+    }
+
+    public void startPinManagementActivity(){
+        Intent i = new Intent(this, PinManagementActivity.class);
+        startActivity(i);
     }
 
     /**

@@ -29,6 +29,14 @@
         tools:replace="android:allowBackup,android:label,android:theme"
         tools:targetApi="n">
         <activity
+            android:name=".ui.fido2.SetAndChangePINActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme"  />
+        <activity
+            android:name=".ui.fido2.PinManagementActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme" />
+        <activity
             android:name=".ui.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"

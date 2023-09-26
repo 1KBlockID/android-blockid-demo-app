@@ -105,4 +105,7 @@ dependencies {
 
     // BlockID SDK
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.70.650420CD'
+
+    implementation 'com.yubico.yubikit:android:2.4.0-beta01'
+    implementation 'com.yubico.yubikit:fido:2.4.0-beta01'
 }

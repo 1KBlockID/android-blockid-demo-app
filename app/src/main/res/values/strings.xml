@@ -164,6 +164,11 @@
     <string name="label_pin_verification_required">PIN Verification required</string>
     <string name="label_enter_the_key_pin">Enter the key PIN</string>
     <string name="label_verify">Verify</string>
+    <string name="label_pin_management">PIN Management</string>
+    <string name="label_tap_to_check">TAP Security Key to check whether PIN is configured or Not.</string>
+    <string name="label_set_pin">SET PIN</string>
+    <string name="label_change_pin">CHANGE PIN</string>
+
 
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
