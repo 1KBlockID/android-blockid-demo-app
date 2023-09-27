@@ -25,7 +25,7 @@ import java.io.IOException;
 
 public class PinManagementActivity extends AppCompatActivity {
     private YubiKitManager yubiKitManager;
-    private AppCompatButton mBtnSetPIN, mBtnChangePIN;
+    private AppCompatButton mBtnSetPIN, mBtnChangePIN, mBtnReset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,7 @@ public class PinManagementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pin_managemnet);
         mBtnSetPIN = findViewById(R.id.btn_set_pin);
         mBtnChangePIN = findViewById(R.id.btn_change_pin);
+        mBtnReset = findViewById(R.id.btn_reset_pin);
         yubiKitManager = new YubiKitManager(this);
 
         mBtnSetPIN.setOnClickListener(view -> {
@@ -41,6 +42,10 @@ public class PinManagementActivity extends AppCompatActivity {
 
         mBtnChangePIN.setOnClickListener(view -> {
             showPINInputDialog(PINMethod.CHANGE_PIN);
+        });
+
+        mBtnReset.setOnClickListener(view -> {
+            showPINInputDialog(PINMethod.RESET);
         });
     }
 
@@ -104,11 +109,17 @@ public class PinManagementActivity extends AppCompatActivity {
             btnVerify.setText(R.string.label_set_pin);
             title.setText(R.string.label_set_pin);
             text.setText(R.string.label_enter_the_key_pin);
-        } else {
+        } else if(pinMethod.equals(PINMethod.CHANGE_PIN)) {
             edtEnterNewPin.setVisibility(View.VISIBLE);
             btnVerify.setText(R.string.label_change_pin);
             title.setText(R.string.label_change_pin);
             text.setText("Enter the Old and New PIN");
+        }else{
+            edtEnterNewPin.setVisibility(View.GONE);
+            edtEnterPin.setVisibility(View.GONE);
+            btnVerify.setText(R.string.label_reset);
+            title.setText(R.string.label_reset);
+            text.setText(R.string.label_reset);
         }
 
         btnCancel.setOnClickListener(view -> dialog.dismiss());
@@ -120,8 +131,8 @@ public class PinManagementActivity extends AppCompatActivity {
             String securityNewPIn = edtEnterNewPin.getEditableText().toString();
             Intent intent = new Intent(this, SetAndChangePINActivity.class);
             intent.putExtra("pinMethod", pinMethod);
-            intent.putExtra("securityKeyOldPIN",securityOldPin);
-            intent.putExtra("securityKeyNewPIN",securityNewPIn);
+            intent.putExtra("securityKeyOldPIN", securityOldPin);
+            intent.putExtra("securityKeyNewPIN", securityNewPIn);
             startActivity(intent);
             dialog.dismiss();
             finish();
@@ -130,6 +141,7 @@ public class PinManagementActivity extends AppCompatActivity {
 
     public enum PINMethod {
         SET_PIN,
-        CHANGE_PIN
+        CHANGE_PIN,
+        RESET
     }
 }

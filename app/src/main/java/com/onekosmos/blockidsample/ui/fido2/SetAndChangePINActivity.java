@@ -11,6 +11,7 @@ import com.yubico.yubikit.android.YubiKitManager;
 import com.yubico.yubikit.android.transport.nfc.NfcConfiguration;
 import com.yubico.yubikit.core.application.ApplicationNotAvailableException;
 import com.yubico.yubikit.core.application.CommandException;
+import com.yubico.yubikit.core.application.CommandState;
 import com.yubico.yubikit.core.smartcard.ApduException;
 import com.yubico.yubikit.core.smartcard.SmartCardConnection;
 import com.yubico.yubikit.fido.client.BasicWebAuthnClient;
@@ -50,6 +51,7 @@ public class SetAndChangePINActivity extends AppCompatActivity {
                     try {
                         SmartCardConnection connection = result.getValue();  // This may throw an IOException
                         Ctap2Session session = new Ctap2Session(connection);
+                        session.reset(null);
                         BasicWebAuthnClient bb = new BasicWebAuthnClient(session);
                         if (pinMethod.equals(PinManagementActivity.PINMethod.SET_PIN)) {
                             bb.setPin(securityKeyOldPIN.toCharArray());
@@ -59,11 +61,19 @@ public class SetAndChangePINActivity extends AppCompatActivity {
                                 }
                             });
                             finish();
-                        } else {
+                        } else if (pinMethod.equals(PinManagementActivity.PINMethod.CHANGE_PIN)) {
                             bb.changePin(securityKeyOldPIN.toCharArray(), securityKeyNewPIN.toCharArray());
                             runOnUiThread(new Runnable() {
                                 public void run() {
                                     Toast.makeText(SetAndChangePINActivity.this, "Pin changed Successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            finish();
+                        } else {
+                            session.reset(null);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(SetAndChangePINActivity.this, "Reset Successfully", Toast.LENGTH_SHORT).show();
                                 }
                             });
                             finish();

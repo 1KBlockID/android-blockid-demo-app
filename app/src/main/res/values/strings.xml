@@ -168,6 +168,7 @@
     <string name="label_tap_to_check">TAP Security Key to check whether PIN is configured or Not.</string>
     <string name="label_set_pin">SET PIN</string>
     <string name="label_change_pin">CHANGE PIN</string>
+    <string name="label_reset">RESET</string>
 
 
     <!-- QR Code -->
