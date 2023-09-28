@@ -30,16 +30,9 @@ public class WebViewActivity extends AppCompatActivity {
 
         WebView webView;
 
-        // Initialize the WebView
         webView = findViewById(R.id.webView);
-        webView.setLayerType(View.LAYER_TYPE_NONE, null);
-        webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-
-        // Enable JavaScript (if needed)
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-//        webSettings.setAllowFileAccessFromFileURLs(true);
-//        webSettings.setAllowUniversalAccessFromFileURLs(true);
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
@@ -59,11 +52,11 @@ public class WebViewActivity extends AppCompatActivity {
             // Load a web page
             webView.loadUrl(response.url);
 
-            BlockIDSDK.getInstance().pollDocumentSession(this, response.sessionId, (status, result, error) -> {
-                if(status){
-                    Log.e("pankti","******** done ***********");
-                }
-            });
+//            BlockIDSDK.getInstance().pollDocumentSession(this, response.sessionId, (status, result, error) -> {
+//                if(status){
+//                    Log.e("pankti","******** done ***********");
+//                }
+//            });
         }
     }
 
