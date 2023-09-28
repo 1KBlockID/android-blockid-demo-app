@@ -39,7 +39,7 @@ import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeResponse;
-import com.onekosmos.blockid.sdk.BIDAPIs.publicip.GetPublicIP;
+import com.onekosmos.blockid.sdk.BIDAPIs.publicip.IPProvider;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
@@ -295,7 +295,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         // Get publicIp Address
         String publicIpAddress = null;
         try {
-            publicIpAddress = new GetPublicIP().execute().get();
+            publicIpAddress = IPProvider.getInstance().getIPAddress();
         } catch (Exception ignored) {
         }
 
