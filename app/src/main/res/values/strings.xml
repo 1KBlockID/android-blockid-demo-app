@@ -142,6 +142,7 @@
 
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
+    <string name="label_fido2_pin_management">FIDO2 PIN Management</string>
     <string name="label_user_name">Username</string>
     <string name="label_register">Register (Web)</string>
     <string name="label_enter_username">Enter username</string>
@@ -164,6 +165,19 @@
     <string name="label_pin_verification_required">PIN Verification required</string>
     <string name="label_enter_the_key_pin">Enter the key PIN</string>
     <string name="label_verify">Verify</string>
+    <string name="label_tap_to_check">IS PIN configured</string>
+    <string name="label_set_pin">SET PIN</string>
+    <string name="label_change_pin">CHANGE PIN</string>
+    <string name="label_reset">RESET</string>
+    <string name="label_security_key_reset_successfully">Security key reset successfully</string>
+    <string name="label_pin_is_configured">Pin is configured</string>
+    <string name="label_pin_is_not_configured">Pin is not configured</string>
+    <string name="label_enter_the_pin">Enter the PIN</string>
+    <string name="label_enter_the_old_and_new_pin">Enter the Old and New PIN</string>
+    <string name="label_enter_old_pin">Enter OLD PIN</string>
+    <string name="label_enter_new_pin">Enter New PIN</string>
+    <string name="label_pin_set_successfully">Pin set Successfully</string>
+    <string name="label_pin_changed_successfully">Pin changed Successfully</string>
 
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
