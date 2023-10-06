@@ -472,7 +472,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     /**
      * Show error dialog
      *
-     * @param error {@link com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse}
+     * @param error {@link ErrorManager.ErrorResponse}
      */
     private void showError(ErrorManager.ErrorResponse error) {
         ErrorDialog errorDialog = new ErrorDialog(this);
