@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.ui.fido2;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -14,9 +13,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 
 /**
@@ -65,7 +62,7 @@ public class PINManagementActivity extends AppCompatActivity {
     }
 
     /**
-     * Show pin input dailog box
+     * Show pin input dialog box
      *
      * @param pinMethod enum value of method to be called
      */
