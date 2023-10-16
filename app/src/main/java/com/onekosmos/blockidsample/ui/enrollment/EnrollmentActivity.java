@@ -37,6 +37,7 @@ import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
+import com.onekosmos.blockidsample.ui.fido2.PINManagementActivity;
 import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.liveID.PassiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
@@ -111,7 +112,10 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_fido2))) {
             onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
+                getString(R.string.label_fido2_pin_management))) {
+            onFido2PINManagementClicked();
+        }else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
@@ -446,6 +450,12 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onFido2Clicked() {
         Intent intent = new Intent(this, FIDO2BaseActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void onFido2PINManagementClicked(){
+        Intent intent = new Intent(this, PINManagementActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
