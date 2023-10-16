@@ -19,14 +19,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/img_logo"
+        android:id="@+id/txt_title_pin_management"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_15dp"
-        android:textAlignment="center"
-        android:textSize="@dimen/dimen_24sp"
-        android:textStyle="bold"
         android:text="@string/label_fido2_pin_management"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +45,7 @@
         android:textSize="@dimen/dimen_16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_set_pin"
