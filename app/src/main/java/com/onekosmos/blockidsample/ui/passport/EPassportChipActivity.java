@@ -17,6 +17,7 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.passport.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
@@ -40,7 +41,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     private AppCompatTextView mTxtSkip;
     private AppCompatButton mBtnScan, mBtnCancel;
     private ConstraintLayout mLayoutNFC, mLayoutScanRFId;
-    private PassportScannerHelper mPassportScannerHelper;
+    private RFIDScannerHelper mRFIDScannerHelper;
     private LinkedHashMap<String, Object> mPassportMap;
     private String mSigToken;
     private boolean mIsRegInProgress;
@@ -49,7 +50,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e_passport_chip_scan);
-        mPassportScannerHelper = new PassportScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
+        mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
         mPassportMap = PassportDataHolder.getData();
         mSigToken = PassportDataHolder.getToken();
         initView();
@@ -66,7 +67,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
-                mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
+                mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                 break;
             case R.id.txt_skip:
             case R.id.btn_cancel:
@@ -81,7 +82,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
             Tag tag = intent.getExtras().getParcelable(NfcAdapter.EXTRA_TAG);
             if (Arrays.asList(tag.getTechList()).contains("android.nfc.tech.IsoDep")) {
-                mPassportScannerHelper.onNewIntent(tag);
+                mRFIDScannerHelper.onNewIntent(tag);
             }
         }
     }
@@ -95,7 +96,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onPause() {
         super.onPause();
-        mPassportScannerHelper.stopRFIDScanning();
+        mRFIDScannerHelper.stopRFIDScanning();
     }
 
     private void initView() {
@@ -127,7 +128,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onPassportResponse(LinkedHashMap<String, Object> passportMap, String s, ErrorManager.ErrorResponse error) {
-        mPassportScannerHelper.stopRFIDScanning();
+        mRFIDScannerHelper.stopRFIDScanning();
         if (passportMap != null) {
             mPassportMap = passportMap;
             registerPassport();
@@ -145,7 +146,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                     getString(R.string.label_scan_again),
                     dialog -> {
                         errorDialog.dismiss();
-                        mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
+                        mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                     });
             return;
         }
@@ -160,7 +161,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
 
     private void registerPassport() {
         mIsRegInProgress = true;
-        mPassportScannerHelper.stopRFIDScanning();
+        mRFIDScannerHelper.stopRFIDScanning();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (mPassportMap != null) {
