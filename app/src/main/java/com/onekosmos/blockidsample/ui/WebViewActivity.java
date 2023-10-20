@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -33,6 +34,8 @@ public class WebViewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
@@ -43,8 +46,16 @@ public class WebViewActivity extends AppCompatActivity {
             public void onPermissionRequestCanceled(PermissionRequest request) {
                 super.onPermissionRequestCanceled(request);
             }
+
         });
 
+
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+        });
 
         String sessionData = getIntent().getStringExtra("session_data");
         if (!TextUtils.isEmpty(sessionData)) {
@@ -52,11 +63,11 @@ public class WebViewActivity extends AppCompatActivity {
             // Load a web page
             webView.loadUrl(response.url);
 
-//            BlockIDSDK.getInstance().pollDocumentSession(this, response.sessionId, (status, result, error) -> {
-//                if(status){
-//                    Log.e("pankti","******** done ***********");
-//                }
-//            });
+            BlockIDSDK.getInstance().pollDocumentSession(this, response.sessionId, (status, result, error) -> {
+                if(status){
+                    Log.e("pankti","******** done ***********");
+                }
+            });
         }
     }
 
