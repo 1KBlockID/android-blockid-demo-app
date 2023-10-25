@@ -1,13 +1,11 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SCAN_ERROR;
-import static com.onekosmos.blockid.sdk.DocumentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
-import static com.onekosmos.blockid.sdk.DocumentScanner.DocumentScannerActivity.K_DOCUMENT_TYPE;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -15,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
-import com.onekosmos.blockid.sdk.DocumentScanner.DocumentScannerActivity;
-import com.onekosmos.blockid.sdk.DocumentScanner.DocumentType;
+import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
+import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -65,7 +63,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
      */
     private void startScan() {
         Intent intent = new Intent(this, DocumentScannerActivity.class);
-        intent.putExtra(K_DOCUMENT_TYPE, DocumentType.DL.getValue());
+        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.DL.getValue());
         documentSessionResult.launch(intent);
     }
 
@@ -94,9 +92,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
      */
     private void showError(ErrorResponse errorResponse) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (errorResponse.getCode() == 0 || errorResponse.getCode() == -6) {
-            errorDialog.show(null,
-                    getString(R.string.label_your_are_offline),
+        if (errorResponse.getCode() == 0) {
+            errorDialog.show(null, getString(R.string.label_your_are_offline),
                     getString(R.string.label_please_check_your_internet_connection),
                     dialog -> {
                         errorDialog.dismiss();
@@ -104,10 +101,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                     });
         } else {
             errorDialog.show(null,
-                    getString(R.string.label_error),
-                    TextUtils.isEmpty(errorResponse.getMessage()) ? K_SCAN_ERROR.getMessage() :
-                            errorResponse.getMessage(),
-                    dialog -> {
+                    getString(R.string.label_error), errorResponse.getMessage(), dialog -> {
                         errorDialog.dismiss();
                         finish();
                     });
