@@ -20,6 +20,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
@@ -49,15 +50,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == RESULT_CANCELED) {
-                            ErrorManager.ErrorResponse error;
+                            ErrorResponse error;
                             if (result.getData() != null) {
                                 error = BIDUtil.JSONStringToObject(
                                         result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR),
-                                        ErrorManager.ErrorResponse.class);
+                                        ErrorResponse.class);
                                 if (error != null) {
                                     showError(error);
                                 } else {
-                                    error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    error = new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                             K_SOMETHING_WENT_WRONG.getMessage());
                                     showError(error);
                                 }
@@ -162,9 +163,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
 
     /**
      * Show Error Dialog
-     * @param errorResponse = {@link ErrorManager.ErrorResponse}
+     * @param errorResponse = {@link ErrorResponse}
      */
-    private void showError(ErrorManager.ErrorResponse errorResponse) {
+    private void showError(ErrorResponse errorResponse) {
         ErrorDialog errorDialog = new ErrorDialog(this);
         if (errorResponse.getCode() == 0) {
             errorDialog.show(null,

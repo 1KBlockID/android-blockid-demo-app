@@ -23,6 +23,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
@@ -52,15 +53,15 @@ public class PassportScanningActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == RESULT_CANCELED) {
-                            ErrorManager.ErrorResponse error;
+                            ErrorResponse error;
                             if (result.getData() != null) {
                                 error = BIDUtil.JSONStringToObject(
                                         result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR),
-                                        ErrorManager.ErrorResponse.class);
+                                        ErrorResponse.class);
                                 if (error != null) {
                                     showError(error);
                                 } else {
-                                    error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    error = new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                             K_SOMETHING_WENT_WRONG.getMessage());
                                     showError(error);
                                 }
@@ -80,15 +81,18 @@ public class PassportScanningActivity extends AppCompatActivity {
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
         else
             startScan();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_CAMERA_PERMISSION)) {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
@@ -129,7 +133,8 @@ public class PassportScanningActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
-                            Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, R.string.label_passport_enrolled_successfully,
+                                    Toast.LENGTH_LONG).show();
                             finish();
                             return;
                         }
@@ -170,12 +175,11 @@ public class PassportScanningActivity extends AppCompatActivity {
         return adapter != null;
     }
 
-
     /**
      * Show Error Dialog
-     * @param errorResponse = {@link ErrorManager.ErrorResponse}
+     * @param errorResponse = {@link ErrorResponse}
      */
-    private void showError(ErrorManager.ErrorResponse errorResponse) {
+    private void showError(ErrorResponse errorResponse) {
         ErrorDialog errorDialog = new ErrorDialog(this);
         if (errorResponse.getCode() == 0) {
             errorDialog.show(null,
@@ -186,8 +190,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                         finish();
                     });
         } else {
-            errorDialog.show(null,
-                    getString(R.string.label_error),
+            errorDialog.show(null, getString(R.string.label_error),
                     errorResponse.getMessage(), dialog -> {
                         errorDialog.dismiss();
                         finish();
