@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
@@ -19,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.DocumentScanner;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -72,7 +73,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        //Process document data and Register Document
+                        // Process document data and Register Document
                         // Call verifyDriverLicense()
                     });
 
@@ -97,8 +98,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
+            errorDialog.show(null, null,
                     getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
@@ -108,9 +108,13 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (!isRegistrationInProgress)
+            super.onBackPressed();
     }
 
+    /**
+     * Initialize UI Object
+     */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(v -> onBackPressed());
@@ -119,6 +123,20 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         mTxtBack.setOnClickListener(v -> onBackPressed());
     }
 
+    /**
+     * Start Driver License Scanning
+     */
+    private void startScan() {
+        if (!isRegistrationInProgress) {
+            Intent intent = new Intent(this, DocumentScannerActivity.class);
+            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
+            documentSessionResult.launch(intent);
+        }
+    }
+
+    /**
+     * Register Driver License
+     */
     private void registerDriverLicense() {
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
@@ -141,39 +159,26 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             return;
                         }
 
-                        if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
+                        if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
                             DocumentHolder.setData(mDriverLicenseMap, null);
-                            Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
-                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            Intent intent = new Intent(this,
+                                    ActiveLiveIDScanningActivity.class);
+                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
+                                    true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);
                             finish();
                             return;
                         }
 
-                        ErrorDialog errorDialog = new ErrorDialog(this);
-                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                            errorDialog.dismiss();
-                            finish();
-                        };
-                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                            errorDialog.showNoInternetDialog(onDismissListener);
-                            return;
-                        }
-                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                        showError(error);
                     });
         }
     }
 
-    private void startScan() {
-        if (!isRegistrationInProgress) {
-            Intent intent = new Intent(this, DocumentScannerActivity.class);
-            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
-            documentSessionResult.launch(intent);
-        }
-    }
-
-
+    /**
+     * Verify Driver License
+     */
     private void verifyDriverLicenseDialog() {
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(null,
@@ -186,8 +191,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     }
 
     private void verifyDriverLicense() {
-        ProgressDialog progressDialog = new ProgressDialog(this, getString(
-                R.string.label_verifying_driver_license));
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_verifying_driver_license));
         progressDialog.show();
 
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mDriverLicenseMap,
@@ -227,25 +232,28 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
 
     /**
      * Show Error Dialog
+     *
      * @param errorResponse = {@link ErrorResponse}
      */
     private void showError(ErrorResponse errorResponse) {
+        // Don't show error when user canceled
+        if (errorResponse.getCode() == DocumentScanner.CANCELED.getCode()) {
+            finish();
+        }
+
         ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
         if (errorResponse.getCode() == 0) {
-            errorDialog.show(null,
-                    getString(R.string.label_your_are_offline),
-                    getString(R.string.label_please_check_your_internet_connection),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+            errorDialog.showNoInternetDialog(onDismissListener);
         } else {
             errorDialog.show(null,
                     getString(R.string.label_error),
-                    errorResponse.getMessage(), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+                    errorResponse.getMessage(),
+                    onDismissListener);
         }
     }
 }

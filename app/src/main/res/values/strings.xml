@@ -35,9 +35,9 @@
     <string name="label_biometric_auth_enroll">Do you want to allow this app to use biometric authentication?</string>
     <string name="label_biometric_auth_req">Biometric authentication required to proceed</string>
     <string name="label_success">Success</string>
+    <string name="label_liveid_enrolled_successfully">LiveId enrolled successfully.</string>
     <string name="label_passport_enrolled_successfully">Passport enrolled successfully.</string>
     <string name="label_nid_enrolled_successfully">National ID enrolled successfully.</string>
-    <string name="label_liveid_enrolled_successfully">LiveId enrolled successfully.</string>
     <string name="label_document_enrolled_successfully">Document enrolled successfully.</string>
     <string name="label_dl_enrolled_successfully">Drivers License enrolled successfully.</string>
     <string name="label_ssn_enrolled_successfully">Social Security Number enrolled successfully.</string>

@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
@@ -19,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -67,7 +68,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        //Process document data and Register Document
+                        // Process document data and Register Document
                         // Call registerNationalID()
                     });
 
@@ -76,22 +77,24 @@ public class NationalIDScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
-        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
-        else {
+        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
+            AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,
+                    K_CAMERA_PERMISSION);
+        } else {
             startScan();
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
+                K_CAMERA_PERMISSION)) {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
+            errorDialog.show(null, null,
                     getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         setResult(RESULT_CANCELED);
@@ -106,6 +109,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
             super.onBackPressed();
     }
 
+    /**
+     * Initialize UI Object
+     */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(v -> onBackPressed());
@@ -114,6 +120,18 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mTxtBack.setOnClickListener(v -> onBackPressed());
     }
 
+    /**
+     * Start NationalID Scanning
+     */
+    private void startScan() {
+        Intent intent = new Intent(this, DocumentScannerActivity.class);
+        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
+        documentSessionResult.launch(intent);
+    }
+
+    /**
+     * Register NationalID
+     */
     private void registerNationalID() {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
@@ -128,60 +146,46 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
-                        Toast.makeText(this, R.string.label_nid_enrolled_successfully, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.label_nid_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     }
-                    if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
+                    if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
                         DocumentHolder.setData(mNationalIDMap, null);
-                        Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
-                        intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                        Intent intent = new Intent(this,
+                                ActiveLiveIDScanningActivity.class);
+                        intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
+                                true);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
                         finish();
                         return;
                     }
 
-                    ErrorDialog errorDialog = new ErrorDialog(this);
-                    DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                        errorDialog.dismiss();
-                        finish();
-                    };
-                    if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                        errorDialog.showNoInternetDialog(onDismissListener);
-                        return;
-                    }
-                    errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
+                    showError(error);
                 });
-    }
-
-    private void startScan() {
-        Intent intent = new Intent(this, DocumentScannerActivity.class);
-        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
-        documentSessionResult.launch(intent);
     }
 
     /**
      * Show Error Dialog
+     *
      * @param errorResponse = {@link ErrorResponse}
      */
     private void showError(ErrorResponse errorResponse) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (errorResponse.getCode() == 0) {
-            errorDialog.show(null,
-                    getString(R.string.label_your_are_offline),
-                    getString(R.string.label_please_check_your_internet_connection),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
+        if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
         } else {
             errorDialog.show(null,
                     getString(R.string.label_error),
-                    errorResponse.getMessage(), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+                    errorResponse.getMessage(),
+                    onDismissListener);
         }
     }
 }

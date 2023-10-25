@@ -1,5 +1,7 @@
 package com.onekosmos.blockidsample.ui.passport;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
@@ -22,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -47,32 +48,40 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
+    private String mSigToken;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
 
-    private final ActivityResultLauncher<Intent> documentSessionResult =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == RESULT_CANCELED) {
-                            ErrorResponse error;
-                            if (result.getData() != null) {
-                                error = BIDUtil.JSONStringToObject(
-                                        result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR),
-                                        ErrorResponse.class);
-                                if (error != null) {
-                                    showError(error);
-                                } else {
-                                    error = new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                            K_SOMETHING_WENT_WRONG.getMessage());
-                                    showError(error);
-                                }
-                            } else {
-                                finish();
-                            }
-                            return;
-                        }
-                        //Process document data and Register Document
-                        // Call registerPassport()
-                    });
+    private final ActivityResultLauncher<Intent> documentSessionResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == RESULT_CANCELED) {
+            ErrorResponse error;
+            if (result.getData() != null) {
+                error = BIDUtil.JSONStringToObject(result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR), ErrorResponse.class);
+                if (error != null) {
+                    showError(error);
+                } else {
+                    error = new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
+                    showError(error);
+                }
+            } else {
+                finish();
+            }
+            return;
+        }
+        // Process document data
+        // Check for NFC and start ePassport Scanning with data
+        // else Call registerPassport()
+
+//                        if (passportMap != null) {
+//                            mPassportMap = passportMap;
+//                            mSigToken = signatureToken;
+//                            if (isDeviceHasNfc) {
+//                                openEPassportChipActivity();
+//                            } else {
+//                                registerPassport();
+//                            }
+//                            return;
+//                        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,37 +90,34 @@ public class PassportScanningActivity extends AppCompatActivity {
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
-                    K_CAMERA_PERMISSION);
-        else
-            startScan();
+            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+        else startScan();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
-                K_CAMERA_PERMISSION)) {
+        if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
-                    getString(R.string.label_camera_permission_alert), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+            errorDialog.show(null, null, getString(R.string.label_camera_permission_alert), dialog -> {
+                errorDialog.dismiss();
+                finish();
+            });
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (isRegistrationInProgress) {
+        if (!isRegistrationInProgress) {
             super.onBackPressed();
         }
     }
 
+    /**
+     * Initialize UI Object
+     */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(v -> onBackPressed());
@@ -120,7 +126,32 @@ public class PassportScanningActivity extends AppCompatActivity {
         mTxtBack.setOnClickListener(v -> onBackPressed());
     }
 
+    /**
+     * Start Passport Scanning
+     */
+    private void startScan() {
+        Intent intent = new Intent(this, DocumentScannerActivity.class);
+        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.PPT.getValue());
+        documentSessionResult.launch(intent);
+    }
+
+    /**
+     * Start EPassportChipActivity for RFID scanning
+     */
+    private void openEPassportChipActivity() {
+        PassportDataHolder.setData(mPassportMap, mSigToken);
+        Intent intent = new Intent(this, EPassportChipActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * Register Passport
+     */
     private void registerPassport() {
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
@@ -128,45 +159,28 @@ public class PassportScanningActivity extends AppCompatActivity {
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
-            BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, (status, error) -> {
-                        progressDialog.dismiss();
-                        isRegistrationInProgress = false;
-                        if (status) {
-                            Toast.makeText(this, R.string.label_passport_enrolled_successfully,
-                                    Toast.LENGTH_LONG).show();
-                            finish();
-                            return;
-                        }
+            BlockIDSDK.getInstance().registerDocument(this, mPassportMap, null, (status, error) -> {
+                progressDialog.dismiss();
+                isRegistrationInProgress = false;
+                if (status) {
+                    Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
 
-                        if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, null);
-                            Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
-                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(intent);
-                            finish();
-                            return;
-                        }
+                if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
+                    DocumentHolder.setData(mPassportMap, null);
+                    Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
+                    intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
 
-                        ErrorDialog errorDialog = new ErrorDialog(this);
-                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                            errorDialog.dismiss();
-                            finish();
-                        };
-                        if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                            errorDialog.showNoInternetDialog(onDismissListener);
-                            return;
-                        }
-                        errorDialog.show(null, getString(R.string.label_error), error.getMessage(), onDismissListener);
-                    });
+                showError(error);
+            });
         }
-    }
-
-    private void startScan() {
-        Intent intent = new Intent(this, DocumentScannerActivity.class);
-        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.PPT.getValue());
-        documentSessionResult.launch(intent);
     }
 
     private boolean isDeviceHasNFC() {
@@ -177,24 +191,20 @@ public class PassportScanningActivity extends AppCompatActivity {
 
     /**
      * Show Error Dialog
+     *
      * @param errorResponse = {@link ErrorResponse}
      */
     private void showError(ErrorResponse errorResponse) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        if (errorResponse.getCode() == 0) {
-            errorDialog.show(null,
-                    getString(R.string.label_your_are_offline),
-                    getString(R.string.label_please_check_your_internet_connection),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
+        if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
         } else {
-            errorDialog.show(null, getString(R.string.label_error),
-                    errorResponse.getMessage(), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
+            errorDialog.show(null, getString(R.string.label_error), errorResponse.getMessage(), onDismissListener);
         }
     }
 }
