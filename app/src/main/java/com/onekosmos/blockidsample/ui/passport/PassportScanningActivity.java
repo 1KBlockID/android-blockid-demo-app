@@ -74,6 +74,18 @@ public class PassportScanningActivity extends AppCompatActivity {
                     });
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_passport_scanning);
+        isDeviceHasNfc = isDeviceHasNFC();
+        initView();
+        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
+            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
+        else
+            startScan();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults, K_CAMERA_PERMISSION)) {
@@ -94,18 +106,6 @@ public class PassportScanningActivity extends AppCompatActivity {
         if (isRegistrationInProgress) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_passport_scanning);
-        isDeviceHasNfc = isDeviceHasNFC();
-        initView();
-        if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
-            AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE, K_CAMERA_PERMISSION);
-        else
-            startScan();
     }
 
     private void initView() {
