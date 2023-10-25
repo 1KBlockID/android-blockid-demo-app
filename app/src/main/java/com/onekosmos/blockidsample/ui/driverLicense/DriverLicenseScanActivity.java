@@ -112,7 +112,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     }
 
     private void initView() {
-
         mImgBack = findViewById(R.id.img_back);
         mImgBack.setOnClickListener(v -> onBackPressed());
 
