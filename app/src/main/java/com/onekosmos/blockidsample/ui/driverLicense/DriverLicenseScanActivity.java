@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 
@@ -29,6 +30,30 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     private static final int K_DL_PERMISSION_REQUEST_CODE = 1011;
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
 
+    private final ActivityResultLauncher<Intent> documentSessionResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_CANCELED) {
+                            ErrorResponse error;
+                            if (result.getData() != null) {
+                                error = BIDUtil.JSONStringToObject(
+                                        result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR),
+                                        ErrorResponse.class);
+                                if (error != null) {
+                                    showError(error);
+                                } else {
+                                    error = new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                            K_SOMETHING_WENT_WRONG.getMessage());
+                                    showError(error);
+                                }
+                            } else {
+                                finish();
+                            }
+                            return;
+                        }
+                        //Process document data and Register Document
+                    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +74,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             startScan();
         } else {
             ErrorDialog errorDialog = new ErrorDialog(this);
-            errorDialog.show(null,
-                    "",
+            errorDialog.show(null, null,
                     getString(R.string.label_camera_permission_alert), dialog -> {
                         errorDialog.dismiss();
                         finish();
@@ -66,25 +90,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.DL.getValue());
         documentSessionResult.launch(intent);
     }
-
-    private final ActivityResultLauncher<Intent> documentSessionResult =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == RESULT_CANCELED) {
-                            if (result.getData() != null) {
-                                ErrorResponse errorResponse = BIDUtil.JSONStringToObject(
-                                        result.getData().getStringExtra(K_DOCUMENT_SCAN_ERROR),
-                                        ErrorResponse.class);
-                                if (errorResponse != null) {
-                                    showError(errorResponse);
-                                }
-                            } else {
-                                finish();
-                            }
-                            return;
-                        }
-                        // Show Details screen
-                    });
 
     /**
      * Show Error Dialog
