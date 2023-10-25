@@ -106,7 +106,7 @@
         <activity
             android:name=".ui.driverLicense.DriverLicenseScanActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.MaterialAppTheme" />
         <activity
             android:name=".ui.restore.RecoverMnemonicActivity"
             android:screenOrientation="portrait"
