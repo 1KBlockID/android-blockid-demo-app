@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -173,6 +174,11 @@ public class NationalIDScanActivity extends AppCompatActivity {
      * @param errorResponse = {@link ErrorResponse}
      */
     private void showError(ErrorResponse errorResponse) {
+        // Don't show error when user canceled
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
+            finish();
+        }
+
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
