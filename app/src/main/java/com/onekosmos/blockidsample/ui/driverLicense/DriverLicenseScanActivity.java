@@ -20,9 +20,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.DocumentScanner;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.DocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -73,8 +77,34 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data and Register Document
-                        // Call verifyDriverLicense()
+
+                        String data;
+                        if (DocumentDataHolder.hasData()) {
+                            data = DocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String dlObject = null;
+                        try {
+                            JSONObject dlResponse = new JSONObject(data);
+                            if (dlResponse.has("dl_object")) {
+                                dlObject = dlResponse.getString("dl_object");
+                            } else {
+                                showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                return;
+                            }
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mDriverLicenseMap = gson.fromJson(dlObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+                        verifyDriverLicense();
                     });
 
     @Override
@@ -239,6 +269,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);

@@ -24,9 +24,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.DocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -36,6 +40,8 @@ import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -73,20 +79,45 @@ public class PassportScanningActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data
-                        // Check for NFC and start ePassport Scanning with data
-                        // else Call registerPassport()
 
-//                        if (passportMap != null) {
-//                            mPassportMap = passportMap;
-//                            mSigToken = signatureToken;
-//                            if (isDeviceHasNfc) {
-//                                openEPassportChipActivity();
-//                            } else {
-//                                registerPassport();
-//                            }
-//                            return;
-//                        }
+                        String data;
+                        if (DocumentDataHolder.hasData()) {
+                            data = DocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String ppObject = "";
+                        String signatureToken = "";
+                        try {
+                            JSONObject pptResponse = new JSONObject(data);
+                            if (pptResponse.has("ppt_object")) {
+                                ppObject = pptResponse.getString("ppt_object");
+                            } else if (pptResponse.has("token")) {
+                                signatureToken = pptResponse.getString("token"); //FIXME: TBD
+                            } else {
+                                showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                return;
+                            }
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mPassportMap = gson.fromJson(ppObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+
+                        if (mPassportMap != null) {
+                            mSigToken = signatureToken;
+                            if (isDeviceHasNfc) {
+                                openEPassportChipActivity();
+                            } else {
+                                registerPassport();
+                            }
+                        }
                     });
 
     @Override
@@ -213,6 +244,7 @@ public class PassportScanningActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);

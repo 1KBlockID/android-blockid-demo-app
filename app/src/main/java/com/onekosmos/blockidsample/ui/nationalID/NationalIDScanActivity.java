@@ -21,9 +21,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.DocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -33,6 +37,8 @@ import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -69,8 +75,34 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data and Register Document
-                        // Call registerNationalID()
+
+                        String data;
+                        if (DocumentDataHolder.hasData()) {
+                            data = DocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String nidObject;
+                        try {
+                            JSONObject nidResponse = new JSONObject(data);
+                            if (nidResponse.has("id_object")) {
+                                nidObject = nidResponse.getString("id_object");
+                            } else {
+                                showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                return;
+                            }
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mNationalIDMap = gson.fromJson(nidObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+                        registerNationalID();
                     });
 
     @Override
@@ -177,6 +209,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);
