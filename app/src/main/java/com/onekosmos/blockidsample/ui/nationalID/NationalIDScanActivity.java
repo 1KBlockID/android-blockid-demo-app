@@ -12,6 +12,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,9 +22,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -33,6 +38,8 @@ import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -69,8 +76,47 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data and Register Document
-                        // Call registerNationalID()
+
+                        String data;
+                        if (BIDDocumentDataHolder.hasData()) {
+                            data = BIDDocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String nidObject, token = null;
+                        try {
+                            JSONObject nidResponse = new JSONObject(data);
+                            if (nidResponse.has("idcard_object")) {
+                                nidObject = nidResponse.getString("idcard_object");
+                            } else {
+                                nidScanFailed();
+                                return;
+                            }
+
+                            if (nidResponse.has("token")) {
+                                token = nidResponse.getString("token");
+                            }
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mNationalIDMap = gson.fromJson(nidObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+
+                        if (mNationalIDMap == null) {
+                            nidScanFailed();
+                            return;
+                        }
+                        if (!TextUtils.isEmpty(token)) {
+                            mNationalIDMap.put("certificate_token", token);
+                        }
+
+                        registerNationalID();
                     });
 
     @Override
@@ -177,6 +223,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);
@@ -184,6 +231,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
             errorDialog.dismiss();
             finish();
         };
+
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
 
         if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
@@ -193,5 +249,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     errorResponse.getMessage(),
                     onDismissListener);
         }
+    }
+
+    // Show Error dialog when scan is failed
+    private void nidScanFailed() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error),
+                getString(R.string.label_nid_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 }

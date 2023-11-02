@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,9 +25,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -36,6 +41,8 @@ import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -73,20 +80,53 @@ public class PassportScanningActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data
-                        // Check for NFC and start ePassport Scanning with data
-                        // else Call registerPassport()
 
-//                        if (passportMap != null) {
-//                            mPassportMap = passportMap;
-//                            mSigToken = signatureToken;
-//                            if (isDeviceHasNfc) {
-//                                openEPassportChipActivity();
-//                            } else {
-//                                registerPassport();
-//                            }
-//                            return;
-//                        }
+                        String data;
+                        if (BIDDocumentDataHolder.hasData()) {
+                            data = BIDDocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String ppObject, token = null;
+                        try {
+                            JSONObject pptResponse = new JSONObject(data);
+                            if (pptResponse.has("ppt_object")) {
+                                ppObject = pptResponse.getString("ppt_object");
+                            } else {
+                                ppScanFailed();
+                                return;
+                            }
+
+                            if (pptResponse.has("token")) {
+                                token = pptResponse.getString("token");
+                            }
+
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mPassportMap = gson.fromJson(ppObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+
+                        if (mPassportMap == null) {
+                            ppScanFailed();
+                            return;
+                        }
+
+                        if (!TextUtils.isEmpty(token)) {
+                            mPassportMap.put("certificate_token", token);
+                        }
+
+                        if (isDeviceHasNfc) {
+                            openEPassportChipActivity();
+                        } else {
+                            registerPassport();
+                        }
                     });
 
     @Override
@@ -149,7 +189,7 @@ public class PassportScanningActivity extends AppCompatActivity {
      * Start EPassportChipActivity for RFID scanning
      */
     private void openEPassportChipActivity() {
-        PassportDataHolder.setData(mPassportMap, mSigToken);
+        PassportDataHolder.setData(mPassportMap, mSigToken); // FIXME : We need to check during RFID test scanning
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
@@ -213,6 +253,7 @@ public class PassportScanningActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);
@@ -221,10 +262,29 @@ public class PassportScanningActivity extends AppCompatActivity {
             finish();
         };
 
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
+
         if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
         } else {
             errorDialog.show(null, getString(R.string.label_error), errorResponse.getMessage(), onDismissListener);
         }
+    }
+
+    // Show Error dialog when scan is failed
+    private void ppScanFailed() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error),
+                getString(R.string.label_pp_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 }

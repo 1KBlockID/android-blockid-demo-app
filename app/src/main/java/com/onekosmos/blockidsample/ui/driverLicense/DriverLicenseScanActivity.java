@@ -11,6 +11,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -20,9 +21,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.DocumentScanner;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -73,8 +78,49 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             }
                             return;
                         }
-                        // Process document data and Register Document
-                        // Call verifyDriverLicense()
+
+                        String data;
+                        if (BIDDocumentDataHolder.hasData()) {
+                            data = BIDDocumentDataHolder.getData();
+                        } else {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        String dlObject, token = null;
+                        try {
+                            JSONObject dlResponse = new JSONObject(data);
+                            if (dlResponse.has("dl_object")) {
+                                dlObject = dlResponse.getString("dl_object");
+                            } else {
+                                dlScanFailed();
+                                return;
+                            }
+
+                            if (dlResponse.has("token")) {
+                                token = dlResponse.getString("token");
+                            }
+
+                        } catch (Exception exception) {
+                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                                    K_SOMETHING_WENT_WRONG.getMessage()));
+                            return;
+                        }
+                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                        mDriverLicenseMap = gson.fromJson(dlObject,
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+
+                        if (mDriverLicenseMap == null) {
+                            dlScanFailed();
+                            return;
+                        }
+
+                        if (!TextUtils.isEmpty(token)) {
+                            mDriverLicenseMap.put("certificate_token", token);
+                        }
+
+                        verifyDriverLicenseDialog();
                     });
 
     @Override
@@ -129,7 +175,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     private void startScan() {
         if (!isRegistrationInProgress) {
             Intent intent = new Intent(this, DocumentScannerActivity.class);
-            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
+            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.DL.getValue());
             documentSessionResult.launch(intent);
         }
     }
@@ -239,6 +285,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         // Don't show error when user canceled
         if (errorResponse.getCode() == DocumentScanner.CANCELED.getCode()) {
             finish();
+            return;
         }
 
         ErrorDialog errorDialog = new ErrorDialog(this);
@@ -246,6 +293,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             errorDialog.dismiss();
             finish();
         };
+
+        if (errorResponse.getCode() == DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
 
         if (errorResponse.getCode() == 0) {
             errorDialog.showNoInternetDialog(onDismissListener);
@@ -255,5 +311,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                     errorResponse.getMessage(),
                     onDismissListener);
         }
+    }
+
+    // Show Error dialog when scan is failed
+    private void dlScanFailed() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error),
+                getString(R.string.label_dl_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 }
