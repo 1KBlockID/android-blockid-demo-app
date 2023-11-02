@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.documentScanner.DocumentDataHolder;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -77,8 +77,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
                         }
 
                         String data;
-                        if (DocumentDataHolder.hasData()) {
-                            data = DocumentDataHolder.getData();
+                        if (BIDDocumentDataHolder.hasData()) {
+                            data = BIDDocumentDataHolder.getData();
                         } else {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
@@ -90,8 +90,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             if (nidResponse.has("id_object")) {
                                 nidObject = nidResponse.getString("id_object");
                             } else {
-                                showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                nidScanFailed();
                                 return;
                             }
                         } catch (Exception exception) {
@@ -226,5 +225,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     errorResponse.getMessage(),
                     onDismissListener);
         }
+    }
+
+    // Show Error dialog when scan is failed
+    private void nidScanFailed() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error),
+                getString(R.string.label_pp_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 }

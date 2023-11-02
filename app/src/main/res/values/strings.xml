@@ -130,6 +130,9 @@
         write any of your documents with BlockID Sample into your storage.</string>
     <string name="label_share">Share</string>
     <string name="label_verify_liveid">Verifying LiveID</string>
+    <string name="label_dl_fail_to_scan">Drivers License fail to scan.</string>
+    <string name="label_pp_fail_to_scan">Passport fail to scan.</string>
+    <string name="label_nid_fail_to_scan">National ID fail to scan.</string>
 
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>

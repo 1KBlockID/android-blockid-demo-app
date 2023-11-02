@@ -30,7 +30,7 @@ import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.documentScanner.DocumentDataHolder;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -81,26 +81,27 @@ public class PassportScanningActivity extends AppCompatActivity {
                         }
 
                         String data;
-                        if (DocumentDataHolder.hasData()) {
-                            data = DocumentDataHolder.getData();
+                        if (BIDDocumentDataHolder.hasData()) {
+                            data = BIDDocumentDataHolder.getData();
                         } else {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
                         String ppObject = "";
-                        String signatureToken = "";
                         try {
                             JSONObject pptResponse = new JSONObject(data);
                             if (pptResponse.has("ppt_object")) {
                                 ppObject = pptResponse.getString("ppt_object");
-                            } else if (pptResponse.has("token")) {
-                                signatureToken = pptResponse.getString("token"); //FIXME: TBD
                             } else {
-                                showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                        K_SOMETHING_WENT_WRONG.getMessage()));
+                                ppScanFailed();
                                 return;
                             }
+
+                            if (pptResponse.has("token")) {
+                                mSigToken = pptResponse.getString("token"); // FIXME : We need to check during RFID test scanning
+                            }
+
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
@@ -111,7 +112,6 @@ public class PassportScanningActivity extends AppCompatActivity {
                                 new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
 
                         if (mPassportMap != null) {
-                            mSigToken = signatureToken;
                             if (isDeviceHasNfc) {
                                 openEPassportChipActivity();
                             } else {
@@ -258,5 +258,15 @@ public class PassportScanningActivity extends AppCompatActivity {
         } else {
             errorDialog.show(null, getString(R.string.label_error), errorResponse.getMessage(), onDismissListener);
         }
+    }
+
+    // Show Error dialog when scan is failed
+    private void ppScanFailed() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error),
+                getString(R.string.label_pp_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 }
