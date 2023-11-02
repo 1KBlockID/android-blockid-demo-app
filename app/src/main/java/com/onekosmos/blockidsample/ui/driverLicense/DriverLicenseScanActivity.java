@@ -86,7 +86,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String dlObject = null;
+                        String dlObject;
                         try {
                             JSONObject dlResponse = new JSONObject(data);
                             if (dlResponse.has("dl_object")) {
@@ -104,7 +104,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         mDriverLicenseMap = gson.fromJson(dlObject,
                                 new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
-                        verifyDriverLicense();
+                        verifyDriverLicenseDialog();
                     });
 
     @Override
@@ -159,7 +159,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     private void startScan() {
         if (!isRegistrationInProgress) {
             Intent intent = new Intent(this, DocumentScannerActivity.class);
-            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
+            intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.DL.getValue());
             documentSessionResult.launch(intent);
         }
     }
