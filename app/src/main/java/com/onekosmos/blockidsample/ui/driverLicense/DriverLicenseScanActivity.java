@@ -11,6 +11,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -86,7 +87,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String dlObject;
+                        String dlObject, token = null;
                         try {
                             JSONObject dlResponse = new JSONObject(data);
                             if (dlResponse.has("dl_object")) {
@@ -95,6 +96,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                                 dlScanFailed();
                                 return;
                             }
+
+                            if (dlResponse.has("token")) {
+                                token = dlResponse.getString("token");
+                            }
+
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
@@ -102,7 +108,18 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         }
                         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         mDriverLicenseMap = gson.fromJson(dlObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+
+                        if (mDriverLicenseMap == null) {
+                            dlScanFailed();
+                            return;
+                        }
+
+                        if (!TextUtils.isEmpty(token)) {
+                            mDriverLicenseMap.put("certificate_token", token);
+                        }
+
                         verifyDriverLicenseDialog();
                     });
 

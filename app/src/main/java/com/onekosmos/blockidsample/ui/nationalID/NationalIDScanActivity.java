@@ -12,6 +12,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -84,14 +85,18 @@ public class NationalIDScanActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String nidObject;
+                        String nidObject, token = null;
                         try {
                             JSONObject nidResponse = new JSONObject(data);
-                            if (nidResponse.has("id_object")) {
-                                nidObject = nidResponse.getString("id_object");
+                            if (nidResponse.has("idcard_object")) {
+                                nidObject = nidResponse.getString("idcard_object");
                             } else {
                                 nidScanFailed();
                                 return;
+                            }
+
+                            if (nidResponse.has("token")) {
+                                token = nidResponse.getString("token");
                             }
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
@@ -100,7 +105,17 @@ public class NationalIDScanActivity extends AppCompatActivity {
                         }
                         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         mNationalIDMap = gson.fromJson(nidObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
+
+                        if (mNationalIDMap == null) {
+                            nidScanFailed();
+                            return;
+                        }
+                        if (!TextUtils.isEmpty(token)) {
+                            mNationalIDMap.put("certificate_token", token);
+                        }
+
                         registerNationalID();
                     });
 
@@ -231,7 +246,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private void nidScanFailed() {
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.show(null, getString(R.string.label_error),
-                getString(R.string.label_pp_fail_to_scan), dialog -> {
+                getString(R.string.label_nid_fail_to_scan), dialog -> {
                     errorDialog.dismiss();
                     finish();
                 });

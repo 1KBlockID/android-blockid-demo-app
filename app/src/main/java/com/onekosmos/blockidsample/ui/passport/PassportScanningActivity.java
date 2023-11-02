@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -88,7 +89,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String ppObject = "";
+                        String ppObject, token = null;
                         try {
                             JSONObject pptResponse = new JSONObject(data);
                             if (pptResponse.has("ppt_object")) {
@@ -99,7 +100,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                             }
 
                             if (pptResponse.has("token")) {
-                                mSigToken = pptResponse.getString("token"); // FIXME : We need to check during RFID test scanning
+                                token = pptResponse.getString("token");
                             }
 
                         } catch (Exception exception) {
@@ -109,14 +110,22 @@ public class PassportScanningActivity extends AppCompatActivity {
                         }
                         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                         mPassportMap = gson.fromJson(ppObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {}.getType());
+                                new TypeToken<LinkedHashMap<String, Object>>() {
+                                }.getType());
 
-                        if (mPassportMap != null) {
-                            if (isDeviceHasNfc) {
-                                openEPassportChipActivity();
-                            } else {
-                                registerPassport();
-                            }
+                        if (mPassportMap == null) {
+                            ppScanFailed();
+                            return;
+                        }
+
+                        if (!TextUtils.isEmpty(token)) {
+                            mPassportMap.put("certificate_token", token);
+                        }
+
+                        if (isDeviceHasNfc) {
+                            openEPassportChipActivity();
+                        } else {
+                            registerPassport();
                         }
                     });
 
@@ -180,7 +189,7 @@ public class PassportScanningActivity extends AppCompatActivity {
      * Start EPassportChipActivity for RFID scanning
      */
     private void openEPassportChipActivity() {
-        PassportDataHolder.setData(mPassportMap, mSigToken);
+        PassportDataHolder.setData(mPassportMap, mSigToken); // FIXME : We need to check during RFID test scanning
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
