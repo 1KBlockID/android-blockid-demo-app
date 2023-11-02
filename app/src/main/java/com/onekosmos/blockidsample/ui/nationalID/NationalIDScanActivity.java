@@ -232,6 +232,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
             finish();
         };
 
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
+
         if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
         } else {

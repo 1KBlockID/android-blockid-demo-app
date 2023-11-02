@@ -294,6 +294,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             finish();
         };
 
+        if (errorResponse.getCode() == DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
+
         if (errorResponse.getCode() == 0) {
             errorDialog.showNoInternetDialog(onDismissListener);
         } else {
