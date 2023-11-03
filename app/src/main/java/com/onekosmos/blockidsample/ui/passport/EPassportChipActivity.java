@@ -68,7 +68,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
-                Log.d("passportMap", mPassportMap.toString());
                 mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                 break;
             case R.id.txt_skip:
