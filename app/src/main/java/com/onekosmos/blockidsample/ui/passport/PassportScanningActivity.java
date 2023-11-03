@@ -56,7 +56,7 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
-    private String mSigToken;
+    private String mSigToken = "";
     private boolean isDeviceHasNfc, isRegistrationInProgress;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =

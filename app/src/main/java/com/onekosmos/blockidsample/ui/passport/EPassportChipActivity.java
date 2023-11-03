@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -67,6 +68,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
+                Log.d("passportMap", mPassportMap.toString());
                 mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
                 break;
             case R.id.txt_skip:
