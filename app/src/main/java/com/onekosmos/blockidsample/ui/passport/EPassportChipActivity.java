@@ -1,11 +1,15 @@
 package com.onekosmos.blockidsample.ui.passport;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,8 +21,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
-import com.onekosmos.blockid.sdk.cameramodule.passport.RFIDScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.rfidScanner.IRFIDScanResponseListener;
+import com.onekosmos.blockid.sdk.cameramodule.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
@@ -28,32 +32,26 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
-
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IPassportResponseListener {
+public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IRFIDScanResponseListener {
     private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
     private AppCompatTextView mTxtSkip;
     private AppCompatButton mBtnScan, mBtnCancel;
     private ConstraintLayout mLayoutNFC, mLayoutScanRFId;
     private RFIDScannerHelper mRFIDScannerHelper;
     private LinkedHashMap<String, Object> mPassportMap;
-    private String mSigToken;
     private boolean mIsRegInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e_passport_chip_scan);
-        mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
+        mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS,
+                this);
         mPassportMap = PassportDataHolder.getData();
-        mSigToken = PassportDataHolder.getToken();
         initView();
     }
 
@@ -68,7 +66,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
-                mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
+                mRFIDScannerHelper.startRFIDScanning(mPassportMap);
                 break;
             case R.id.txt_skip:
             case R.id.btn_cancel:
@@ -92,6 +90,43 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     public void onBackPressed() {
         if (!mIsRegInProgress)
             super.onBackPressed();
+    }
+
+    @Override
+    public void onRFIDResponse(LinkedHashMap<String, Object> passportMap,
+                               ErrorManager.ErrorResponse error) {
+        mRFIDScannerHelper.stopRFIDScanning();
+        if (passportMap != null) {
+            mPassportMap = passportMap;
+            registerPassport();
+            return;
+        }
+
+        if (error == null)
+            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage());
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        if (error.getCode() == K_PP_RFID_TIMEOUT.getCode()) {
+            errorDialog.showWithOneButton(null,
+                    getString(R.string.label_timeout),
+                    error.getMessage() + "\n(" + getString(R.string.label_error_code) +
+                            error.getCode() + ")",
+                    getString(R.string.label_scan_again),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        mRFIDScannerHelper.startRFIDScanning(mPassportMap);
+                    });
+            return;
+        }
+        errorDialog.show(null,
+                getString(R.string.label_error),
+                error.getMessage() + "\n(" + getString(R.string.label_error_code)
+                        + error.getCode() + ")",
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
     }
 
     @Override
@@ -124,39 +159,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                 dialog -> {
                     errorDialog.dismiss();
                     registerPassport();
-                });
-    }
-
-    @Override
-    public void onPassportResponse(LinkedHashMap<String, Object> passportMap, String s, ErrorManager.ErrorResponse error) {
-        mRFIDScannerHelper.stopRFIDScanning();
-        if (passportMap != null) {
-            mPassportMap = passportMap;
-            registerPassport();
-            return;
-        }
-
-        if (error == null)
-            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
-
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        if (error.getCode() == K_PP_RFID_TIMEOUT.getCode()) {
-            errorDialog.showWithOneButton(null,
-                    getString(R.string.label_timeout),
-                    error.getMessage() + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")",
-                    getString(R.string.label_scan_again),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        mRFIDScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
-                    });
-            return;
-        }
-        errorDialog.show(null,
-                getString(R.string.label_error),
-                error.getMessage() + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")",
-                dialog -> {
-                    errorDialog.dismiss();
-                    finish();
                 });
     }
 
