@@ -190,8 +190,7 @@ public class PassportScanningActivity extends AppCompatActivity {
      * Start EPassportChipActivity for RFID scanning
      */
     private void openEPassportChipActivity() {
-        DocumentHolder.setData(mPassportMap, token);
-        // FIXME : We need to check during RFID test scanning
+        DocumentHolder.setData(mPassportMap, null);
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
