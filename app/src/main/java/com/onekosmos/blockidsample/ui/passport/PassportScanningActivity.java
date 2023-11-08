@@ -56,7 +56,6 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
-    private String mSigToken = "";
     private boolean isDeviceHasNfc, isRegistrationInProgress;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
@@ -189,7 +188,7 @@ public class PassportScanningActivity extends AppCompatActivity {
      * Start EPassportChipActivity for RFID scanning
      */
     private void openEPassportChipActivity() {
-        PassportDataHolder.setData(mPassportMap, mSigToken); // FIXME : We need to check during RFID test scanning
+        // FIXME : We need to check during RFID test scanning
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);

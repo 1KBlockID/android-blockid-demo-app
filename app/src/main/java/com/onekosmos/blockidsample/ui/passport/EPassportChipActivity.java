@@ -20,9 +20,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.rfidScanner.IRFIDScanResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.rfidScanner.RFIDScannerHelper;
+import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
+import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
@@ -51,7 +50,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_e_passport_chip_scan);
         mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS,
                 this);
-        mPassportMap = PassportDataHolder.getData();
+        mPassportMap = DocumentHolder.getData();
         initView();
     }
 
@@ -175,7 +174,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
-                            PassportDataHolder.clearData();
+                            DocumentHolder.clearData();
                             Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
                             finish();
                             return;
