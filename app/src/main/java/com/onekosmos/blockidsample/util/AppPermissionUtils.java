@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 
 import androidx.appcompat.widget.AppCompatButton;
@@ -18,17 +17,14 @@ import com.onekosmos.blockidsample.R;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
+@SuppressWarnings("All")
 public class AppPermissionUtils {
     public static void requestPermission(Activity activity, int requestCode, String[] requestPermission) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            activity.requestPermissions(requestPermission, requestCode);
-        }
+        activity.requestPermissions(requestPermission, requestCode);
     }
 
     public static void requestPermission(Fragment fragment, int requestCode, String[] requestPermission) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            fragment.requestPermissions(requestPermission, requestCode);
-        }
+        fragment.requestPermissions(requestPermission, requestCode);
     }
 
 
@@ -64,12 +60,10 @@ public class AppPermissionUtils {
     }
 
     public static boolean isPermissionGiven(String[] requestPermission, Activity activity) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            String array[] = requestPermission;
-            for (int i = 0; i < array.length; i++) {
-                if (ActivityCompat.checkSelfPermission(activity, array[i]) != PackageManager.PERMISSION_GRANTED)
-                    return false;
-            }
+        String array[] = requestPermission;
+        for (int i = 0; i < array.length; i++) {
+            if (ActivityCompat.checkSelfPermission(activity, array[i]) != PackageManager.PERMISSION_GRANTED)
+                return false;
         }
         return true;
     }

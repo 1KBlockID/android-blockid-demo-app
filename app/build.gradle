@@ -6,7 +6,7 @@ android {
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.onekosmos.blockid.poc"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 33
         versionCode 1
         versionName "1.9.90" + "." + getCurrentTimestampHexValue()
@@ -104,5 +104,5 @@ dependencies {
     implementation("com.walletconnect:android-core:1.0.0")
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.90.652FBE85'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.90.654B76FD'
 }
