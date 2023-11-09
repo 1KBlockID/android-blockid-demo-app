@@ -85,18 +85,32 @@ public class NationalIDScanActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String nidObject, token = null;
+                        String nidObject, token, proof;
                         try {
                             JSONObject nidResponse = new JSONObject(data);
-                            if (nidResponse.has("idcard_object")) {
-                                nidObject = nidResponse.getString("idcard_object");
-                            } else {
+
+                            if (!nidResponse.has("token") || !nidResponse.has("idcard_object") ||
+                                    !nidResponse.has("proof_jwt")) {
                                 nidScanFailed();
                                 return;
                             }
 
-                            if (nidResponse.has("token")) {
-                                token = nidResponse.getString("token");
+                            token = nidResponse.getString("token");
+                            if (TextUtils.isEmpty(token)) {
+                                nidScanFailed();
+                                return;
+                            }
+
+                            nidObject = nidResponse.getString("idcard_object");
+                            if (TextUtils.isEmpty(nidObject)) {
+                                nidScanFailed();
+                                return;
+                            }
+
+                            proof = nidResponse.getString("proof_jwt");
+                            if (TextUtils.isEmpty(proof)) {
+                                nidScanFailed();
+                                return;
                             }
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
@@ -112,9 +126,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             nidScanFailed();
                             return;
                         }
-                        if (!TextUtils.isEmpty(token)) {
-                            mNationalIDMap.put("certificate_token", token);
-                        }
+                        mNationalIDMap.put("certificate_token", token);
+                        mNationalIDMap.put("proof", proof);
 
                         registerNationalID();
                     });

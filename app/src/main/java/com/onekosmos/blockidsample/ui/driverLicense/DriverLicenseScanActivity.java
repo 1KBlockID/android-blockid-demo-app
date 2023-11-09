@@ -87,20 +87,33 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String dlObject, token = null;
+                        String dlObject, token, proof;
                         try {
                             JSONObject dlResponse = new JSONObject(data);
-                            if (dlResponse.has("dl_object")) {
-                                dlObject = dlResponse.getString("dl_object");
-                            } else {
+
+                            if (!dlResponse.has("token") || !dlResponse.has("dl_object") ||
+                                    !dlResponse.has("proof_jwt")) {
                                 dlScanFailed();
                                 return;
                             }
 
-                            if (dlResponse.has("token")) {
-                                token = dlResponse.getString("token");
+                            token = dlResponse.getString("token");
+                            if (TextUtils.isEmpty(token)) {
+                                dlScanFailed();
+                                return;
                             }
 
+                            dlObject = dlResponse.getString("dl_object");
+                            if (TextUtils.isEmpty(dlObject)) {
+                                dlScanFailed();
+                                return;
+                            }
+
+                            proof = dlResponse.getString("proof_jwt");
+                            if (TextUtils.isEmpty(proof)) {
+                                dlScanFailed();
+                                return;
+                            }
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
@@ -116,9 +129,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             return;
                         }
 
-                        if (!TextUtils.isEmpty(token)) {
-                            mDriverLicenseMap.put("certificate_token", token);
-                        }
+                        mDriverLicenseMap.put("certificate_token", token);
 
                         verifyDriverLicenseDialog();
                     });

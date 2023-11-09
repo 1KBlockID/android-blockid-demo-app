@@ -89,18 +89,32 @@ public class PassportScanningActivity extends AppCompatActivity {
                                     K_SOMETHING_WENT_WRONG.getMessage()));
                             return;
                         }
-                        String ppObject, token = null;
+                        String ppObject, token, proof;
                         try {
                             JSONObject pptResponse = new JSONObject(data);
-                            if (pptResponse.has("ppt_object")) {
-                                ppObject = pptResponse.getString("ppt_object");
-                            } else {
+
+                            if (!pptResponse.has("token") || !pptResponse.has("ppt_object") ||
+                                    !pptResponse.has("proof_jwt")) {
                                 ppScanFailed();
                                 return;
                             }
 
-                            if (pptResponse.has("token")) {
-                                token = pptResponse.getString("token");
+                            token = pptResponse.getString("token");
+                            if (TextUtils.isEmpty(token)) {
+                                ppScanFailed();
+                                return;
+                            }
+
+                            ppObject = pptResponse.getString("ppt_object");
+                            if (TextUtils.isEmpty(ppObject)) {
+                                ppScanFailed();
+                                return;
+                            }
+
+                            proof = pptResponse.getString("proof_jwt");
+                            if (TextUtils.isEmpty(proof)) {
+                                ppScanFailed();
+                                return;
                             }
 
                         } catch (Exception exception) {
@@ -118,10 +132,10 @@ public class PassportScanningActivity extends AppCompatActivity {
                             return;
                         }
 
-                        if (!TextUtils.isEmpty(token)) {
-                            mPassportMap.put("certificate_token", token);
-                            this.token = token;
-                        }
+
+                        mPassportMap.put("certificate_token", token);
+                        this.token = token;
+                        mPassportMap.put("proof", proof);
 
                         if (isDeviceHasNfc) {
                             openEPassportChipActivity();
