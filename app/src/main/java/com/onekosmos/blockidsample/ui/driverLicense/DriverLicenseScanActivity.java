@@ -114,6 +114,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                                 dlScanFailed();
                                 return;
                             }
+                            
                         } catch (Exception exception) {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
