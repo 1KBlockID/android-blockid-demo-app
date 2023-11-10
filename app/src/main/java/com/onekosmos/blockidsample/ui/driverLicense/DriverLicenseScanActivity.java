@@ -43,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 
 /**
@@ -79,60 +80,12 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             return;
                         }
 
-                        String data;
                         if (BIDDocumentDataHolder.hasData()) {
-                            data = BIDDocumentDataHolder.getData();
+                            processData(BIDDocumentDataHolder.getData());
                         } else {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
                         }
-                        String dlObject, token, proof;
-                        try {
-                            JSONObject dlResponse = new JSONObject(data);
-
-                            if (!dlResponse.has("token") || !dlResponse.has("dl_object") ||
-                                    !dlResponse.has("proof_jwt")) {
-                                dlScanFailed();
-                                return;
-                            }
-
-                            token = dlResponse.getString("token");
-                            if (TextUtils.isEmpty(token)) {
-                                dlScanFailed();
-                                return;
-                            }
-
-                            dlObject = dlResponse.getString("dl_object");
-                            if (TextUtils.isEmpty(dlObject)) {
-                                dlScanFailed();
-                                return;
-                            }
-
-                            proof = dlResponse.getString("proof_jwt");
-                            if (TextUtils.isEmpty(proof)) {
-                                dlScanFailed();
-                                return;
-                            }
-                            
-                        } catch (Exception exception) {
-                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                    K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
-                        }
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mDriverLicenseMap = gson.fromJson(dlObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {
-                                }.getType());
-
-                        if (mDriverLicenseMap == null) {
-                            dlScanFailed();
-                            return;
-                        }
-
-                        mDriverLicenseMap.put("certificate_token", token);
-
-                        verifyDriverLicenseDialog();
                     });
 
     @Override
@@ -193,6 +146,74 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     }
 
     /**
+     * Process the data received from the scanner
+     *
+     * @param data String result
+     */
+    private void processData(String data) {
+        String responseStatus, dlObject, token, proofJWT;
+        try {
+            JSONObject dataObject = new JSONObject(data);
+
+            responseStatus = dataObject.has("responseStatus") ?
+                    dataObject.getString("responseStatus") : null;
+
+            // responseStatus is empty or not success
+            if (TextUtils.isEmpty(responseStatus) ||
+                    !responseStatus.equalsIgnoreCase("SUCCESS")) {
+                dlScanFailed();
+                return;
+            }
+
+            token = dataObject.has("token") ? dataObject.getString("token") : null;
+
+            // toke is empty
+            if (TextUtils.isEmpty(token)) {
+                dlScanFailed();
+                return;
+            }
+
+            dlObject = dataObject.has("dl_object") ?
+                    dataObject.getString("dl_object") : null;
+
+            // dl object is empty
+            if (TextUtils.isEmpty(dlObject)) {
+                dlScanFailed();
+                return;
+            }
+
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            mDriverLicenseMap = gson.fromJson(dlObject,
+                    new TypeToken<LinkedHashMap<String, Object>>() {
+                    }.getType());
+
+            // passport map is null
+            if (mDriverLicenseMap == null) {
+                dlScanFailed();
+                return;
+            }
+
+            proofJWT = mDriverLicenseMap.containsKey("proof_jwt")
+                    ? mDriverLicenseMap.get("proof_jwt") != null
+                    ? Objects.requireNonNull(mDriverLicenseMap.get("proof_jwt")).toString()
+                    : null : null;
+
+            // proofJWT is empty
+            if (TextUtils.isEmpty(proofJWT)) {
+                dlScanFailed();
+                return;
+            }
+
+            mDriverLicenseMap.put("certificate_token", token);
+            mDriverLicenseMap.put("proof", proofJWT);
+            verifyDriverLicenseDialog();
+        } catch (Exception exception) {
+            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage()));
+        }
+    }
+
+    /**
      * Register Driver License
      */
     private void registerDriverLicense() {
@@ -218,7 +239,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         }
 
                         if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mDriverLicenseMap, null);
+                            DocumentHolder.setData(mDriverLicenseMap);
                             Intent intent = new Intent(this,
                                     ActiveLiveIDScanningActivity.class);
                             intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,

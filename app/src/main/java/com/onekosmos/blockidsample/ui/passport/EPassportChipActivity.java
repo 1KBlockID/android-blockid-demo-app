@@ -184,7 +184,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, null);
+                            DocumentHolder.setData(mPassportMap);
                             Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
                             intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
