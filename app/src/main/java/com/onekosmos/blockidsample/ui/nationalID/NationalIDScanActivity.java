@@ -42,6 +42,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
@@ -77,46 +78,12 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             return;
                         }
 
-                        String data;
                         if (BIDDocumentDataHolder.hasData()) {
-                            data = BIDDocumentDataHolder.getData();
+                            processData(BIDDocumentDataHolder.getData());
                         } else {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
                         }
-                        String nidObject, token = null;
-                        try {
-                            JSONObject nidResponse = new JSONObject(data);
-                            if (nidResponse.has("idcard_object")) {
-                                nidObject = nidResponse.getString("idcard_object");
-                            } else {
-                                nidScanFailed();
-                                return;
-                            }
-
-                            if (nidResponse.has("token")) {
-                                token = nidResponse.getString("token");
-                            }
-                        } catch (Exception exception) {
-                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                    K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
-                        }
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mNationalIDMap = gson.fromJson(nidObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {
-                                }.getType());
-
-                        if (mNationalIDMap == null) {
-                            nidScanFailed();
-                            return;
-                        }
-                        if (!TextUtils.isEmpty(token)) {
-                            mNationalIDMap.put("certificate_token", token);
-                        }
-
-                        registerNationalID();
                     });
 
     @Override
@@ -177,6 +144,74 @@ public class NationalIDScanActivity extends AppCompatActivity {
     }
 
     /**
+     * Process the data received from the scanner
+     *
+     * @param data String result
+     */
+    private void processData(String data) {
+        String responseStatus, idCardObject, token, proofJWT;
+        try {
+            JSONObject dataObject = new JSONObject(data);
+
+            responseStatus = dataObject.has("responseStatus") ?
+                    dataObject.getString("responseStatus") : null;
+
+            // responseStatus is empty or not success
+            if (TextUtils.isEmpty(responseStatus) ||
+                    !responseStatus.equalsIgnoreCase("SUCCESS")) {
+                nidScanFailed();
+                return;
+            }
+
+            token = dataObject.has("token") ? dataObject.getString("token") : null;
+
+            // toke is empty
+            if (TextUtils.isEmpty(token)) {
+                nidScanFailed();
+                return;
+            }
+
+            idCardObject = dataObject.has("idcard_object") ?
+                    dataObject.getString("idcard_object") : null;
+
+            //idcard object is empty
+            if (TextUtils.isEmpty(idCardObject)) {
+                nidScanFailed();
+                return;
+            }
+
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            mNationalIDMap = gson.fromJson(idCardObject,
+                    new TypeToken<LinkedHashMap<String, Object>>() {
+                    }.getType());
+
+            // passport map is null
+            if (mNationalIDMap == null) {
+                nidScanFailed();
+                return;
+            }
+
+            proofJWT = mNationalIDMap.containsKey("proof_jwt")
+                    ? mNationalIDMap.get("proof_jwt") != null
+                    ? Objects.requireNonNull(mNationalIDMap.get("proof_jwt")).toString()
+                    : null : null;
+
+            // proofJWT is empty
+            if (TextUtils.isEmpty(proofJWT)) {
+                nidScanFailed();
+                return;
+            }
+
+            mNationalIDMap.put("certificate_token", token);
+            mNationalIDMap.put("proof", proofJWT);
+            registerNationalID();
+        } catch (Exception exception) {
+            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage()));
+        }
+    }
+
+    /**
      * Register NationalID
      */
     private void registerNationalID() {
@@ -199,7 +234,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
                         return;
                     }
                     if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                        DocumentHolder.setData(mNationalIDMap, null);
+                        DocumentHolder.setData(mNationalIDMap);
                         Intent intent = new Intent(this,
                                 ActiveLiveIDScanningActivity.class);
                         intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,

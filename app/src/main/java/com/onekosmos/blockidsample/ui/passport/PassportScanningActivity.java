@@ -45,6 +45,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
@@ -57,7 +58,6 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
-    private String token;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -80,53 +80,11 @@ public class PassportScanningActivity extends AppCompatActivity {
                             }
                             return;
                         }
-
-                        String data;
                         if (BIDDocumentDataHolder.hasData()) {
-                            data = BIDDocumentDataHolder.getData();
+                            processData(BIDDocumentDataHolder.getData());
                         } else {
                             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                                     K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
-                        }
-                        String ppObject, token = null;
-                        try {
-                            JSONObject pptResponse = new JSONObject(data);
-                            if (pptResponse.has("ppt_object")) {
-                                ppObject = pptResponse.getString("ppt_object");
-                            } else {
-                                ppScanFailed();
-                                return;
-                            }
-
-                            if (pptResponse.has("token")) {
-                                token = pptResponse.getString("token");
-                            }
-
-                        } catch (Exception exception) {
-                            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
-                                    K_SOMETHING_WENT_WRONG.getMessage()));
-                            return;
-                        }
-                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                        mPassportMap = gson.fromJson(ppObject,
-                                new TypeToken<LinkedHashMap<String, Object>>() {
-                                }.getType());
-
-                        if (mPassportMap == null) {
-                            ppScanFailed();
-                            return;
-                        }
-
-                        if (!TextUtils.isEmpty(token)) {
-                            mPassportMap.put("certificate_token", token);
-                            this.token = token;
-                        }
-
-                        if (isDeviceHasNfc) {
-                            openEPassportChipActivity();
-                        } else {
-                            registerPassport();
                         }
                     });
 
@@ -187,10 +145,82 @@ public class PassportScanningActivity extends AppCompatActivity {
     }
 
     /**
+     * Process the data received from the scanner
+     *
+     * @param data String result
+     */
+    private void processData(String data) {
+        String responseStatus, pptObject, token, proofJWT;
+        try {
+            JSONObject dataObject = new JSONObject(data);
+
+            responseStatus = dataObject.has("responseStatus") ?
+                    dataObject.getString("responseStatus") : null;
+
+            // responseStatus is empty or not success
+            if (TextUtils.isEmpty(responseStatus) ||
+                    !responseStatus.equalsIgnoreCase("SUCCESS")) {
+                ppScanFailed();
+                return;
+            }
+
+            token = dataObject.has("token") ? dataObject.getString("token") : null;
+
+            // toke is empty
+            if (TextUtils.isEmpty(token)) {
+                ppScanFailed();
+                return;
+            }
+
+            pptObject = dataObject.has("ppt_object") ?
+                    dataObject.getString("ppt_object") : null;
+
+            // ppt object is empty
+            if (TextUtils.isEmpty(pptObject)) {
+                ppScanFailed();
+                return;
+            }
+
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            mPassportMap = gson.fromJson(pptObject,
+                    new TypeToken<LinkedHashMap<String, Object>>() {
+                    }.getType());
+
+            // passport map is null
+            if (mPassportMap == null) {
+                ppScanFailed();
+                return;
+            }
+
+            proofJWT = mPassportMap.containsKey("proof_jwt")
+                    ? mPassportMap.get("proof_jwt") != null
+                    ? Objects.requireNonNull(mPassportMap.get("proof_jwt")).toString()
+                    : null : null;
+
+            // proofJWT is empty
+            if (TextUtils.isEmpty(proofJWT)) {
+                ppScanFailed();
+                return;
+            }
+
+            mPassportMap.put("certificate_token", token);
+            mPassportMap.put("proof", proofJWT);
+            if (isDeviceHasNfc) {
+                openEPassportChipActivity();
+            } else {
+                registerPassport();
+            }
+        } catch (Exception exception) {
+            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage()));
+        }
+    }
+
+    /**
      * Start EPassportChipActivity for RFID scanning
      */
     private void openEPassportChipActivity() {
-        DocumentHolder.setData(mPassportMap, null);
+        DocumentHolder.setData(mPassportMap);
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
@@ -223,7 +253,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                         }
 
                         if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, null);
+                            DocumentHolder.setData(mPassportMap);
                             Intent intent = new Intent(this,
                                     ActiveLiveIDScanningActivity.class);
                             intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
