@@ -9,10 +9,14 @@ import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -55,6 +59,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mNationalIDMap;
     private boolean isRegistrationInProgress;
+    private String sessionID;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -152,6 +157,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
         String responseStatus, idCardObject, token, proofJWT;
         try {
             JSONObject dataObject = new JSONObject(data);
+            sessionID = dataObject.has("sessionId") ?
+                    dataObject.getString("sessionId") : "";
+            Log.e("pankti", "session id: " + sessionID);
 
             responseStatus = dataObject.has("responseStatus") ?
                     dataObject.getString("responseStatus") : null;
@@ -291,8 +299,22 @@ public class NationalIDScanActivity extends AppCompatActivity {
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.show(null, getString(R.string.label_error),
                 getString(R.string.label_nid_fail_to_scan), dialog -> {
+                    copyToClipboard();
                     errorDialog.dismiss();
                     finish();
                 });
+    }
+
+    private void copyToClipboard() {
+        if (TextUtils.isEmpty(sessionID)) {
+            return;
+        }
+        try {
+            ClipboardManager clipboard = (ClipboardManager) this.getSystemService(
+                    CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("msg", sessionID);
+            clipboard.setPrimaryClip(clip);
+        } catch (Exception ignored) {
+        }
     }
 }
