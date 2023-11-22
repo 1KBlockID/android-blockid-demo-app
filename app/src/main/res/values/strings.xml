@@ -47,7 +47,6 @@
         of your documents with BlockID Sample and verify your identity unless you permit access
         to the camera.</string>
     <string name="label_error_code">Error code:</string>
-    <string name="label_doc_about_to_expire_2">days, Would you still like to enroll it?</string>
     <string name="label_e_passport_chip_scan">e-Passport chip scan</string>
     <string name="label_scan_rfid">Scan RFID</string>
     <string name="label_skip">Skip</string>
@@ -98,8 +97,6 @@
     <string name="label_enter_preset_qr_data">Enter preset qr data</string>
     <string name="label_back">Back</string>
     <string name="label_authenticating_please_wait">Authenticating, please wait...</string>
-    <string name="label_scanning">Scanning...</string>
-    <string name="label_scan_complete">Scan complete</string>
     <string name="label_permission_alert">Permission Alert</string>
     <string name="label_you_have_denied">You have denied the permission, please allow permission.</string>
     <string name="label_restore_account">Restore Account</string>
