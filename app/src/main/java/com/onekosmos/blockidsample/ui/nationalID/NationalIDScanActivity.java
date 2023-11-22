@@ -139,7 +139,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
      */
     private void startScan() {
         Intent intent = new Intent(this, DocumentScannerActivity.class);
-        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.ID.getValue());
+        intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.IDCARD.getValue());
         documentSessionResult.launch(intent);
     }
 
