@@ -47,7 +47,6 @@
         of your documents with BlockID Sample and verify your identity unless you permit access
         to the camera.</string>
     <string name="label_error_code">Error code:</string>
-    <string name="label_doc_about_to_expire_2">days, Would you still like to enroll it?</string>
     <string name="label_e_passport_chip_scan">e-Passport chip scan</string>
     <string name="label_scan_rfid">Scan RFID</string>
     <string name="label_skip">Skip</string>
@@ -98,8 +97,6 @@
     <string name="label_enter_preset_qr_data">Enter preset qr data</string>
     <string name="label_back">Back</string>
     <string name="label_authenticating_please_wait">Authenticating, please wait...</string>
-    <string name="label_scanning">Scanning...</string>
-    <string name="label_scan_complete">Scan complete</string>
     <string name="label_permission_alert">Permission Alert</string>
     <string name="label_you_have_denied">You have denied the permission, please allow permission.</string>
     <string name="label_restore_account">Restore Account</string>
@@ -130,10 +127,11 @@
         write any of your documents with BlockID Sample into your storage.</string>
     <string name="label_share">Share</string>
     <string name="label_verify_liveid">Verifying LiveID</string>
-    <string name="label_dl_fail_to_scan">Drivers License fail to scan.</string>
-    <string name="label_pp_fail_to_scan">Passport fail to scan.</string>
-    <string name="label_nid_fail_to_scan">National ID fail to scan.</string>
+    <string name="label_dl_fail_to_scan">Drivers License failed to scan.</string>
+    <string name="label_pp_fail_to_scan">Passport failed to scan.</string>
+    <string name="label_nid_fail_to_scan">National ID failed to scan.</string>
     <string name="label_scan_timeout_title">Scanning timeout</string>
+
     <string name="label_scan_timeout_message">Scanning time exceeded. To continue, please restart the scanning process.</string>
 
     <!-- Fido2 -->
