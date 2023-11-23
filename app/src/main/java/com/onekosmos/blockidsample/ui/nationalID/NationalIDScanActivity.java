@@ -212,6 +212,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
 
             mNationalIDMap.put("certificate_token", token);
             mNationalIDMap.put("proof", proofJWT);
+            copyToClipboard();
             registerNationalID();
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),

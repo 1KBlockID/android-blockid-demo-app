@@ -213,6 +213,7 @@ public class PassportScanningActivity extends AppCompatActivity {
 
             mPassportMap.put("certificate_token", token);
             mPassportMap.put("proof", proofJWT);
+            copyToClipboard();
             if (isDeviceHasNfc) {
                 openEPassportChipActivity();
             } else {

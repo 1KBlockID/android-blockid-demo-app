@@ -213,6 +213,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
 
             mDriverLicenseMap.put("certificate_token", token);
             mDriverLicenseMap.put("proof", proofJWT);
+            copyToClipboard();
             verifyDriverLicenseDialog();
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
