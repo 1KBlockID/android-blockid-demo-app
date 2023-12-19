@@ -189,6 +189,7 @@
         order to authenticate.</string>
 
     <!-- Add User -->
+    <string name="label_submit_url">Submit URL</string>
     <string name="label_add_user">Add User</string>
     <string name="label_invalid_link">Invalid link</string>
     <string name="label_empty_payload">Empty payload</string>

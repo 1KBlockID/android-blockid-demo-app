@@ -33,6 +33,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
+import com.onekosmos.blockidsample.ui.WebViewActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
@@ -123,6 +124,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onAboutClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
             getKYC();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_submit_url))) {
+            submitURL();
         }
     }
 
@@ -488,5 +491,10 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                     message, getString(R.string.label_ok), listener);
 
         });
+    }
+
+    private void submitURL(){
+            Intent intent = new Intent(this, WebViewActivity.class);
+            startActivity(intent);
     }
 }

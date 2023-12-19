@@ -30,6 +30,7 @@ public class EnrollmentsDataSource {
 
     public enum EnrollmentAssetEnum {
         ASSET_ADD_USER,
+        ASSET_SUBMIT_URL,
         ASSET_LIVE_ID_ACTIVE,
         ASSET_LIVE_ID_PASSIVE,
         ASSET_PIN,
@@ -62,6 +63,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_ABOUT);
 
         arr.add(EnrollmentAssetEnum.ASSET_ADD_USER);
+        arr.add(EnrollmentAssetEnum.ASSET_SUBMIT_URL);
 
         arr.add(EnrollmentAssetEnum.ASSET_DL);
         arr.add(EnrollmentAssetEnum.ASSET_PP1);
@@ -97,7 +99,10 @@ public class EnrollmentsDataSource {
                             account.getUserId(), account.getOrigin().getTag() + " | " +
                             account.getOrigin().getCommunity());
                 break;
-
+            case ASSET_SUBMIT_URL:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_submit_url), null);
+                break;
             case ASSET_DL:
                 String dlID1 = getDriverLicenseID(1);
                 dlID1 = TextUtils.isEmpty(dlID1) ? "" : "\n(# " + dlID1 + ")";
