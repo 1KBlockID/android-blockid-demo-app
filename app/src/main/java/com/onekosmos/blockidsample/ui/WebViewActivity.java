@@ -51,7 +51,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         mDocumentScannerWebView = findViewById(R.id.webview_document_scanner);
 
-        initializeAndLoadWebView("https://1k-dev.1kosmos.net/idproofing/extract-demo");
+        initializeAndLoadWebView("https://1k-dev.1kosmos.net/idproofing/capture-demo");
     }
 
     /**
@@ -61,6 +61,7 @@ public class WebViewActivity extends AppCompatActivity {
      */
     @SuppressLint("SetJavaScriptEnabled")
     private void initializeAndLoadWebView(String url) {
+        mDocumentScannerWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         mDocumentScannerWebView.getSettings().setJavaScriptEnabled(true);
         mDocumentScannerWebView.getSettings().setDomStorageEnabled(true);
 
