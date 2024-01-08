@@ -42,6 +42,7 @@ public class EnrollmentsDataSource {
         ASSET_LOGIN_WITH_QR,
         ASSET_RECOVER_MNEMONIC,
         ASSET_FIDO2,
+        ASSET_FIDO2_PIN_MANAGEMENT,
         ASSET_WALLET_CONNECT,
         ASSET_ABOUT,
         ASSET_KYC,
@@ -77,6 +78,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
+        arr.add(EnrollmentAssetEnum.ASSET_FIDO2_PIN_MANAGEMENT);
         arr.add(EnrollmentAssetEnum.ASSET_WALLET_CONNECT);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
@@ -161,6 +163,11 @@ public class EnrollmentsDataSource {
             case ASSET_FIDO2:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_fido2), null);
+                break;
+            case ASSET_FIDO2_PIN_MANAGEMENT:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_fido2_pin_management),
+                        null);
                 break;
             case ASSET_WALLET_CONNECT:
                 enrollmentAsset = new EnrollmentAsset(false,

@@ -311,6 +311,7 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
      */
     private void registerLiveIDWithDocument(Bitmap livIdBitmap) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
+        mProgressDialog.show();
         LinkedHashMap<String, Object> documentMap = DocumentHolder.getData();
         documentMap.put("category", identity_document.name());
         documentMap.put("type", documentMap.get("type"));

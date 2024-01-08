@@ -6,17 +6,18 @@ android {
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.onekosmos.blockid.poc"
-        minSdkVersion 23
+        minSdkVersion 25
         targetSdkVersion 33
         versionCode 1
-        versionName "1.9.83" + "." + getCurrentTimestampHexValue()
+        versionName "1.9.90" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
         debug {
             minifyEnabled false
@@ -104,5 +105,5 @@ dependencies {
     implementation("com.walletconnect:android-core:1.0.0")
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.83.655DAA9E'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.9.90.659BF109'
 }

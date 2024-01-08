@@ -1,5 +1,10 @@
 package com.onekosmos.blockidsample.ui.passport;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
@@ -15,8 +20,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.cameramodule.camera.passportModule.IPassportResponseListener;
-import com.onekosmos.blockid.sdk.cameramodule.passport.PassportScannerHelper;
+import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
+import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
@@ -26,32 +31,26 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
-import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
-import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
-
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IPassportResponseListener {
+public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IRFIDScanResponseListener {
     private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
     private AppCompatTextView mTxtSkip;
     private AppCompatButton mBtnScan, mBtnCancel;
     private ConstraintLayout mLayoutNFC, mLayoutScanRFId;
-    private PassportScannerHelper mPassportScannerHelper;
+    private RFIDScannerHelper mRFIDScannerHelper;
     private LinkedHashMap<String, Object> mPassportMap;
-    private String mSigToken;
     private boolean mIsRegInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_e_passport_chip_scan);
-        mPassportScannerHelper = new PassportScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS, this);
-        mPassportMap = PassportDataHolder.getData();
-        mSigToken = PassportDataHolder.getToken();
+        mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS,
+                this);
+        mPassportMap = DocumentHolder.getData();
         initView();
     }
 
@@ -66,7 +65,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             case R.id.btn_scan:
                 mLayoutNFC.setVisibility(View.GONE);
                 mLayoutScanRFId.setVisibility(View.VISIBLE);
-                mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
+                mRFIDScannerHelper.startRFIDScanning(mPassportMap);
                 break;
             case R.id.txt_skip:
             case R.id.btn_cancel:
@@ -81,7 +80,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
             Tag tag = intent.getExtras().getParcelable(NfcAdapter.EXTRA_TAG);
             if (Arrays.asList(tag.getTechList()).contains("android.nfc.tech.IsoDep")) {
-                mPassportScannerHelper.onNewIntent(tag);
+                mRFIDScannerHelper.onNewIntent(tag);
             }
         }
     }
@@ -93,9 +92,46 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     }
 
     @Override
+    public void onRFIDResponse(LinkedHashMap<String, Object> passportMap,
+                               ErrorManager.ErrorResponse error) {
+        mRFIDScannerHelper.stopRFIDScanning();
+        if (passportMap != null) {
+            mPassportMap = passportMap;
+            registerPassport();
+            return;
+        }
+
+        if (error == null)
+            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage());
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        if (error.getCode() == K_PP_RFID_TIMEOUT.getCode()) {
+            errorDialog.showWithOneButton(null,
+                    getString(R.string.label_timeout),
+                    error.getMessage() + "\n(" + getString(R.string.label_error_code) +
+                            error.getCode() + ")",
+                    getString(R.string.label_scan_again),
+                    dialog -> {
+                        errorDialog.dismiss();
+                        mRFIDScannerHelper.startRFIDScanning(mPassportMap);
+                    });
+            return;
+        }
+        errorDialog.show(null,
+                getString(R.string.label_error),
+                error.getMessage() + "\n(" + getString(R.string.label_error_code)
+                        + error.getCode() + ")",
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-        mPassportScannerHelper.stopRFIDScanning();
+        mRFIDScannerHelper.stopRFIDScanning();
     }
 
     private void initView() {
@@ -125,42 +161,9 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                 });
     }
 
-    @Override
-    public void onPassportResponse(LinkedHashMap<String, Object> passportMap, String s, ErrorManager.ErrorResponse error) {
-        mPassportScannerHelper.stopRFIDScanning();
-        if (passportMap != null) {
-            mPassportMap = passportMap;
-            registerPassport();
-            return;
-        }
-
-        if (error == null)
-            error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
-
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        if (error.getCode() == K_PP_RFID_TIMEOUT.getCode()) {
-            errorDialog.showWithOneButton(null,
-                    getString(R.string.label_timeout),
-                    error.getMessage() + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")",
-                    getString(R.string.label_scan_again),
-                    dialog -> {
-                        errorDialog.dismiss();
-                        mPassportScannerHelper.startRFIDScanning(mPassportMap, mSigToken);
-                    });
-            return;
-        }
-        errorDialog.show(null,
-                getString(R.string.label_error),
-                error.getMessage() + "\n(" + getString(R.string.label_error_code) + error.getCode() + ")",
-                dialog -> {
-                    errorDialog.dismiss();
-                    finish();
-                });
-    }
-
     private void registerPassport() {
         mIsRegInProgress = true;
-        mPassportScannerHelper.stopRFIDScanning();
+        mRFIDScannerHelper.stopRFIDScanning();
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         if (mPassportMap != null) {
@@ -171,7 +174,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                     null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
-                            PassportDataHolder.clearData();
+                            DocumentHolder.clearData();
                             Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
                             finish();
                             return;
@@ -181,7 +184,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                             error = new ErrorManager.ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(), K_SOMETHING_WENT_WRONG.getMessage());
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap, null);
+                            DocumentHolder.setData(mPassportMap);
                             Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
                             intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

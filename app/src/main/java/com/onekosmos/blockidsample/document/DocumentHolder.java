@@ -9,27 +9,21 @@ import java.util.LinkedHashMap;
 public enum DocumentHolder {
     INSTANCE;
     private LinkedHashMap<String, Object> documentHolder;
-    private String token;
 
     public static boolean hasData() {
         return INSTANCE.documentHolder != null;
     }
 
-    public static void setData(final LinkedHashMap<String, Object> documentHolder, final String token) {
+    public static void setData(final LinkedHashMap<String, Object> documentHolder) {
         INSTANCE.documentHolder = documentHolder;
-        INSTANCE.token = token;
     }
 
     public static LinkedHashMap<String, Object> getData() {
         return INSTANCE.documentHolder;
     }
 
-    public static String getToken() {
-        return INSTANCE.token;
-    }
 
     public static void clearData() {
         INSTANCE.documentHolder = null;
-        INSTANCE.token = null;
     }
 }
