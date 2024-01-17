@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
@@ -37,7 +36,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -216,11 +214,11 @@ public class NationalIDScanActivity extends AppCompatActivity {
             if (dataObject.has(K_LIVEID_OBJECT)) {
                 JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
                 if (liveIDObject.has(K_FACE)) {
-                    DocumentHolder.setLiveIDImageBase64(liveIDObject.getString(K_FACE));
+                    mLiveIDImageB64 = liveIDObject.getString(K_FACE);
                 }
 
                 if (liveIDObject.has(K_PROOFED_BY)) {
-                    DocumentHolder.setLiveIDProofedBy(liveIDObject.getString(K_PROOFED_BY));
+                    mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
                 }
             }
 
@@ -249,29 +247,27 @@ public class NationalIDScanActivity extends AppCompatActivity {
      * Register documents with LiveID
      */
     private void registerDocumentWithLiveID() {
-        mImgBack.setClickable(false);
-        mTxtBack.setClickable(false);
-        ProgressDialog progressDialog = new ProgressDialog(this,
-                getString(R.string.label_registering_driver_license));
+        ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
-
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        mNationalIDMap.put("category", identity_document.name());
+        mNationalIDMap.put("type", NATIONAL_ID.getValue());
+        mNationalIDMap.put("id", mNationalIDMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        if (mNationalIDMap != null) {
-            BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
-                    null, null, null, (status, error) -> {
-                        progressDialog.dismiss();
-                        isRegistrationInProgress = false;
-                        if (!status) {
-                            showError(error);
-                            return;
-                        }
-                        Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
+                mLiveIDProofedBy, null, null, (status, error) -> {
+                    progressDialog.dismiss();
+                    isRegistrationInProgress = false;
+                    if (status) {
+                        Toast.makeText(this, R.string.label_nid_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
                         finish();
                         return;
-                    });
-        }
+                    }
+                    showError(error);
+                });
     }
 
     /**
@@ -293,17 +289,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_nid_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
-                        finish();
-                        return;
-                    }
-                    if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                        DocumentHolder.setData(mNationalIDMap);
-                        Intent intent = new Intent(this,
-                                ActiveLiveIDScanningActivity.class);
-                        intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
-                                true);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(intent);
                         finish();
                         return;
                     }
