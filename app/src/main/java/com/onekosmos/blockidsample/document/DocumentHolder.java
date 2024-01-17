@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 public enum DocumentHolder {
     INSTANCE;
     private LinkedHashMap<String, Object> documentHolder;
+    private String liveIDImageBase64;
+    private String liveIDProofedBy;
 
     public static boolean hasData() {
         return INSTANCE.documentHolder != null;
@@ -25,5 +27,24 @@ public enum DocumentHolder {
 
     public static void clearData() {
         INSTANCE.documentHolder = null;
+        INSTANCE.liveIDImageBase64 = null;
+        INSTANCE.liveIDProofedBy = null;
     }
+
+    public static void setLiveIDImageBase64(String liveIDImageBase64) {
+        liveIDImageBase64 = liveIDImageBase64;
+    }
+
+    public String getLiveIDImageBase64() {
+        return liveIDImageBase64;
+    }
+
+    public static void setLiveIDProofedBy(String liveIDProofedBy) {
+        liveIDProofedBy = liveIDProofedBy;
+    }
+
+    public String getLiveIDProofedBy() {
+        return liveIDProofedBy;
+    }
+
 }

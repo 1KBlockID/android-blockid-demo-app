@@ -10,8 +10,11 @@ import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.android.gms.common.data.DataHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -57,6 +61,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mDriverLicenseMap;
     private boolean isRegistrationInProgress;
+    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_FACE = "face";
+    private static final String K_PROOFED_BY = "proofedBy";
+    private String mLiveIDImageB64, mLiveIDProofedBy;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -93,6 +101,9 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
         initView();
+        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
+        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -204,6 +215,17 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                 return;
             }
 
+            if (dataObject.has(K_LIVEID_OBJECT)) {
+                JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
+                if (liveIDObject.has(K_FACE)) {
+                    DocumentHolder.setLiveIDImageBase64(liveIDObject.getString(K_FACE));
+                }
+
+                if (liveIDObject.has(K_PROOFED_BY)) {
+                    DocumentHolder.setLiveIDProofedBy(liveIDObject.getString(K_PROOFED_BY));
+                }
+            }
+
             mDriverLicenseMap.put("certificate_token", token);
             mDriverLicenseMap.put("proof", proofJWT);
             verifyDriverLicenseDialog();
@@ -255,6 +277,43 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         }
     }
 
+    private Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * Register documents with LiveID
+     */
+    private void registerDocumentWithLiveID() {
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_registering_driver_license));
+        progressDialog.show();
+        isRegistrationInProgress = true;
+
+        Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        if (mDriverLicenseMap != null) {
+            BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
+                    null, null, null, (status, error) -> {
+                        progressDialog.dismiss();
+                        isRegistrationInProgress = false;
+                        if (!status) {
+                            showError(error);
+                            return;
+                        }
+                        Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    });
+        }
+    }
+
     /**
      * Verify Driver License
      */
@@ -265,7 +324,13 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                 getString(R.string.label_do_you_want_to_verify_driver_license),
                 getString(R.string.label_yes),
                 getString(R.string.label_no),
-                (dialogInterface, i) -> registerDriverLicense(),
+                (dialogInterface, i) -> {
+                    if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                        registerDriverLicense();
+                    } else {
+                        registerDocumentWithLiveID();
+                    }
+                },
                 dialog -> verifyDriverLicense());
     }
 
