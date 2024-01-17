@@ -11,8 +11,11 @@ import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -55,6 +58,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mNationalIDMap;
     private boolean isRegistrationInProgress;
+    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_FACE = "face";
+    private static final String K_PROOFED_BY = "proofedBy";
+    private String mLiveIDImageB64, mLiveIDProofedBy;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -91,6 +98,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
+
+        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
+        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -202,12 +213,64 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 return;
             }
 
+            if (dataObject.has(K_LIVEID_OBJECT)) {
+                JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
+                if (liveIDObject.has(K_FACE)) {
+                    DocumentHolder.setLiveIDImageBase64(liveIDObject.getString(K_FACE));
+                }
+
+                if (liveIDObject.has(K_PROOFED_BY)) {
+                    DocumentHolder.setLiveIDProofedBy(liveIDObject.getString(K_PROOFED_BY));
+                }
+            }
+
             mNationalIDMap.put("certificate_token", token);
             mNationalIDMap.put("proof", proofJWT);
-            registerNationalID();
+            if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                registerNationalID();
+            } else {
+                registerDocumentWithLiveID();
+            }
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                     K_SOMETHING_WENT_WRONG.getMessage()));
+        }
+    }
+
+    private Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * Register documents with LiveID
+     */
+    private void registerDocumentWithLiveID() {
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_registering_driver_license));
+        progressDialog.show();
+        isRegistrationInProgress = true;
+
+        Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        if (mNationalIDMap != null) {
+            BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
+                    null, null, null, (status, error) -> {
+                        progressDialog.dismiss();
+                        isRegistrationInProgress = false;
+                        if (!status) {
+                            showError(error);
+                            return;
+                        }
+                        Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    });
         }
     }
 
