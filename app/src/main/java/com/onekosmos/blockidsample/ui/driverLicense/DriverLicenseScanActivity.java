@@ -218,11 +218,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             if (dataObject.has(K_LIVEID_OBJECT)) {
                 JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
                 if (liveIDObject.has(K_FACE)) {
-                    DocumentHolder.setLiveIDImageBase64(liveIDObject.getString(K_FACE));
+                    mLiveIDImageB64 = liveIDObject.getString(K_FACE);
                 }
 
                 if (liveIDObject.has(K_PROOFED_BY)) {
-                    DocumentHolder.setLiveIDProofedBy(liveIDObject.getString(K_PROOFED_BY));
+                    mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
                 }
             }
 
@@ -260,18 +260,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                             return;
                         }
 
-                        if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mDriverLicenseMap);
-                            Intent intent = new Intent(this,
-                                    ActiveLiveIDScanningActivity.class);
-                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
-                                    true);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(intent);
-                            finish();
-                            return;
-                        }
-
                         showError(error);
                     });
         }
@@ -289,30 +277,29 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
      * Register documents with LiveID
      */
     private void registerDocumentWithLiveID() {
-        mImgBack.setClickable(false);
-        mTxtBack.setClickable(false);
-        ProgressDialog progressDialog = new ProgressDialog(this,
-                getString(R.string.label_registering_driver_license));
+        ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
-
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        mDriverLicenseMap.put("category", identity_document.name());
+        mDriverLicenseMap.put("type", DL.getValue());
+        mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        if (mDriverLicenseMap != null) {
-            BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
-                    null, null, null, (status, error) -> {
-                        progressDialog.dismiss();
-                        isRegistrationInProgress = false;
-                        if (!status) {
-                            showError(error);
-                            return;
-                        }
+        BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
+                mLiveIDProofedBy, null, null, (status, error) -> {
+                    progressDialog.dismiss();
+                    isRegistrationInProgress = false;
+                    if (status) {
                         Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
                         finish();
                         return;
-                    });
-        }
+                    }
+                    showError(error);
+                });
     }
+
 
     /**
      * Verify Driver License
