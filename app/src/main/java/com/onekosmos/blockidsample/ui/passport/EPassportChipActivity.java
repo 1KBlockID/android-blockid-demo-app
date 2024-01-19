@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.passport;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
@@ -7,9 +8,13 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
 
@@ -43,6 +48,10 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     private RFIDScannerHelper mRFIDScannerHelper;
     private LinkedHashMap<String, Object> mPassportMap;
     private boolean mIsRegInProgress;
+    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_FACE = "face";
+    private static final String K_PROOFED_BY = "proofedBy";
+    private String mLiveIDImageB64, mLiveIDProofedBy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +61,9 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                 this);
         mPassportMap = DocumentHolder.getData();
         initView();
+
+        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
+        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
     }
 
     @Override
@@ -97,7 +109,11 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mRFIDScannerHelper.stopRFIDScanning();
         if (passportMap != null) {
             mPassportMap = passportMap;
-            registerPassport();
+            if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                registerPassport();
+            } else {
+                registerDocumentWithLiveID();
+            }
             return;
         }
 
@@ -157,8 +173,82 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
                 },
                 dialog -> {
                     errorDialog.dismiss();
-                    registerPassport();
+                    if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                        registerPassport();
+                    } else {
+                        registerDocumentWithLiveID();
+                    }
                 });
+    }
+
+    private Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * Register documents with LiveID
+     */
+    private void registerDocumentWithLiveID() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        mIsRegInProgress = true;
+        mPassportMap.put("category", identity_document.name());
+        mPassportMap.put("type", PPT.getValue());
+        mPassportMap.put("id", mPassportMap.get("id"));
+        Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
+                mLiveIDProofedBy, null, null, (status, error) -> {
+                    progressDialog.dismiss();
+                    mIsRegInProgress = false;
+                    if (status) {
+                        Toast.makeText(this, R.string.label_passport_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                    showError(error);
+                });
+    }
+
+    /**
+     * Show Error Dialog
+     *
+     * @param errorResponse = {@link ErrorManager.ErrorResponse}
+     */
+    private void showError(ErrorManager.ErrorResponse errorResponse) {
+        // Don't show error when user canceled
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
+            finish();
+            return;
+        }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+            finish();
+        };
+
+        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
+            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                    getString(R.string.label_scan_timeout_message), dialog -> {
+                        errorDialog.dismiss();
+                        finish();
+                    });
+            return;
+        }
+
+        if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
+        } else {
+            errorDialog.show(null,
+                    getString(R.string.label_error),
+                    errorResponse.getMessage(),
+                    onDismissListener);
+        }
     }
 
     private void registerPassport() {
