@@ -102,8 +102,6 @@ public class PassportScanningActivity extends AppCompatActivity {
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
 
-        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
-        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
@@ -218,10 +216,12 @@ public class PassportScanningActivity extends AppCompatActivity {
                 JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
                 if (liveIDObject.has(K_FACE)) {
                     mLiveIDImageB64 = liveIDObject.getString(K_FACE);
+                    DocumentHolder.INSTANCE.setLiveIDImageBase64(mLiveIDImageB64);
                 }
 
                 if (liveIDObject.has(K_PROOFED_BY)) {
                     mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
+                    DocumentHolder.INSTANCE.setLiveIDProofedBy(mLiveIDProofedBy);
                 }
             }
 

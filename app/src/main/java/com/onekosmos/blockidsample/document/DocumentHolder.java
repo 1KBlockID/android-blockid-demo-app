@@ -31,20 +31,20 @@ public enum DocumentHolder {
         INSTANCE.liveIDProofedBy = null;
     }
 
-    public static void setLiveIDImageBase64(String liveIDImageBase64) {
-        liveIDImageBase64 = liveIDImageBase64;
+    public void setLiveIDImageBase64(String liveIDImageBase64) {
+        INSTANCE.liveIDImageBase64 = liveIDImageBase64;
     }
 
     public String getLiveIDImageBase64() {
-        return liveIDImageBase64;
+        return INSTANCE.liveIDImageBase64;
     }
 
-    public static void setLiveIDProofedBy(String liveIDProofedBy) {
-        liveIDProofedBy = liveIDProofedBy;
+    public void setLiveIDProofedBy(String liveIDProofedBy) {
+        INSTANCE.liveIDProofedBy = liveIDProofedBy;
     }
 
     public String getLiveIDProofedBy() {
-        return liveIDProofedBy;
+        return INSTANCE.liveIDProofedBy;
     }
 
 }
