@@ -12,10 +12,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -58,6 +61,10 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
+    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_FACE = "face";
+    private static final String K_PROOFED_BY = "proofedBy";
+    private String mLiveIDImageB64, mLiveIDProofedBy;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -94,6 +101,10 @@ public class PassportScanningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_passport_scanning);
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
+
+        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
+        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -203,12 +214,27 @@ public class PassportScanningActivity extends AppCompatActivity {
                 return;
             }
 
+            if (dataObject.has(K_LIVEID_OBJECT)) {
+                JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
+                if (liveIDObject.has(K_FACE)) {
+                    mLiveIDImageB64 = liveIDObject.getString(K_FACE);
+                }
+
+                if (liveIDObject.has(K_PROOFED_BY)) {
+                    mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
+                }
+            }
+
             mPassportMap.put("certificate_token", token);
             mPassportMap.put("proof", proofJWT);
             if (isDeviceHasNfc) {
                 openEPassportChipActivity();
             } else {
-                registerPassport();
+                if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                    registerPassport();
+                } else {
+                    registerDocumentWithLiveID();
+                }
             }
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
@@ -225,6 +251,41 @@ public class PassportScanningActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
         finish();
+    }
+
+    private Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * Register documents with LiveID
+     */
+    private void registerDocumentWithLiveID() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        isRegistrationInProgress = true;
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        mPassportMap.put("category", identity_document.name());
+        mPassportMap.put("type", PPT.getValue());
+        mPassportMap.put("id", mPassportMap.get("id"));
+        Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
+                mLiveIDProofedBy, null, null, (status, error) -> {
+                    progressDialog.dismiss();
+                    isRegistrationInProgress = false;
+                    if (status) {
+                        Toast.makeText(this, R.string.label_passport_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                    showError(error);
+                });
     }
 
     /**
@@ -248,18 +309,6 @@ public class PassportScanningActivity extends AppCompatActivity {
                             Toast.makeText(this,
                                     R.string.label_passport_enrolled_successfully,
                                     Toast.LENGTH_LONG).show();
-                            finish();
-                            return;
-                        }
-
-                        if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                            DocumentHolder.setData(mPassportMap);
-                            Intent intent = new Intent(this,
-                                    ActiveLiveIDScanningActivity.class);
-                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
-                                    true);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(intent);
                             finish();
                             return;
                         }
