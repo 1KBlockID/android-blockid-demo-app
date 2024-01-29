@@ -1,7 +1,6 @@
 package com.onekosmos.blockidsample.ui.nationalID;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
@@ -11,8 +10,11 @@ import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -34,7 +36,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -55,6 +56,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mNationalIDMap;
     private boolean isRegistrationInProgress;
+    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_FACE = "face";
+    private static final String K_PROOFED_BY = "proofedBy";
+    private String mLiveIDImageB64, mLiveIDProofedBy;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -91,6 +96,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
+
+        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
+        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -202,13 +211,63 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 return;
             }
 
+            if (dataObject.has(K_LIVEID_OBJECT)) {
+                JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
+                if (liveIDObject.has(K_FACE)) {
+                    mLiveIDImageB64 = liveIDObject.getString(K_FACE);
+                }
+
+                if (liveIDObject.has(K_PROOFED_BY)) {
+                    mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
+                }
+            }
+
             mNationalIDMap.put("certificate_token", token);
             mNationalIDMap.put("proof", proofJWT);
-            registerNationalID();
+            if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                registerNationalID();
+            } else {
+                registerDocumentWithLiveID();
+            }
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
                     K_SOMETHING_WENT_WRONG.getMessage()));
         }
+    }
+
+    private Bitmap convertBase64ToBitmap(String img) {
+        if (TextUtils.isEmpty(img)) {
+            return null;
+        }
+        byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+    }
+
+    /**
+     * Register documents with LiveID
+     */
+    private void registerDocumentWithLiveID() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        isRegistrationInProgress = true;
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        mNationalIDMap.put("category", identity_document.name());
+        mNationalIDMap.put("type", NATIONAL_ID.getValue());
+        mNationalIDMap.put("id", mNationalIDMap.get("id"));
+        Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
+                mLiveIDProofedBy, null, null, (status, error) -> {
+                    progressDialog.dismiss();
+                    isRegistrationInProgress = false;
+                    if (status) {
+                        Toast.makeText(this, R.string.label_nid_enrolled_successfully,
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                    showError(error);
+                });
     }
 
     /**
@@ -230,17 +289,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_nid_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
-                        finish();
-                        return;
-                    }
-                    if (error.getCode() == K_LIVEID_IS_MANDATORY.getCode()) {
-                        DocumentHolder.setData(mNationalIDMap);
-                        Intent intent = new Intent(this,
-                                ActiveLiveIDScanningActivity.class);
-                        intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT,
-                                true);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(intent);
                         finish();
                         return;
                     }
