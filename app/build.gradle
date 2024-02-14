@@ -106,5 +106,4 @@ dependencies {
 
     // BlockID SDK
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.10.65CC8C2B'
-
 }
