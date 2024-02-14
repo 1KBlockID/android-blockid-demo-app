@@ -45,8 +45,10 @@ public class AboutActivity extends AppCompatActivity {
                 + " (" + tenant.getCommunityId() + ")" + "\n\n"
                 + getString(R.string.label_app_tenant) + ":\n"
                 + getString(R.string.label_dns) + ": " + appTenant.getDns() + "\n"
-                + getString(R.string.label_tag) + ": " + appTenant.getTenantTag() + "\n"
-                + getString(R.string.label_community) + ": " + appTenant.getCommunity();
+                + getString(R.string.label_tag) + ": " + appTenant.getTenantTag()
+                + " (" + appTenant.getTenantId() + ")"+ "\n"
+                + getString(R.string.label_community) + ": " + appTenant.getCommunity()
+                + " (" + appTenant.getCommunityId() + ")";
         txtTenantDNS.setText(tenantInfo);
 
         // Get and set license key
