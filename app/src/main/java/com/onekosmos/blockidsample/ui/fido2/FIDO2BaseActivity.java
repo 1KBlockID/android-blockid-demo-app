@@ -72,7 +72,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 if (validateUserName(mEtUserName.getText().toString())) {
                     mProgressDialog.show();
                     mBtnRegisterClicked = true;
-                    BIDTenant tenant = AppConstant.clientTenant;
+                    BIDTenant tenant = AppConstant.defaultTenant;
                     BlockIDSDK.getInstance().registerFIDO2Key(this,
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
@@ -99,7 +99,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
                 if (validateUserName(mEtUserName.getText().toString())) {
                     mProgressDialog.show();
                     mBtnAuthenticateClicked = true;
-                    BIDTenant tenant = AppConstant.clientTenant;
+                    BIDTenant tenant = AppConstant.defaultTenant;
                     BlockIDSDK.getInstance().authenticateFIDO2Key(this,
                             mEtUserName.getText().toString(),
                             tenant.getDns(),
@@ -250,8 +250,8 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         mProgressDialog.show();
         BlockIDSDK.getInstance().registerFIDO2Key(this,
                 mEtUserName.getText().toString(),
-                AppConstant.clientTenant.getDns(),
-                AppConstant.clientTenant.getCommunity(),
+                AppConstant.defaultTenant.getDns(),
+                AppConstant.defaultTenant.getCommunity(),
                 keyType,
                 securityKeyPin,
                 (status, errorResponse) -> {
@@ -283,8 +283,8 @@ public class FIDO2BaseActivity extends AppCompatActivity {
 
         BlockIDSDK.getInstance().authenticateFIDO2Key(this,
                 mEtUserName.getText().toString(),
-                AppConstant.clientTenant.getDns(),
-                AppConstant.clientTenant.getCommunity(),
+                AppConstant.defaultTenant.getDns(),
+                AppConstant.defaultTenant.getCommunity(),
                 keyType,
                 securityKeyPin,
                 (status, errorResponse) -> {
