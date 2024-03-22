@@ -3,13 +3,13 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     defaultConfig {
         applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 25
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
-        versionName "1.10.10" + "." + getCurrentTimestampHexValue()
+        versionName "1.10.20" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -105,5 +105,5 @@ dependencies {
     implementation("com.walletconnect:android-core:1.0.0")
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.10.65E6D625'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.20.65FDDB4C'
 }
