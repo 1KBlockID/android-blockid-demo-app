@@ -36,8 +36,7 @@ import java.util.LinkedHashMap;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class LiveIDScanningActivity extends AppCompatActivity implements
-        ILiveIDResponseListener {
+public class LiveIDScanningActivity extends AppCompatActivity implements ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
@@ -205,8 +204,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements
 
     @Override
     public void onFaceFocusChanged(boolean isFocused, String message) {
-        // Show face message
-        // show focused view
+        // Show face message and focused view
         showFaceFocusedViews();
         if (message != null) {
             mTxtMessage.setVisibility(View.VISIBLE);

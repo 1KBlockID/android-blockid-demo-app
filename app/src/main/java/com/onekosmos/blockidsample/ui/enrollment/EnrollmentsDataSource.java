@@ -120,7 +120,7 @@ public class EnrollmentsDataSource {
 
             case ASSET_LIVE_ID:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
-                        context.getResources().getString(R.string.label_liveid_active), null);
+                        context.getResources().getString(R.string.label_liveid), null);
                 break;
 
             case ASSET_DEVICE_AUTH:

@@ -85,7 +85,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         EnrollmentAsset asset = enrollmentAssets.get(position);
         if (position == 1) {
             onAddUserClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_active))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked();
         }  else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
             onDeviceAuthClicked();
