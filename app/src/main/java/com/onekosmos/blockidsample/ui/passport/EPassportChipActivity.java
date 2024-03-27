@@ -29,7 +29,7 @@ import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
 import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
@@ -275,8 +275,8 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
 
                         if (error.getCode() == ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY.getCode()) {
                             DocumentHolder.setData(mPassportMap);
-                            Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
-                            intent.putExtra(ActiveLiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
+                            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+                            intent.putExtra(LiveIDScanningActivity.LIVEID_WITH_DOCUMENT, true);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(intent);
                             finish();

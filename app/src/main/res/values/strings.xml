@@ -16,8 +16,7 @@
     <string name="label_please_wait">Please wait...</string>
     <string name="label_error">Error</string>
     <string name="label_retry">Retry</string>
-    <string name="label_liveid_active">LiveID Active</string>
-    <string name="label_liveid_passive">LiveID Passive</string>
+    <string name="label_liveid_active">LiveID </string>
     <string name="label_enroll_liveid">Enroll LiveID</string>
     <string name="label_login_with_qr">Login with QR</string>
     <string name="label_liveid_camera_permission_alert">Please note that you will not be able to
