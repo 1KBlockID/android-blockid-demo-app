@@ -30,12 +30,12 @@ import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper.LiveIDDataObject;
 import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -96,9 +96,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
-
-        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
-        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,
@@ -256,7 +253,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
+        LiveIDDataObject liveIDDataObject = new LiveIDDataObject();
+        liveIDDataObject.liveIdBitmap = liveIDBitmap;
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDDataObject,
                 mLiveIDProofedBy, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;

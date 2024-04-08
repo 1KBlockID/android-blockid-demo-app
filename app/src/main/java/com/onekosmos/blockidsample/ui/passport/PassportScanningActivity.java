@@ -33,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper.LiveIDDataObject;
 import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
@@ -99,7 +100,6 @@ public class PassportScanningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_passport_scanning);
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
-
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
@@ -272,7 +272,9 @@ public class PassportScanningActivity extends AppCompatActivity {
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
+        LiveIDDataObject liveIDDataObject = new LiveIDDataObject();
+        liveIDDataObject.liveIdBitmap = liveIDBitmap;
+        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDDataObject,
                 mLiveIDProofedBy, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;

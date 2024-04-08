@@ -25,6 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper.LiveIDDataObject;
 import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
 import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -200,7 +201,9 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
+        LiveIDDataObject liveIDDataObject = new LiveIDDataObject();
+        liveIDDataObject.liveIdBitmap = liveIDBitmap;
+        BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDDataObject,
                 mLiveIDProofedBy, null, null, (status, error) -> {
                     progressDialog.dismiss();
                     mIsRegInProgress = false;
