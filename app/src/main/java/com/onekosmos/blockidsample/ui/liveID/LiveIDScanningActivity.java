@@ -5,7 +5,6 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 
 import android.content.DialogInterface.OnDismissListener;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -22,6 +21,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper.LiveIDDataObject;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -147,7 +147,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
     // LiveID scanning response
     @Override
-    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, ErrorResponse error) {
+    public void onLiveIDCaptured(LiveIDDataObject liveIDBitmap, String signatureToken, ErrorResponse error) {
         // Stop LiveID scanning
         mLiveIDScannerHelper.stopLiveIDScanning();
 
@@ -187,19 +187,19 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
         // Activity started for authentication purpose, call verify LiveID
         if (mIsFromAuthentication) {
-            verifyLiveID(liveIDBitmap);
+            verifyLiveID(liveIDBitmap, signatureToken);
             return;
         }
 
         // Activity stared after document scanning, register LiveID with Document Data
         if (getIntent().hasExtra(LIVEID_WITH_DOCUMENT) &&
                 getIntent().getBooleanExtra(LIVEID_WITH_DOCUMENT, false)) {
-            registerLiveIDWithDocument(liveIDBitmap);
+            registerLiveIDWithDocument(liveIDBitmap, signatureToken);
             return;
         }
 
         // Activity stared for LiveID registration, register LiveID
-        registerLiveID(liveIDBitmap);
+        registerLiveID(liveIDBitmap, signatureToken);
     }
 
     @Override
@@ -233,12 +233,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     /**
      * Register LiveID
      *
-     * @param livIdBitmap LiveID image received from LiveID scanner
+     * @param liveIDDataObject LiveID object received from LiveID scanner
+     * @param signatureToken
      */
-    private void registerLiveID(Bitmap livIdBitmap) {
+    private void registerLiveID(LiveIDDataObject liveIDDataObject, String signatureToken) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null,
+        BlockIDSDK.getInstance().setLiveID(liveIDDataObject, null, signatureToken,
                 (status, message, error) -> {
                     mProgressDialog.dismiss();
 
@@ -260,9 +261,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     /**
      * Register LiveID with document
      *
-     * @param livIdBitmap LiveID image received from LiveID scanner
+     * @param liveIDDataObject LiveID object received from LiveID scanner
+     * @param signatureToken
      */
-    private void registerLiveIDWithDocument(Bitmap livIdBitmap) {
+    private void registerLiveIDWithDocument(LiveIDDataObject liveIDDataObject, String signatureToken) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
         mProgressDialog.show();
         LinkedHashMap<String, Object> documentMap = DocumentHolder.getData();
@@ -271,7 +273,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
         documentMap.put("id", documentMap.get("id"));
 
         BlockIDSDK.getInstance().registerDocument(this, documentMap,
-                livIdBitmap, null, null, null, (status, error) -> {
+                liveIDDataObject, null, null, signatureToken, (status, error) -> {
                     mProgressDialog.dismiss();
                     DocumentHolder.clearData();
 
@@ -293,24 +295,26 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     /**
      * Verify LiveID
      *
-     * @param bitmap LiveID image received from LiveID scanner
+     * @param liveIDDataObject LiveID object received from LiveID scanner
+     * @param signatureToken
      */
-    private void verifyLiveID(Bitmap bitmap) {
+    private void verifyLiveID(LiveIDDataObject liveIDDataObject, String signatureToken) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (status, error) -> {
-            mProgressDialog.dismiss();
-            // LiveID verification failed
-            if (!status) {
-                // show error
-                showError(error);
-                return;
-            }
+        BlockIDSDK.getInstance().verifyLiveID(this, liveIDDataObject, signatureToken,
+                (status, error) -> {
+                    mProgressDialog.dismiss();
+                    // LiveID verification failed
+                    if (!status) {
+                        // show error
+                        showError(error);
+                        return;
+                    }
 
-            // LiveID verified successfully
-            setResult(RESULT_OK);
-            finish();
-        });
+                    // LiveID verified successfully
+                    setResult(RESULT_OK);
+                    finish();
+                });
     }
 
     /**
