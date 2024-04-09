@@ -105,5 +105,5 @@ dependencies {
     implementation("com.walletconnect:android-core:1.0.0")
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.20.66046C27'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.20.MOB-5644.66159D60'
 }
