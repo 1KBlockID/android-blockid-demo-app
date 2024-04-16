@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
-import androidx.core.content.ContextCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
@@ -37,8 +36,7 @@ import java.util.LinkedHashMap;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
-        ILiveIDResponseListener {
+public class LiveIDScanningActivity extends AppCompatActivity implements ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
@@ -73,7 +71,8 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
     public void onStop() {
         super.onStop();
         // Stop LiveID scanning
-        mLiveIDScannerHelper.stopLiveIDScanning();
+        if (mLiveIDScannerHelper != null)
+            mLiveIDScannerHelper.stopLiveIDScanning();
     }
 
     @Override
@@ -143,13 +142,14 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
         mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
-                mScannerOverlay, false, this);
+                mScannerOverlay, this);
         mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
     }
 
     // LiveID scanning response
     @Override
-    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, ErrorResponse error) {
+    public void onLiveIDCaptured(Bitmap liveIDBitmap, String signatureToken, String livenessResult,
+                                 ErrorResponse error) {
         // Stop LiveID scanning
         mLiveIDScannerHelper.stopLiveIDScanning();
 
@@ -189,7 +189,7 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
 
         // Activity started for authentication purpose, call verify LiveID
         if (mIsFromAuthentication) {
-            verifyLiveID(liveIDBitmap);
+            verifyLiveID(liveIDBitmap, signatureToken, livenessResult);
             return;
         }
 
@@ -201,22 +201,19 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
         }
 
         // Activity stared for LiveID registration, register LiveID
-        registerLiveID(liveIDBitmap);
+        registerLiveID(liveIDBitmap, signatureToken, livenessResult);
     }
 
     @Override
-    public void onFaceFocusChanged(boolean isFocused, String expression) {
-        // Show face expression message
-        // show focused view
+    public void onFaceFocusChanged(boolean isFocused, String message) {
+        // Show face message and focused view
         showFaceFocusedViews();
-        mTxtMessage.setVisibility(View.VISIBLE);
-        mTxtMessage.setText(getMessageForExpression(expression));
-    }
-
-    @Override
-    public void expressionDidReset(String message) {
-        // Show face out of focus view
-        showFaceNotFocusedViews(message);
+        if (message != null) {
+            mTxtMessage.setVisibility(View.VISIBLE);
+            mTxtMessage.setText(message);
+        } else {
+            mTxtMessage.setVisibility(View.GONE);
+        }
     }
 
     // LiveID Liveness check is in progress
@@ -229,52 +226,10 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
     }
 
     /**
-     * Update the overlay image, color and message
-     *
-     * @param expression String
-     */
-    private void showFaceNotFocusedViews(String expression) {
-        mScannerOverlay.setImageResource(R.drawable.group_3);
-        mScannerOverlay.setColorFilter(ContextCompat.getColor(this, R.color.misc2));
-        mTxtMessage.setText(getMessageForExpression(expression));
-    }
-
-    /**
      * Update the overlay image and color
      */
     private void showFaceFocusedViews() {
         mScannerOverlay.setImageResource(R.drawable.group_3);
-        mScannerOverlay.setColorFilter(ContextCompat.getColor(this, (R.color.misc1)));
-    }
-
-    /**
-     * Based on expression from LiveID scanner, return dynamic message
-     *
-     * @param expression String
-     * @return String message
-     */
-    private String getMessageForExpression(String expression) {
-        switch (expression) {
-            case "Blink":
-                return getResources().getString(R.string.label_liveid_please_blink_your_eyes);
-            case "Smile":
-                return getResources().getString(R.string.label_liveid_please_smile);
-            case "LookRight":
-                return getResources().getString(R.string.label_liveid_look_right);
-            case "LookLeft":
-                return getResources().getString(R.string.label_liveid_look_left);
-            case "LookUp":
-                return getResources().getString(R.string.label_liveid_look_up);
-            case "LookDown":
-                return getResources().getString(R.string.label_liveid_look_bottom);
-            case "Scanning Complete":
-                return getResources().getString(R.string.label_scanning_complete);
-            case "Reset Expression":
-                return getResources().getString(R.string.label_reset_expression);
-            case "Face out of bounds":
-                return getResources().getString(R.string.label_face_out_of_bounds);
-        }
-        return "";
     }
 
     /**
@@ -282,11 +237,11 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
      *
      * @param livIdBitmap LiveID image received from LiveID scanner
      */
-    private void registerLiveID(Bitmap livIdBitmap) {
+    private void registerLiveID(Bitmap livIdBitmap, String signatureToken, String livenessResult) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, null,
-                (status, message, error) -> {
+        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, signatureToken,
+                livenessResult, (status, message, error) -> {
                     mProgressDialog.dismiss();
 
                     // Register LiveID failed
@@ -342,22 +297,23 @@ public class ActiveLiveIDScanningActivity extends AppCompatActivity implements
      *
      * @param bitmap LiveID image received from LiveID scanner
      */
-    private void verifyLiveID(Bitmap bitmap) {
+    private void verifyLiveID(Bitmap bitmap, String signatureToken, String livenessResult) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, (status, error) -> {
-            mProgressDialog.dismiss();
-            // LiveID verification failed
-            if (!status) {
-                // show error
-                showError(error);
-                return;
-            }
+        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, signatureToken, livenessResult,
+                (status, error) -> {
+                    mProgressDialog.dismiss();
+                    // LiveID verification failed
+                    if (!status) {
+                        // show error
+                        showError(error);
+                        return;
+                    }
 
-            // LiveID verified successfully
-            setResult(RESULT_OK);
-            finish();
-        });
+                    // LiveID verified successfully
+                    setResult(RESULT_OK);
+                    finish();
+                });
     }
 
     /**

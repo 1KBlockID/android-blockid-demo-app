@@ -38,8 +38,7 @@ import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
 import com.onekosmos.blockidsample.ui.fido2.PINManagementActivity;
-import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
-import com.onekosmos.blockidsample.ui.liveID.PassiveLiveIDScanningActivity;
+import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
@@ -86,11 +85,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         EnrollmentAsset asset = enrollmentAssets.get(position);
         if (position == 1) {
             onAddUserClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_active))) {
-            onLiveIdActiveClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid_passive))) {
-            onLiveIdPassiveClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
+            onLiveIdClicked();
+        }  else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
             onPinClicked();
@@ -177,17 +174,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         startActivity(intent);
     }
 
-    private void onLiveIdActiveClicked() {
+    private void onLiveIdClicked() {
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
-            Intent intent = new Intent(this, ActiveLiveIDScanningActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
-        }
-    }
-
-    private void onLiveIdPassiveClicked() {
-        if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
-            Intent intent = new Intent(this, PassiveLiveIDScanningActivity.class);
+            Intent intent = new Intent(this, LiveIDScanningActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
         }

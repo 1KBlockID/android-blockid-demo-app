@@ -35,7 +35,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -96,9 +95,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nationalid_scanning);
         initView();
-
-        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
-        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,

@@ -1,6 +1,5 @@
 package com.onekosmos.blockidsample.ui.driverLicense;
 
-import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_LIVEID_IS_MANDATORY;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
@@ -24,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.google.android.gms.common.data.DataHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,8 +35,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.liveID.ActiveLiveIDScanningActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
@@ -101,8 +97,6 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_license_scan);
         initView();
-        mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
-        mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
