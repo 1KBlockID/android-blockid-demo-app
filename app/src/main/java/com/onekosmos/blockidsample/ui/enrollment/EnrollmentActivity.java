@@ -49,6 +49,7 @@ import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
 import com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.ResetSDKMessages;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,7 +88,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onAddUserClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_liveid))) {
             onLiveIdClicked();
-        }  else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_device_auth))) {
             onDeviceAuthClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_app_pin))) {
             onPinClicked();
@@ -112,7 +113,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_fido2_pin_management))) {
             onFido2PINManagementClicked();
-        }else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
+        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
             onWalletConnectClicked();
@@ -416,7 +417,9 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
                 getString(R.string.label_cancel), getString(R.string.label_ok),
                 (dialogInterface, i) -> {
                     errorDialog.dismiss();
-                    BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
+                    BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey,
+                            AppConstant.defaultTenant,
+                            ResetSDKMessages.RESET_APP_OPTION_CLICK.getMessage());
                     Intent intent = new Intent(this, RegisterTenantActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
@@ -443,7 +446,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         startActivity(intent);
     }
 
-    private void onFido2PINManagementClicked(){
+    private void onFido2PINManagementClicked() {
         Intent intent = new Intent(this, PINManagementActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
