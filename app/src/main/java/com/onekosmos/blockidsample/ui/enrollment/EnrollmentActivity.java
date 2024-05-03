@@ -101,7 +101,7 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         } else if (asset.getAssetTitle().contains(getResources().getString(R.string.label_national_id_1))) {
             onNationalIDClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_reset_app))) {
-            onResetAppClick(); //RESET
+            onResetAppClick();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_login_with_qr))) {
             onQrLoginClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
