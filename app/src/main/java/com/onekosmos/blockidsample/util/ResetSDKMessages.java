@@ -1,9 +1,12 @@
 package com.onekosmos.blockidsample.util;
 
+import androidx.annotation.Keep;
+
 /**
  * @author Vaishali Sharma. Created on 19/04/2024.
  * Copyright © 2024 1Kosmos. All rights reserved.
  */
+@Keep
 public enum ResetSDKMessages {
     RESET_APP_OPTION_CLICK("Reset App option click from Home Screen"),
     TENANT_REGISTRATION_FAILED_DURING_RESTORATION("Tenant Registration failed during Account Restoration"),
