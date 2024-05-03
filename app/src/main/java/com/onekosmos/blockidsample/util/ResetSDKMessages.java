@@ -11,7 +11,7 @@ public enum ResetSDKMessages {
     RESET_APP_OPTION_CLICK("Reset App option click from Home Screen"),
     TENANT_REGISTRATION_FAILED_DURING_RESTORATION("Tenant Registration failed during Account Restoration"),
     FETCH_WALLET_FAILED_DURING_RESTORATION("Fetch wallet failed during Account Restoration"),
-    ACCOUNT_RESTORATION_FAILED("Account Restoration failed"); // when device offline, publickeys api fails but resetsdk happen
+    ACCOUNT_RESTORATION_FAILED("Account Restoration failed");
     private final String message;
 
     ResetSDKMessages(String message) {
