@@ -22,6 +22,7 @@ import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.ui.restore.RestoreAccountActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.ResetSDKMessages;
 
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 
@@ -81,7 +82,7 @@ public class RegisterTenantActivity extends AppCompatActivity {
                 return;
             }
 
-            String errorCode = error.getMessage()+" ("+ error.getCode() +").";
+            String errorCode = error.getMessage() + " (" + error.getCode() + ").";
             errorDialog.showWithOneButton(null, getString(R.string.label_error),
                     errorCode, getString(R.string.label_ok),
                     onDismissListener);
@@ -128,7 +129,8 @@ public class RegisterTenantActivity extends AppCompatActivity {
         if (requestCode == RESTORE_REQUEST_CODE && resultCode == RESULT_OK) {
             updateAuthUi();
         } else {
-            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
+            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey, AppConstant.defaultTenant,
+                    ResetSDKMessages.ACCOUNT_RESTORATION_FAILED.getMessage());
         }
     }
 }

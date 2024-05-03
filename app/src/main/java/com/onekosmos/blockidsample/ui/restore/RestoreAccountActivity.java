@@ -19,6 +19,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.ResetSDKMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +167,9 @@ public class RestoreAccountActivity extends AppCompatActivity {
                         restoreAccount();
                         return;
                     }
-                    showErrorDialog(error.getMessage());
+                    showErrorDialog(error.getMessage(),
+                            ResetSDKMessages.TENANT_REGISTRATION_FAILED_DURING_RESTORATION.
+                                    getMessage(error.getCode(), error.getMessage()));
                 });
     }
 
@@ -181,16 +184,21 @@ public class RestoreAccountActivity extends AppCompatActivity {
             }
             BlockIDSDK.getInstance().resetRestorationData();
             if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
-                showErrorDialog(error.getMessage());
+                showErrorDialog(error.getMessage(), ResetSDKMessages.
+                        FETCH_WALLET_FAILED_DURING_RESTORATION.getMessage(
+                                error.getCode(), error.getMessage()));
                 return;
             }
-            showErrorDialog(getString(R.string.label_account_restoration_failed));
+            showErrorDialog(getString(R.string.label_account_restoration_failed), ResetSDKMessages.
+                    FETCH_WALLET_FAILED_DURING_RESTORATION.getMessage(
+                            error.getCode(), error.getMessage()));
         });
     }
 
-    private void showErrorDialog(String argMessage) {
+    private void showErrorDialog(String argMessage, String reason) {
         mBtnRestore.setEnabled(true);
-        BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey);
+        BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey, AppConstant.defaultTenant,
+                reason);
         mProgressDialog.dismiss();
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
