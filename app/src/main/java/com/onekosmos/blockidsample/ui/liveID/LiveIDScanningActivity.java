@@ -60,8 +60,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         // Check for camera permission
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_LIVEID_PERMISSION_REQUEST_CODE,
