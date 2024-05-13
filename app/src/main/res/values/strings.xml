@@ -252,4 +252,7 @@
 
     <!-- KYC -->
     <string name="label_my_kyc">My KYC</string>
+
+    <!-- LiveID with Face Detection Threshold-->
+    <string name="label_liveid_face_detection_threshold">LiveID with Face detection threshold</string>
 </resources>
