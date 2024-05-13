@@ -50,7 +50,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private BIDScannerView mBIDScannerView;
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private ProgressDialog mProgressDialog;
-    private boolean mIsFromAuthentication, mIsFromLiveIDFaceDetectionThreshold; // Is LiveID scanning started for authentication purpose
+    private boolean mIsFromAuthentication; // Is LiveID scanning started for authentication purpose
+    private boolean mIsFromLiveIDFaceDetectionThreshold; // Is LiveID scanning started for Live ID with threshold
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,8 +155,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
         mScannerOverlay.setVisibility(View.VISIBLE);
         if (mIsFromLiveIDFaceDetectionThreshold) {
             FaceDetectionThreshold faceDetectionThreshold =
-                    new FaceDetectionThreshold(0, 1);
-
+                    new FaceDetectionThreshold(0.60, 0.40);
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
                     mScannerOverlay, faceDetectionThreshold, this );
         } else {
