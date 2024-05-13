@@ -22,6 +22,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
+import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper.FaceDetectionThreshold;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -151,11 +152,11 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
         if (mIsFromLiveIDFaceDetectionThreshold) {
-            LiveIDScannerHelper.FaceDetectionThreshold faceDetectionThreshold =
-                    new LiveIDScannerHelper.FaceDetectionThreshold(0.60, 0.40);
+            FaceDetectionThreshold faceDetectionThreshold =
+                    new FaceDetectionThreshold(0, 1);
 
-           mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
-                   mScannerOverlay, faceDetectionThreshold, this );
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
+                    mScannerOverlay, faceDetectionThreshold, this );
         } else {
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
                     mScannerOverlay, this);
