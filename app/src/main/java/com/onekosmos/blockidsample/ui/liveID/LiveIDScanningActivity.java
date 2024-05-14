@@ -22,7 +22,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
-
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
@@ -51,7 +50,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private ProgressDialog mProgressDialog;
     private boolean mIsFromAuthentication; // Is LiveID scanning started for authentication purpose
-    private boolean mIsLiveIDWithFacePresenceLevel; // Is LiveID scanning started for Live ID with threshold
+    private boolean mIsLiveIDWithFacePresenceLevel; // Is LiveID scanning started with Face Presence Level
 
 
     public void onCreate(Bundle savedInstanceState) {
