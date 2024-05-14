@@ -31,6 +31,7 @@ public class EnrollmentsDataSource {
     public enum EnrollmentAssetEnum {
         ASSET_ADD_USER,
         ASSET_LIVE_ID,
+        ASSET_LIVEID_WITH_FACE_PRESENCE_LEVEL,
         ASSET_PIN,
         ASSET_DEVICE_AUTH,
         ASSET_DL,
@@ -45,8 +46,7 @@ public class EnrollmentsDataSource {
         ASSET_WALLET_CONNECT,
         ASSET_ABOUT,
         ASSET_KYC,
-        ASSET_RESET_SDK,
-        ASSET_FACE_DETECTION_LIVE_ID_THRESHOLD
+        ASSET_RESET_SDK
     }
 
     private EnrollmentsDataSource() {
@@ -73,7 +73,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
         arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
-        arr.add(EnrollmentAssetEnum.ASSET_FACE_DETECTION_LIVE_ID_THRESHOLD);
+        arr.add(EnrollmentAssetEnum.ASSET_LIVEID_WITH_FACE_PRESENCE_LEVEL);
 
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
@@ -123,6 +123,12 @@ public class EnrollmentsDataSource {
             case ASSET_LIVE_ID:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
                         context.getResources().getString(R.string.label_liveid), null);
+                break;
+
+            case ASSET_LIVEID_WITH_FACE_PRESENCE_LEVEL:
+                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
+                        context.getString(R.string.label_liveid_face_presence_level),
+                        null);
                 break;
 
             case ASSET_DEVICE_AUTH:
@@ -181,10 +187,6 @@ public class EnrollmentsDataSource {
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_my_kyc), null);
                 break;
-            case ASSET_FACE_DETECTION_LIVE_ID_THRESHOLD:
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isLiveIDRegistered(),
-                        context.getString(R.string.label_liveid_face_detection_threshold),
-                        null);
         }
         return enrollmentAsset;
     }
