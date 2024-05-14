@@ -57,6 +57,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_FACE = "face";
     private static final String K_PIN = "pin";
     private static final String K_FINGERPRINT = "fingerprint";
+    private static final String K_NONE = "none";
     private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
@@ -69,6 +70,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private AuthenticationPayloadV1 mAuthenticationPayloadV1 = new AuthenticationPayloadV1();
     private RecyclerView mRvUserScope;
     private boolean mScanQRWithScope = false;
+    private String authResultType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,7 +259,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 }
                 break;
             default:
-                onSuccessFullVerification();
+                onSuccessFullVerification(K_NONE);
                 break;
         }
     }
@@ -271,7 +273,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     public void onBiometricAuthResult(boolean status,
                                                       ErrorManager.ErrorResponse errorResponse) {
                         if (status)
-                            onSuccessFullVerification();
+                            onSuccessFullVerification(K_FINGERPRINT);
                         else
                             mBtnAuthenticate.setClickable(true);
                     }
@@ -279,7 +281,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                     @Override
                     public void onNonBiometricAuth(boolean status) {
                         if (status)
-                            onSuccessFullVerification();
+                            onSuccessFullVerification(K_FINGERPRINT);
                         else
                             mBtnAuthenticate.setClickable(true);
                     }
@@ -290,7 +292,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
             registerForActivityResult(new
                     ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    onSuccessFullVerification();
+                    onSuccessFullVerification(authResultType);
                 } else {
                     mBtnAuthenticate.setClickable(true);
                 }
@@ -300,6 +302,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         Intent scanLiveIdIntent = new Intent(this, PinVerificationActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
+        authResultType = K_PIN;
         verifyAuthResultLauncher.launch(scanLiveIdIntent);
     }
 
@@ -307,23 +310,25 @@ public class AuthenticatorActivity extends AppCompatActivity {
         Intent scanLiveIdIntent = new Intent(this, LiveIDScanningActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
+        authResultType = K_FACE;
         verifyAuthResultLauncher.launch(scanLiveIdIntent);
     }
 
-    private void onSuccessFullVerification() {
+    private void onSuccessFullVerification(String authType) {
         if (mScanQRWithScope) {
-            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude, authType);
         } else {
             String presetData = Objects.requireNonNull(mEtPresetData.getText()).toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
-            callAuthenticateService(mAuthenticationPayloadV1, dataObject, mLatitude, mLongitude);
+            callAuthenticateService(mAuthenticationPayloadV1, dataObject, mLatitude, mLongitude,
+                    authType);
         }
     }
 
     // authenticate user with scope
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
-                                         double latitude, double longitude) {
+                                         double latitude, double longitude, String authType) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
 
@@ -334,11 +339,14 @@ public class AuthenticatorActivity extends AppCompatActivity {
             metadata.put(K_WEBAUTHN_CHALLENGE,
                     mAuthenticationPayloadV1.metadata.webauthn_challenge);
         }
+        if (authType.equals(K_FACE)) authType = "LiveID";
+        if (authType.equals(K_FINGERPRINT)) authType = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
                 authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, (status, sessionId, error) -> {
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authType,
+                (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
@@ -348,13 +356,16 @@ public class AuthenticatorActivity extends AppCompatActivity {
     // authenticate user with pre-set data
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
                                          LinkedHashMap<String, Object> dataObject,
-                                         double latitude, double longitude) {
+                                         double latitude, double longitude, String authType) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
+        if (authType.equals(K_FACE)) authType = "LiveID";
+        if (authType.equals(K_FINGERPRINT)) authType = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
                 authenticationPayloadV1.sessionURL, dataObject, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, (status, sessionId, error) -> {
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, authType,
+                (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
                     onUserAuthenticated(status, error);
