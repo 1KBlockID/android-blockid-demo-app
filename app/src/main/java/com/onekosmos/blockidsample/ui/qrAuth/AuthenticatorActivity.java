@@ -70,7 +70,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private AuthenticationPayloadV1 mAuthenticationPayloadV1 = new AuthenticationPayloadV1();
     private RecyclerView mRvUserScope;
     private boolean mScanQRWithScope = false;
-    private String authResultType;
+    private String authFactorType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,7 +292,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
             registerForActivityResult(new
                     ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK) {
-                    onSuccessFullVerification(authResultType);
+                    onSuccessFullVerification(authFactorType);
                 } else {
                     mBtnAuthenticate.setClickable(true);
                 }
@@ -302,7 +302,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         Intent scanLiveIdIntent = new Intent(this, PinVerificationActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
-        authResultType = K_PIN;
+        authFactorType = K_PIN;
         verifyAuthResultLauncher.launch(scanLiveIdIntent);
     }
 
@@ -310,19 +310,19 @@ public class AuthenticatorActivity extends AppCompatActivity {
         Intent scanLiveIdIntent = new Intent(this, LiveIDScanningActivity.class);
         scanLiveIdIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         scanLiveIdIntent.putExtra(IS_FROM_AUTHENTICATE, true);
-        authResultType = K_FACE;
+        authFactorType = K_FACE;
         verifyAuthResultLauncher.launch(scanLiveIdIntent);
     }
 
-    private void onSuccessFullVerification(String authType) {
+    private void onSuccessFullVerification(String authFactor) {
         if (mScanQRWithScope) {
-            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude, authType);
+            callAuthenticateService(mAuthenticationPayloadV1, mLatitude, mLongitude, authFactor);
         } else {
             String presetData = Objects.requireNonNull(mEtPresetData.getText()).toString();
             LinkedHashMap<String, Object> dataObject = new LinkedHashMap<>();
             dataObject.put("data", presetData);
             callAuthenticateService(mAuthenticationPayloadV1, dataObject, mLatitude, mLongitude,
-                    authType);
+                    authFactor);
         }
     }
 
@@ -356,15 +356,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
     // authenticate user with pre-set data
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
                                          LinkedHashMap<String, Object> dataObject,
-                                         double latitude, double longitude, String authType) {
+                                         double latitude, double longitude, String authFactor) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        if (authType.equals(K_FACE)) authType = "LiveID";
-        if (authType.equals(K_FINGERPRINT)) authType = "Biometric";
+        if (authFactor.equals(K_FACE)) authFactor = "LiveID";
+        if (authFactor.equals(K_FINGERPRINT)) authFactor = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(null, authenticationPayloadV1.session,
                 authenticationPayloadV1.sessionURL, dataObject, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, authType,
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, authFactor,
                 (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
