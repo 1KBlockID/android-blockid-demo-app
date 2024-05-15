@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 public class LiveIDScanningActivity extends AppCompatActivity implements ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
+    public static String IS_LIVEID_WITH_FACE_PRESENCE_LEVEL = "IS_LIVEID_WITH_FACE_PRESENCE_LEVEL";
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
     private static final int mScannerOverlayMargin = 30;
     private final String[] K_CAMERA_PERMISSION = new String[]{CAMERA};
@@ -49,12 +50,17 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private LiveIDScannerHelper mLiveIDScannerHelper;
     private ProgressDialog mProgressDialog;
     private boolean mIsFromAuthentication; // Is LiveID scanning started for authentication purpose
+    private boolean mIsLiveIDWithFacePresenceLevel; // Is LiveID scanning started with Face Presence Level
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_liveid_scan);
         mIsFromAuthentication = getIntent().hasExtra(IS_FROM_AUTHENTICATE) &&
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
+        mIsLiveIDWithFacePresenceLevel = getIntent()
+                .hasExtra(IS_LIVEID_WITH_FACE_PRESENCE_LEVEL) && getIntent()
+                .getBooleanExtra(IS_LIVEID_WITH_FACE_PRESENCE_LEVEL, false);
 
         initViews();
     }
@@ -146,8 +152,14 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private void startLiveIDScan() {
         mBIDScannerView.setVisibility(View.VISIBLE);
         mScannerOverlay.setVisibility(View.VISIBLE);
-        mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
-                mScannerOverlay, this);
+        if (mIsLiveIDWithFacePresenceLevel) {
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
+                    mScannerOverlay, LiveIDScannerHelper.FacePresenceLevel.MEDIUM,
+                    this);
+        } else {
+            mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
+                    mScannerOverlay, this);
+        }
         mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
     }
 

@@ -6,6 +6,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
+import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_LIVEID_WITH_FACE_PRESENCE_LEVEL;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -121,6 +122,8 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onAboutClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
             getKYC();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_liveid_face_presence_level))) {
+            onLiveIdWithFacePresenceLevel();
         }
     }
 
@@ -179,6 +182,15 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
         if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
             Intent intent = new Intent(this, LiveIDScanningActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        }
+    }
+
+    private void onLiveIdWithFacePresenceLevel() {
+        if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
+            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra(IS_LIVEID_WITH_FACE_PRESENCE_LEVEL, true);
             startActivity(intent);
         }
     }
