@@ -54,9 +54,8 @@ public class UserOptionsActivity extends AppCompatActivity {
                             if (isPinRequired)
                                 showPINInputDialog(authenticationPayload,
                                         Fido2Operation.AUTHENTICATE);
-                            else {
+                            else
                                 authenticate(authenticationPayload, null, "none");
-                            }
                         }
                     });
 
