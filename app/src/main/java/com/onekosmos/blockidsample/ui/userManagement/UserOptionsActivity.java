@@ -55,7 +55,7 @@ public class UserOptionsActivity extends AppCompatActivity {
                                 showPINInputDialog(authenticationPayload,
                                         Fido2Operation.AUTHENTICATE);
                             else
-                                authenticate(authenticationPayload, null);
+                                authenticate(authenticationPayload, null, "none");
                         }
                     });
 
@@ -144,7 +144,7 @@ public class UserOptionsActivity extends AppCompatActivity {
             if (operation.equals(Fido2Operation.REGISTER))
                 registerExternalAuthenticator(securityPin);
             else
-                authenticate(authenticationPayload, securityPin);
+                authenticate(authenticationPayload, securityPin, "none");
 
             dialog.dismiss();
         });
@@ -221,7 +221,8 @@ public class UserOptionsActivity extends AppCompatActivity {
         scanQRActivityResultLauncher.launch(scanQRCodeIntent);
     }
 
-    private void authenticate(AuthenticationPayloadV1 payload, @Nullable String securityKeyPin) {
+    private void authenticate(AuthenticationPayloadV1 payload, @Nullable String securityKeyPin,
+                              String authFactor) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         LinkedHashMap<String, Object> metadata = null;
@@ -232,7 +233,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
                 securityKeyPin, null, payload.session, payload.sessionURL, payload.scopes,
                 metadata, payload.creds, payload.getOrigin(), null, null,
-                BuildConfig.VERSION_NAME, (status, error) -> {
+                BuildConfig.VERSION_NAME, authFactor, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this,
