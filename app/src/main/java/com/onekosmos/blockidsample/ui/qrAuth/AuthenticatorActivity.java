@@ -328,7 +328,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
 
     // authenticate user with scope
     private void callAuthenticateService(AuthenticationPayloadV1 authenticationPayloadV1,
-                                         double latitude, double longitude, String authType) {
+                                         double latitude, double longitude, String authFactor) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
 
@@ -339,13 +339,13 @@ public class AuthenticatorActivity extends AppCompatActivity {
             metadata.put(K_WEBAUTHN_CHALLENGE,
                     mAuthenticationPayloadV1.metadata.webauthn_challenge);
         }
-        if (authType.equals(K_FACE)) authType = "LiveID";
-        if (authType.equals(K_FINGERPRINT)) authType = "Biometric";
+        if (authFactor.equals(K_FACE)) authFactor = "LiveID";
+        if (authFactor.equals(K_FINGERPRINT)) authFactor = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
                 authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authType,
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor,
                 (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();

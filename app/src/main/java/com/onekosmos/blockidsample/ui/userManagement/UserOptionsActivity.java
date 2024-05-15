@@ -222,7 +222,7 @@ public class UserOptionsActivity extends AppCompatActivity {
     }
 
     private void authenticate(AuthenticationPayloadV1 payload, @Nullable String securityKeyPin,
-                              String authType) {
+                              String authFactor) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         LinkedHashMap<String, Object> metadata = null;
@@ -233,7 +233,7 @@ public class UserOptionsActivity extends AppCompatActivity {
         BlockIDSDK.getInstance().authenticateFIDO2Key(this, mAuthenticationFido2KeyType,
                 securityKeyPin, null, payload.session, payload.sessionURL, payload.scopes,
                 metadata, payload.creds, payload.getOrigin(), null, null,
-                BuildConfig.VERSION_NAME, authType, (status, error) -> {
+                BuildConfig.VERSION_NAME, authFactor, (status, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         Toast.makeText(this,
