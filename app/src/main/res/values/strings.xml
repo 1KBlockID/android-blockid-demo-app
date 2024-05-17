@@ -252,4 +252,7 @@
 
     <!-- KYC -->
     <string name="label_my_kyc">My KYC</string>
+
+    <!-- LiveID with Face Presence Level-->
+    <string name="label_liveid_face_presence_level">LiveID with Face presence level</string>
 </resources>
