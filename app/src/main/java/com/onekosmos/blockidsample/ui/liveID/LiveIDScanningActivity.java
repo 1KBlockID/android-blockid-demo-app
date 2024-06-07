@@ -160,7 +160,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
             mLiveIDScannerHelper = new LiveIDScannerHelper(this, mBIDScannerView,
                     mScannerOverlay, this);
         }
-        mLiveIDScannerHelper.startLiveIDScanning(AppConstant.dvcId);
+        mLiveIDScannerHelper.startLiveIDScanning();
     }
 
     // LiveID scanning response
