@@ -23,7 +23,6 @@
 -keep class com.onekosmos.blockid.sdk.**{ *;}
 -keep public class org.**{ *;}
 
--keep class com.walletconnect.**{* ;}
 -keep class net.sqlcipher.** { *; }
 -keep class net.sqlcipher.database.** { *; }
 -keep class com.onekosmos.fido2authenticator.** {*;}
