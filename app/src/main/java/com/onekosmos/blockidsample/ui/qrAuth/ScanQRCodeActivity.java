@@ -32,8 +32,6 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanResponseListener {
-    public static final String IS_FROM_WALLET_CONNECT = "IS_FROM_WALLET_CONNECT";
-    public static final String WALLET_CONNECT_QR_DATA = "WALLET_CONNECT_QR_DATA";
     private AppCompatTextView mTxtPleaseWait;
     private ProgressBar mProgressBar;
     private final String[] K_CAMERA_PERMISSION = new String[]{
@@ -44,14 +42,11 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private RelativeLayout mScannerOverlay;
     private LinearLayout mScannerView;
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
-    private boolean isFromWalletConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_qrcode);
-        isFromWalletConnect = getIntent().hasExtra(IS_FROM_WALLET_CONNECT) &&
-                getIntent().getBooleanExtra(IS_FROM_WALLET_CONNECT, false);
         initView();
     }
 
@@ -122,15 +117,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mScannerView.setVisibility(View.INVISIBLE);
         mProgressBar.setVisibility(View.VISIBLE);
         mTxtPleaseWait.setVisibility(View.VISIBLE);
-
-        // wallet connect
-        if (isFromWalletConnect) {
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(WALLET_CONNECT_QR_DATA, qrResponse);
-            setResult(RESULT_OK, resultIntent);
-            this.finish();
-            return;
-        }
 
         // uwl1.0 and uwl 2.0
         processQRData(qrResponse);

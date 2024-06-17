@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,7 +32,6 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
-import com.onekosmos.blockidsample.BaseActivity;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
@@ -47,7 +47,6 @@ import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
 import com.onekosmos.blockidsample.ui.userManagement.AddUserActivity;
 import com.onekosmos.blockidsample.ui.userManagement.UserOptionsActivity;
 import com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity;
-import com.onekosmos.blockidsample.ui.walletconnect.WalletConnectActivity;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.ResetSDKMessages;
@@ -65,7 +64,7 @@ import java.util.Objects;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapter.EnrollmentClickListener {
+public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
 
@@ -116,8 +115,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
             onFido2PINManagementClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_wallet_connect))) {
-            onWalletConnectClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
             onAboutClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_my_kyc))) {
@@ -460,12 +457,6 @@ public class EnrollmentActivity extends BaseActivity implements EnrollmentAdapte
 
     private void onFido2PINManagementClicked() {
         Intent intent = new Intent(this, PINManagementActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onWalletConnectClicked() {
-        Intent intent = new Intent(this, WalletConnectActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
