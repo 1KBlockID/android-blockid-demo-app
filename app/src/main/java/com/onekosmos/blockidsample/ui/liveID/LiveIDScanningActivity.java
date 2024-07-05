@@ -22,7 +22,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.camera.liveIDModule.ILiveIDResponseListener;
 import com.onekosmos.blockid.sdk.cameramodule.liveID.LiveIDScannerHelper;
-import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
@@ -222,15 +221,37 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     }
 
     @Override
-    public void onFaceFocusChanged(boolean isFocused, String message) {
+    public void onFaceFocusChanged(boolean isFocused, String message, ErrorResponse error) {
         // Show face message and focused view
         showFaceFocusedViews();
         if (message != null) {
             mTxtMessage.setVisibility(View.VISIBLE);
-            mTxtMessage.setText(message);
+            mTxtMessage.setText(getDisplayMessage(error) != null ? getDisplayMessage(error) : message);
         } else {
             mTxtMessage.setVisibility(View.GONE);
         }
+    }
+
+    private String getDisplayMessage(ErrorResponse error) {
+        if (error != null) {
+            switch (error.getCode()) {
+                case 415001:
+                    return "We did not detect a face.";
+                case 415002:
+                    return "Please keep your eyes open.";
+                case 415003:
+                    return "Please smile.";
+                case 415004:
+                    return "Make sure you are facing the camera straight.";
+                case 416001:
+                    return "Your face needs to be at the center of the preview window.";
+                case 416002:
+                    return "Only one face can be presented at a time.";
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 
     // LiveID Liveness check is in progress
