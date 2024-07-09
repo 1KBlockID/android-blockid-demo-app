@@ -2,6 +2,12 @@ package com.onekosmos.blockidsample.ui.liveID;
 
 import static android.Manifest.permission.CAMERA;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.FACE_IS_NOT_FOUND;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.HEAD_TURNED_TOO_FAR;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.MULTIPLE_FACES_FOUND;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.PLEASE_ALIGN_THE_FACE_IN_THE_CENTER;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.UNABLE_TO_DETECT_EYES;
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.UNABLE_TO_DETECT_LIPS;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 
 import android.content.DialogInterface.OnDismissListener;
@@ -234,22 +240,21 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
     private String getDisplayMessage(ErrorResponse error) {
         if (error != null) {
-            switch (error.getCode()) {
-                case 415001:
-                    return "We did not detect a face.";
-                case 415002:
-                    return "Please keep your eyes open.";
-                case 415003:
-                    return "Please smile.";
-                case 415004:
-                    return "Make sure you are facing the camera straight.";
-                case 416001:
-                    return "Your face needs to be at the center of the preview window.";
-                case 416002:
-                    return "Only one face can be presented at a time.";
-                default:
-                    return null;
+            int code = error.getCode();
+            if (code == FACE_IS_NOT_FOUND.getCode()) {
+                return "We did not detect a face.";
+            } else if (code == UNABLE_TO_DETECT_EYES.getCode()) {
+                return "Please keep your eyes open.";
+            } else if (code == UNABLE_TO_DETECT_LIPS.getCode()) {
+                return "Please smile.";
+            } else if (code == HEAD_TURNED_TOO_FAR.getCode()) {
+                return "Make sure you are facing the camera straight.";
+            } else if (code == PLEASE_ALIGN_THE_FACE_IN_THE_CENTER.getCode()) {
+                return "Your face needs to be at the center of the preview window.";
+            } else if (code == MULTIPLE_FACES_FOUND.getCode()) {
+                return "Only one face can be presented at a time.";
             }
+            return null;
         }
         return null;
     }
