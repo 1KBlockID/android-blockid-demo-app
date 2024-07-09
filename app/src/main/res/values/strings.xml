@@ -18,6 +18,7 @@
     <string name="label_retry">Retry</string>
     <string name="label_liveid">LiveID </string>
     <string name="label_enroll_liveid">Enroll LiveID</string>
+    <string name="label_liveid_note">Make sure you are not wearing a mask, your eyes are open, and your face is not tilted.</string>
     <string name="label_login_with_qr">Login with QR</string>
     <string name="label_liveid_camera_permission_alert">Please note that you will not be able to
         secure your accounts with BlockID Sample and proceed until you have enrolled in LiveID.</string>
