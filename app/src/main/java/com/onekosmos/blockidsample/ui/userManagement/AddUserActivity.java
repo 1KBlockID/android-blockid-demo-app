@@ -106,9 +106,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     @Override
     protected void onStop() {
         super.onStop();
-        if (mQRScannerHelper != null && mQRScannerHelper.isRunning()) {
-            mQRScannerHelper.stopQRScanning();
-        }
+        mQRScannerHelper.stopQRScanning();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PERMISSION_GRANTED
@@ -146,11 +144,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      */
     @Override
     public void onQRScanResultResponse(String qrCodeData) {
-        if (mQRScannerHelper != null && mQRScannerHelper.isRunning()) {
-            mQRScannerHelper.stopQRScanning();
-            mQRScannerHelper = null;
-        }
-
+        mQRScannerHelper.stopQRScanning();
         mMagicLink = qrCodeData;
         runOnUiThread(() -> {
             hideQRCodeScanner();
