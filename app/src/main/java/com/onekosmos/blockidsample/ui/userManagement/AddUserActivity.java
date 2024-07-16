@@ -106,7 +106,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     @Override
     protected void onStop() {
         super.onStop();
-        mQRScannerHelper.stopQRScanning();
+        if (mQRScannerHelper != null)
+            mQRScannerHelper.stopQRScanning();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PERMISSION_GRANTED
