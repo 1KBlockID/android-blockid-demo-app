@@ -89,10 +89,8 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
 
     @Override
     public void onQRScanResultResponse(String qrCodeData) {
-        if (mQRScannerHelper.isRunning()) {
-            mQRScannerHelper.stopQRScanning();
-            runOnUiThread(() -> onQRCodeScanResponse(qrCodeData));
-        }
+        mQRScannerHelper.stopQRScanning();
+        runOnUiThread(() -> onQRCodeScanResponse(qrCodeData));
     }
 
     private void initView() {
