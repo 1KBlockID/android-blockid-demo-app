@@ -84,7 +84,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_message_liveid_active"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_40dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_30dp"
         android:layout_marginTop="@dimen/dimen_20dp"
         android:background="@drawable/rounded_white_btn"
