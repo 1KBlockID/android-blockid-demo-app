@@ -3,7 +3,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         //noinspection JcenterRepositoryObsolete
-        jcenter()
         mavenCentral()
         maven {
             url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
