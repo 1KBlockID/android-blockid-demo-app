@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
     // Network Call
-    implementation "com.amitshekhar.android:android-networking:1.0.2"
+    implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
 
     //Location
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
