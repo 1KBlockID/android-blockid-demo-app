@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
     // Network Call
-    implementation "com.amitshekhar.android:android-networking:1.0.2"
+    implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
 
     //Location
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
@@ -101,5 +101,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.50.66AB3F6F'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.60.66D05C17'
 }
