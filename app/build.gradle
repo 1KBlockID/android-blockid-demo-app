@@ -9,7 +9,7 @@ android {
         minSdkVersion 25
         targetSdkVersion 34
         versionCode 1
-        versionName "1.10.50" + "." + getCurrentTimestampHexValue()
+        versionName "1.10.60" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
