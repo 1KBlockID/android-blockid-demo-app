@@ -44,6 +44,7 @@ import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -244,7 +245,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             mDriverLicenseMap.put("type", DL.getValue());
             mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
             BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
-                    null, (status, error) -> {
+                    null, null, null, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
@@ -280,8 +281,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         mDriverLicenseMap.put("type", DL.getValue());
         mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String sessionID = UUID.randomUUID().toString();
+        String documentID = DL.getValue().toString() + "_with_face_enroll_" + sessionID;
         BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -321,7 +324,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         progressDialog.show();
 
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mDriverLicenseMap,
-                new String[]{"dl_verify"}, (status, documentVerification, error) -> {
+                new String[]{"dl_verify"}, null, null, (status, documentVerification, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         //Verification success, call documentRegistration API

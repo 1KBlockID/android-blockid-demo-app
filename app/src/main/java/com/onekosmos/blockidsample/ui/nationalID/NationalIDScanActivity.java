@@ -43,6 +43,7 @@ import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -252,8 +253,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String sessionID = UUID.randomUUID().toString();
+        String documentID = NATIONAL_ID.getValue().toString() + "_with_face_enroll_" + sessionID;
         BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -278,7 +281,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("category", identity_document.name());
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null, null, null,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;

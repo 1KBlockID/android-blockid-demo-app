@@ -175,7 +175,7 @@ public class VerifySSNActivity extends AppCompatActivity {
         mSSNMap.put("ssn", ssnNumber);
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
-        BlockIDSDK.getInstance().verifyDocument(mSSNMap, new String[]{"ssn_verify"},
+        BlockIDSDK.getInstance().verifyDocument(mSSNMap, new String[]{"ssn_verify"}, null, null,
                 (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();
@@ -359,7 +359,7 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
             ssnMap.put("proof", dataObject.getString("proof"));
 
-            BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
+            BlockIDSDK.getInstance().registerDocument(this, ssnMap, null, null, null,
                     (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {

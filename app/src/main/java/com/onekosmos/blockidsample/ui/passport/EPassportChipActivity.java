@@ -35,6 +35,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -200,8 +201,10 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String sessionID = UUID.randomUUID().toString();
+        String documentID = PPT.getValue().toString() + "_with_face_enroll_" + sessionID;
         BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
                     progressDialog.dismiss();
                     mIsRegInProgress = false;
                     if (status) {
@@ -261,7 +264,7 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, (status, error) -> {
+                    null, null, null, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             DocumentHolder.clearData();
