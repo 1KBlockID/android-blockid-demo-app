@@ -4,6 +4,7 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomEr
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_PP_RFID_TIMEOUT;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_SOMETHING_WENT_WRONG;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
+import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
 import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -201,10 +203,12 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        String sessionID = UUID.randomUUID().toString();
-        String documentID = PPT.getValue().toString() + "_with_face_enroll_" + sessionID;
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = PPT.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
+                (status, error) -> {
                     progressDialog.dismiss();
                     mIsRegInProgress = false;
                     if (status) {
@@ -263,8 +267,10 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = PPT.getValue().toLowerCase() + UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, null, null, (status, error) -> {
+                    null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             DocumentHolder.clearData();

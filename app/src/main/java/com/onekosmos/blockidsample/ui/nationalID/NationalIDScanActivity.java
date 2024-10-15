@@ -253,10 +253,12 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        String sessionID = UUID.randomUUID().toString();
-        String documentID = NATIONAL_ID.getValue().toString() + "_with_face_enroll_" + sessionID;
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = NATIONAL_ID.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
+                (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -281,7 +283,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("category", identity_document.name());
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null, null, null,
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = NATIONAL_ID.getValue().toLowerCase() + UUID.randomUUID().toString();
+        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,
+                mobileSessionID, mobileDocumentID,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;

@@ -273,11 +273,13 @@ public class PassportScanningActivity extends AppCompatActivity {
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        String sessionID = UUID.randomUUID().toString();
-        String documentID = PPT.getValue().toString() + "_with_face_enroll_" + sessionID;
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = PPT.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
 
         BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
+                (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -303,7 +305,10 @@ public class PassportScanningActivity extends AppCompatActivity {
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
-            BlockIDSDK.getInstance().registerDocument(this, mPassportMap, null, null, null,
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = PPT.getValue().toLowerCase() + UUID.randomUUID().toString();
+            BlockIDSDK.getInstance().registerDocument(this, mPassportMap, null,
+                    mobileSessionID, mobileDocumentID,
                     (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;

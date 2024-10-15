@@ -58,6 +58,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -359,7 +360,11 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
             ssnMap.put("proof", dataObject.getString("proof"));
 
-            BlockIDSDK.getInstance().registerDocument(this, ssnMap, null, null, null,
+            String mobileSessionID = UUID.randomUUID().toString();
+            String mobileDocumentID = RegisterDocType.SSN.getValue().toLowerCase() + mobileSessionID;
+
+            BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
+                    mobileSessionID, mobileDocumentID,
                     (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {

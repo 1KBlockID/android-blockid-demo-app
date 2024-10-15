@@ -244,8 +244,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             mDriverLicenseMap.put("category", identity_document.name());
             mDriverLicenseMap.put("type", DL.getValue());
             mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = DL.getValue().toLowerCase() + UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
-                    null, null, null, (status, error) -> {
+                    null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
@@ -281,10 +283,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         mDriverLicenseMap.put("type", DL.getValue());
         mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
-        String sessionID = UUID.randomUUID().toString();
-        String documentID = DL.getValue().toString() + "_with_face_enroll_" + sessionID;
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = DL.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, sessionID, documentID, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
