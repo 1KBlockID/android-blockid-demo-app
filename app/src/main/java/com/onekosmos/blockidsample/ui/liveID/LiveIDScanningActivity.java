@@ -170,7 +170,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
         String mobileSessionID = UUID.randomUUID().toString();
         String mobileDocumentID;
-        if (mIsFromAuthentication)
+        if (!mIsFromAuthentication)
             mobileDocumentID = "liveid_" + mobileSessionID;
         else
             mobileDocumentID = "liveid_verify_" + mobileSessionID;
