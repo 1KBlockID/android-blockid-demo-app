@@ -365,7 +365,8 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("proof", dataObject.getString("proof"));
 
             String mobileSessionID = UUID.randomUUID().toString();
-            String mobileDocumentID = RegisterDocType.SSN.getValue().toLowerCase() + mobileSessionID;
+            String mobileDocumentID = RegisterDocType.SSN.getValue().toLowerCase() + "_" +
+                    mobileSessionID;
 
             BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
                     mobileSessionID, mobileDocumentID,

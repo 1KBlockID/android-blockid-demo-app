@@ -267,7 +267,8 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
             String mobileSessionID = BIDDocumentDataHolder.getSessionID();
-            String mobileDocumentID = PPT.getValue().toLowerCase() + UUID.randomUUID().toString();
+            String mobileDocumentID = PPT.getValue().toLowerCase() + "_" +
+                    UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
                     null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();

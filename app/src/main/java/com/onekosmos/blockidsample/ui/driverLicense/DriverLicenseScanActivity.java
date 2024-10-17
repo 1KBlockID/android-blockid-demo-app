@@ -246,7 +246,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             mDriverLicenseMap.put("type", DL.getValue());
             mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
             String mobileSessionID = BIDDocumentDataHolder.getSessionID();
-            String mobileDocumentID = DL.getValue().toLowerCase() + UUID.randomUUID().toString();
+            String mobileDocumentID = DL.getValue().toLowerCase() + "_" + UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
                     null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();
