@@ -101,5 +101,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.70.670F8F7A'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.10.70.6710C723'
 }

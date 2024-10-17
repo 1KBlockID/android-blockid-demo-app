@@ -32,6 +32,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
@@ -181,7 +182,10 @@ public class VerifySSNActivity extends AppCompatActivity {
                     if (status) {
                         progressDialog.dismiss();
                         try {
-                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            UserAPI.DocuVerifyResult docuVerifyResult = BIDUtil.
+                                    JSONStringToObject(documentVerification,
+                                            UserAPI.DocuVerifyResult.class);
+                            JSONObject jsonObject = new JSONObject(docuVerifyResult.result);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
                             JSONObject certificate = certificates.length() > 0 ?
                                     certificates.getJSONObject(0) : null;

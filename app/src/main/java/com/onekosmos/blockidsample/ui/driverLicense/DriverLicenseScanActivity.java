@@ -28,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.DocumentScanner;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -337,7 +338,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         // from verifyDocument API response.
 
                         try {
-                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            UserAPI.DocuVerifyResult docuVerifyResult = BIDUtil.
+                                    JSONStringToObject(documentVerification,
+                                            UserAPI.DocuVerifyResult.class);
+                            JSONObject jsonObject = new JSONObject(docuVerifyResult.result);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
                             String[] tokens = new String[certificates.length()];
                             for (int index = 0; index < certificates.length(); index++) {
