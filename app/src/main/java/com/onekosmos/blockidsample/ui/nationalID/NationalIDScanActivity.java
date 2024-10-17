@@ -284,7 +284,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
         mNationalIDMap.put("type", NATIONAL_ID.getValue());
         mNationalIDMap.put("id", mNationalIDMap.get("id"));
         String mobileSessionID = BIDDocumentDataHolder.getSessionID();
-        String mobileDocumentID = NATIONAL_ID.getValue().toLowerCase() + UUID.randomUUID().toString();
+        String mobileDocumentID = NATIONAL_ID.getValue().toLowerCase() + "_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, null,
                 mobileSessionID, mobileDocumentID,
                 (status, error) -> {
