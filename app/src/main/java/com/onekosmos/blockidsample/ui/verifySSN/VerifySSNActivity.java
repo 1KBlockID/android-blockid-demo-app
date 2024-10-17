@@ -32,6 +32,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
@@ -58,6 +59,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -175,12 +177,15 @@ public class VerifySSNActivity extends AppCompatActivity {
         mSSNMap.put("ssn", ssnNumber);
         mSSNMap.put("dob", changeDateFormat(mBirthDate.getText().toString().trim(),
                 displayDateFormat, requiredDateFormat));
-        BlockIDSDK.getInstance().verifyDocument(mSSNMap, new String[]{"ssn_verify"},
+        BlockIDSDK.getInstance().verifyDocument(mSSNMap, new String[]{"ssn_verify"}, null, null,
                 (status, documentVerification, error) -> {
                     if (status) {
                         progressDialog.dismiss();
                         try {
-                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            UserAPI.DocuVerifyResult docuVerifyResult = BIDUtil.
+                                    JSONStringToObject(documentVerification,
+                                            UserAPI.DocuVerifyResult.class);
+                            JSONObject jsonObject = new JSONObject(docuVerifyResult.result);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
                             JSONObject certificate = certificates.length() > 0 ?
                                     certificates.getJSONObject(0) : null;
@@ -359,7 +364,11 @@ public class VerifySSNActivity extends AppCompatActivity {
             ssnMap.put("certificate_token", dataObject.getString("certificate_token_value"));
             ssnMap.put("proof", dataObject.getString("proof"));
 
+            String mobileSessionID = UUID.randomUUID().toString();
+            String mobileDocumentID = RegisterDocType.SSN.getValue().toLowerCase() + mobileSessionID;
+
             BlockIDSDK.getInstance().registerDocument(this, ssnMap, null,
+                    mobileSessionID, mobileDocumentID,
                     (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {

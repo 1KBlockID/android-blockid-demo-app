@@ -28,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.DocumentScanner;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -243,8 +245,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             mDriverLicenseMap.put("category", identity_document.name());
             mDriverLicenseMap.put("type", DL.getValue());
             mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = DL.getValue().toLowerCase() + UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap,
-                    null, (status, error) -> {
+                    null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;
                         if (status) {
@@ -280,8 +284,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         mDriverLicenseMap.put("type", DL.getValue());
         mDriverLicenseMap.put("id", mDriverLicenseMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = DL.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mDriverLicenseMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID, (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -321,7 +328,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         progressDialog.show();
 
         BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mDriverLicenseMap,
-                new String[]{"dl_verify"}, (status, documentVerification, error) -> {
+                new String[]{"dl_verify"}, null, null, (status, documentVerification, error) -> {
                     progressDialog.dismiss();
                     if (status) {
                         //Verification success, call documentRegistration API
@@ -331,7 +338,10 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         // from verifyDocument API response.
 
                         try {
-                            JSONObject jsonObject = new JSONObject(documentVerification);
+                            UserAPI.DocuVerifyResult docuVerifyResult = BIDUtil.
+                                    JSONStringToObject(documentVerification,
+                                            UserAPI.DocuVerifyResult.class);
+                            JSONObject jsonObject = new JSONObject(docuVerifyResult.result);
                             JSONArray certificates = jsonObject.getJSONArray("certifications");
                             String[] tokens = new String[certificates.length()];
                             for (int index = 0; index < certificates.length(); index++) {
