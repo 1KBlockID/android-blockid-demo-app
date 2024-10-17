@@ -296,9 +296,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     /**
      * Register LiveID
      *
-     * @param livIdBitmap LiveID image received from LiveID scanner
-     * @param mobileSessionID
-     * @param mobileDocumentID
+     * @param livIdBitmap      LiveID image received from LiveID scanner
+     * @param mobileSessionID  UUID
+     * @param mobileDocumentID "liveid_mobileSessionID"
      */
     private void registerLiveID(Bitmap livIdBitmap, String signatureToken,
                                 String livenessResult, String mobileSessionID,
@@ -329,8 +329,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
      * Register LiveID with document
      *
      * @param livIdBitmap      LiveID image received from LiveID scanner
-     * @param mobileSessionID
-     * @param mobileDocumentID
+     * @param mobileSessionID  IDP_SessionID
+     * @param mobileDocumentID {type}_with_liveid_mobileSessionID
      */
     private void registerLiveIDWithDocument(Bitmap livIdBitmap, String mobileSessionID, String mobileDocumentID) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
