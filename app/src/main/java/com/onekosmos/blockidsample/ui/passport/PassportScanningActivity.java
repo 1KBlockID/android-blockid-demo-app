@@ -47,6 +47,7 @@ import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -272,8 +273,13 @@ public class PassportScanningActivity extends AppCompatActivity {
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = PPT.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
+
         BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
+                (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
@@ -299,7 +305,10 @@ public class PassportScanningActivity extends AppCompatActivity {
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = PPT.getValue().toLowerCase() + "_" + UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap, null,
+                    mobileSessionID, mobileDocumentID,
                     (status, error) -> {
                         progressDialog.dismiss();
                         isRegistrationInProgress = false;

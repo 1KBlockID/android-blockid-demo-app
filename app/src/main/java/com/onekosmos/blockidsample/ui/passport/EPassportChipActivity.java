@@ -25,6 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.rfidScanner.IRFIDScanResponseListener;
 import com.onekosmos.blockid.sdk.rfidScanner.RFIDScannerHelper;
 import com.onekosmos.blockidsample.R;
@@ -35,6 +36,7 @@ import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 /**
  * Created by 1Kosmos Engineering
@@ -200,8 +202,12 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
         mPassportMap.put("type", PPT.getValue());
         mPassportMap.put("id", mPassportMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
+        String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+        String mobileDocumentID = PPT.getValue().toLowerCase() + "_with_liveid_" +
+                UUID.randomUUID().toString();
         BlockIDSDK.getInstance().registerDocument(this, mPassportMap, liveIDBitmap,
-                mLiveIDProofedBy, null, null, (status, error) -> {
+                mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
+                (status, error) -> {
                     progressDialog.dismiss();
                     mIsRegInProgress = false;
                     if (status) {
@@ -260,8 +266,11 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             mPassportMap.put("category", identity_document.name());
             mPassportMap.put("type", PPT.getValue());
             mPassportMap.put("id", mPassportMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = PPT.getValue().toLowerCase() + "_" +
+                    UUID.randomUUID().toString();
             BlockIDSDK.getInstance().registerDocument(this, mPassportMap,
-                    null, (status, error) -> {
+                    null, mobileSessionID, mobileDocumentID, (status, error) -> {
                         progressDialog.dismiss();
                         if (status) {
                             DocumentHolder.clearData();
