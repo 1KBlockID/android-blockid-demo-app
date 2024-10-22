@@ -305,9 +305,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                                 String mobileDocumentID) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, signatureToken, mobileSessionID,
-                mobileDocumentID,
-                livenessResult, (status, message, error) -> {
+        BlockIDSDK.getInstance().setLiveID(livIdBitmap, null, signatureToken, livenessResult,
+                mobileSessionID, mobileDocumentID, (status, message, error) -> {
                     mProgressDialog.dismiss();
 
                     // Register LiveID failed
