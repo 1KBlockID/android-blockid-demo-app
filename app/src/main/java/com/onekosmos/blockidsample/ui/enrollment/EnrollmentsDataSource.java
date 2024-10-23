@@ -45,7 +45,8 @@ public class EnrollmentsDataSource {
         ASSET_FIDO2_PIN_MANAGEMENT,
         ASSET_ABOUT,
         ASSET_KYC,
-        ASSET_RESET_SDK
+        ASSET_RESET_SDK,
+        ASSET_JIRA_TICKET
     }
 
     private EnrollmentsDataSource() {
@@ -79,6 +80,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2);
         arr.add(EnrollmentAssetEnum.ASSET_FIDO2_PIN_MANAGEMENT);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
+        arr.add(EnrollmentAssetEnum.ASSET_JIRA_TICKET);
         return arr;
     }
 
@@ -180,6 +182,10 @@ public class EnrollmentsDataSource {
             case ASSET_KYC:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_my_kyc), null);
+                break;
+            case ASSET_JIRA_TICKET:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        "Jira Tickets", null);
                 break;
         }
         return enrollmentAsset;

@@ -32,6 +32,7 @@ import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
+import com.onekosmos.blockidsample.JiraService;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
@@ -54,6 +55,7 @@ import com.onekosmos.blockidsample.util.ResetSDKMessages;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -121,6 +123,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             getKYC();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_liveid_face_presence_level))) {
             onLiveIdWithFacePresenceLevel();
+        } else if (TextUtils.equals(asset.getAssetTitle(), "Jira Tickets")) {
+            JiraService jiraService = new JiraService();
+            try {
+                jiraService.createJiraTicket();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
