@@ -270,17 +270,18 @@ public class UserOptionsActivity extends AppCompatActivity {
     private void unlinkAccount(BIDLinkedAccount linkedAccount) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
-        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, (status, error) -> {
-            progressDialog.dismiss();
-            if (status) {
-                Toast.makeText(this, getString(R.string.label_account_removed),
-                        Toast.LENGTH_SHORT).show();
-                BlockIDSDK.getInstance().setSelectedAccount(null);
-                finish();
-                return;
-            }
-            showError(error);
-        });
+        BlockIDSDK.getInstance().unlinkAccount(linkedAccount, null, null,
+                (status, error) -> {
+                    progressDialog.dismiss();
+                    if (status) {
+                        Toast.makeText(this, getString(R.string.label_account_removed),
+                                Toast.LENGTH_SHORT).show();
+                        BlockIDSDK.getInstance().setSelectedAccount(null);
+                        finish();
+                        return;
+                    }
+                    showError(error);
+                });
     }
 
     /**
