@@ -183,7 +183,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                     + "_with_liveid_" + mobileSessionID;
         }
 
-        mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID);
+        mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID,
+                mIsFromAuthentication);
     }
 
     // LiveID scanning response
@@ -229,7 +230,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
         // Activity started for authentication purpose, call verify LiveID
         if (mIsFromAuthentication) {
-            verifyLiveID(liveIDBitmap, signatureToken, livenessResult, mobileSessionID, mobileDocumentID);
+            // LiveID verified successfully
+            setResult(RESULT_OK);
+            finish();
+//            verifyLiveID(liveIDBitmap, signatureToken, livenessResult, mobileSessionID, mobileDocumentID);
             return;
         }
 
@@ -369,7 +373,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                               String mobileSessionID, String mobileDocumentID) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().verifyLiveIDFirstCompareThenLiveness(this, bitmap, signatureToken,
+        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, signatureToken,
                 livenessResult, mobileSessionID, mobileDocumentID,
                 (status, error) -> {
                     mProgressDialog.dismiss();
