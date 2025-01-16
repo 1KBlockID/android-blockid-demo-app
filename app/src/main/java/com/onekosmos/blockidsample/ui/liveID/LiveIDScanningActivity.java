@@ -183,7 +183,11 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                     + "_with_liveid_" + mobileSessionID;
         }
 
-        mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID);
+        if (!mIsFromAuthentication)
+            mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID);
+        else
+            mLiveIDScannerHelper.startLiveIDScanningWithVerification(mobileSessionID,
+                    mobileDocumentID);
     }
 
     // LiveID scanning response
@@ -229,7 +233,10 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
         // Activity started for authentication purpose, call verify LiveID
         if (mIsFromAuthentication) {
-            verifyLiveID(liveIDBitmap, signatureToken, livenessResult, mobileSessionID, mobileDocumentID);
+//            verifyLiveID(liveIDBitmap, signatureToken, livenessResult, mobileSessionID, mobileDocumentID);
+            // LiveID verified successfully
+            setResult(RESULT_OK);
+            finish();
             return;
         }
 
