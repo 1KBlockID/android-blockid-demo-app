@@ -229,4 +229,7 @@
 
     <!-- LiveID with Face Presence Level-->
     <string name="label_liveid_face_presence_level">LiveID with Face presence level</string>
+    <string name="label_verify_live_id">Verify LiveID</string>
+    <string name="label_liveid_is_not_registered">LiveID is not registered.</string>
+    <string name="label_liveid_verified_successfully">LiveID verified successfully.</string>
 </resources>

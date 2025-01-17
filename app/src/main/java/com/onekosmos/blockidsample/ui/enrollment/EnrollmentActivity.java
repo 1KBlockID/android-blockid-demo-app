@@ -6,6 +6,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
+import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_LIVEID_WITH_FACE_PRESENCE_LEVEL;
 
 import android.annotation.SuppressLint;
@@ -15,6 +16,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -67,6 +70,15 @@ import java.util.Objects;
 public class EnrollmentActivity extends AppCompatActivity implements EnrollmentAdapter.EnrollmentClickListener {
     private final List<EnrollmentAsset> enrollmentAssets = new ArrayList<>();
     private EnrollmentAdapter mEnrollmentAdapter;
+    private final ActivityResultLauncher<Intent> liveIDVerificationResult =
+            registerForActivityResult(new
+                    ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Toast.makeText(this,
+                            getResources().getString(R.string.label_liveid_verified_successfully),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +133,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             getKYC();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_liveid_face_presence_level))) {
             onLiveIdWithFacePresenceLevel();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_verify_live_id))) {
+            onVerifyLiveID();
         }
     }
 
@@ -191,6 +205,24 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             startActivity(intent);
         }
     }
+
+    private void onVerifyLiveID() {
+        if (!BlockIDSDK.getInstance().isLiveIDRegistered()) {
+            ErrorDialog errorDialog = new ErrorDialog(this);
+            errorDialog.showWithOneButton(
+                    null,
+                    null,
+                    getString(R.string.label_liveid_is_not_registered),
+                    getString(R.string.label_ok),
+                    dialogInterface -> errorDialog.dismiss());
+        } else {
+            Intent intent = new Intent(this, LiveIDScanningActivity.class);
+            intent.putExtra(IS_FROM_AUTHENTICATE, true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            liveIDVerificationResult.launch(intent);
+        }
+    }
+
 
     private void onDeviceAuthClicked() {
         if (!BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
