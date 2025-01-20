@@ -45,6 +45,7 @@ import java.util.UUID;
 @SuppressWarnings("FieldCanBeLocal")
 public class LiveIDScanningActivity extends AppCompatActivity implements ILiveIDResponseListener {
     public static String IS_FROM_AUTHENTICATE = "IS_FROM_AUTHENTICATE";
+    public static String IS_FOR_LIVENESS_AND_COMPARE = "IS_FOR_LIVENESS_AND_COMPARE";
     public static String LIVEID_WITH_DOCUMENT = "LIVEID_WITH_DOCUMENT";
     public static String IS_LIVEID_WITH_FACE_PRESENCE_LEVEL = "IS_LIVEID_WITH_FACE_PRESENCE_LEVEL";
     private static final int K_LIVEID_PERMISSION_REQUEST_CODE = 1009;
@@ -58,6 +59,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private ProgressDialog mProgressDialog;
     private boolean mIsFromAuthentication; // Is LiveID scanning started for authentication purpose
     private boolean mIsLiveIDWithFacePresenceLevel; // Is LiveID scanning started with Face Presence Level
+    private boolean mIsLiveIDLivenessAndCompare; // Is LiveID scanning started without Liveness and verify with Liveness and compare function
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,9 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
         mIsLiveIDWithFacePresenceLevel = getIntent()
                 .hasExtra(IS_LIVEID_WITH_FACE_PRESENCE_LEVEL) && getIntent()
                 .getBooleanExtra(IS_LIVEID_WITH_FACE_PRESENCE_LEVEL, false);
+        mIsLiveIDLivenessAndCompare = getIntent()
+                .hasExtra(IS_FOR_LIVENESS_AND_COMPARE) && getIntent()
+                .getBooleanExtra(IS_FOR_LIVENESS_AND_COMPARE, false);
 
         initViews();
     }
@@ -183,7 +188,11 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                     + "_with_liveid_" + mobileSessionID;
         }
 
-        mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID);
+        if (!mIsLiveIDLivenessAndCompare)
+            mLiveIDScannerHelper.startLiveIDScanning(mobileSessionID, mobileDocumentID);
+        else
+            mLiveIDScannerHelper.startLiveIDScanning(true,
+                    mobileSessionID, mobileDocumentID);
     }
 
     // LiveID scanning response
@@ -228,7 +237,7 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
         // LiveID scanned successful
 
         // Activity started for authentication purpose, call verify LiveID
-        if (mIsFromAuthentication) {
+        if (mIsFromAuthentication || mIsLiveIDLivenessAndCompare) {
             verifyLiveID(liveIDBitmap, signatureToken, livenessResult, mobileSessionID, mobileDocumentID);
             return;
         }
@@ -369,21 +378,40 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
                               String mobileSessionID, String mobileDocumentID) {
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_verify_liveid));
         mProgressDialog.show();
-        BlockIDSDK.getInstance().verifyLiveID(this, bitmap, signatureToken,
-                livenessResult, mobileSessionID, mobileDocumentID,
-                (status, error) -> {
-                    mProgressDialog.dismiss();
-                    // LiveID verification failed
-                    if (!status) {
-                        // show error
-                        showError(error);
-                        return;
-                    }
 
-                    // LiveID verified successfully
-                    setResult(RESULT_OK);
-                    finish();
-                });
+        if (mIsLiveIDLivenessAndCompare) {
+            BlockIDSDK.getInstance().verifyFaceWithLiveness(bitmap, mobileSessionID, mobileDocumentID,
+                    (status, error) -> {
+                        mProgressDialog.dismiss();
+                        // LiveID verification failed
+                        if (!status) {
+                            // show error
+                            showError(error);
+                            return;
+                        }
+
+                        // LiveID verified successfully
+                        setResult(RESULT_OK);
+                        finish();
+                    });
+        } else {
+            BlockIDSDK.getInstance().verifyLiveID(this, bitmap, signatureToken,
+                    livenessResult, mobileSessionID, mobileDocumentID,
+                    (status, error) -> {
+                        mProgressDialog.dismiss();
+                        // LiveID verification failed
+                        if (!status) {
+                            // show error
+                            showError(error);
+                            return;
+                        }
+
+                        // LiveID verified successfully
+                        setResult(RESULT_OK);
+                        finish();
+                    });
+        }
+
     }
 
     /**
