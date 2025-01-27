@@ -136,6 +136,8 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
 
         if (mIsFromAuthentication)
             mTxtTitle.setText(R.string.label_verify_liveid);
+        else if(mIsLiveIDLivenessAndCompare)
+            mTxtTitle.setText(R.string.label_liveid_liveness_and_compare);
 
         mTxtMessage = findViewById(R.id.txt_message_liveid_active);
         mImgBack = findViewById(R.id.img_back_liveid_active);
