@@ -229,4 +229,5 @@
 
     <!-- LiveID with Face Presence Level-->
     <string name="label_liveid_face_presence_level">LiveID with Face presence level</string>
+    <string name="label_liveid_liveness_and_compare">LiveID Liveness &amp; Compare</string>
 </resources>
