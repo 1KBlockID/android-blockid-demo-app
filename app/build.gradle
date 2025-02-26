@@ -5,12 +5,17 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdk 34
     defaultConfig {
+        namespace "com.onekosmos.blockidsample"
         applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 25
         targetSdkVersion 34
         versionCode 1
-        versionName "1.20.00" + "." + getCurrentTimestampHexValue()
+        versionName "1.20.20" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -25,8 +30,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     packagingOptions {
@@ -51,7 +56,7 @@ String getCurrentTimestampHexValue() {
     return hexVal.toUpperCase()
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.bouncycastle') {
             details.useTarget 'org.bouncycastle:bcprov-jdk15to18:1.70'
@@ -65,11 +70,11 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.8.0'
-    implementation 'androidx.navigation:navigation-fragment:2.5.0'
-    implementation 'androidx.navigation:navigation-ui:2.5.0'
+    implementation 'androidx.navigation:navigation-fragment:2.5.2'
+    implementation 'androidx.navigation:navigation-ui:2.5.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     // Secure  Shared preference
@@ -101,5 +106,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.00.67912346'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.20.67B8BFB0'
 }
