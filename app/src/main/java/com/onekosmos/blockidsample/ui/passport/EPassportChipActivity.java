@@ -139,17 +139,15 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
 
     private void initView() {
         mTxtSkip = findViewById(R.id.txt_skip);
-        mTxtSkip.setOnClickListener(v -> showWarningDialog());
+        mTxtSkip.setOnClickListener(view -> showWarningDialog());
         mBtnScan = findViewById(R.id.btn_scan);
-        mBtnScan.setOnClickListener(v -> {
+        mBtnScan.setOnClickListener(view -> {
             mLayoutNFC.setVisibility(View.GONE);
             mLayoutScanRFId.setVisibility(View.VISIBLE);
             mRFIDScannerHelper.startRFIDScanning(mPassportMap);
         });
         mBtnCancel = findViewById(R.id.btn_cancel);
-        mBtnCancel.setOnClickListener(v -> {
-            showWarningDialog();
-        });
+        mBtnCancel.setOnClickListener(view -> showWarningDialog());
         mLayoutNFC = findViewById(R.id.layout_nfc);
         mLayoutScanRFId = findViewById(R.id.layout_scan_rfid);
     }
