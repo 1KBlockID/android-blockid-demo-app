@@ -78,3 +78,22 @@
 -keep class net.sqlcipher.database.** { *; }
 -keep class com.onekosmos.fido2authenticator.** {*;}
 -keep class com.google.firebase.** { *; }
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+-keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+
+-keep public class com.google.gson.** {*;}
+-dontwarn com.google.gson.**
+
+-keep class * implements com.google.gson.** {*;}
+-keep class com.google.gson.stream.** { *; }
+
+# Reflection on classes from native code
+-keep class com.google.gson.JsonArray { *; }
+-keep class com.google.gson.JsonElement { *; }
+-keep class com.google.gson.JsonObject { *; }
+-keep class com.google.gson.JsonPrimitive { *; }
+-dontnote com.google.gson.**
