@@ -122,8 +122,8 @@
     <string name="label_pp_fail_to_scan">Passport failed to scan.</string>
     <string name="label_nid_fail_to_scan">National ID failed to scan.</string>
     <string name="label_scan_timeout_title">Scanning timeout</string>
-
-    <string name="label_scan_timeout_message">Scanning time exceeded. To continue, please restart the scanning process.</string>
+    <string name="label_session_expired">Session Expired</string>
+    <string name="label_verification_session_no_longer_available">This verification session is no longer available. You need to begin the journey again.</string>
 
     <!-- Fido2 -->
     <string name="label_fido2">FIDO2</string>
