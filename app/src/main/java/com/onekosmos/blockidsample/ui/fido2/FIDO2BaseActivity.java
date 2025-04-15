@@ -6,6 +6,7 @@ import static com.onekosmos.blockidsample.util.SharedPreferenceUtil.K_PREF_FIDO2
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -52,6 +53,9 @@ public class FIDO2BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_fido2_base);
 
         mImgBack = findViewById(R.id.img_back);

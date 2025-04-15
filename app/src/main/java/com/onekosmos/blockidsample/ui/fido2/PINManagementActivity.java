@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui.fido2;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -25,9 +27,13 @@ public class PINManagementActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatButton mBtnIsPINConfigured, mBtnSetPIN, mBtnChangePIN, mBtnReset;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_fido2_pinmanagement);
 
         mImgBack = findViewById(R.id.img_back);

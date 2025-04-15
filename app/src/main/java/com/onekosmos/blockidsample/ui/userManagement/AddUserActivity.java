@@ -13,6 +13,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -77,9 +78,13 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private QRScannerHelper mQRScannerHelper;
     private String mMagicLink, mAcrPublicKey, mIAL;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_add_user);
 
         mCurrentLocationHelper = new CurrentLocationHelper(this);

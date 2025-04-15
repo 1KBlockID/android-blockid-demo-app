@@ -1,8 +1,10 @@
 package com.onekosmos.blockidsample.ui.restore;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -28,9 +30,12 @@ public class RecoverMnemonicActivity extends AppCompatActivity {
     private List<String> mMnemonicPhrases;
     private AppCompatTextView[] mTvPhrases = new AppCompatTextView[12];
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_recover_mnemonic_account);
         mMnemonicPhrases = BlockIDSDK.getInstance().getMnemonic();
         initView();

@@ -1,8 +1,10 @@
 package com.onekosmos.blockidsample.ui.enrollPin;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -42,9 +44,12 @@ public class PinEnrollmentActivity extends AppCompatActivity {
     private TextWatcher textWatcherEnterPin;
     private boolean isEnteredPin = false;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_pin_enrollment);
         initView();
     }

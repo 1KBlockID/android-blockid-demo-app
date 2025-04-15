@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -17,9 +19,13 @@ import com.onekosmos.blockidsample.ui.login.LoginActivity;
 public class SplashActivity extends AppCompatActivity {
     private static int K_SPLASH_SCREEN_TIME_OUT = 1000;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_splash);
 
         Handler handler = new Handler();

@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui.login;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -30,9 +32,13 @@ public class PinVerificationActivity extends AppCompatActivity {
     private PinView mPvEnterPin;
     private boolean mShowPivValue;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_pin_verification);
         initView();
     }

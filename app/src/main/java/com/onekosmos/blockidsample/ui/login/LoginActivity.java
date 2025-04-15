@@ -1,6 +1,8 @@
 package com.onekosmos.blockidsample.ui.login;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -23,9 +25,13 @@ public class LoginActivity extends AppCompatActivity {
     private static final int K_PIN_VERIFICATION_REQUEST_CODE = 1189;
     private AppCompatButton mBtnAppPin, mBtnDeviceAuth;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_login);
         initView();
     }

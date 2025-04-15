@@ -3,8 +3,10 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
@@ -43,9 +45,12 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private LinearLayout mScannerView;
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_scan_qrcode);
         initView();
     }

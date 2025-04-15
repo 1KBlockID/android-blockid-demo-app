@@ -10,7 +10,9 @@ import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDSc
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.LiveIDScanningError.UNABLE_TO_DETECT_LIPS;
 import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDocCategory.identity_document;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -62,9 +64,13 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     private boolean mIsLiveIDLivenessAndCompare; // Is LiveID scanning started without Liveness and verify with Liveness and compare function
 
 
+    @SuppressLint("SourceLockedOrientationActivity")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_liveid_scan);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         mIsFromAuthentication = getIntent().hasExtra(IS_FROM_AUTHENTICATE) &&
                 getIntent().getBooleanExtra(IS_FROM_AUTHENTICATE, false);
         mIsLiveIDWithFacePresenceLevel = getIntent()

@@ -12,6 +12,7 @@ import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_LI
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -79,9 +80,13 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 }
             });
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_enrollment);
         initView();
     }

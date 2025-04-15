@@ -1,7 +1,9 @@
 package com.onekosmos.blockidsample.ui;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -35,9 +37,13 @@ public class RegisterTenantActivity extends AppCompatActivity {
     private ConstraintLayout mLayoutAuth;
     private AppCompatButton mBtnRegisterTenant, mBtnRestore, mBtnDeviceAuth;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         setContentView(R.layout.activity_register_tenant);
         mBtnRestore = findViewById(R.id.btn_restore_account);
         mBtnRestore.setOnClickListener(view -> restoreAccount());
