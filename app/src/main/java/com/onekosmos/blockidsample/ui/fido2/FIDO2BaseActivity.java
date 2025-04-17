@@ -22,7 +22,6 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.fido2.FIDO2KeyType;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
@@ -40,13 +39,10 @@ import com.onekosmos.blockidsample.util.SharedPreferenceUtil;
 public class FIDO2BaseActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     // html file to show UI/UX as per app design
-    private final String K_FILE_NAME = "fido3.html";
-    private AppCompatButton mBtnRegister, mBtnAuthenticate, mBtnRegisterPlatformAuthenticator,
-            mBtnRegisterExternalAuthenticator, mBtnAuthenticatePlatformAuthenticator,
-            mBtnAuthenticateExternalAuthenticator, mBtnRegisterExternalAuthenticatorWithPin,
-            mBtnAuthenticateExternalAuthenticatorWithPin;
+    private AppCompatButton mBtnRegisterPlatformAuthenticator, mBtnRegisterExternalAuthenticator,
+            mBtnAuthenticatePlatformAuthenticator, mBtnAuthenticateExternalAuthenticator,
+            mBtnRegisterExternalAuthenticatorWithPin, mBtnAuthenticateExternalAuthenticatorWithPin;
     private TextInputEditText mEtUserName;
-    private boolean mBtnRegisterClicked, mBtnAuthenticateClicked;
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -63,63 +59,7 @@ public class FIDO2BaseActivity extends AppCompatActivity {
             mEtUserName.setText(storedUserName);
         }
 
-        mBtnRegister = findViewById(R.id.btn_register_web);
-        mBtnAuthenticate = findViewById(R.id.btn_authenticate_web);
         mProgressDialog = new ProgressDialog(this, getString(R.string.label_please_wait));
-
-        mBtnRegister.setOnClickListener(v -> {
-            if (!mBtnRegisterClicked) {
-                if (validateUserName(mEtUserName.getText().toString())) {
-                    mProgressDialog.show();
-                    mBtnRegisterClicked = true;
-                    BIDTenant tenant = AppConstant.defaultTenant;
-                    BlockIDSDK.getInstance().registerFIDO2Key(this,
-                            mEtUserName.getText().toString(),
-                            tenant.getDns(),
-                            tenant.getCommunity(),
-                            K_FILE_NAME,
-                            (status, errorResponse) -> {
-                                mProgressDialog.dismiss();
-                                mBtnRegisterClicked = false;
-                                if (!status) {
-                                    showError(errorResponse);
-                                } else {
-                                    SharedPreferenceUtil.getInstance().setString(
-                                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
-                                    showResultDialog(R.drawable.icon_dialog_success,
-                                            getString(R.string.label_fido2_key_has_been_successfully_registered));
-                                }
-                            });
-                }
-            }
-        });
-
-        mBtnAuthenticate.setOnClickListener(v -> {
-            if (!mBtnAuthenticateClicked) {
-                if (validateUserName(mEtUserName.getText().toString())) {
-                    mProgressDialog.show();
-                    mBtnAuthenticateClicked = true;
-                    BIDTenant tenant = AppConstant.defaultTenant;
-                    BlockIDSDK.getInstance().authenticateFIDO2Key(this,
-                            mEtUserName.getText().toString(),
-                            tenant.getDns(),
-                            tenant.getCommunity(),
-                            K_FILE_NAME,
-                            (status, errorResponse) -> {
-                                mProgressDialog.dismiss();
-                                mBtnAuthenticateClicked = false;
-                                if (!status) {
-                                    showError(errorResponse);
-                                } else {
-                                    SharedPreferenceUtil.getInstance().setString(
-                                            K_PREF_FIDO2_USERNAME, mEtUserName.getText().toString());
-                                    showResultDialog(R.drawable.icon_dialog_success,
-                                            getString(R.string.label_successfully_authenticated_with_your_fido2_key));
-                                }
-                            });
-                }
-            }
-        });
 
         mBtnRegisterPlatformAuthenticator = findViewById(
                 R.id.btn_register_platform_authenticator);
