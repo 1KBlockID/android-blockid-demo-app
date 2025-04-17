@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:20.0.0'
 
     // LiveID
-    implementation 'com.google.guava:guava:31.0.1-android'
+    implementation 'com.google.guava:guava:31.1-android'
 
     // kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
