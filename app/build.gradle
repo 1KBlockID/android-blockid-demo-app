@@ -83,7 +83,7 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
 
     // RecyclerView
-    implementation "androidx.recyclerview:recyclerview:1.2.1"
+    implementation "androidx.recyclerview:recyclerview:1.4.0"
 
     // Network Call
     implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
@@ -106,5 +106,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.30.6800AF4C'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.30.mob-6434.67FFFB8B'
 }
