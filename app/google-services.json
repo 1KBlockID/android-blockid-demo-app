@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "1063606575382",
-    "project_id": "mobile-poc-e3162",
-    "storage_bucket": "mobile-poc-e3162.appspot.com"
+    "project_number": "210746664639",
+    "project_id": "blockid-demo-a2484",
+    "storage_bucket": "blockid-demo-a2484.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1063606575382:android:1207d37343e1711376f037",
+        "mobilesdk_app_id": "1:210746664639:android:582efeba91bfd23ac4480a",
         "android_client_info": {
           "package_name": "com.onekosmos.blockid.poc"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1063606575382-n9sdvo6qjnajlokib8ppgqttmn3775p7.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA266I_4dOqrdNMizuOhCEt2fXyFP-k1RY"
+          "current_key": "AIzaSyBugYZpq3gGUbszm3ror1gkWtNXpK-NK54"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1063606575382-n9sdvo6qjnajlokib8ppgqttmn3775p7.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1063606575382-48innmlflhaov9fbaviqrd1of3tt623r.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.onekosmos.blockid.poc"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
