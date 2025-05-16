@@ -60,6 +60,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private static final String K_FACE = "face";
     private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
+    private static final String K_EXPIRED = "EXPIRED";
+    private static final String K_ABANDONED = "ABANDONED";
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -161,6 +163,30 @@ public class NationalIDScanActivity extends AppCompatActivity {
 
             responseStatus = dataObject.has("responseStatus") ?
                     dataObject.getString("responseStatus") : null;
+
+            if (TextUtils.isEmpty(responseStatus) ||
+                    responseStatus.equalsIgnoreCase(K_EXPIRED)) {
+                ErrorDialog errorDialog = new ErrorDialog(this);
+                errorDialog.show(null, getString(R.string.label_session_expired),
+                        getString(R.string.label_verification_session_no_longer_available),
+                        dialog -> {
+                            errorDialog.dismiss();
+                            finish();
+                        });
+                return;
+            }
+
+            if (TextUtils.isEmpty(responseStatus) ||
+                    responseStatus.equalsIgnoreCase(K_ABANDONED)) {
+                ErrorDialog errorDialog = new ErrorDialog(this);
+                errorDialog.show(null, getString(R.string.label_scan_timeout_title),
+                        getString(R.string.label_verification_session_no_longer_available),
+                        dialog -> {
+                            errorDialog.dismiss();
+                            finish();
+                        });
+                return;
+            }
 
             // responseStatus is empty or not success
             if (TextUtils.isEmpty(responseStatus) ||
@@ -319,15 +345,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
             errorDialog.dismiss();
             finish();
         };
-
-        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
-            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
-                    getString(R.string.label_scan_timeout_message), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
-            return;
-        }
 
         if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);

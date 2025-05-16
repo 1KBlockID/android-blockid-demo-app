@@ -42,7 +42,7 @@ import java.util.UUID;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class EPassportChipActivity extends AppCompatActivity implements View.OnClickListener, IRFIDScanResponseListener {
+public class EPassportChipActivity extends AppCompatActivity implements IRFIDScanResponseListener {
     private static int K_PASSPORT_EXPIRY_GRACE_DAYS = 90;
     private AppCompatTextView mTxtSkip;
     private AppCompatButton mBtnScan, mBtnCancel;
@@ -71,21 +71,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_scan:
-                mLayoutNFC.setVisibility(View.GONE);
-                mLayoutScanRFId.setVisibility(View.VISIBLE);
-                mRFIDScannerHelper.startRFIDScanning(mPassportMap);
-                break;
-            case R.id.txt_skip:
-            case R.id.btn_cancel:
-                showWarningDialog();
-                break;
-        }
     }
 
     @Override
@@ -154,11 +139,15 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
 
     private void initView() {
         mTxtSkip = findViewById(R.id.txt_skip);
-        mTxtSkip.setOnClickListener(this);
+        mTxtSkip.setOnClickListener(view -> showWarningDialog());
         mBtnScan = findViewById(R.id.btn_scan);
-        mBtnScan.setOnClickListener(this);
+        mBtnScan.setOnClickListener(view -> {
+            mLayoutNFC.setVisibility(View.GONE);
+            mLayoutScanRFId.setVisibility(View.VISIBLE);
+            mRFIDScannerHelper.startRFIDScanning(mPassportMap);
+        });
         mBtnCancel = findViewById(R.id.btn_cancel);
-        mBtnCancel.setOnClickListener(this::onClick);
+        mBtnCancel.setOnClickListener(view -> showWarningDialog());
         mLayoutNFC = findViewById(R.id.layout_nfc);
         mLayoutScanRFId = findViewById(R.id.layout_scan_rfid);
     }
@@ -237,15 +226,6 @@ public class EPassportChipActivity extends AppCompatActivity implements View.OnC
             errorDialog.dismiss();
             finish();
         };
-
-        if (errorResponse.getCode() == ErrorManager.DocumentScanner.TIMEOUT.getCode()) {
-            errorDialog.show(null, getString(R.string.label_scan_timeout_title),
-                    getString(R.string.label_scan_timeout_message), dialog -> {
-                        errorDialog.dismiss();
-                        finish();
-                    });
-            return;
-        }
 
         if (errorResponse.getCode() == K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
