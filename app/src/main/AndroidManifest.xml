@@ -43,7 +43,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.onekosmos.blockidsample.provider"
+            android:authorities="com.onekosmos.onekosmossample.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

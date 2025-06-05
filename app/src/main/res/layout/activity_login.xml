@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.onekosmos.blockidsample.ui.login.LoginActivity">
+    tools:context="com.onekosmos.onekosmossample.ui.login.LoginActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_logo"
