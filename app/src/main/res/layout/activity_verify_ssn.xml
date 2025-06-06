@@ -8,7 +8,7 @@
     android:overScrollMode="ifContentScrolls"
     android:scrollbarStyle="insideOverlay"
     android:scrollbars="vertical"
-    tools:context="com.onekosmos.onekosmossample.ui.verifySSN.VerifySSNActivity">
+    tools:context="com.onekosmos.blockidsample.ui.verifySSN.VerifySSNActivity">
 
     <RelativeLayout
         android:id="@+id/webLayout"

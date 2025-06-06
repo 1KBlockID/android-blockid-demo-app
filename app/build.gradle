@@ -5,7 +5,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdk 34
     defaultConfig {
-        namespace "com.onekosmos.onekosmossample"
+        namespace "com.onekosmos.blockidsample"
         applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 26
         targetSdkVersion 34
