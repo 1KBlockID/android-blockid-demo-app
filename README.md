@@ -1,1 +1,1 @@
-# android-blockid-demo-app
+# android-1kosmos-demo-app
