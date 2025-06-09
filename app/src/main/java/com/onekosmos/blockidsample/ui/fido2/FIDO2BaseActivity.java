@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.view.WindowCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
@@ -55,6 +57,10 @@ public class FIDO2BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // 🔒 Lock the orientation to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
 
         setContentView(R.layout.activity_fido2_base);
 

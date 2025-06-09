@@ -67,7 +67,7 @@ configurations.configureEach {
 dependencies {
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
@@ -106,5 +106,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.40.6846B074'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.40.684727A0'
 }

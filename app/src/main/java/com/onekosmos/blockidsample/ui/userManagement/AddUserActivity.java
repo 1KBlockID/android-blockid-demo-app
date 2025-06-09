@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
@@ -33,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.WindowCompat;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
@@ -84,6 +86,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         super.onCreate(savedInstanceState);
         // 🔒 Lock the orientation to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
 
         setContentView(R.layout.activity_add_user);
 

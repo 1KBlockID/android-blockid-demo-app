@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -24,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.WindowCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -63,6 +65,10 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
         super.onCreate(savedInstanceState);
         // 🔒 Lock the orientation to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
 
         setContentView(R.layout.activity_e_passport_chip_scan);
         mRFIDScannerHelper = new RFIDScannerHelper(this, K_PASSPORT_EXPIRY_GRACE_DAYS,

@@ -3,6 +3,7 @@ package com.onekosmos.blockidsample.ui.restore;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -14,6 +15,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.WindowCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -45,6 +47,11 @@ public class RestoreAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // 🔒 Lock the orientation to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_restore_account);
         initView();
     }
