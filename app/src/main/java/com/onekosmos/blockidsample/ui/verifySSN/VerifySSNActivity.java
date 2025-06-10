@@ -10,6 +10,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -31,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.view.WindowCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -83,9 +85,17 @@ public class VerifySSNActivity extends AppCompatActivity {
     private JSONObject mDLObject;
     private JSONArray maskedJsonArray = new JSONArray();
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_verify_ssn);
 
         mScrollView = findViewById(R.id.scrollView);

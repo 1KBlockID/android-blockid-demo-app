@@ -1,14 +1,18 @@
 package com.onekosmos.blockidsample.ui.about;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.WindowCompat;
 
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
@@ -18,9 +22,17 @@ import com.onekosmos.blockidsample.R;
 
 public class AboutActivity extends AppCompatActivity {
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_about);
         initView();
     }
@@ -46,7 +58,7 @@ public class AboutActivity extends AppCompatActivity {
                 + getString(R.string.label_app_tenant) + ":\n"
                 + getString(R.string.label_dns) + ": " + appTenant.getDns() + "\n"
                 + getString(R.string.label_tag) + ": " + appTenant.getTenantTag()
-                + " (" + appTenant.getTenantId() + ")"+ "\n"
+                + " (" + appTenant.getTenantId() + ")" + "\n"
                 + getString(R.string.label_community) + ": " + appTenant.getCommunity()
                 + " (" + appTenant.getCommunityId() + ")";
         txtTenantDNS.setText(tenantInfo);
