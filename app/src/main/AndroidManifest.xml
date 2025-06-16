@@ -59,10 +59,6 @@
         </provider>
 
         <activity
-            android:name=".ui.fido2.PINManagementActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
-        <activity
             android:name=".ui.enrollment.EnrollmentActivity"
             android:resizeableActivity="true"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -122,10 +118,7 @@
             android:name=".ui.verifySSN.VerifySSNActivity"
             android:resizeableActivity="true"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.fido2.FIDO2BaseActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
+
         <activity
             android:name=".ui.userManagement.AddUserActivity"
             android:resizeableActivity="true"

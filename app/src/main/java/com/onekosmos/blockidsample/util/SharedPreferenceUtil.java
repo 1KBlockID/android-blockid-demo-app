@@ -15,7 +15,6 @@ import java.security.GeneralSecurityException;
  * Copyright © 2022 1Kosmos. All rights reserved.
  */
 public class SharedPreferenceUtil {
-    public static final String K_PREF_FIDO2_USERNAME = "K_PREF_FIDO2_USERNAME";
     private static SharedPreferenceUtil mSharedPreferenceUtil;
     private static SharedPreferences mSharedPreferences;
 

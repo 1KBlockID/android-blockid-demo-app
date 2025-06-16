@@ -43,8 +43,6 @@ import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
-import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
-import com.onekosmos.blockidsample.ui.fido2.PINManagementActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
@@ -129,12 +127,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_recover_mnemonic))) {
             onRecoverMnemonicClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_fido2))) {
-            onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_fido2_pin_management))) {
-            onFido2PINManagementClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
@@ -481,18 +473,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void onRecoverMnemonicClicked() {
         Intent intent = new Intent(this, RecoverMnemonicActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onFido2Clicked() {
-        Intent intent = new Intent(this, FIDO2BaseActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onFido2PINManagementClicked() {
-        Intent intent = new Intent(this, PINManagementActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
