@@ -125,47 +125,6 @@
     <string name="label_session_expired">Session Expired</string>
     <string name="label_verification_session_no_longer_available">This verification session is no longer available. You need to begin the journey again.</string>
 
-    <!-- Fido2 -->
-    <string name="label_fido2">FIDO2</string>
-    <string name="label_fido2_pin_management">FIDO2 PIN Management</string>
-    <string name="label_user_name">Username</string>
-    <string name="label_register">Register (Web)</string>
-    <string name="label_enter_username">Enter username</string>
-    <string name="label_fido2_key_has_been_successfully_registered">Your FIDO2 key has been
-        successfully registered.</string>
-    <string name="label_fido2_key_registration_failed">FIDO2 key registration
-        failed.</string>
-    <string name="label_successfully_authenticated_with_your_fido2_key">You have successfully
-        authenticated with your FIDO2 key.</string>
-    <string name="label_authentication_failed">Authentication failed</string>
-    <string name="label_platform_key_registered">Platform key registered successfully.</string>
-    <string name="label_security_key_registered">Security key registered successfully.</string>
-    <string name="label_platform_key_authenticated">Platform key authenticated successfully.</string>
-    <string name="label_security_key_authenticated">Security key is authenticated successfully.</string>
-
-    <string name="label_register_security_key">Register (Security Key)</string>
-    <string name="label_authenticate_security_key">Authenticate (Security Key)</string>
-    <string name="label_register_security_key_with_pin">Register (Security Key with Pin)</string>
-    <string name="label_authenticate_security_key_with_pin">Authenticate (Security Key with Pin)</string>
-    <string name="label_pin_verification_required">PIN Verification required</string>
-    <string name="label_enter_the_key_pin">Enter the new PIN</string>
-    <string name="label_verify">Verify</string>
-    <string name="label_tap_to_check">Is PIN Configured</string>
-    <string name="label_set_pin">Set PIN</string>
-    <string name="label_change_pin">Change PIN</string>
-    <string name="label_reset">Reset FIDO</string>
-    <string name="label_security_key_reset_successfully">Security key reset successfully</string>
-    <string name="label_pin_is_configured">Pin is configured</string>
-    <string name="label_pin_is_not_configured">Pin is not configured</string>
-    <string name="label_enter_the_new_pin">New PIN</string>
-    <string name="label_enter_confirm_the_pin">Confirm PIN</string>
-    <string name="label_enter_the_pin">Enter the Key PIN</string>
-    <string name="label_enter_old_pin">Current PIN</string>
-    <string name="label_pin_set_successfully">Pin set Successfully</string>
-    <string name="label_pin_changed_successfully">Pin changed Successfully</string>
-    <string name="label_pin_does_not_match">PIN does not match</string>
-    <string name="label_do_you_want_to_reset_fido">Do you want to reset FIDO?</string>
-
     <!-- QR Code -->
     <string name="label_qr_session_1_with_scope">QR Session 1 \n (scan qr ,authenticate with
         scope data)</string>
