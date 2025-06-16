@@ -8,10 +8,13 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FROM_AUTHENTICATE;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -22,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.view.WindowCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,9 +76,17 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private boolean mScanQRWithScope = false;
     private String authFactorType;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_authenticator);
         initView();
         mCurrentLocationHelper = new CurrentLocationHelper(this);
@@ -332,18 +344,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
 
-        LinkedHashMap<String, Object> metadata = null;
-        if (mAuthenticationPayloadV1.metadata != null &&
-                mAuthenticationPayloadV1.metadata.webauthn_challenge != null) {
-            metadata = new LinkedHashMap<>();
-            metadata.put(K_WEBAUTHN_CHALLENGE,
-                    mAuthenticationPayloadV1.metadata.webauthn_challenge);
-        }
         if (authFactor.equals(K_FACE)) authFactor = "LiveID";
         if (authFactor.equals(K_FINGERPRINT)) authFactor = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
-                authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
+                authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
                 String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor,
                 (status, sessionId, error) -> {

@@ -3,8 +3,11 @@ package com.onekosmos.blockidsample.ui.qrAuth;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.CustomErrors.K_CONNECTION_ERROR;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
@@ -16,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.WindowCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,9 +47,17 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     private LinearLayout mScannerView;
     private static final String K_AUTH_REQUEST_MODEL = "K_AUTH_REQUEST_MODEL";
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_scan_qrcode);
         initView();
     }
@@ -131,32 +143,35 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         if (qrCodeData.startsWith("https://") && qrCodeData.contains("/sessions/session/")) {
             String[] sessionDetails = qrCodeData.split("/session/");
             // check for trusted source
-            if (!BlockIDSDK.getInstance().isTrustedSessionSource(sessionDetails[0])) {
-                errorDialog.show(null, getString(R.string.label_error),
-                        getString(R.string.label_suspicious_qr_code), onDismissListener);
-                return;
-            }
 
-            GetSessionData.getInstance().getSessionData(qrCodeData, (status, response, error) -> {
-                if (!status) {
-                    if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
-                        errorDialog.showNoInternetDialog(onDismissListener);
-                        return;
-                    }
-
+            BlockIDSDK.getInstance().isTrustedSessionSource(sessionDetails[0], isTrusted -> {
+                if (!isTrusted) {
                     errorDialog.show(null, getString(R.string.label_error),
-                            error.getMessage(), onDismissListener);
+                            getString(R.string.label_suspicious_qr_code), onDismissListener);
                     return;
                 }
-                Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                try {
-                    AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
-                            AuthenticationPayloadV2.class);
-                    processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
-                } catch (Exception e) {
-                    errorDialog.show(null, getString(R.string.label_error),
-                            getString(R.string.label_unsupported_qr_code), onDismissListener);
-                }
+
+                GetSessionData.getInstance().getSessionData(qrCodeData, (status, response, error) -> {
+                    if (!status) {
+                        if (error.getCode() == K_CONNECTION_ERROR.getCode()) {
+                            errorDialog.showNoInternetDialog(onDismissListener);
+                            return;
+                        }
+
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage(), onDismissListener);
+                        return;
+                    }
+                    Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                    try {
+                        AuthenticationPayloadV2 authenticationPayloadV2 = gson.fromJson(response,
+                                AuthenticationPayloadV2.class);
+                        processScope(authenticationPayloadV2.getAuthRequestModel(qrCodeData));
+                    } catch (Exception e) {
+                        errorDialog.show(null, getString(R.string.label_error),
+                                getString(R.string.label_unsupported_qr_code), onDismissListener);
+                    }
+                });
             });
         }
         // UWL 1

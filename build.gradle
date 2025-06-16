@@ -6,7 +6,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        //noinspection JcenterRepositoryObsolete
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"

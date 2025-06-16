@@ -12,6 +12,8 @@ import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_LI
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,8 +43,6 @@ import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
 import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
-import com.onekosmos.blockidsample.ui.fido2.FIDO2BaseActivity;
-import com.onekosmos.blockidsample.ui.fido2.PINManagementActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
@@ -79,9 +80,17 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 }
             });
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 🔒 Lock the orientation to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        }
+
         setContentView(R.layout.activity_enrollment);
         initView();
     }
@@ -118,12 +127,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
                 getString(R.string.label_recover_mnemonic))) {
             onRecoverMnemonicClicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_fido2))) {
-            onFido2Clicked();
-        } else if (TextUtils.equals(asset.getAssetTitle(), getResources().
-                getString(R.string.label_fido2_pin_management))) {
-            onFido2PINManagementClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getResources().getString(R.string.label_enroll_ssn))) {
             onVerifySSNClicked();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_about))) {
@@ -470,18 +473,6 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
 
     private void onRecoverMnemonicClicked() {
         Intent intent = new Intent(this, RecoverMnemonicActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onFido2Clicked() {
-        Intent intent = new Intent(this, FIDO2BaseActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-    }
-
-    private void onFido2PINManagementClicked() {
-        Intent intent = new Intent(this, PINManagementActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
