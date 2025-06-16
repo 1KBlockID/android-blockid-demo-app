@@ -152,16 +152,7 @@
 
     <!-- User Options -->
     <string name="label_welcome">Welcome</string>
-    <string name="label_register_platform_authenticator">Register (Platform Authenticator)</string>
-    <string name="label_register_external_authenticator">Register (External Authenticator)</string>
-    <string name="label_register_external_authenticator_with_pin">Register (External Authenticator with PIN)</string>
-    <string name="label_authenticate_platform_authenticator">Authenticate (Platform Authenticator)</string>
-    <string name="label_authenticate_external_authenticator">Authenticate (External Authenticator)</string>
-    <string name="label_authenticate_external_authenticator_with_pin">Authenticate (External Authenticator with PIN)</string>
     <string name="label_remove_account">Remove Account</string>
-    <string name="label_register_platform_authenticator_successful">Your account is registered as platform authenticator successfully.</string>
-    <string name="label_register_external_authenticator_successful">Your account is registered as external authenticator successfully.</string>
-
     <string name="label_remove_ssn_title">SSN Removal!</string>
     <string name="label_remove_ssn">Do you want to remove SSN?</string>
     <string name="label_enroll_dl">Please enroll Drivers License to
