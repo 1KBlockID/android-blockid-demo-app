@@ -344,18 +344,11 @@ public class AuthenticatorActivity extends AppCompatActivity {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
 
-        LinkedHashMap<String, Object> metadata = null;
-        if (mAuthenticationPayloadV1.metadata != null &&
-                mAuthenticationPayloadV1.metadata.webauthn_challenge != null) {
-            metadata = new LinkedHashMap<>();
-            metadata.put(K_WEBAUTHN_CHALLENGE,
-                    mAuthenticationPayloadV1.metadata.webauthn_challenge);
-        }
         if (authFactor.equals(K_FACE)) authFactor = "LiveID";
         if (authFactor.equals(K_FINGERPRINT)) authFactor = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
-                authenticationPayloadV1.scopes, metadata, authenticationPayloadV1.creds,
+                authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
                 String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor,
                 (status, sessionId, error) -> {

@@ -105,6 +105,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
+    // Animation
+    implementation 'com.airbnb.android:lottie:3.7.0'
+
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.40.684F98AD'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.40.684FD1FB'
 }
