@@ -97,3 +97,7 @@
 -keep class com.google.gson.JsonObject { *; }
 -keep class com.google.gson.JsonPrimitive { *; }
 -dontnote com.google.gson.**
+
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontwarn org.slf4j.impl.StaticMDCBinder
+-dontwarn org.slf4j.impl.StaticMarkerBinder
