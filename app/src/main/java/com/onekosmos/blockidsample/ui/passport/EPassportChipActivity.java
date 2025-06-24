@@ -9,7 +9,6 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.NfcAdapter;
@@ -63,8 +62,6 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 🔒 Lock the orientation to portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
             WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
