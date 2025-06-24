@@ -12,7 +12,6 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,8 +69,6 @@ public class LiveIDScanningActivity extends AppCompatActivity implements ILiveID
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_active_liveid_scan);
-        // 🔒 Lock the orientation to portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
             WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
