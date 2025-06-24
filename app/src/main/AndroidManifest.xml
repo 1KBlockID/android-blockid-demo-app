@@ -60,77 +60,95 @@
 
         <activity
             android:name=".ui.enrollment.EnrollmentActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.login.PinVerificationActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.RegisterTenantActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.liveID.LiveIDScanningActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.passport.EPassportChipActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.passport.PassportScanningActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.qrAuth.AuthenticatorActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.qrAuth.ScanQRCodeActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.enrollPin.PinEnrollmentActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.nationalID.NationalIDScanActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.driverLicense.DriverLicenseScanActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.restore.RecoverMnemonicActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.restore.RestoreAccountActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.verifySSN.VerifySSNActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
 
         <activity
             android:name=".ui.userManagement.AddUserActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.about.AboutActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".ui.userManagement.UserOptionsActivity"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.MaterialAppTheme" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
     </application>
 
 </manifest>

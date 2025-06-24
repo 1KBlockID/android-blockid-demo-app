@@ -2,7 +2,6 @@ package com.onekosmos.blockidsample.ui.login;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -38,8 +37,6 @@ public class PinVerificationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 🔒 Lock the orientation to portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
             WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
