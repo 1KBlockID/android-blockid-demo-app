@@ -35,6 +35,7 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.BuildConfig;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
@@ -340,12 +341,15 @@ public class AuthenticatorActivity extends AppCompatActivity {
                                          double latitude, double longitude, String authFactor) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
+        LinkedHashMap<String, Object> metaData = authenticationPayloadV1 != null ?
+                authenticationPayloadV1.metadata != null ?
+                        BIDUtil.convertObjectToMap(authenticationPayloadV1.metadata) : null : null;
 
         if (authFactor.equals(K_FACE)) authFactor = "LiveID";
         if (authFactor.equals(K_FINGERPRINT)) authFactor = "Biometric";
         BlockIDSDK.getInstance().authenticateUser(this, null,
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
-                authenticationPayloadV1.scopes, authenticationPayloadV1.creds,
+                authenticationPayloadV1.scopes, metaData, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
                 String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor,
                 (status, sessionId, error) -> {
