@@ -35,7 +35,11 @@
         android:usesCleartextTraffic="true"
         tools:ignore="DataExtractionRules"
         tools:replace="android:allowBackup,android:label,android:theme">
-
+        <activity
+            android:name=".PasskeyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.SplashActivity"
             android:exported="true"
@@ -133,7 +137,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
-
         <activity
             android:name=".ui.userManagement.AddUserActivity"
             android:screenOrientation="portrait"

@@ -65,6 +65,8 @@ configurations.configureEach {
 }
 
 dependencies {
+    implementation 'androidx.activity:activity:1.8.0'
+
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
@@ -107,4 +109,13 @@ dependencies {
 
     // BlockID SDK
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.51.689AEC45'
+
+    // passkey
+    // Core Credential Manager API
+    implementation "androidx.credentials:credentials:1.5.0"
+
+    // Passkey/WebAuthn-specific classes
+    implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
+
+    implementation "androidx.core:core:1.13.1" // for ContextCompat.getMainExecutor
 }
