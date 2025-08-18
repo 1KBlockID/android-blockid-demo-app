@@ -14,6 +14,14 @@ import androidx.credentials.CreatePublicKeyCredentialRequest;
 import androidx.credentials.CreatePublicKeyCredentialResponse;
 import androidx.credentials.CredentialManager;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ApiResponseCallback;
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
+import com.onekosmos.blockid.sdk.BIDAPIs.fido2.FIDO2NativeAPIs;
+import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
+
+import org.json.JSONObject;
+
 public class PasskeyActivity extends AppCompatActivity {
     private  CredentialManager credentialManager;
 
@@ -87,8 +95,29 @@ public class PasskeyActivity extends AppCompatActivity {
         String username = edtUserName.getText().toString();
         String psw = edtPassword.getText().toString();
 
-        btnRegister.setOnClickListener(v -> register());
-        btnAuth.setOnClickListener(v -> auth());
+        btnRegister.setOnClickListener(v -> {
+            BlockIDSDK.getInstance().attestationOption(this,
+                    "https://1k-dev.1kosmos.net/webauthn",
+                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==",
+                    new ApiResponseCallback<FIDO2NativeAPIs.AttestationOptionsData>() {
+                        @Override
+                        public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error,
+                                                FIDO2NativeAPIs.AttestationOptionsData result) {
+
+                            Log.e("pankti", "status " + status);
+                            if (status) {
+                                Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                creationOptionsJson = BIDUtil.objectToJSONString(result, true);
+                                register();
+                            }else {
+                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "attestationOption fail", Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    });
+        });
+        btnAuth.setOnClickListener(v -> {
+           auth();
+        });
     }
 
 
@@ -100,13 +129,14 @@ public class PasskeyActivity extends AppCompatActivity {
                 new PasskeyClient.JsonCallback() {
                     @Override
                     public void onSuccess(@NonNull String webAuthnJson) {
-                        Log.i("MainActivity", "Registration JSON received: " + webAuthnJson);
+                        Log.e("pankti", "Registration JSON received: " + webAuthnJson);
+                        callResult(webAuthnJson);
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey created (check log)", Toast.LENGTH_SHORT).show());
                     }
 
                     @Override
                     public void onError(@NonNull Exception e) {
-                        Log.e("MainActivity", "Registration failed", e);
+                        Log.e("pankti", "Registration failed", e);
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Create failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
                     }
                 }
@@ -120,13 +150,13 @@ public class PasskeyActivity extends AppCompatActivity {
                 new PasskeyClient.JsonCallback() {
                     @Override
                     public void onSuccess(@NonNull String webAuthnJson) {
-                        Log.i("MainActivity", "Assertion JSON received: " + webAuthnJson);
+                        Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey sign-in (check log)", Toast.LENGTH_SHORT).show());
                     }
 
                     @Override
                     public void onError(@NonNull Exception e) {
-                        Log.e("MainActivity", "Sign-in failed", e);
+                        Log.e("pankti", "Sign-in failed", e);
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Sign-in failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
                     }
                 },
@@ -134,9 +164,54 @@ public class PasskeyActivity extends AppCompatActivity {
                     @Override
                     public void onPassword(@NonNull String username, @NonNull String password) {
                         // Handle password fallback (if user selected a saved password)
-                        Log.i("MainActivity", "Password fallback chosen: user=" + username);
+                        Log.e("pankti", "Password fallback chosen: user=" + username);
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Password chosen: " + username, Toast.LENGTH_SHORT).show());
                     }
                 });
+    }
+
+    private void callResult(String result) {
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+
+            FIDO2NativeAPIs.AttestationResultRequest request = new FIDO2NativeAPIs.AttestationResultRequest();
+            request.rawId = jsonObject.getString("rawId");
+            request.authenticatorAttachment = jsonObject.getString("authenticatorAttachment");
+            request.attestationResultRequestId = jsonObject.getString("id");
+            request.type = jsonObject.getString("type");
+            request.dns = "1k-dev.1kosmos.net";
+            request.communityId = "68418b2587942f1d3158a799";
+            request.tenantId ="68418b2587942f1d3158a789";
+
+            JSONObject jsonObject1 = jsonObject.getJSONObject("response");
+            FIDO2NativeAPIs.AuthenticatorResponse response = new FIDO2NativeAPIs.AuthenticatorResponse();
+
+            response.clientDataJSON= jsonObject1.getString("clientDataJSON");
+            response.attestationObject = jsonObject1.getString("attestationObject");
+            request.response = response;
+
+            BlockIDSDK.getInstance().callAttestationResult(this,
+                    "https://1k-dev.1kosmos.net/webauthn",
+                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==",
+                    request, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
+                        @Override
+                        public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
+                            Log.e("pankti", "status2: " + status);
+                            if (status) {
+                                Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                creationOptionsJson = BIDUtil.objectToJSONString(result, true);
+                                register();
+                            }else {
+                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAttestationResult fail", Toast.LENGTH_SHORT).show());
+                            }
+
+                        }
+                    }
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

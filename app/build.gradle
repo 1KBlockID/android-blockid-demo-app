@@ -108,7 +108,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.51.689AEC45'
+//    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.51.689AEC45'
+
+    implementation project(path: ':android-kernel-sdk')
 
     // passkey
     // Core Credential Manager API
