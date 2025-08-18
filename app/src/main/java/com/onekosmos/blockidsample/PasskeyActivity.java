@@ -16,6 +16,8 @@ import com.onekosmos.blockid.sdk.BIDAPIs.fido2.FIDO2NativeAPIs;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -119,7 +121,40 @@ public class PasskeyActivity extends AppCompatActivity {
                     });
         });
         btnAuth.setOnClickListener(v -> {
-            auth();
+            BlockIDSDK.getInstance().assertionOption(this, "https://1k-dev.1kosmos.net/webauthn",
+                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==", new ApiResponseCallback<String>() {
+                        @Override
+                        public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, String result) {
+                            Log.e("pankti", "status " + status);
+                            if (status) {
+                                Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                try {
+                                    JSONObject jsonObject = new JSONObject(result);
+                                    JSONArray allowCredentials = jsonObject.getJSONArray("allowCredentials");
+
+                                    // Transports array you want to add
+                                    JSONArray transports = new JSONArray();
+                                    transports.put("usb");
+                                    transports.put("nfc");
+                                    transports.put("ble");
+                                    transports.put("hybrid");
+                                    transports.put("internal");
+
+                                    // Add transports to each credential in the array
+                                    for (int i = 0; i < allowCredentials.length(); i++) {
+                                        JSONObject cred = allowCredentials.getJSONObject(i);
+                                        cred.put("transports", new JSONArray(transports.toString()));
+                                    }
+                                    String jsonString = jsonObject.toString();
+                                    auth(jsonString);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else {
+                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "assertionOption fail", Toast.LENGTH_SHORT).show());
+                            }
+                        }
+                    });
         });
     }
 
@@ -146,14 +181,27 @@ public class PasskeyActivity extends AppCompatActivity {
         );
     }
 
-    private void auth() {
+    private void auth(String result) {
         passkeyClient.signInWithPasskey(
                 this,
-                requestOptionsJson,
+                result,
                 new PasskeyClient.JsonCallback() {
                     @Override
                     public void onSuccess(@NonNull String webAuthnJson) {
                         Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
+                        BlockIDSDK.getInstance().callAssertionResult(PasskeyActivity.this,
+                                "https://1k-dev.1kosmos.net/webauthn",
+                                "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==", webAuthnJson, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
+                                    @Override
+                                    public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
+                                        Log.e("pankti", "status " + status);
+                                        if (status) {
+                                            Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                        } else {
+                                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAssertionResult fail", Toast.LENGTH_SHORT).show());
+                                        }
+                                    }
+                                });
                         runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey sign-in (check log)", Toast.LENGTH_SHORT).show());
                     }
 
