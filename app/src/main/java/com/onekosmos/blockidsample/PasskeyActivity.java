@@ -1,6 +1,5 @@
 package com.onekosmos.blockidsample;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,9 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.core.content.ContextCompat;
-import androidx.credentials.CreatePublicKeyCredentialRequest;
-import androidx.credentials.CreatePublicKeyCredentialResponse;
 import androidx.credentials.CredentialManager;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ApiResponseCallback;
@@ -22,8 +18,10 @@ import com.onekosmos.blockid.sdk.utils.BIDUtil;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class PasskeyActivity extends AppCompatActivity {
-    private  CredentialManager credentialManager;
+    private CredentialManager credentialManager;
 
     private AppCompatEditText edtUserName, edtPassword;
     private AppCompatButton btnRegister, btnAuth;
@@ -107,16 +105,21 @@ public class PasskeyActivity extends AppCompatActivity {
                             Log.e("pankti", "status " + status);
                             if (status) {
                                 Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                // If already registered then the register id will be present in excluded list.
+                                // usually we need to call getPublicKeyCredential to get the already register id.
+                                // if we want to block duplicate registration if we don't want to block it then.
+                                // we have to pass an empty array list to exclude creds to allow duplicate registration.
+                                result.excludeCredentials = new ArrayList<>();
                                 creationOptionsJson = BIDUtil.objectToJSONString(result, true);
                                 register();
-                            }else {
+                            } else {
                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "attestationOption fail", Toast.LENGTH_SHORT).show());
                             }
                         }
                     });
         });
         btnAuth.setOnClickListener(v -> {
-           auth();
+            auth();
         });
     }
 
@@ -181,12 +184,12 @@ public class PasskeyActivity extends AppCompatActivity {
             request.type = jsonObject.getString("type");
             request.dns = "1k-dev.1kosmos.net";
             request.communityId = "68418b2587942f1d3158a799";
-            request.tenantId ="68418b2587942f1d3158a789";
+            request.tenantId = "68418b2587942f1d3158a789";
 
             JSONObject jsonObject1 = jsonObject.getJSONObject("response");
             FIDO2NativeAPIs.AuthenticatorResponse response = new FIDO2NativeAPIs.AuthenticatorResponse();
 
-            response.clientDataJSON= jsonObject1.getString("clientDataJSON");
+            response.clientDataJSON = jsonObject1.getString("clientDataJSON");
             response.attestationObject = jsonObject1.getString("attestationObject");
             request.response = response;
 
@@ -200,8 +203,8 @@ public class PasskeyActivity extends AppCompatActivity {
                             if (status) {
                                 Log.e("pankti", BIDUtil.objectToJSONString(result, true));
                                 creationOptionsJson = BIDUtil.objectToJSONString(result, true);
-                                register();
-                            }else {
+                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Registration successfully: " + result.sub, Toast.LENGTH_SHORT).show());
+                            } else {
                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAttestationResult fail", Toast.LENGTH_SHORT).show());
                             }
 

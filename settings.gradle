@@ -21,6 +21,6 @@ dependencyResolutionManagement {
 include ':app'
 rootProject.name = "BlockIDSdkDemo"
 
-def sdk='/Users/pankit/1K/android/android-kernel-sdk'
+def sdk='C:\\Users\\gaurav.rane\\StudioProjects\\android-kernel-sdk'
 include ':android-kernel-sdk'
 project(':android-kernel-sdk').projectDir = new File(sdk + '/app')
