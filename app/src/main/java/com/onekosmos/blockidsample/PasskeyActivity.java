@@ -1,6 +1,7 @@
 package com.onekosmos.blockidsample;
 
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 public class PasskeyActivity extends AppCompatActivity {
@@ -160,65 +162,108 @@ public class PasskeyActivity extends AppCompatActivity {
 
 
     private void register() {
-        // Example: call register (create) directly
-        passkeyClient.registerPasskey(
-                this,
-                creationOptionsJson,
-                new PasskeyClient.JsonCallback() {
-                    @Override
-                    public void onSuccess(@NonNull String webAuthnJson) {
-                        Log.e("pankti", "Registration JSON received: " + webAuthnJson);
-                        callResult(webAuthnJson);
-                        runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey created (check log)", Toast.LENGTH_SHORT).show());
-                    }
+        try {
+            JSONObject options = new JSONObject();
+            options.put("rp", new JSONObject()
+                    .put("name", "BlockID App")
+                    .put("id", "1k-dev.1kosmos.net"));
 
-                    @Override
-                    public void onError(@NonNull Exception e) {
-                        Log.e("pankti", "Registration failed", e);
-                        runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Create failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            options.put("user", new JSONObject()
+                    .put("id", Base64.encodeToString("12345".getBytes(),
+                            Base64.URL_SAFE | Base64.NO_PADDING))
+                    .put("name", "test@example.com")
+                    .put("displayName", "test example"));
+
+            JSONArray pubKeyCredParams = new JSONArray();
+            pubKeyCredParams.put(new JSONObject().put("type", "public-key").put("alg", -7));   // ES256
+            options.put("pubKeyCredParams", pubKeyCredParams);
+
+            options.put("authenticatorSelection", new JSONObject()
+                    .put("authenticatorAttachment", "platform")
+                    .put("residentKey", "required")
+                    .put("userVerification", "required"));
+
+            options.put("attestation", "none");
+            options.put("challenge", generateChallenge());
+            options.put("timeout", 60000);
+
+            String optionsString = options.toString();
+            Log.e("mistry", "optionsString: " + optionsString);
+            // Example: call register (create) directly
+            passkeyClient.registerPasskey(
+                    this,
+                    optionsString,
+                    new PasskeyClient.JsonCallback() {
+                        @Override
+                        public void onSuccess(@NonNull String webAuthnJson) {
+                            Log.e("pankti", "Registration JSON received: " + webAuthnJson);
+                            callResult(webAuthnJson);
+                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey created (check log)", Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onError(@NonNull Exception e) {
+                            Log.e("pankti", "Registration failed", e);
+                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Create failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        }
                     }
-                }
-        );
+            );
+        }catch (Exception e){
+
+        }
     }
 
     private void auth(String result) {
-        passkeyClient.signInWithPasskey(
-                this,
-                result,
-                new PasskeyClient.JsonCallback() {
-                    @Override
-                    public void onSuccess(@NonNull String webAuthnJson) {
-                        Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
-                        BlockIDSDK.getInstance().callAssertionResult(PasskeyActivity.this,
-                                "https://1k-dev.1kosmos.net/webauthn",
-                                "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==", webAuthnJson, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
-                                    @Override
-                                    public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
-                                        Log.e("pankti", "status " + status);
-                                        if (status) {
-                                            Log.e("pankti", BIDUtil.objectToJSONString(result, true));
-                                        } else {
-                                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAssertionResult fail", Toast.LENGTH_SHORT).show());
-                                        }
-                                    }
-                                });
-                        runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey sign-in (check log)", Toast.LENGTH_SHORT).show());
-                    }
+        try {
+            JSONObject options = new JSONObject();
+            options.put("challenge", generateChallenge());
+            options.put("timeout", 60000);
+            options.put("rpId", "1k-dev.1kosmos.net");
+            options.put("userVerification", "required");
 
-                    @Override
-                    public void onError(@NonNull Exception e) {
-                        Log.e("pankti", "Sign-in failed", e);
-                        runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Sign-in failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-                    }
-                },
-                new PasskeyClient.PasswordCallback() {
-                    @Override
-                    public void onPassword(@NonNull String username, @NonNull String password) {
-                        // Handle password fallback (if user selected a saved password)
-                        Log.e("pankti", "Password fallback chosen: user=" + username);
-                        runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Password chosen: " + username, Toast.LENGTH_SHORT).show());
-                    }
-                });
+            String optionsString = options.toString();
+
+            Log.e("mistry", "auth optionsString: "+optionsString);
+            passkeyClient.signInWithPasskey(
+                    this,
+                    optionsString,
+                    new PasskeyClient.JsonCallback() {
+                        @Override
+                        public void onSuccess(@NonNull String webAuthnJson) {
+                            Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
+                            BlockIDSDK.getInstance().callAssertionResult(PasskeyActivity.this,
+                                    "https://1k-dev.1kosmos.net/webauthn",
+                                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==", webAuthnJson, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
+                                        @Override
+                                        public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
+                                            Log.e("pankti", "status " + status);
+                                            if (status) {
+                                                Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                            } else {
+                                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAssertionResult fail", Toast.LENGTH_SHORT).show());
+                                            }
+                                        }
+                                    });
+                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Passkey sign-in (check log)", Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onError(@NonNull Exception e) {
+                            Log.e("pankti", "Sign-in failed", e);
+                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Sign-in failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        }
+                    },
+                    new PasskeyClient.PasswordCallback() {
+                        @Override
+                        public void onPassword(@NonNull String username, @NonNull String password) {
+                            // Handle password fallback (if user selected a saved password)
+                            Log.e("pankti", "Password fallback chosen: user=" + username);
+                            runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Password chosen: " + username, Toast.LENGTH_SHORT).show());
+                        }
+                    });
+        }catch (Exception e){
+
+        }
     }
 
     private void callResult(String result) {
@@ -264,5 +309,25 @@ public class PasskeyActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    public static String generateChallenge() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] challenge = new byte[32]; // 32 bytes = 256 bits
+        secureRandom.nextBytes(challenge);
+        return Base64.encodeToString(challenge, Base64.URL_SAFE | Base64.NO_PADDING);
+    }
+
+    /**
+     * Base64 encode
+     *
+     * @param input the data to encode
+     * @return Base64 encoded string
+     */
+    private String base64Encode(byte[] input) {
+        if (input == null)
+            return null;
+        return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP |
+                Base64.URL_SAFE);
     }
 }
