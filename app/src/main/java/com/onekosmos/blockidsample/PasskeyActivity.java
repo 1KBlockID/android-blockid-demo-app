@@ -57,8 +57,7 @@ public class PasskeyActivity extends AppCompatActivity {
 //            "  ]\n" +
 //            "}";
 
-    String creationOptionsJson =
-            "{\"rp\":{\"name\":\"1k-dev.1kosmos.net\",\"id\":\"1k-dev.1kosmos.net\"},\"user\":{\"id\":\"rnjSNw2n-txpJGqVBu5XXoGtazag4yWt7odPFx41LHo\",\"name\":\"pankti\",\"displayName\":\"panktimistry\"},\"attestation\":\"direct\",\"pubKeyCredParams\":[{\"type\":\"public-key\",\"alg\":-7}],\"timeout\":7200000,\"authenticatorSelection\":{\"userVerification\":\"preferred\",\"requireResidentKey\":false},\"challenge\":\"ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmhkV1FpT2lJeGF5MWtaWFl1TVd0dmMyMXZjeTV1WlhRaUxDSnpkV0lpT2lKd1lXNXJkR2tpTENKbGVIQWlPakUzTlRVeE9UTTNNREVzSW5KaGJtUWlPaUpwU1RaS2N6UjNOVTVIYjNONmNuSnBZbVpMV21rMk1IRjVSRWhLVjJkNGRDMWhVRzlPU0dKaklpd2lhV1FpT2lKeWJtcFRUbmN5YmkxMGVIQktSM0ZXUW5VMVdGaHZSM1JoZW1Gbk5IbFhkRGR2WkZCR2VEUXhURWh2SWl3aVlYVjBhSE5sYkdWamRHbHZiaUk2SWlJc0ltRjBkR1Z6ZEdGMGFXOXVJam9pWkdseVpXTjBJbjAubUEtNW9nb0lSY0tKR3E5LTI4RjJUQVlTT0ZHdENnaTk4a2tZODZTM1NmNA\",\"excludeCredentials\":[],\"status\":\"ok\",\"errorMessage\":\"\"}";
+    String creationOptionsJson;
 
     String requestOptionsJson =
             "{"
@@ -129,7 +128,7 @@ public class PasskeyActivity extends AppCompatActivity {
                         public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, String result) {
                             Log.e("pankti", "status " + status);
                             if (status) {
-                                Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                Log.e("pankti", "assertionOption: " + BIDUtil.objectToJSONString(result, true));
                                 try {
                                     JSONObject jsonObject = new JSONObject(result);
                                     JSONArray allowCredentials = jsonObject.getJSONArray("allowCredentials");
@@ -148,7 +147,8 @@ public class PasskeyActivity extends AppCompatActivity {
                                         cred.put("transports", new JSONArray(transports.toString()));
                                     }
                                     String jsonString = jsonObject.toString();
-                                    auth(jsonString);
+//                                    auth(jsonString);
+                                    auth(result);
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -165,7 +165,7 @@ public class PasskeyActivity extends AppCompatActivity {
         try {
             JSONObject options = new JSONObject();
             options.put("rp", new JSONObject()
-                    .put("name", "BlockID App")
+                    .put("name", "BlockID App") // 1k-dev.1kosmos.net
                     .put("id", "1k-dev.1kosmos.net"));
 
             options.put("user", new JSONObject()
@@ -175,24 +175,40 @@ public class PasskeyActivity extends AppCompatActivity {
                     .put("displayName", "test example"));
 
             JSONArray pubKeyCredParams = new JSONArray();
-            pubKeyCredParams.put(new JSONObject().put("type", "public-key").put("alg", -7));   // ES256
+            pubKeyCredParams.put(
+                    new JSONObject().put("type", "public-key").
+                            put("alg", -7));   // ES256
             options.put("pubKeyCredParams", pubKeyCredParams);
 
             options.put("authenticatorSelection", new JSONObject()
-                    .put("authenticatorAttachment", "platform")
-                    .put("residentKey", "required")
-                    .put("userVerification", "required"));
+                    .put("authenticatorAttachment", "platform") // not there
+                    .put("residentKey", "required") // not there
+                    .put("userVerification", "required")); // preferred
 
-            options.put("attestation", "none");
+            options.put("attestation", "none"); // direct
             options.put("challenge", generateChallenge());
             options.put("timeout", 60000);
 
             String optionsString = options.toString();
             Log.e("mistry", "optionsString: " + optionsString);
+
+            // ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmhkV1FpT2lJeGF5MWtaWFl1TVd0dmMyMXZjeTV1WlhRaUxDSnpkV0lpT2lKd1lXNXJkR2tpTENKbGVIQWlPakUzTlRVMU9EWXhPVGdzSW5KaGJtUWlPaUoxZDBZd2MyUTFiM2wxV0MwdFZsWkpWbEo0YkVwemMwTlJWMmwwY0haYVowRXlkM1ZoTVdWeUlpd2lhV1FpT2lKQllXRnhUV1ZuVkdaSlZITTRVRk5xTXpJM09VbDBNVWhvVUVOalQwOU9OWFZmTm10RWRUSk5ibEF3SWl3aVlYVjBhSE5sYkdWamRHbHZiaUk2SWlJc0ltRjBkR1Z6ZEdGMGFXOXVJam9pWkdseVpXTjBJbjAuYlVnZmVVbnV6Q0hCVHVyR0ppUFhhMTdsMWFmV0hMbnp5QXpJRVRWSF9uWQ
+            // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxay1kZXYuMWtvc21vcy5uZXQiLCJzdWIiOiJwYW5rdGkiLCJleHAiOjE3NTU1ODYxOTgsInJhbmQiOiJ1d0Ywc2Q1b3l1WC0tVlZJVlJ4bEpzc0NRV2l0cHZaZ0Eyd3VhMWVyIiwiaWQiOiJBYWFxTWVnVGZJVHM4UFNqMzI3OUl0MUhoUENjT09ONXVfNmtEdTJNblAwIiwiYXV0aHNlbGVjdGlvbiI6IiIsImF0dGVzdGF0aW9uIjoiZGlyZWN0In0.bUgfeUnuzCHBTurGJiPXa17l1afWHLnzyAzIETVH_nY
+
+            // {
+            //  "aud": "1k-dev.1kosmos.net",
+            //  "sub": "pankti",
+            //  "exp": 1755586198,
+            //  "rand": "uwF0sd5oyuX--VVIVRxlJssCQWitpvZgA2wua1er",
+            //  "id": "AaaqMegTfITs8PSj3279It1HhPCcOON5u_6kDu2MnP0",
+            //  "authselection": "",
+            //  "attestation": "direct"
+            //}
+
             // Example: call register (create) directly
             passkeyClient.registerPasskey(
                     this,
-                    optionsString,
+                    creationOptionsJson,
                     new PasskeyClient.JsonCallback() {
                         @Override
                         public void onSuccess(@NonNull String webAuthnJson) {
@@ -223,17 +239,28 @@ public class PasskeyActivity extends AppCompatActivity {
 
             String optionsString = options.toString();
 
-            Log.e("mistry", "auth optionsString: "+optionsString);
+            JSONObject requestOptions = new JSONObject(result);
+
+            // 🚫 Remove allowCredentials if present
+            requestOptions.remove("allowCredentials");
+
+            // Convert back to string
+            String cleanedJson = requestOptions.toString();
+
+            Log.e("mistry", "auth optionsString: "+ optionsString);
             passkeyClient.signInWithPasskey(
                     this,
-                    optionsString,
+                    cleanedJson,
                     new PasskeyClient.JsonCallback() {
                         @Override
                         public void onSuccess(@NonNull String webAuthnJson) {
                             Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
+                            String fixed =  fixWebAuthnJson(webAuthnJson);
+                            Log.e("pankti", "fixed: " + fixed);
                             BlockIDSDK.getInstance().callAssertionResult(PasskeyActivity.this,
                                     "https://1k-dev.1kosmos.net/webauthn",
-                                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==", webAuthnJson, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
+                                    "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==",
+                                    fixed, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
                                         @Override
                                         public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
                                             Log.e("pankti", "status " + status);
@@ -266,6 +293,7 @@ public class PasskeyActivity extends AppCompatActivity {
         }
     }
 
+
     private void callResult(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
@@ -295,7 +323,6 @@ public class PasskeyActivity extends AppCompatActivity {
                             Log.e("pankti", "status2: " + status);
                             if (status) {
                                 Log.e("pankti", BIDUtil.objectToJSONString(result, true));
-                                creationOptionsJson = BIDUtil.objectToJSONString(result, true);
                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Registration successfully: " + result.sub, Toast.LENGTH_SHORT).show());
                             } else {
                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAttestationResult fail", Toast.LENGTH_SHORT).show());
@@ -330,4 +357,52 @@ public class PasskeyActivity extends AppCompatActivity {
         return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP |
                 Base64.URL_SAFE);
     }
+
+    // Convert to Base64URL without padding or newlines
+    private static String toBase64Url(String base64Input) {
+        if (base64Input == null || base64Input.isEmpty()) {
+            return base64Input;
+        }
+        try {
+            // Remove whitespace/newlines
+            String cleaned = base64Input.trim();
+
+            // Decode (handles both standard Base64 and Base64URL with padding)
+            byte[] decoded = Base64.decode(cleaned, Base64.DEFAULT);
+
+            // Encode to Base64URL (NO_PADDING | NO_WRAP | URL_SAFE)
+            return Base64.encodeToString(decoded,
+                    Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
+        } catch (IllegalArgumentException e) {
+            // If it's not valid Base64, just clean up
+            return base64Input.trim().replace("=", "");
+        }
+    }
+
+    public static String fixWebAuthnJson(String jsonString) {
+        try {
+            JSONObject json = new JSONObject(jsonString);
+
+            // Top-level fields
+            json.put("id", toBase64Url(json.optString("id")));
+            json.put("rawId", toBase64Url(json.optString("rawId")));
+
+            // Response object
+            JSONObject response = json.getJSONObject("response");
+            response.put("clientDataJSON", toBase64Url(response.optString("clientDataJSON")));
+            response.put("authenticatorData", toBase64Url(response.optString("authenticatorData")));
+            response.put("signature", toBase64Url(response.optString("signature")));
+            response.put("userHandle", toBase64Url(response.optString("userHandle")));
+
+
+            response.put("dns","1k-dev.1kosmos.net");
+            response.put("communityId","68418b2587942f1d3158a799");
+            response.put("tenantId","68418b2587942f1d3158a789");
+
+            return json.toString();
+        }catch (Exception e){
+            return null;
+        }
+    }
+
 }
