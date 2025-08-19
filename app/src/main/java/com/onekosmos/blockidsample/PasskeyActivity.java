@@ -111,7 +111,7 @@ public class PasskeyActivity extends AppCompatActivity {
                                 // usually we need to call getPublicKeyCredential to get the already register id.
                                 // if we want to block duplicate registration if we don't want to block it then.
                                 // we have to pass an empty array list to exclude creds to allow duplicate registration.
-                                result.excludeCredentials = new ArrayList<>();
+                                //result.excludeCredentials = new ArrayList<>();
                                 creationOptionsJson = BIDUtil.objectToJSONString(result, true);
                                 register();
                             } else {
@@ -140,34 +140,34 @@ public class PasskeyActivity extends AppCompatActivity {
 
     private void register() {
         try {
-            JSONObject options = new JSONObject();
-            options.put("rp", new JSONObject()
-                    .put("name", "BlockID App") // 1k-dev.1kosmos.net
-                    .put("id", "1k-dev.1kosmos.net"));
-
-            options.put("user", new JSONObject()
-                    .put("id", Base64.encodeToString("12345".getBytes(),
-                            Base64.URL_SAFE | Base64.NO_PADDING))
-                    .put("name", "test@example.com")
-                    .put("displayName", "test example"));
-
-            JSONArray pubKeyCredParams = new JSONArray();
-            pubKeyCredParams.put(
-                    new JSONObject().put("type", "public-key").
-                            put("alg", -7));   // ES256
-            options.put("pubKeyCredParams", pubKeyCredParams);
-
-            options.put("authenticatorSelection", new JSONObject()
-                    .put("authenticatorAttachment", "platform") // not there
-                    .put("residentKey", "required") // not there
-                    .put("userVerification", "required")); // preferred
-
-            options.put("attestation", "none"); // direct
-            options.put("challenge", generateChallenge());
-            options.put("timeout", 60000);
-
-            String optionsString = options.toString();
-            Log.e("mistry", "optionsString: " + optionsString);
+//            JSONObject options = new JSONObject();
+//            options.put("rp", new JSONObject()
+//                    .put("name", "BlockID App") // 1k-dev.1kosmos.net
+//                    .put("id", "1k-dev.1kosmos.net"));
+//
+//            options.put("user", new JSONObject()
+//                    .put("id", Base64.encodeToString("12345".getBytes(),
+//                            Base64.URL_SAFE | Base64.NO_PADDING))
+//                    .put("name", "test@example.com")
+//                    .put("displayName", "test example"));
+//
+//            JSONArray pubKeyCredParams = new JSONArray();
+//            pubKeyCredParams.put(
+//                    new JSONObject().put("type", "public-key").
+//                            put("alg", -7));   // ES256
+//            options.put("pubKeyCredParams", pubKeyCredParams);
+//
+//            options.put("authenticatorSelection", new JSONObject()
+//                    .put("authenticatorAttachment", "platform") // not there
+//                    .put("residentKey", "required") // not there
+//                    .put("userVerification", "required")); // preferred
+//
+//            options.put("attestation", "none"); // direct
+//            options.put("challenge", generateChallenge());
+//            options.put("timeout", 60000);
+//
+//            String optionsString = options.toString();
+//            Log.e("mistry", "optionsString: " + optionsString);
 
             // ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmhkV1FpT2lJeGF5MWtaWFl1TVd0dmMyMXZjeTV1WlhRaUxDSnpkV0lpT2lKd1lXNXJkR2tpTENKbGVIQWlPakUzTlRVMU9EWXhPVGdzSW5KaGJtUWlPaUoxZDBZd2MyUTFiM2wxV0MwdFZsWkpWbEo0YkVwemMwTlJWMmwwY0haYVowRXlkM1ZoTVdWeUlpd2lhV1FpT2lKQllXRnhUV1ZuVkdaSlZITTRVRk5xTXpJM09VbDBNVWhvVUVOalQwOU9OWFZmTm10RWRUSk5ibEF3SWl3aVlYVjBhSE5sYkdWamRHbHZiaUk2SWlJc0ltRjBkR1Z6ZEdGMGFXOXVJam9pWkdseVpXTjBJbjAuYlVnZmVVbnV6Q0hCVHVyR0ppUFhhMTdsMWFmV0hMbnp5QXpJRVRWSF9uWQ
             // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxay1kZXYuMWtvc21vcy5uZXQiLCJzdWIiOiJwYW5rdGkiLCJleHAiOjE3NTU1ODYxOTgsInJhbmQiOiJ1d0Ywc2Q1b3l1WC0tVlZJVlJ4bEpzc0NRV2l0cHZaZ0Eyd3VhMWVyIiwiaWQiOiJBYWFxTWVnVGZJVHM4UFNqMzI3OUl0MUhoUENjT09ONXVfNmtEdTJNblAwIiwiYXV0aHNlbGVjdGlvbiI6IiIsImF0dGVzdGF0aW9uIjoiZGlyZWN0In0.bUgfeUnuzCHBTurGJiPXa17l1afWHLnzyAzIETVH_nY
