@@ -224,20 +224,20 @@ public class PasskeyActivity extends AppCompatActivity {
                         }
                     }
             );
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
 
     private void auth(String result) {
         try {
-            JSONObject options = new JSONObject();
-            options.put("challenge", generateChallenge());
-            options.put("timeout", 60000);
-            options.put("rpId", "1k-dev.1kosmos.net");
-            options.put("userVerification", "required");
-
-            String optionsString = options.toString();
+//            JSONObject options = new JSONObject();
+//            options.put("challenge", generateChallenge());
+//            options.put("timeout", 60000);
+//            options.put("rpId", "1k-dev.1kosmos.net");
+//            options.put("userVerification", "required");
+//
+//            String optionsString = options.toString();
 
             JSONObject requestOptions = new JSONObject(result);
 
@@ -247,7 +247,7 @@ public class PasskeyActivity extends AppCompatActivity {
             // Convert back to string
             String cleanedJson = requestOptions.toString();
 
-            Log.e("mistry", "auth optionsString: "+ optionsString);
+//            Log.e("mistry", "auth optionsString: "+ optionsString);
             passkeyClient.signInWithPasskey(
                     this,
                     cleanedJson,
@@ -255,17 +255,18 @@ public class PasskeyActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(@NonNull String webAuthnJson) {
                             Log.e("pankti", "Assertion JSON received: " + webAuthnJson);
-                            String fixed =  fixWebAuthnJson(webAuthnJson);
-                            Log.e("pankti", "fixed: " + fixed);
+                            //String fixed =  fixWebAuthnJson(webAuthnJson);
+                            //Log.e("pankti", "fixed: " + fixed);
                             BlockIDSDK.getInstance().callAssertionResult(PasskeyActivity.this,
                                     "https://1k-dev.1kosmos.net/webauthn",
                                     "8a7O4b7Q46BPHKrMjfZhl/azy4eOT1rKDI3NmQIYenDcm4uVyu95wqWl4EHRD86aKmc2y00KWrasWTrc/QzqWg==",
-                                    fixed, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
+                                    webAuthnJson, new ApiResponseCallback<FIDO2NativeAPIs.ResultResponse>() {
                                         @Override
                                         public void apiResponse(boolean status, String message, ErrorManager.ErrorResponse error, FIDO2NativeAPIs.ResultResponse result) {
                                             Log.e("pankti", "status " + status);
                                             if (status) {
                                                 Log.e("pankti", BIDUtil.objectToJSONString(result, true));
+                                                runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAssertionResult pass: " + result.sub, Toast.LENGTH_SHORT).show());
                                             } else {
                                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "callAssertionResult fail", Toast.LENGTH_SHORT).show());
                                             }
@@ -288,7 +289,7 @@ public class PasskeyActivity extends AppCompatActivity {
                             runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "Password chosen: " + username, Toast.LENGTH_SHORT).show());
                         }
                     });
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -371,8 +372,7 @@ public class PasskeyActivity extends AppCompatActivity {
             byte[] decoded = Base64.decode(cleaned, Base64.DEFAULT);
 
             // Encode to Base64URL (NO_PADDING | NO_WRAP | URL_SAFE)
-            return Base64.encodeToString(decoded,
-                    Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
+            return Base64.encodeToString(decoded, Base64.NO_WRAP | Base64.URL_SAFE);
         } catch (IllegalArgumentException e) {
             // If it's not valid Base64, just clean up
             return base64Input.trim().replace("=", "");
@@ -395,12 +395,12 @@ public class PasskeyActivity extends AppCompatActivity {
             response.put("userHandle", toBase64Url(response.optString("userHandle")));
 
 
-            response.put("dns","1k-dev.1kosmos.net");
-            response.put("communityId","68418b2587942f1d3158a799");
-            response.put("tenantId","68418b2587942f1d3158a789");
+            response.put("dns", "1k-dev.1kosmos.net");
+            response.put("communityId", "68418b2587942f1d3158a799");
+            response.put("tenantId", "68418b2587942f1d3158a789");
 
             return json.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }

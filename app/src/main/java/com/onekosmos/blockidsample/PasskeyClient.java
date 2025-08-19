@@ -3,7 +3,6 @@ package com.onekosmos.blockidsample;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.CancellationSignal;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -126,14 +125,9 @@ public final class PasskeyClient {
                             if (cred instanceof PublicKeyCredential) {
                                 String authJson = ((PublicKeyCredential) cred).getAuthenticationResponseJson();
                                 JSONObject authJsonObject = new JSONObject(authJson);
-                                String rawID = authJsonObject.getString("rawId");
-                                String id = authJsonObject.getString("id");
-                                authJsonObject.put("id", Base64.encodeToString(
-                                        id.getBytes(),
-                                        Base64.DEFAULT));
-                                authJsonObject.put("rawId", Base64.encodeToString(
-                                        rawID.getBytes(),
-                                        Base64.DEFAULT));
+                                authJsonObject.put("tenantId", "68418b2587942f1d3158a798");
+                                authJsonObject.put("communityId","68418b2587942f1d3158a799");
+                                authJsonObject.put("dns","1k-dev.1kosmos.net");
                                 String finalJsonString = authJsonObject.toString();
                                 passkeyCallback.onSuccess(finalJsonString);
                                 return;
