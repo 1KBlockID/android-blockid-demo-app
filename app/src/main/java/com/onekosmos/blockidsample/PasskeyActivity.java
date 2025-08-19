@@ -18,7 +18,6 @@ import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.SecureRandom;
@@ -129,29 +128,7 @@ public class PasskeyActivity extends AppCompatActivity {
                             Log.e("pankti", "status " + status);
                             if (status) {
                                 Log.e("pankti", "assertionOption: " + BIDUtil.objectToJSONString(result, true));
-                                try {
-                                    JSONObject jsonObject = new JSONObject(result);
-                                    JSONArray allowCredentials = jsonObject.getJSONArray("allowCredentials");
-
-                                    // Transports array you want to add
-                                    JSONArray transports = new JSONArray();
-                                    transports.put("usb");
-                                    transports.put("nfc");
-                                    transports.put("ble");
-                                    transports.put("hybrid");
-                                    transports.put("internal");
-
-                                    // Add transports to each credential in the array
-                                    for (int i = 0; i < allowCredentials.length(); i++) {
-                                        JSONObject cred = allowCredentials.getJSONObject(i);
-                                        cred.put("transports", new JSONArray(transports.toString()));
-                                    }
-                                    String jsonString = jsonObject.toString();
-//                                    auth(jsonString);
-                                    auth(result);
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                auth(result);
                             } else {
                                 runOnUiThread(() -> Toast.makeText(PasskeyActivity.this, "assertionOption fail", Toast.LENGTH_SHORT).show());
                             }
@@ -239,18 +216,18 @@ public class PasskeyActivity extends AppCompatActivity {
 //
 //            String optionsString = options.toString();
 
-            JSONObject requestOptions = new JSONObject(result);
+            //JSONObject requestOptions = new JSONObject(result);
 
             // 🚫 Remove allowCredentials if present
-            requestOptions.remove("allowCredentials");
+            //requestOptions.remove("allowCredentials");
 
             // Convert back to string
-            String cleanedJson = requestOptions.toString();
+            //String cleanedJson = requestOptions.toString();
 
 //            Log.e("mistry", "auth optionsString: "+ optionsString);
             passkeyClient.signInWithPasskey(
                     this,
-                    cleanedJson,
+                    result,
                     new PasskeyClient.JsonCallback() {
                         @Override
                         public void onSuccess(@NonNull String webAuthnJson) {
