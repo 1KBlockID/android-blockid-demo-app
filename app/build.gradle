@@ -10,7 +10,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 35
         versionCode 1
-        versionName "1.20.51" + "." + getCurrentTimestampHexValue()
+        versionName "1.20.52" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -65,6 +65,8 @@ configurations.configureEach {
 }
 
 dependencies {
+    implementation 'androidx.activity:activity:1.10.1'
+
     //The default toolchain implements the new language features by performing bytecode
     // transformations, called desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
@@ -106,5 +108,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.51.689AEC45'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.52.68AC987C'
 }

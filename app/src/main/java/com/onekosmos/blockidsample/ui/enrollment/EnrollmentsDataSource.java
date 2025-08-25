@@ -44,7 +44,8 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_ABOUT,
         ASSET_KYC,
-        ASSET_RESET_SDK
+        ASSET_RESET_SDK,
+        ASSET_PASSKEY
     }
 
     private EnrollmentsDataSource() {
@@ -69,6 +70,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_KYC);
 
         arr.add(EnrollmentAssetEnum.ASSET_PIN);
+        arr.add(EnrollmentAssetEnum.ASSET_PASSKEY);
         arr.add(EnrollmentAssetEnum.ASSET_DEVICE_AUTH);
         arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID);
         arr.add(EnrollmentAssetEnum.ASSET_LIVEID_WITH_FACE_PRESENCE_LEVEL);
@@ -140,6 +142,11 @@ public class EnrollmentsDataSource {
             case ASSET_PIN:
                 enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPinRegistered(),
                         context.getResources().getString(R.string.label_app_pin), null);
+                break;
+
+            case ASSET_PASSKEY:
+                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPinRegistered(),
+                        context.getResources().getString(R.string.label_pass_key), null);
                 break;
 
             case ASSET_NATIONAL_ID:
