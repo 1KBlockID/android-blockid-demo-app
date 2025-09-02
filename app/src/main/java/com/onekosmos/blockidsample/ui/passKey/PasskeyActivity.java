@@ -115,7 +115,8 @@ public class PasskeyActivity extends AppCompatActivity {
                             PasskeyRequest passkeyRequest = new PasskeyRequest
                                     (AppConstant.defaultTenant, fetchUserResponse.data.username,
                                             fetchUserResponse.data.username);
-                            BlockIDSDK.getInstance().authenticatePasskey(PasskeyActivity.this,
+                            BlockIDSDK.getInstance().authenticatePasskey(
+                                    PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
                                         if (statusKey) {
                                             showSuccessDialog(response,
@@ -132,14 +133,25 @@ public class PasskeyActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Show progress dialog
+     *
+     * @param message to be shown on progress dialog
+     */
     private void showProgressDialog(String message) {
         mProgressDialog = new ProgressDialog(this, message);
         mProgressDialog.show();
     }
 
+    /**
+     * Show success dialog
+     *
+     * @param response      {@link PasskeyResponse}
+     * @param passKeyAction {@link PassKeyAction} to be shown on success dialog message
+     */
     private void showSuccessDialog(PasskeyResponse response, PassKeyAction passKeyAction) {
         SuccessDialog successDialog = new SuccessDialog(this);
-        String message = "";
+        String message;
 
         if (passKeyAction.equals(PassKeyAction.REGISTER)) {
             message = "Passkey registration successful for " + response.sub +
@@ -150,17 +162,14 @@ public class PasskeyActivity extends AppCompatActivity {
         }
 
         successDialog.show(null, getString(R.string.label_success), message,
-                dialog -> {
-                    successDialog.dismiss();
-                });
+                dialog -> successDialog.dismiss());
     }
 
     private void showErrorDialog(ErrorManager.ErrorResponse errorResponse, String userName,
                                  PassKeyAction passKeyAction) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-            errorDialog.dismiss();
-        };
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                errorDialog.dismiss();
 
         if (errorResponse.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
             errorDialog.showNoInternetDialog(onDismissListener);
@@ -171,37 +180,32 @@ public class PasskeyActivity extends AppCompatActivity {
             errorDialog.show(null,
                     getString(R.string.label_error),
                     getString(R.string.label_user_not_found),
-                    dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    dialog -> errorDialog.dismiss());
             return;
         }
 
         if (errorResponse.getCode() == ALREADY_REGISTERED_PASS_KEY.getCode())
             errorDialog.show(null,
                     getString(R.string.label_error),
-                    errorResponse.getMessage() + "\n(" + getString(R.string.label_error_code)
+                    errorResponse.getMessage() +
+                            "\n(" + getString(R.string.label_error_code)
                             + errorResponse.getCode() + ")",
-                    dialog -> {
-                        errorDialog.dismiss();
-                    });
+                    dialog -> errorDialog.dismiss());
 
-        String title = "";
-        String message = "";
+        String title;
+        String message;
         if (passKeyAction.equals(PassKeyAction.REGISTER)) {
-            title = "Passkey registration failed";
+            title = getString(R.string.label_passkey_registration_failed);
             message = "We couldn’t register passkey with " + userName +
                     ". Please try again.";
         } else {
-            title = "Passkey verification failed";
+            title = getString(R.string.label_passkey_verification_failed);
             message = "We couldn’t verify passkey with " + userName +
                     ". Please try again.";
         }
 
         errorDialog.show(null, title, message,
-                dialog -> {
-                    errorDialog.dismiss();
-                });
+                dialog -> errorDialog.dismiss());
     }
 
     public enum PassKeyAction {
