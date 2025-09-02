@@ -83,7 +83,7 @@ public class PasskeyActivity extends AppCompatActivity {
         mBtnRegister.setOnClickListener(v -> {
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
-            BlockIDSDK.getInstance().fetchExistingUserInfo(this, AppConstant.defaultTenant,
+            BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
@@ -108,7 +108,7 @@ public class PasskeyActivity extends AppCompatActivity {
         mBtnAuthenticate.setOnClickListener(v -> {
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_authenticating_passkey));
-            BlockIDSDK.getInstance().fetchExistingUserInfo(this, AppConstant.defaultTenant,
+            BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
