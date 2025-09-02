@@ -181,4 +181,11 @@
     <!-- LiveID with Face Presence Level-->
     <string name="label_liveid_face_presence_level">LiveID with Face presence level</string>
     <string name="label_liveid_liveness_and_compare">LiveID Liveness &amp; Compare</string>
+
+    <!-- Pass Key-->
+    <string name="label_register">Register</string>
+    <string name="label_username">Username*</string>
+    <string name="label_user_not_found">User details not found</string>
+    <string name="label_registering_passkey">Registering pass key please wait.</string>
+    <string name="label_authenticating_passkey">Authentication pass key please wait.</string>
 </resources>

@@ -1,26 +1,43 @@
 package com.onekosmos.blockidsample.ui.passKey;
 
+import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.Passkey.ALREADY_REGISTERED_PASS_KEY;
+
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
-import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.passKey.PasskeyRequest;
+import com.onekosmos.blockid.sdk.passKey.PasskeyResponse;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.util.ErrorDialog;
+import com.onekosmos.blockidsample.util.ProgressDialog;
+import com.onekosmos.blockidsample.util.SuccessDialog;
 
+/**
+ * Created by 1Kosmos Engineering
+ * Copyright © 2025 1Kosmos. All rights reserved.
+ */
 public class PasskeyActivity extends AppCompatActivity {
-    AppCompatEditText etUsername, etDisplayName;
-    AppCompatButton btnRegister, btnAuthenticate;
+    private AppCompatEditText mEdittextUsername;
+    private AppCompatButton mBtnRegister, mBtnAuthenticate;
+    private ProgressDialog mProgressDialog;
 
+    /**
+     * @noinspection DataFlowIssue, deprecation
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,62 +48,164 @@ public class PasskeyActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        etUsername = findViewById(R.id.etUsername);
-        etDisplayName = findViewById(R.id.etDisplayName);
-        btnRegister = findViewById(R.id.btnRegister);
-        btnAuthenticate = findViewById(R.id.btnAuthenticate);
+        mEdittextUsername = findViewById(R.id.edt_username);
+        mBtnRegister = findViewById(R.id.btn_register);
+        mBtnAuthenticate = findViewById(R.id.btn_authenticate);
 
-        btnRegister.setOnClickListener(v -> {
-            String username = etUsername.getText().toString();
-            String displayName = etDisplayName.getText().toString();
+        AppCompatImageView mImgBack = findViewById(R.id.img_back_passkey);
+        mImgBack.setOnClickListener(view -> onBackPressed());
 
-            if (username.isEmpty() || displayName.isEmpty()) {
-                Toast.makeText(this, "Please enter username and display name",
-                        Toast.LENGTH_SHORT).show();
-                return;
+        mBtnRegister.setEnabled(false);
+        mBtnAuthenticate.setEnabled(false);
+
+        mEdittextUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // not used
             }
-            BIDTenant tenant = new BIDTenant("1kosmos", "default", "https://1k-dev.1kosmos.net");
-            PasskeyRequest passkeyRequest = new PasskeyRequest
-                    (tenant, username, displayName);
-            BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
-                    passkeyRequest, (status, response, error) -> {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String username = s.toString().trim();
+                boolean isValid = username.length() >= 3;
+
+                mBtnRegister.setEnabled(isValid);
+                mBtnAuthenticate.setEnabled(isValid);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // not used
+            }
+        });
+
+
+        mBtnRegister.setOnClickListener(v -> {
+            String username = mEdittextUsername.getText().toString();
+            showProgressDialog(getString(R.string.label_registering_passkey));
+            BlockIDSDK.getInstance().fetchExistingUserInfo(this, AppConstant.defaultTenant,
+                    username, (status, fetchUserResponse, errorResponse) -> {
+                        mProgressDialog.dismiss();
                         if (status) {
-                            Toast.makeText(this, "Passkey registered successfully : " +
-                                            response.sub,
-                                    Toast.LENGTH_SHORT).show();
+                            PasskeyRequest passkeyRequest = new PasskeyRequest
+                                    (AppConstant.defaultTenant, fetchUserResponse.data.username,
+                                            fetchUserResponse.data.username);
+                            BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
+                                    passkeyRequest, (statusKey, response, error) -> {
+                                        if (statusKey) {
+                                            showSuccessDialog(response, PassKeyAction.REGISTER);
+                                        } else {
+                                            showErrorDialog(error, username,
+                                                    PassKeyAction.REGISTER);
+                                        }
+                                    });
                         } else {
-                            Toast.makeText(this, "Passkey registration failed : " +
-                                            error.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                            showErrorDialog(errorResponse, username, PassKeyAction.REGISTER);
                         }
                     });
         });
 
-        btnAuthenticate.setOnClickListener(v -> {
-            String username = etUsername.getText().toString();
-            String displayName = etDisplayName.getText().toString();
-
-            if (username.isEmpty() || displayName.isEmpty()) {
-                Toast.makeText(this, "Please enter username and display name",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-            BIDTenant tenant = new BIDTenant("1kosmos", "default", "https://1k-dev.1kosmos.net");
-            PasskeyRequest passkeyRequest = new PasskeyRequest
-                    (tenant, username, displayName);
-            BlockIDSDK.getInstance().authenticatePasskey(PasskeyActivity.this,
-                    passkeyRequest, (status, response, error) -> {
+        mBtnAuthenticate.setOnClickListener(v -> {
+            String username = mEdittextUsername.getText().toString();
+            showProgressDialog(getString(R.string.label_authenticating_passkey));
+            BlockIDSDK.getInstance().fetchExistingUserInfo(this, AppConstant.defaultTenant,
+                    username, (status, fetchUserResponse, errorResponse) -> {
+                        mProgressDialog.dismiss();
                         if (status) {
-                            Toast.makeText(this, "Passkey Authentication successfully : " +
-                                            response.sub,
-                                    Toast.LENGTH_SHORT).show();
+                            PasskeyRequest passkeyRequest = new PasskeyRequest
+                                    (AppConstant.defaultTenant, fetchUserResponse.data.username,
+                                            fetchUserResponse.data.username);
+                            BlockIDSDK.getInstance().authenticatePasskey(PasskeyActivity.this,
+                                    passkeyRequest, (statusKey, response, error) -> {
+                                        if (statusKey) {
+                                            showSuccessDialog(response,
+                                                    PassKeyAction.AUTHENTICATION);
+                                        } else {
+                                            showErrorDialog(error, username,
+                                                    PassKeyAction.AUTHENTICATION);
+                                        }
+                                    });
                         } else {
-                            Toast.makeText(this, "Passkey Authentication failed : " +
-                                            error.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                            showErrorDialog(errorResponse, username, PassKeyAction.AUTHENTICATION);
                         }
                     });
         });
+    }
 
+    private void showProgressDialog(String message) {
+        mProgressDialog = new ProgressDialog(this, message);
+        mProgressDialog.show();
+    }
+
+    private void showSuccessDialog(PasskeyResponse response, PassKeyAction passKeyAction) {
+        SuccessDialog successDialog = new SuccessDialog(this);
+        String message = "";
+
+        if (passKeyAction.equals(PassKeyAction.REGISTER)) {
+            message = "Passkey registration successful for " + response.sub +
+                    "\n Authenticator ID : " + response.authenticatorId;
+        } else {
+            message = "Passkey verification successful for " + response.sub +
+                    "\n Authenticator ID : " + response.authenticatorId;
+        }
+
+        successDialog.show(null, getString(R.string.label_success), message,
+                dialog -> {
+                    successDialog.dismiss();
+                });
+    }
+
+    private void showErrorDialog(ErrorManager.ErrorResponse errorResponse, String userName,
+                                 PassKeyAction passKeyAction) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+            errorDialog.dismiss();
+        };
+
+        if (errorResponse.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
+            errorDialog.showNoInternetDialog(onDismissListener);
+            return;
+        }
+
+        if (errorResponse.getCode() == 404) {
+            errorDialog.show(null,
+                    getString(R.string.label_error),
+                    getString(R.string.label_user_not_found),
+                    dialog -> {
+                        errorDialog.dismiss();
+                    });
+            return;
+        }
+
+        if (errorResponse.getCode() == ALREADY_REGISTERED_PASS_KEY.getCode())
+            errorDialog.show(null,
+                    getString(R.string.label_error),
+                    errorResponse.getMessage() + "\n(" + getString(R.string.label_error_code)
+                            + errorResponse.getCode() + ")",
+                    dialog -> {
+                        errorDialog.dismiss();
+                    });
+
+        String title = "";
+        String message = "";
+        if (passKeyAction.equals(PassKeyAction.REGISTER)) {
+            title = "Passkey registration failed";
+            message = "We couldn’t register passkey with " + userName +
+                    ". Please try again.";
+        } else {
+            title = "Passkey verification failed";
+            message = "We couldn’t verify passkey with " + userName +
+                    ". Please try again.";
+        }
+
+        errorDialog.show(null, title, message,
+                dialog -> {
+                    errorDialog.dismiss();
+                });
+    }
+
+    public enum PassKeyAction {
+        REGISTER,
+        AUTHENTICATION
     }
 }
