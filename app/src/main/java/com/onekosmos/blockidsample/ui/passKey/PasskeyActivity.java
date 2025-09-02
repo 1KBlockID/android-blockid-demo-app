@@ -20,6 +20,7 @@ import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.passKey.PasskeyRequest;
 import com.onekosmos.blockid.sdk.passKey.PasskeyResponse;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -87,9 +88,13 @@ public class PasskeyActivity extends AppCompatActivity {
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
+                            FetchUserResponse responseUser =
+                                    BIDUtil.JSONStringToObject(fetchUserResponse,
+                                            FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    (AppConstant.defaultTenant, fetchUserResponse.data.username,
-                                            fetchUserResponse.data.username);
+                                    //uid is an Unique ID for user
+                                    (AppConstant.defaultTenant, responseUser.data.uid,
+                                            responseUser.data.username);
                             BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
                                         if (statusKey) {
@@ -112,9 +117,12 @@ public class PasskeyActivity extends AppCompatActivity {
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
+                            FetchUserResponse responseUser =
+                                    BIDUtil.JSONStringToObject(fetchUserResponse,
+                                            FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    (AppConstant.defaultTenant, fetchUserResponse.data.username,
-                                            fetchUserResponse.data.username);
+                                    (AppConstant.defaultTenant, responseUser.data.uid,
+                                            responseUser.data.username);
                             BlockIDSDK.getInstance().authenticatePasskey(
                                     PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
@@ -211,5 +219,25 @@ public class PasskeyActivity extends AppCompatActivity {
     public enum PassKeyAction {
         REGISTER,
         AUTHENTICATION
+    }
+
+    public static class FetchUserResponse {
+        public UserData data;
+        public String publicKey;
+    }
+
+    /**
+     * @noinspection unused
+     */
+    public static class UserData {
+        public String username;
+        public String status;
+        public String roleValue;
+        public String moduleId;
+        public String email;
+        public String firstname;
+        public String lastname;
+        public String phone;
+        public String uid;
     }
 }
