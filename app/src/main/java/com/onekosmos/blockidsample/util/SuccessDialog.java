@@ -24,7 +24,6 @@ public class SuccessDialog extends Dialog {
     private AppCompatButton mBtn1;
     private AppCompatImageView mImgDialogIcon;
     private OnDismissListener mDismissListener;
-    private OnClickListener mOnClickListener;
 
     public SuccessDialog(@NonNull Context context) {
         super(context);
@@ -43,7 +42,8 @@ public class SuccessDialog extends Dialog {
         });
     }
 
-    public void show(Drawable dialogIcon, String title, String message, OnDismissListener dismissListener) {
+    public void show(Drawable dialogIcon, String title, String message,
+                     OnDismissListener dismissListener) {
         mDismissListener = dismissListener;
         mBtn1.setVisibility(View.VISIBLE);
         mBtn1.setText(R.string.label_ok);
