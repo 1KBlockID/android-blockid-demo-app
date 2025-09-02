@@ -17,7 +17,7 @@ import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
- * Copyright © 2021 1Kosmos. All rights reserved.
+ * Copyright © 2025 1Kosmos. All rights reserved.
  */
 public class SuccessDialog extends Dialog {
     private AppCompatTextView mTxtTitle, mTxtMessage;
