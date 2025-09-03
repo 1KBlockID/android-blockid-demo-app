@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Keep;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -216,11 +217,13 @@ public class PasskeyActivity extends AppCompatActivity {
                 dialog -> errorDialog.dismiss());
     }
 
+    @Keep
     public enum PassKeyAction {
         REGISTER,
         AUTHENTICATION
     }
 
+    @Keep
     public static class FetchUserResponse {
         public UserData data;
         public String publicKey;
@@ -229,6 +232,7 @@ public class PasskeyActivity extends AppCompatActivity {
     /**
      * @noinspection unused
      */
+    @Keep
     public static class UserData {
         public String username;
         public String status;
