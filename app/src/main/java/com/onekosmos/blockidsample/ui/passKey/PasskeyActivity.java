@@ -93,8 +93,8 @@ public class PasskeyActivity extends AppCompatActivity {
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    //uid is an Unique ID for user
-                                    (AppConstant.defaultTenant, responseUser.data.uid,
+                                    // dguid is an Unique ID for user
+                                    (AppConstant.defaultTenant, responseUser.data.dguid,
                                             responseUser.data.username);
                             BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
@@ -122,7 +122,8 @@ public class PasskeyActivity extends AppCompatActivity {
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    (AppConstant.defaultTenant, responseUser.data.uid,
+                                    // dguid is an Unique ID for user
+                                    (AppConstant.defaultTenant, responseUser.data.dguid,
                                             responseUser.data.username);
                             BlockIDSDK.getInstance().authenticatePasskey(
                                     PasskeyActivity.this,
@@ -223,6 +224,9 @@ public class PasskeyActivity extends AppCompatActivity {
         AUTHENTICATION
     }
 
+    /**
+     * @noinspection unused
+     */
     @Keep
     public static class FetchUserResponse {
         public UserData data;
@@ -243,5 +247,6 @@ public class PasskeyActivity extends AppCompatActivity {
         public String lastname;
         public String phone;
         public String uid;
+        public String dguid;
     }
 }
