@@ -162,7 +162,7 @@ public class EnrollmentsDataSource {
                 break;
 
             case ASSET_PASSKEY:
-                enrollmentAsset = new EnrollmentAsset(BlockIDSDK.getInstance().isPinRegistered(),
+                enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_pass_key), null);
                 break;
 

@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -115,7 +114,6 @@ public class PasskeyActivity extends AppCompatActivity {
             }
         });
 
-
         mBtnRegisterPasskey.setOnClickListener(v -> {
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
@@ -178,14 +176,29 @@ public class PasskeyActivity extends AppCompatActivity {
 
         mBtnRegisterPasskeyAndLink.setOnClickListener(view -> {
             String passkeyName = mEdittextPasskeyName.getText().toString();
-            Log.e("passkeyName", passkeyName);
+            // FIXME need to implement
         });
 
         mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view -> {
-            mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
-            mTxtGeneratedJwtValue.setVisibility(VISIBLE);
-            mTxtGeneratedJwtValue.setText("panlti12jhedhjhd.dgwiduh.jdheiudhew.uydegid.diuehiudhweidhu.12jhedhjhd.dgwiduh.jdheiudhew.uydegid.diuehiudhweidhu.12jhedhjhd.dgwiduh.jdheiudhew.uydegid.diuehiudhweidhu.mistry");
-            mBtnCopyJwt.setVisibility(VISIBLE);
+            showProgressDialog(getString(R.string.label_authenticating_passkey));
+
+            String username = mEdittextUsername.getText().toString();
+            PasskeyRequest passkeyRequest = new PasskeyRequest(AppConstant.defaultTenant,
+                    username);
+            BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
+                    passkeyRequest, (status, response, error) -> {
+                        mProgressDialog.dismiss();
+                        if (!status) {
+                            showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                            return;
+                        }
+
+                        mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
+                        mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+                        mTxtGeneratedJwtValue.setText(response.jwt);
+                        mBtnCopyJwt.setVisibility(VISIBLE);
+                        showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
+                    });
         });
 
         mBtnCopyJwt.setOnClickListener(view -> {
