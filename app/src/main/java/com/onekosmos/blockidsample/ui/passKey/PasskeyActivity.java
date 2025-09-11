@@ -179,32 +179,38 @@ public class PasskeyActivity extends AppCompatActivity {
             // FIXME need to implement
         });
 
-        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view -> {
-            showProgressDialog(getString(R.string.label_authenticating_passkey));
-
-            String username = mEdittextUsername.getText().toString();
-            PasskeyRequest passkeyRequest = new PasskeyRequest(AppConstant.defaultTenant,
-                    username);
-            BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
-                    passkeyRequest, (status, response, error) -> {
-                        mProgressDialog.dismiss();
-                        if (!status) {
-                            showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
-                            return;
-                        }
-
-                        mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
-                        mTxtGeneratedJwtValue.setVisibility(VISIBLE);
-                        mTxtGeneratedJwtValue.setText(response.jwt);
-                        mBtnCopyJwt.setVisibility(VISIBLE);
-                        showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
-                    });
-        });
+        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view ->
+                issueJWTOnPasskeyAuthentication());
 
         mBtnCopyJwt.setOnClickListener(view -> {
             String jwt = mTxtGeneratedJwtValue.getText().toString();
             copyToClipboard(PasskeyActivity.this, jwt);
         });
+    }
+
+    private void issueJWTOnPasskeyAuthentication() {
+        showProgressDialog(getString(R.string.label_authenticating_passkey));
+
+        String username = mEdittextUsername.getText().toString();
+
+        PasskeyRequest passkeyRequest = new PasskeyRequest(
+                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                null); // Required username
+
+        BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
+                passkeyRequest, (status, response, error) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                        return;
+                    }
+
+                    mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
+                    mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+                    mTxtGeneratedJwtValue.setText(response.jwt);
+                    mBtnCopyJwt.setVisibility(VISIBLE);
+                    showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
+                });
     }
 
     /**
@@ -258,9 +264,10 @@ public class PasskeyActivity extends AppCompatActivity {
         }
 
         if (errorResponse.getCode() == 404) {
-            errorDialog.show(null,
-                    getString(R.string.label_error),
-                    getString(R.string.label_user_not_found),
+            errorDialog.showWithOneButton(null,
+                    getString(R.string.label_no_account_found),
+                    getString(R.string.label_we_could_not_find_any_account_with, userName),
+                    getString(R.string.label_ok),
                     dialog -> errorDialog.dismiss());
             return;
         }
