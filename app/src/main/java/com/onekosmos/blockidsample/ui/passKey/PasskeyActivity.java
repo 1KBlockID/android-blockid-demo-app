@@ -195,7 +195,7 @@ public class PasskeyActivity extends AppCompatActivity {
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                null); // Required username
+                username); // Required username
 
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
