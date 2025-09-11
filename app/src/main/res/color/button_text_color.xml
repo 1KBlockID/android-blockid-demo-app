@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Disabled state -->
-    <item android:color="@color/secondary6" android:state_enabled="false" />
+    <item android:color="@color/darkGray" android:state_enabled="false" />
 
     <!-- Enabled state -->
     <item android:color="@color/white" android:state_enabled="true" />
