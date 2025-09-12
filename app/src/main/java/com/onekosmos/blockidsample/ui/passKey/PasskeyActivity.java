@@ -1,18 +1,25 @@
 package com.onekosmos.blockidsample.ui.passKey;
 
+import static android.view.View.VISIBLE;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.Passkey.ALREADY_REGISTERED_PASS_KEY;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Keep;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,12 +40,15 @@ import com.onekosmos.blockidsample.util.SuccessDialog;
  * Copyright © 2025 1Kosmos. All rights reserved.
  */
 public class PasskeyActivity extends AppCompatActivity {
-    private AppCompatEditText mEdittextUsername;
-    private AppCompatButton mBtnRegister, mBtnAuthenticate;
+    private AppCompatEditText mEdittextUsername, mEdittextPasskeyName;
+    private AppCompatTextView mTxtGeneratedJwtTitle, mTxtGeneratedJwtValue;
+    private AppCompatButton mBtnRegisterPasskey, mBtnAuthenticateViaPasskey,
+            mBtnRegisterPasskeyAndLink, mBtnAuthenticateViaPasskeyAndGetJWT,
+            mBtnCopyJwt;
     private ProgressDialog mProgressDialog;
 
     /**
-     * @noinspection DataFlowIssue, deprecation
+     * @noinspection DataFlowIssue
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +60,36 @@ public class PasskeyActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // System back press
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        finish(); // close the activity
+                    }
+                });
+
         mEdittextUsername = findViewById(R.id.edt_username);
-        mBtnRegister = findViewById(R.id.btn_register);
-        mBtnAuthenticate = findViewById(R.id.btn_authenticate);
+        mEdittextPasskeyName = findViewById(R.id.edt_passkey_name);
+
+        mTxtGeneratedJwtTitle = findViewById(R.id.txt_generated_jwt_title);
+        mTxtGeneratedJwtValue = findViewById(R.id.txt_generated_jwt_value);
+
+        mBtnRegisterPasskey = findViewById(R.id.btn_register_passkey);
+        mBtnAuthenticateViaPasskey = findViewById(R.id.btn_authenticate_via_passkey);
+        mBtnRegisterPasskeyAndLink = findViewById(R.id.btn_register_passkey_and_link);
+        mBtnAuthenticateViaPasskeyAndGetJWT = findViewById(
+                R.id.btn_authenticate_via_passkey_and_get_jwt);
+        mBtnCopyJwt = findViewById(R.id.btn_copy_jwt);
 
         AppCompatImageView mImgBack = findViewById(R.id.img_back_passkey);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> finish());
 
-        mBtnRegister.setEnabled(false);
-        mBtnAuthenticate.setEnabled(false);
+        mBtnRegisterPasskey.setEnabled(false);
+        mBtnAuthenticateViaPasskey.setEnabled(false);
+        mBtnRegisterPasskeyAndLink.setEnabled(false);
+        mBtnAuthenticateViaPasskeyAndGetJWT.setEnabled(false);
 
         mEdittextUsername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -71,8 +102,10 @@ public class PasskeyActivity extends AppCompatActivity {
                 String username = s.toString().trim();
                 boolean isValid = username.length() >= 3;
 
-                mBtnRegister.setEnabled(isValid);
-                mBtnAuthenticate.setEnabled(isValid);
+                mBtnRegisterPasskey.setEnabled(isValid);
+                mBtnAuthenticateViaPasskey.setEnabled(isValid);
+                mBtnRegisterPasskeyAndLink.setEnabled(isValid);
+                mBtnAuthenticateViaPasskeyAndGetJWT.setEnabled(isValid);
             }
 
             @Override
@@ -81,8 +114,7 @@ public class PasskeyActivity extends AppCompatActivity {
             }
         });
 
-
-        mBtnRegister.setOnClickListener(v -> {
+        mBtnRegisterPasskey.setOnClickListener(v -> {
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -111,7 +143,7 @@ public class PasskeyActivity extends AppCompatActivity {
                     });
         });
 
-        mBtnAuthenticate.setOnClickListener(v -> {
+        mBtnAuthenticateViaPasskey.setOnClickListener(v -> {
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_authenticating_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -141,6 +173,44 @@ public class PasskeyActivity extends AppCompatActivity {
                         }
                     });
         });
+
+        mBtnRegisterPasskeyAndLink.setOnClickListener(view -> {
+            String passkeyName = mEdittextPasskeyName.getText().toString();
+            // FIXME need to implement
+        });
+
+        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view ->
+                issueJWTOnPasskeyAuthentication());
+
+        mBtnCopyJwt.setOnClickListener(view -> {
+            String jwt = mTxtGeneratedJwtValue.getText().toString();
+            copyToClipboard(PasskeyActivity.this, jwt);
+        });
+    }
+
+    private void issueJWTOnPasskeyAuthentication() {
+        showProgressDialog(getString(R.string.label_authenticating_passkey));
+
+        String username = mEdittextUsername.getText().toString();
+
+        PasskeyRequest passkeyRequest = new PasskeyRequest(
+                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                username); // Required username
+
+        BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
+                passkeyRequest, (status, response, error) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                        return;
+                    }
+
+                    mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
+                    mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+                    mTxtGeneratedJwtValue.setText(response.jwt);
+                    mBtnCopyJwt.setVisibility(VISIBLE);
+                    showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
+                });
     }
 
     /**
@@ -175,6 +245,13 @@ public class PasskeyActivity extends AppCompatActivity {
                 dialog -> successDialog.dismiss());
     }
 
+    /**
+     * Show error dialog
+     *
+     * @param errorResponse {@link ErrorManager.ErrorResponse}
+     * @param userName      String username
+     * @param passKeyAction {@link PassKeyAction} to be shown on error dialog message
+     */
     private void showErrorDialog(ErrorManager.ErrorResponse errorResponse, String userName,
                                  PassKeyAction passKeyAction) {
         ErrorDialog errorDialog = new ErrorDialog(this);
@@ -187,9 +264,10 @@ public class PasskeyActivity extends AppCompatActivity {
         }
 
         if (errorResponse.getCode() == 404) {
-            errorDialog.show(null,
-                    getString(R.string.label_error),
-                    getString(R.string.label_user_not_found),
+            errorDialog.showWithOneButton(null,
+                    getString(R.string.label_no_account_found),
+                    getString(R.string.label_we_could_not_find_any_account_with, userName),
+                    getString(R.string.label_ok),
                     dialog -> errorDialog.dismiss());
             return;
         }
@@ -216,6 +294,23 @@ public class PasskeyActivity extends AppCompatActivity {
 
         errorDialog.show(null, title, message,
                 dialog -> errorDialog.dismiss());
+    }
+
+    /**
+     * @param context Activity context
+     * @param text    Content to be copy
+     */
+    private void copyToClipboard(Context context, String text) {
+        try {
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(
+                    CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("msg", text);
+            clipboard.setPrimaryClip(clip);
+
+            Toast.makeText(context, getResources().getString(R.string.label_jwt_copied),
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {
+        }
     }
 
     @Keep
