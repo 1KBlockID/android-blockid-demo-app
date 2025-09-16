@@ -35,6 +35,8 @@ import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.SuccessDialog;
 
+import java.util.Objects;
+
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2025 1Kosmos. All rights reserved.
@@ -176,7 +178,7 @@ public class PasskeyActivity extends AppCompatActivity {
 
         mBtnRegisterPasskeyAndLink.setOnClickListener(view -> {
             String passkeyName = mEdittextPasskeyName.getText().toString();
-            // FIXME need to implement
+            registerPassKeyAndLinkAccount();
         });
 
         mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view ->
@@ -188,6 +190,28 @@ public class PasskeyActivity extends AppCompatActivity {
         });
     }
 
+    private void registerPassKeyAndLinkAccount() {
+        showProgressDialog(getString(R.string.label_registering_passkey));
+
+        String username = mEdittextUsername.getText().toString();
+        String passKeyName = Objects.requireNonNull(mEdittextPasskeyName.getText()).toString();
+
+        PasskeyRequest passkeyRequest = new PasskeyRequest(
+                username,// Required username
+                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                passKeyName); // optional passkey name
+
+        BlockIDSDK.getInstance().registerPasskeyWithAccountLinking(PasskeyActivity.this,
+                passkeyRequest, (status, response, error) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                        return;
+                    }
+                    showSuccessDialog(response, PassKeyAction.REGISTER);
+                });
+    }
+
     private void issueJWTOnPasskeyAuthentication() {
         showProgressDialog(getString(R.string.label_authenticating_passkey));
 
@@ -195,7 +219,7 @@ public class PasskeyActivity extends AppCompatActivity {
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                username); // Required username
+                username, ""); // Required username
 
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
