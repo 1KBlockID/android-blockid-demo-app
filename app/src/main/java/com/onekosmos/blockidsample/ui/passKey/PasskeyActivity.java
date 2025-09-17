@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.passKey;
 
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.Passkey.ALREADY_REGISTERED_PASS_KEY;
 
@@ -117,6 +118,7 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnRegisterPasskey.setOnClickListener(v -> {
+            hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -146,6 +148,7 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnAuthenticateViaPasskey.setOnClickListener(v -> {
+            hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_authenticating_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -177,12 +180,14 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnRegisterPasskeyAndLink.setOnClickListener(view -> {
-            String passkeyName = mEdittextPasskeyName.getText().toString();
+            hideJWTView();
             registerPassKeyAndLinkAccount();
         });
 
-        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view ->
-                issueJWTOnPasskeyAuthentication());
+        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view -> {
+            hideJWTView();
+            issueJWTOnPasskeyAuthentication();
+        });
 
         mBtnCopyJwt.setOnClickListener(view -> {
             String jwt = mTxtGeneratedJwtValue.getText().toString();
@@ -193,7 +198,8 @@ public class PasskeyActivity extends AppCompatActivity {
     private void registerPassKeyAndLinkAccount() {
         showProgressDialog(getString(R.string.label_registering_passkey));
 
-        String username = mEdittextUsername.getText().toString();
+        String username = mEdittextUsername.getText() != null ?
+                mEdittextUsername.getText().toString() : "";
         String passKeyName = Objects.requireNonNull(mEdittextPasskeyName.getText()).toString();
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
@@ -216,7 +222,8 @@ public class PasskeyActivity extends AppCompatActivity {
     private void issueJWTOnPasskeyAuthentication() {
         showProgressDialog(getString(R.string.label_authenticating_passkey));
 
-        String username = mEdittextUsername.getText().toString();
+        String username = mEdittextUsername.getText() != null ?
+                mEdittextUsername.getText().toString() : "";
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
@@ -230,12 +237,22 @@ public class PasskeyActivity extends AppCompatActivity {
                         return;
                     }
 
-                    mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
-                    mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+                    showJWTView();
                     mTxtGeneratedJwtValue.setText(response.jwt);
-                    mBtnCopyJwt.setVisibility(VISIBLE);
                     showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
                 });
+    }
+
+    private void showJWTView() {
+        mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
+        mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+        mBtnCopyJwt.setVisibility(VISIBLE);
+    }
+
+    private void hideJWTView() {
+        mTxtGeneratedJwtTitle.setVisibility(GONE);
+        mTxtGeneratedJwtValue.setVisibility(GONE);
+        mBtnCopyJwt.setVisibility(GONE);
     }
 
     /**
