@@ -1,5 +1,6 @@
 package com.onekosmos.blockidsample.ui.passKey;
 
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.Passkey.ALREADY_REGISTERED_PASS_KEY;
 
@@ -34,6 +35,8 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 import com.onekosmos.blockidsample.util.SuccessDialog;
+
+import java.util.Objects;
 
 /**
  * Created by 1Kosmos Engineering
@@ -115,6 +118,7 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnRegisterPasskey.setOnClickListener(v -> {
+            hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -124,10 +128,12 @@ public class PasskeyActivity extends AppCompatActivity {
                             FetchUserResponse responseUser =
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
-                            PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    // dguid is an Unique ID for user
-                                    (AppConstant.defaultTenant, responseUser.data.dguid,
-                                            responseUser.data.username);
+
+                            PasskeyRequest passkeyRequest = new PasskeyRequest(
+                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required display name
+                                    ""); // Optional passkey name
                             BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
                                         if (statusKey) {
@@ -144,6 +150,7 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnAuthenticateViaPasskey.setOnClickListener(v -> {
+            hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_authenticating_passkey));
             BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
@@ -153,10 +160,11 @@ public class PasskeyActivity extends AppCompatActivity {
                             FetchUserResponse responseUser =
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
-                            PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    // dguid is an Unique ID for user
-                                    (AppConstant.defaultTenant, responseUser.data.dguid,
-                                            responseUser.data.username);
+                            PasskeyRequest passkeyRequest = new PasskeyRequest(
+                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required display name
+                                    ""); // Optional passkey name
                             BlockIDSDK.getInstance().authenticatePasskey(
                                     PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
@@ -175,12 +183,14 @@ public class PasskeyActivity extends AppCompatActivity {
         });
 
         mBtnRegisterPasskeyAndLink.setOnClickListener(view -> {
-            String passkeyName = mEdittextPasskeyName.getText().toString();
-            // FIXME need to implement
+            hideJWTView();
+            registerPassKeyAndLinkAccount();
         });
 
-        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view ->
-                issueJWTOnPasskeyAuthentication());
+        mBtnAuthenticateViaPasskeyAndGetJWT.setOnClickListener(view -> {
+            hideJWTView();
+            issueJWTOnPasskeyAuthentication();
+        });
 
         mBtnCopyJwt.setOnClickListener(view -> {
             String jwt = mTxtGeneratedJwtValue.getText().toString();
@@ -188,14 +198,41 @@ public class PasskeyActivity extends AppCompatActivity {
         });
     }
 
-    private void issueJWTOnPasskeyAuthentication() {
-        showProgressDialog(getString(R.string.label_authenticating_passkey));
+    private void registerPassKeyAndLinkAccount() {
+        showProgressDialog(getString(R.string.label_registering_passkey));
 
-        String username = mEdittextUsername.getText().toString();
+        String username = mEdittextUsername.getText() != null ?
+                mEdittextUsername.getText().toString() : "";
+        String passKeyName = Objects.requireNonNull(mEdittextPasskeyName.getText()).toString();
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                username); // Required username
+                username, // Required username
+                "", // Optional display name
+                passKeyName); // Optional passkey name
+
+        BlockIDSDK.getInstance().registerPasskeyWithAccountLinking(PasskeyActivity.this,
+                passkeyRequest, (status, response, error) -> {
+                    mProgressDialog.dismiss();
+                    if (!status) {
+                        showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                        return;
+                    }
+                    showSuccessDialog(response, PassKeyAction.REGISTER);
+                });
+    }
+
+    private void issueJWTOnPasskeyAuthentication() {
+        showProgressDialog(getString(R.string.label_authenticating_passkey));
+
+        String username = mEdittextUsername.getText() != null ?
+                mEdittextUsername.getText().toString() : "";
+
+        PasskeyRequest passkeyRequest = new PasskeyRequest(
+                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                username, // Required username
+                "", // Optional display name
+                ""); // Required username
 
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
@@ -205,12 +242,22 @@ public class PasskeyActivity extends AppCompatActivity {
                         return;
                     }
 
-                    mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
-                    mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+                    showJWTView();
                     mTxtGeneratedJwtValue.setText(response.jwt);
-                    mBtnCopyJwt.setVisibility(VISIBLE);
                     showSuccessDialog(response, PassKeyAction.AUTHENTICATION);
                 });
+    }
+
+    private void showJWTView() {
+        mTxtGeneratedJwtTitle.setVisibility(VISIBLE);
+        mTxtGeneratedJwtValue.setVisibility(VISIBLE);
+        mBtnCopyJwt.setVisibility(VISIBLE);
+    }
+
+    private void hideJWTView() {
+        mTxtGeneratedJwtTitle.setVisibility(GONE);
+        mTxtGeneratedJwtValue.setVisibility(GONE);
+        mBtnCopyJwt.setVisibility(GONE);
     }
 
     /**
