@@ -128,10 +128,12 @@ public class PasskeyActivity extends AppCompatActivity {
                             FetchUserResponse responseUser =
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
-                            PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    // dguid is an Unique ID for user
-                                    (AppConstant.defaultTenant, responseUser.data.dguid,
-                                            responseUser.data.username, "");
+
+                            PasskeyRequest passkeyRequest = new PasskeyRequest(
+                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required display name
+                                    ""); // Optional passkey name
                             BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
                                         if (statusKey) {
@@ -158,10 +160,11 @@ public class PasskeyActivity extends AppCompatActivity {
                             FetchUserResponse responseUser =
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
-                            PasskeyRequest passkeyRequest = new PasskeyRequest
-                                    // dguid is an Unique ID for user
-                                    (AppConstant.defaultTenant, responseUser.data.dguid,
-                                            responseUser.data.username, "");
+                            PasskeyRequest passkeyRequest = new PasskeyRequest(
+                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required display name
+                                    ""); // Optional passkey name
                             BlockIDSDK.getInstance().authenticatePasskey(
                                     PasskeyActivity.this,
                                     passkeyRequest, (statusKey, response, error) -> {
@@ -204,9 +207,9 @@ public class PasskeyActivity extends AppCompatActivity {
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                username,// Required username
-                "", // optional display name
-                passKeyName); // optional passkey name
+                username, // Required username
+                "", // Optional display name
+                passKeyName); // Optional passkey name
 
         BlockIDSDK.getInstance().registerPasskeyWithAccountLinking(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
@@ -227,7 +230,9 @@ public class PasskeyActivity extends AppCompatActivity {
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                username, "", ""); // Required username
+                username, // Required username
+                "", // Optional display name
+                ""); // Required username
 
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
