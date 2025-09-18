@@ -232,7 +232,7 @@ public class PasskeyActivity extends AppCompatActivity {
                 AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
                 username, // Required username
                 "", // Optional display name
-                ""); // Required username
+                ""); // Optional passkey name
 
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(PasskeyActivity.this,
                 passkeyRequest, (status, response, error) -> {
