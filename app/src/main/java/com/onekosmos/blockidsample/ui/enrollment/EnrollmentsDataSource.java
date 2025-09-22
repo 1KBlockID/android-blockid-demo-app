@@ -44,7 +44,8 @@ public class EnrollmentsDataSource {
         ASSET_RECOVER_MNEMONIC,
         ASSET_ABOUT,
         ASSET_KYC,
-        ASSET_RESET_SDK
+        ASSET_RESET_SDK,
+        ASSET_PASSKEY
     }
 
     private EnrollmentsDataSource() {
@@ -75,6 +76,7 @@ public class EnrollmentsDataSource {
         arr.add(EnrollmentAssetEnum.ASSET_LIVE_ID_LIVENESS_AND_COMPARE);
 
         arr.add(EnrollmentAssetEnum.ASSET_LOGIN_WITH_QR);
+        arr.add(EnrollmentAssetEnum.ASSET_PASSKEY);
         arr.add(EnrollmentAssetEnum.ASSET_RECOVER_MNEMONIC);
         arr.add(EnrollmentAssetEnum.ASSET_RESET_SDK);
         return arr;
@@ -158,6 +160,12 @@ public class EnrollmentsDataSource {
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_login_with_qr), null);
                 break;
+
+            case ASSET_PASSKEY:
+                enrollmentAsset = new EnrollmentAsset(false,
+                        context.getResources().getString(R.string.label_pass_key), null);
+                break;
+
             case ASSET_RECOVER_MNEMONIC:
                 enrollmentAsset = new EnrollmentAsset(false,
                         context.getResources().getString(R.string.label_recover_mnemonic), null);

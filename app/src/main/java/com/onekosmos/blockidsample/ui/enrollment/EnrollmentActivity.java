@@ -44,6 +44,7 @@ import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
+import com.onekosmos.blockidsample.ui.passKey.PasskeyActivity;
 import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticatorActivity;
 import com.onekosmos.blockidsample.ui.restore.RecoverMnemonicActivity;
@@ -134,6 +135,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
             onLiveIdWithFacePresenceLevel();
         } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_liveid_liveness_and_compare))) {
             onLiveIdAuthenticationClicked();
+        } else if (TextUtils.equals(asset.getAssetTitle(), getString(R.string.label_pass_key))) {
+            onPassKeyClicked();
         }
     }
 
@@ -496,5 +499,14 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     message, getString(R.string.label_ok), listener);
 
         });
+    }
+
+    /**
+     * Register and Auth Pass Key
+     */
+    private void onPassKeyClicked() {
+        Intent intent = new Intent(this, PasskeyActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 }

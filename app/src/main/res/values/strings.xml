@@ -11,6 +11,7 @@
     <string name="label_passport1">Passport 1</string>
     <string name="label_passport2">Passport 2</string>
     <string name="label_app_pin">App Pin</string>
+    <string name="label_pass_key">Passkeys</string>
     <string name="label_national_id_1">National ID 1</string>
     <string name="label_reset_app">Reset App</string>
     <string name="label_please_wait">Please wait...</string>
@@ -180,4 +181,21 @@
     <!-- LiveID with Face Presence Level-->
     <string name="label_liveid_face_presence_level">LiveID with Face presence level</string>
     <string name="label_liveid_liveness_and_compare">LiveID Liveness &amp; Compare</string>
+
+    <!-- Pass Key-->
+    <string name="label_username">User Name*</string>
+    <string name="label_unique_passkey_name">Unique Passkey Name</string>
+    <string name="label_register_passkey">Register Passkey</string>
+    <string name="label_authenticate_via_passkey">Authenticate via Passkey</string>
+    <string name="label_register_passkey_and_link">Register Passkey &amp; Link with account</string>
+    <string name="label_authenticate_via_passkey_and_get_JWT">Authenticate via Passkey &amp; Get JWT</string>
+    <string name="label_generated_jwt">Generated JWT: </string>
+    <string name="label_copy_jwt">Copy JWT</string>
+    <string name="label_jwt_copied">JWT Copied.</string>
+    <string name="label_no_account_found">No Account Found</string>
+    <string name="label_we_could_not_find_any_account_with">We couldn’t find any account with %1$s</string>
+    <string name="label_registering_passkey">Registering pass key please wait.</string>
+    <string name="label_authenticating_passkey">Authentication pass key please wait.</string>
+    <string name="label_passkey_registration_failed">Passkey registration failed</string>
+    <string name="label_passkey_verification_failed">"Passkey verification failed"</string>
 </resources>
