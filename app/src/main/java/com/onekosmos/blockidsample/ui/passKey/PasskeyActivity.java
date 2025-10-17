@@ -215,7 +215,7 @@ public class PasskeyActivity extends AppCompatActivity {
                 passkeyRequest, (status, response, error) -> {
                     mProgressDialog.dismiss();
                     if (!status) {
-                        showErrorDialog(error, username, PassKeyAction.AUTHENTICATION);
+                        showErrorDialog(error, username, PassKeyAction.REGISTER);
                         return;
                     }
                     showSuccessDialog(response, PassKeyAction.REGISTER);
