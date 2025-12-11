@@ -6,6 +6,7 @@ import static com.onekosmos.blockid.sdk.document.BIDDocumentProvider.RegisterDoc
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -69,6 +70,7 @@ public class PassportScanningActivity extends AppCompatActivity {
     private String mLiveIDImageB64, mLiveIDProofedBy;
     private static final String K_EXPIRED = "EXPIRED";
     private static final String K_ABANDONED = "ABANDONED";
+    private String mUID;
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -111,7 +113,7 @@ public class PassportScanningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_passport_scanning);
         isDeviceHasNfc = isDeviceHasNFC();
         initView();
-
+        mUID = getIntent().getStringExtra(K_UID);
 
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_PASSPORT_PERMISSION_REQUEST_CODE,
@@ -160,6 +162,7 @@ public class PassportScanningActivity extends AppCompatActivity {
     private void startScan() {
         Intent intent = new Intent(this, DocumentScannerActivity.class);
         intent.putExtra(K_DOCUMENT_SCAN_TYPE, DocumentScannerType.PPT.getValue());
+        intent.putExtra(K_UID, mUID);
         documentSessionResult.launch(intent);
     }
 

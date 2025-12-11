@@ -6,6 +6,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.DL;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.document.RegisterDocType.SSN;
+import static com.onekosmos.blockidsample.ui.DocumentVerificationActivity.K_DOCUMENT_TYPE;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_FOR_LIVENESS_AND_COMPARE;
 import static com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity.IS_LIVEID_WITH_FACE_PRESENCE_LEVEL;
 
@@ -38,9 +39,10 @@ import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.ui.DocumentVerificationActivity;
+import com.onekosmos.blockidsample.ui.DocumentVerificationActivity.DocumentScannerTypeForUID;
 import com.onekosmos.blockidsample.ui.RegisterTenantActivity;
 import com.onekosmos.blockidsample.ui.about.AboutActivity;
-import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.ui.enrollPin.PinEnrollmentActivity;
 import com.onekosmos.blockidsample.ui.liveID.LiveIDScanningActivity;
 import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
@@ -314,7 +316,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     });
             return;
         }
-        Intent intent = new Intent(this, DriverLicenseScanActivity.class);
+        Intent intent = new Intent(this, DocumentVerificationActivity.class);
+        intent.putExtra(K_DOCUMENT_TYPE, DocumentScannerTypeForUID.DL1.getValue());
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
@@ -346,7 +349,11 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     });
             return;
         }
-        Intent intent = new Intent(this, PassportScanningActivity.class);
+        Intent intent = new Intent(this, DocumentVerificationActivity.class);
+        if (count == 1)
+            intent.putExtra(K_DOCUMENT_TYPE, DocumentScannerTypeForUID.PP1.getValue());
+        else if (count == 2)
+            intent.putExtra(K_DOCUMENT_TYPE, DocumentScannerTypeForUID.PP2.getValue());
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
@@ -379,7 +386,8 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                     });
             return;
         }
-        Intent intent = new Intent(this, NationalIDScanActivity.class);
+        Intent intent = new Intent(this, DocumentVerificationActivity.class);
+        intent.putExtra(K_DOCUMENT_TYPE, DocumentScannerTypeForUID.NID1.getValue());
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
