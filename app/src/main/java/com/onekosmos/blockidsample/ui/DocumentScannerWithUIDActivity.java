@@ -25,7 +25,7 @@ import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
  * Created by 1Kosmos Engineering
  * Copyright © 2025 1Kosmos. All rights reserved.
  */
-public class DocumentVerificationActivity extends AppCompatActivity {
+public class DocumentScannerWithUIDActivity extends AppCompatActivity {
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtTitle;
     private AppCompatEditText mEdTxtEnterUID;
@@ -42,7 +42,7 @@ public class DocumentVerificationActivity extends AppCompatActivity {
             WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         }
 
-        setContentView(R.layout.activity_document_uid);
+        setContentView(R.layout.activity_document_scanner_with_uid);
         mDocType = getIntent().getStringExtra(K_DOCUMENT_TYPE);
         mDocumentScannerType = DocumentScannerTypeForUID.valueOf(mDocType);
         initView();
@@ -63,7 +63,7 @@ public class DocumentVerificationActivity extends AppCompatActivity {
         mImgBack.setOnClickListener(v -> onBackPressed());
 
         mTxtTitle = findViewById(R.id.txt_title_uid);
-        mEdTxtEnterUID = findViewById(R.id.edt_username);
+        mEdTxtEnterUID = findViewById(R.id.edt_uid);
         mBtnVerification = findViewById(R.id.btn_verification);
         mBtnVerificationWithUID = findViewById(R.id.btn_verification_with_uid);
 
