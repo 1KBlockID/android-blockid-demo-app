@@ -323,6 +323,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_passport_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
+                        setResult(RESULT_OK);
                         finish();
                         return;
                     }
@@ -354,6 +355,7 @@ public class PassportScanningActivity extends AppCompatActivity {
                             Toast.makeText(this,
                                     R.string.label_passport_enrolled_successfully,
                                     Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
                             finish();
                             return;
                         }

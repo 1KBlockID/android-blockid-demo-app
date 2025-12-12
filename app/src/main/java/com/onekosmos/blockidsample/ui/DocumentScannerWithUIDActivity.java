@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -37,6 +39,13 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
     private AppCompatButton mBtnVerification, mBtnVerificationWithUID;
     private String mDocType;
     private DocumentScannerTypeForUID mDocumentScannerType;
+
+    private final ActivityResultLauncher<Intent> documentSessionResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK)
+                            finish();
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,16 +124,16 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
             if (mDocumentScannerType == DocumentScannerTypeForUID.DL1) {
                 Intent intent = new Intent(this, DriverLicenseScanActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             } else if (mDocumentScannerType == DocumentScannerTypeForUID.PP1 ||
                     mDocumentScannerType == DocumentScannerTypeForUID.PP2) {
                 Intent intent = new Intent(this, PassportScanningActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             } else if (mDocumentScannerType == DocumentScannerTypeForUID.NID1) {
                 Intent intent = new Intent(this, NationalIDScanActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             }
         });
 
@@ -133,18 +142,18 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, DriverLicenseScanActivity.class);
                 intent.putExtra(K_UID, mEdTxtEnterUID.getText().toString());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             } else if (mDocumentScannerType == DocumentScannerTypeForUID.PP1 ||
                     mDocumentScannerType == DocumentScannerTypeForUID.PP2) {
                 Intent intent = new Intent(this, PassportScanningActivity.class);
                 intent.putExtra(K_UID, mEdTxtEnterUID.getText().toString());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             } else if (mDocumentScannerType == DocumentScannerTypeForUID.NID1) {
                 Intent intent = new Intent(this, NationalIDScanActivity.class);
                 intent.putExtra(K_UID, mEdTxtEnterUID.getText().toString());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
+                documentSessionResult.launch(intent);
             }
         });
     }

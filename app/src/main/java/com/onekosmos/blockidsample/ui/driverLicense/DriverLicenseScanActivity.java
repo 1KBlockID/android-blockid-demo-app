@@ -293,6 +293,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                         if (status) {
                             Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                     Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
                             finish();
                             return;
                         }
@@ -333,6 +334,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                     if (status) {
                         Toast.makeText(this, R.string.label_dl_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
+                        setResult(RESULT_OK);
                         finish();
                         return;
                     }
