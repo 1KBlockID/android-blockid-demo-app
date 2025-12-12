@@ -152,6 +152,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.MaterialAppTheme"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".ui.DocumentScannerWithUIDActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.MaterialAppTheme"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
     </application>
 
 </manifest>
