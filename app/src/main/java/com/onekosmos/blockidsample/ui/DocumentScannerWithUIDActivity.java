@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -24,15 +25,18 @@ import com.onekosmos.blockidsample.ui.passport.PassportScanningActivity;
 /**
  * Created by 1Kosmos Engineering
  * Copyright © 2025 1Kosmos. All rights reserved.
+ *
+ * @noinspection FieldCanBeLocal
  */
 public class DocumentScannerWithUIDActivity extends AppCompatActivity {
+    public static final String K_DOCUMENT_TYPE = "document_type";
+
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtTitle;
     private AppCompatEditText mEdTxtEnterUID;
     private AppCompatButton mBtnVerification, mBtnVerificationWithUID;
     private String mDocType;
     private DocumentScannerTypeForUID mDocumentScannerType;
-    public static final String K_DOCUMENT_TYPE = "document_type";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +45,20 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
             WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         }
-
         setContentView(R.layout.activity_document_scanner_with_uid);
+
+        // System back press
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        finish(); // close the activity
+                    }
+                });
+
         mDocType = getIntent().getStringExtra(K_DOCUMENT_TYPE);
         mDocumentScannerType = DocumentScannerTypeForUID.valueOf(mDocType);
         initView();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     /**
@@ -60,7 +68,7 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
      */
     private void initView() {
         mImgBack = findViewById(R.id.img_back_uid);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(v -> finish());
 
         mTxtTitle = findViewById(R.id.txt_title_uid);
         mEdTxtEnterUID = findViewById(R.id.edt_uid);
@@ -149,7 +157,7 @@ public class DocumentScannerWithUIDActivity extends AppCompatActivity {
 
         private final String docType;
 
-        private DocumentScannerTypeForUID(String docType) {
+        DocumentScannerTypeForUID(String docType) {
             this.docType = docType;
         }
 
