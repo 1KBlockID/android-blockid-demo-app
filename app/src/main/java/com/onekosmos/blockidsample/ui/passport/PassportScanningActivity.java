@@ -72,6 +72,17 @@ public class PassportScanningActivity extends AppCompatActivity {
     private static final String K_ABANDONED = "ABANDONED";
     private String mUID;
 
+    private final ActivityResultLauncher<Intent> ePassportResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            setResult(RESULT_OK);
+                            finish();
+                        } else {
+                            finish();
+                        }
+                    });
+
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -286,8 +297,7 @@ public class PassportScanningActivity extends AppCompatActivity {
         DocumentHolder.setData(mPassportMap);
         Intent intent = new Intent(this, EPassportChipActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-        finish();
+        ePassportResult.launch(intent);
     }
 
     private Bitmap convertBase64ToBitmap(String img) {
