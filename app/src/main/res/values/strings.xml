@@ -7,12 +7,18 @@
     <string name="label_unlock_sdk">Unlock SDK</string>
     <string name="label_login_successfully">Login Successfully</string>
     <string name="label_driver_license_1">Drivers License 1</string>
+    <string name="label_start_dl_verification">Start DL Verification</string>
+    <string name="label_start_dl_verification_with_UID">Start DL Verification with UID</string>
     <string name="label_driver_license_with_verification">Drivers License with Verification</string>
     <string name="label_passport1">Passport 1</string>
     <string name="label_passport2">Passport 2</string>
+    <string name="label_start_pp_verification">Start Passport Verification</string>
+    <string name="label_start_pp_verification_with_UID">Start Passport Verification with UID</string>
     <string name="label_app_pin">App Pin</string>
     <string name="label_pass_key">Passkeys</string>
     <string name="label_national_id_1">National ID 1</string>
+    <string name="label_start_nid_verification">Start National ID Verification</string>
+    <string name="label_start_nid_verification_with_UID">Start National ID Verification with UID</string>
     <string name="label_reset_app">Reset App</string>
     <string name="label_please_wait">Please wait...</string>
     <string name="label_error">Error</string>
@@ -198,4 +204,6 @@
     <string name="label_authenticating_passkey">Authentication pass key please wait.</string>
     <string name="label_passkey_registration_failed">Passkey registration failed</string>
     <string name="label_passkey_verification_failed">"Passkey verification failed"</string>
+
+    <string name="label_uid">UID</string>
 </resources>

@@ -136,6 +136,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
                         + error.getCode() + ")",
                 dialog -> {
                     errorDialog.dismiss();
+                    setResult(RESULT_CANCELED);
                     finish();
                 });
     }
@@ -211,6 +212,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
                     if (status) {
                         Toast.makeText(this, R.string.label_passport_enrolled_successfully,
                                 Toast.LENGTH_LONG).show();
+                        setResult(RESULT_OK);
                         finish();
                         return;
                     }
@@ -226,6 +228,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
     private void showError(ErrorManager.ErrorResponse errorResponse) {
         // Don't show error when user canceled
         if (errorResponse.getCode() == ErrorManager.DocumentScanner.CANCELED.getCode()) {
+            setResult(RESULT_CANCELED);
             finish();
             return;
         }
@@ -233,6 +236,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
         ErrorDialog errorDialog = new ErrorDialog(this);
         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
             errorDialog.dismiss();
+            setResult(RESULT_CANCELED);
             finish();
         };
 
@@ -264,6 +268,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
                         if (status) {
                             DocumentHolder.clearData();
                             Toast.makeText(this, R.string.label_passport_enrolled_successfully, Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
                             finish();
                             return;
                         }
@@ -284,6 +289,7 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
                         ErrorDialog errorDialog = new ErrorDialog(this);
                         DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
                             errorDialog.dismiss();
+                            setResult(RESULT_CANCELED);
                             finish();
                         };
                         if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {

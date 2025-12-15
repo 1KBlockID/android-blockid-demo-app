@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".ui.DocumentScannerWithUIDActivity">
+
+    <!-- Back Arrow -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/img_back_uid"
+        android:layout_width="@dimen/dimen_25dp"
+        android:layout_height="@dimen/dimen_25dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:padding="@dimen/dimen_5dp"
+        android:src="@drawable/icon_backarrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Title -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/txt_title_uid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_20dp"
+        android:text=""
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_28sp"
+        app:layout_constraintBottom_toBottomOf="@id/img_back_uid"
+        app:layout_constraintStart_toEndOf="@id/img_back_uid"
+        app:layout_constraintTop_toTopOf="@id/img_back_uid" />
+
+    <!-- UID Input Box -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_enter_uid"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_15dp"
+        android:layout_marginTop="@dimen/dimen_74dp"
+        android:hint="@string/label_uid"
+        app:boxCornerRadiusBottomEnd="@dimen/dimen_5dp"
+        app:boxCornerRadiusBottomStart="@dimen/dimen_5dp"
+        app:boxCornerRadiusTopEnd="@dimen/dimen_5dp"
+        app:boxCornerRadiusTopStart="@dimen/dimen_5dp"
+        app:boxStrokeWidth="@dimen/dimen_0_5dp"
+        app:boxStrokeWidthFocused="@dimen/dimen_0_5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_title_uid"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_uid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:maxLength="100"
+            android:singleLine="false"
+            android:textCursorDrawable="@null"
+            android:textSize="@dimen/dimen_14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Button 1 -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_verification"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginEnd="@dimen/dimen_9dp"
+        android:background="@color/secondary6"
+        android:paddingHorizontal="@dimen/dimen_10dp"
+        android:textAllCaps="false"
+        android:textColor="@color/button_text_color"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintEnd_toStartOf="@id/btn_verification_with_uid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/til_enter_uid" />
+
+    <!-- Authenticate Button -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_verification_with_uid"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_9dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginEnd="@dimen/dimen_15dp"
+        android:background="@color/secondary6"
+        android:enabled="false"
+        android:paddingHorizontal="@dimen/dimen_10dp"
+        android:textAllCaps="false"
+        android:textColor="@color/button_text_color"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_verification"
+        app:layout_constraintTop_toBottomOf="@id/til_enter_uid" />
+</androidx.constraintlayout.widget.ConstraintLayout>
