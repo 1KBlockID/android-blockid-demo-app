@@ -186,7 +186,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
 
     private void processScope(AuthenticationPayloadV1 authenticationPayloadV1) {
         String mQRScopes = authenticationPayloadV1.scopes.toLowerCase();
-        mQRScopes = mQRScopes.replace("windows", "scep_creds");
         authenticationPayloadV1.scopes = mQRScopes;
         Intent resultIntent = new Intent();
         resultIntent.putExtra(K_AUTH_REQUEST_MODEL, new Gson().toJson(authenticationPayloadV1));
