@@ -10,7 +10,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 35
         versionCode 1
-        versionName "1.20.80" + "." + getCurrentTimestampHexValue()
+        versionName "1.20.90" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -101,10 +101,10 @@ dependencies {
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation platform('com.google.firebase:firebase-bom:33.12.0')
+    implementation platform('com.google.firebase:firebase-bom:34.7.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.80.69414286'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.20.90.69660287'
 }

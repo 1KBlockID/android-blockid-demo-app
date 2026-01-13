@@ -443,9 +443,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
                             Objects.requireNonNull(scopesMap.get("dl"))).get("documentId"));
                 }
 
-                if (scopesMap.containsKey("scep_creds"))
-                    pScopesMap.put("SCEP : ", scopesMap.get("scep_creds"));
-
                 if (scopesMap.containsKey("creds"))
                     pScopesMap.put("Creds : ", scopesMap.get("creds"));
             }
