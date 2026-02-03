@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import javax.crypto.Cipher;
 public class MainActivity extends AppCompatActivity {
 
     private TextView txtResult, txtProvider;
+    private EditText edtUserName;
     private Executor executor;
     private Button btnPasskeyRegister, btnPasskeyAuthenticate;
 
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         txtResult = findViewById(R.id.txtResult);
         txtProvider = findViewById(R.id.txtProvider);
+        edtUserName = findViewById(R.id.edtUserName);
         txtProvider.setText("Start: \n" + printProvider());
 
         Button btnEncrypt = findViewById(R.id.btnEncrypt);
@@ -68,8 +71,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void passkeyAuthenticate() {
+        String userName = edtUserName.getText().toString();
+
+        if (userName.isEmpty() || userName.length() <= 3) {
+            Toast.makeText(this, "Please enter correct user name", Toast.LENGTH_SHORT).show();
+            return;
+        }
         txtResult.setText("Passkey authenticate in progress...");
-        PasskeyRequest request = new PasskeyRequest(AppConstant.defaultTenant, "pankti@1kosmos.com", null, null);
+        PasskeyRequest request = new PasskeyRequest(AppConstant.defaultTenant, userName, null, null);
         BlockIDSDK.getInstance().issueJWTOnPasskeyAuthentication(this, request, (status, passkeyResponse, errorResponse) -> {
             txtResult.setText("");
             txtProvider.setText("After authenticate passkey:\n" + printProvider());
@@ -86,8 +95,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void passkeyRegister() {
+        String userName = edtUserName.getText().toString();
+        if (userName.isEmpty() || userName.length() <= 3) {
+            Toast.makeText(this, "Please enter correct user name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         txtResult.setText("Passkey registration in progress...");
-        PasskeyRequest request = new PasskeyRequest(AppConstant.defaultTenant, "pankti@1kosmos.com", null, null);
+        PasskeyRequest request = new PasskeyRequest(AppConstant.defaultTenant, userName, null, null);
         BlockIDSDK.getInstance().registerPasskeyWithAccountLinking(this, request,
                 (status, passkeyResponse, errorResponse) -> {
                     txtResult.setText("");

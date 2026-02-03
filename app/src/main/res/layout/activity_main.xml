@@ -20,32 +20,42 @@
         android:id="@+id/btnTenantRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="1Kosmos Tenant Register" />
+
+    <EditText
+        android:id="@+id/edtUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="User Name" />
 
     <Button
         android:id="@+id/btnPasskeyRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="1Kosmos Passkey Register" />
 
     <Button
         android:id="@+id/btnPasskeyAuthenticate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="1Kosmos Passkey Authenticate" />
 
     <Button
         android:id="@+id/btnEncrypt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:text="Encrypt and Save Secure Data" />
 
     <Button
         android:id="@+id/btnDecrypt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:text="Decrypt Secure Data" />
 
     <TextView
