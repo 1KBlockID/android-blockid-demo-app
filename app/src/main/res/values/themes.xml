@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!--    <style name="Theme.BiometricAuthDemo" parent="android:Theme.Material.Light.NoActionBar" />-->
+
+    <style name="Theme.BiometricAuthDemo"
+        parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize if needed -->
+    </style>
+</resources>
