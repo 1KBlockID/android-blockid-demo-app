@@ -16,9 +16,11 @@ import androidx.core.content.ContextCompat;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
 import com.onekosmos.blockid.sdk.passKey.PasskeyRequest;
 
+
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.Security;
+import java.security.Signature;
 import java.util.concurrent.Executor;
 
 import javax.crypto.Cipher;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtUserName;
     private Executor executor;
     private Button btnPasskeyRegister, btnPasskeyAuthenticate;
+    public static final String SIGNATURE_ALG = "SHA256withECDSA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,9 +170,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void encrypt() {
         try {
-            Cipher cipher = BiometricCryptoManager.getEncryptCipher();
+//            Cipher cipher = BiometricCryptoManager.getEncryptCipher();
+            Signature cipher = BiometricCryptoManager.getSignatureForEncrypt();
             authenticate(cipher, true);
         } catch (KeyPermanentlyInvalidatedException e) {
+            Log.d("bhavesh", "encrypt: KeyPermanentlyInvalidatedException" + e.toString());
             recoverFromBiometricChange();
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,9 +190,11 @@ public class MainActivity extends AppCompatActivity {
                 txtResult.setText("No encrypted data found");
                 return;
             }
-            Cipher cipher = BiometricCryptoManager.getDecryptCipher(iv);
+//            Cipher cipher = BiometricCryptoManager.getDecryptCipher(iv);
+            Signature cipher = BiometricCryptoManager.getSignatureForDecrypt();
             authenticate(cipher, false);
         } catch (KeyPermanentlyInvalidatedException e) {
+            Log.d("bhavesh", "decrypt: KeyPermanentlyInvalidatedException"+e.toString());
             recoverFromBiometricChange();
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void authenticate(Cipher cipher, boolean encrypt) {
+    private void authenticate(Signature cipher, boolean encrypt) {
         BiometricPrompt biometricPrompt =
                 new BiometricPrompt(this, executor,
                         new BiometricPrompt.AuthenticationCallback() {
@@ -205,6 +212,12 @@ public class MainActivity extends AppCompatActivity {
                                     BiometricPrompt.AuthenticationResult result) {
                                 try {
                                     Cipher c = result.getCryptoObject().getCipher();
+
+                                    BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
+                                    if (cryptoObject != null && cryptoObject.getSignature() != null) {
+                                        Signature signature = cryptoObject.getSignature();
+                                        signDataWithAuthenticatedSignature(signature);
+                                    }
                                     if (encrypt) {
                                         String secret = "USER_SESSION_TOKEN";
                                         byte[] encrypted = c.doFinal(
@@ -252,10 +265,28 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButtonText("Cancel")
                         .build();
 
+//        final Signature signature = Signature.getInstance(SIGNATURE_ALG);
+//        signature.initSign(cipher);
+
         biometricPrompt.authenticate(
                 promptInfo,
                 new BiometricPrompt.CryptoObject(cipher)
         );
+    }
+
+    private void signDataWithAuthenticatedSignature(Signature signature) {
+        try {
+            byte[] dataToSign = "Sensitive data".getBytes();
+            signature.update(dataToSign);
+            byte[] signedData = signature.sign();
+
+            String signedBase64 = android.util.Base64.encodeToString(
+                    signedData, android.util.Base64.DEFAULT);
+            Log.d("BiometricAuth", "Signed data: " + signedBase64);
+
+        } catch (Exception e) {
+            Log.e("BiometricAuth", "Signing failed: " + e.getMessage());
+        }
     }
 
     public static String printProvider() {

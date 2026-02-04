@@ -2,7 +2,6 @@ package com.example.biometricauthdemo;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Base64;
 
 public class SecureStorage {
