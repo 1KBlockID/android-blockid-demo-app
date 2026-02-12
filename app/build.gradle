@@ -3,12 +3,12 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         namespace "com.onekosmos.blockidsample"
         applicationId "com.onekosmos.blockid.poc"
         minSdkVersion 26
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
         versionName "1.30.00" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -106,5 +106,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.00.698A10DC'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.00.698DEB36'
 }
