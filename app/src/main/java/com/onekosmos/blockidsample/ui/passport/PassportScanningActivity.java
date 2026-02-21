@@ -7,6 +7,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -43,8 +44,10 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
+import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
+import com.onekosmos.blockidsample.util.IDPErrorCode;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONObject;
@@ -187,8 +190,8 @@ public class PassportScanningActivity extends AppCompatActivity {
         try {
             JSONObject dataObject = new JSONObject(data);
 
-            responseStatus = dataObject.has("responseStatus") ?
-                    dataObject.getString("responseStatus") : null;
+            responseStatus = dataObject.has("sessionResult") ?
+                    dataObject.getString("sessionResult") : null;
 
             if (TextUtils.isEmpty(responseStatus) ||
                     responseStatus.equalsIgnoreCase(K_EXPIRED)) {
@@ -217,7 +220,7 @@ public class PassportScanningActivity extends AppCompatActivity {
             // responseStatus is empty or not success
             if (TextUtils.isEmpty(responseStatus) ||
                     !responseStatus.equalsIgnoreCase("SUCCESS")) {
-                ppScanFailed();
+                handleErrorResponse(dataObject);
                 return;
             }
 
@@ -229,8 +232,19 @@ public class PassportScanningActivity extends AppCompatActivity {
                 return;
             }
 
-            pptObject = dataObject.has("ppt_object") ?
-                    dataObject.getString("ppt_object") : null;
+            // Detect what document type was actually scanned
+            String detectedDocType = detectActualDocumentType(dataObject);
+
+            // CASE II: User chose PPT but scanned something else (DL or other)
+            if (detectedDocType != null && !getDocumentScannerType(detectedDocType).getValue()
+                    .equalsIgnoreCase(DocumentScannerType.PPT.getValue())) {
+                showWrongDocumentTypeError();
+                return;
+            }
+
+
+            pptObject = dataObject.has("document") ?
+                    dataObject.getString("document") : null;
 
             // ppt object is empty
             if (TextUtils.isEmpty(pptObject)) {
@@ -414,5 +428,136 @@ public class PassportScanningActivity extends AppCompatActivity {
                     errorDialog.dismiss();
                     finish();
                 });
+    }
+
+    /**
+     * Handle error response from API when sessionResult is not SUCCESS
+     * Parses errorInfo and reasonCode to show user-friendly messages using IDPErrorCode
+     *
+     * @param dataObject JSON object from API response
+     */
+    private void handleErrorResponse(JSONObject dataObject) {
+        try {
+            String errorCode = null;
+            String errorMessage = null;
+
+            // Try to extract error information from the response
+            if (dataObject.has("errorInfo")) {
+                JSONObject errorInfo = dataObject.getJSONObject("errorInfo");
+                if (errorInfo.has("reasonCode")) {
+                    errorCode = errorInfo.getString("reasonCode");
+                }
+                if (errorInfo.has("message")) {
+                    errorMessage = errorInfo.getString("message");
+                }
+            }
+
+            // If we have a valid IDP error code, use the user-friendly message
+            if (errorCode != null && IDPErrorCode.isValidCode(errorCode)) {
+                String userMessage = IDPErrorCode.getUserMessageFromCode(errorCode);
+                showErrorDialog(userMessage);
+            } else {
+                // EDGE CASE: If error code doesn't exist or doesn't match, show generic message
+                showErrorDialog("We couldn't complete the verification of the document. Please try again.");
+            }
+        } catch (Exception e) {
+            // Fallback to generic error
+            showErrorDialog("We couldn't complete the verification of the document. Please try again.");
+        }
+    }
+
+    /**
+     * Show error dialog with custom message and navigate to My Identity on dismiss
+     *
+     * @param message Error message to display
+     */
+    private void showErrorDialog(String message) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null,
+                getString(R.string.label_error),
+                message,
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
+    }
+
+    /**
+     * Detect actual document type from API response
+     *
+     * @param dataObject JSON object from API response
+     * @return Detected document type or null
+     */
+    private String detectActualDocumentType(JSONObject dataObject) {
+        try {
+            // Check if document object exists
+            if (dataObject.has("document")) {
+                JSONObject documentObj = dataObject.getJSONObject("document");
+
+                // Get documentType field from document object
+                if (documentObj.has("documentType")) {
+                    String docType = documentObj.getString("documentType");
+
+                    // Map documentType to scanner type
+                    if ("DL".equalsIgnoreCase(docType)) {
+                        return DocumentScannerType.DL.getValue();
+                    } else if ("PPT".equalsIgnoreCase(docType)) {
+                        return DocumentScannerType.PPT.getValue();
+                    } else if ("IDCARD".equalsIgnoreCase(docType)) {
+                        return IDCARD.getValue();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * Show error when wrong document type is scanned (CASE I & II)
+     * Used when user chooses DL but scans PPT/other, or chooses PPT but scans DL/other
+     */
+    private void showWrongDocumentTypeError() {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithOneButton(
+                null,
+                getString(R.string.label_error),
+                "Scan Failed. Please scan a valid document.",
+                getString(R.string.label_ok),
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                }
+        );
+    }
+
+    public enum DocType {
+        DL("DL"),
+        PPT("PASSPORT"),
+        NID("");
+        private final String docType;
+
+        private DocType(String var3) {
+            this.docType = var3;
+        }
+
+        public String getValue() {
+            return this.docType;
+        }
+    }
+
+    /**
+     * Get DocumentScannerType based on document type
+     *
+     * @return string value of text
+     */
+    private DocumentScannerType getDocumentScannerType(String documentType) {
+        if (documentType.equalsIgnoreCase(DriverLicenseScanActivity.DocType.DL.getValue()))
+            return DocumentScannerType.DL;
+        else if (documentType.equalsIgnoreCase(DriverLicenseScanActivity.DocType.PPT.getValue()))
+            return DocumentScannerType.PPT;
+        else
+            return IDCARD;
     }
 }
