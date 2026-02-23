@@ -7,6 +7,7 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.DL;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
 
 import android.Manifest;
@@ -44,7 +45,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
-import com.onekosmos.blockidsample.ui.driverLicense.DriverLicenseScanActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.IDPErrorCode;
@@ -499,11 +499,11 @@ public class PassportScanningActivity extends AppCompatActivity {
                     String docType = documentObj.getString("documentType");
 
                     // Map documentType to scanner type
-                    if ("DL".equalsIgnoreCase(docType)) {
-                        return DocumentScannerType.DL.getValue();
-                    } else if ("PPT".equalsIgnoreCase(docType)) {
+                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
+                        return DL.getValue();
+                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
                         return DocumentScannerType.PPT.getValue();
-                    } else if ("IDCARD".equalsIgnoreCase(docType)) {
+                    } else {
                         return IDCARD.getValue();
                     }
                 }
@@ -534,8 +534,7 @@ public class PassportScanningActivity extends AppCompatActivity {
 
     public enum DocType {
         DL("DL"),
-        PPT("PASSPORT"),
-        NID("");
+        PPT("PASSPORT");
         private final String docType;
 
         private DocType(String var3) {
@@ -553,9 +552,9 @@ public class PassportScanningActivity extends AppCompatActivity {
      * @return string value of text
      */
     private DocumentScannerType getDocumentScannerType(String documentType) {
-        if (documentType.equalsIgnoreCase(DriverLicenseScanActivity.DocType.DL.getValue()))
+        if (documentType.equalsIgnoreCase(DocType.DL.getValue()))
             return DocumentScannerType.DL;
-        else if (documentType.equalsIgnoreCase(DriverLicenseScanActivity.DocType.PPT.getValue()))
+        else if (documentType.equalsIgnoreCase(DocType.PPT.getValue()))
             return DocumentScannerType.PPT;
         else
             return IDCARD;

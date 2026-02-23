@@ -42,7 +42,6 @@ import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.ui.nationalID.NationalIDScanActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
 import com.onekosmos.blockidsample.util.IDPErrorCode;
@@ -528,11 +527,11 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                     String docType = documentObj.getString("documentType");
 
                     // Map documentType to scanner type
-                    if ("DL".equalsIgnoreCase(docType)) {
+                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
                         return DocumentScannerType.DL.getValue();
-                    } else if ("PPT".equalsIgnoreCase(docType)) {
+                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
                         return PPT.getValue();
-                    } else if ("IDCARD".equalsIgnoreCase(docType)) {
+                    } else {
                         return IDCARD.getValue();
                     }
                 }
@@ -563,8 +562,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
 
     public enum DocType {
         DL("DL"),
-        PPT("PASSPORT"),
-        NID("");
+        PPT("PASSPORT");
         private final String docType;
 
         private DocType(String var3) {

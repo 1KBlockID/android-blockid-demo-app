@@ -448,11 +448,11 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     String docType = documentObj.getString("documentType");
 
                     // Map documentType to scanner type
-                    if ("DL".equalsIgnoreCase(docType)) {
+                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
                         return DL.getValue();
-                    } else if ("PPT".equalsIgnoreCase(docType)) {
+                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
                         return PPT.getValue();
-                    } else if ("IDCARD".equalsIgnoreCase(docType)) {
+                    } else {
                         return IDCARD.getValue();
                     }
                 }
@@ -859,8 +859,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
 
     public enum DocType {
         DL("DL"),
-        PPT("PASSPORT"),
-        NID("");
+        PPT("PASSPORT");
         private final String docType;
 
         private DocType(String var3) {
