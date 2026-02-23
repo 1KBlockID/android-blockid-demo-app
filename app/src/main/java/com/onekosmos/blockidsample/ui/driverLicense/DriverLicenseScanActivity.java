@@ -483,14 +483,17 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             // If we have a valid IDP error code, use the user-friendly message
             if (errorCode != null && IDPErrorCode.isValidCode(errorCode)) {
                 String userMessage = IDPErrorCode.getUserMessageFromCode(errorCode);
-                showErrorDialog(userMessage);
+                if (TextUtils.isEmpty(userMessage))
+                    showErrorDialog(errorMessage);
+                else
+                    showErrorDialog(userMessage);
             } else {
                 // EDGE CASE: If error code doesn't exist or doesn't match, show generic message
-                showErrorDialog("We couldn't complete the verification of the document. Please try again.");
+                showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
             }
         } catch (Exception e) {
             // Fallback to generic error
-            showErrorDialog("We couldn't complete the verification of the document. Please try again.");
+            showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
         }
     }
 
@@ -551,7 +554,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         errorDialog.showWithOneButton(
                 null,
                 getString(R.string.label_error),
-                "Scan Failed. Please scan a valid document.",
+                getString(R.string.label_scan_failed_please_scan_a_valid_document),
                 getString(R.string.label_ok),
                 dialog -> {
                     errorDialog.dismiss();

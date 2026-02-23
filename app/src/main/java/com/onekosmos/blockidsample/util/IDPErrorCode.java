@@ -8,7 +8,7 @@ package com.onekosmos.blockidsample.util;
  */
 public enum IDPErrorCode {
     IDV0001("IDV0001", "Image quality check failed",
-            "Scan Failed. Please check the surrounding and try scanning again."),
+            "Scan Failed. Please check the surroundings and try scanning again."),
 
     IDV0002("IDV0002", "Verification partially completed",
             "We couldn't complete the verification of the document. Please try again."),
@@ -114,16 +114,5 @@ public enum IDPErrorCode {
      */
     public static boolean isValidCode(String code) {
         return fromCode(code) != UNKNOWN;
-    }
-
-    /**
-     * Check if error code indicates wrong document type
-     *
-     * @param code Error code string
-     * @return true if error is related to wrong document type
-     */
-    public static boolean isWrongDocumentType(String code) {
-        IDPErrorCode errorCode = fromCode(code);
-        return errorCode == IDV0005 || errorCode == IDV0006 || errorCode == IDV0015;
     }
 }
