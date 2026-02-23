@@ -568,8 +568,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         PPT("PASSPORT");
         private final String docType;
 
-        private DocType(String var3) {
-            this.docType = var3;
+        private DocType(String documentType) {
+            this.docType = documentType;
         }
 
         public String getValue() {
