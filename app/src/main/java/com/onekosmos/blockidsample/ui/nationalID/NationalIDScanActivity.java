@@ -246,10 +246,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
             // CASE III: Handle cross-document detection for National ID
             // If DL or Passport detected while scanning National ID
             if (detectedDocType != null &&
-                    (getDocumentScannerType(detectedDocType).getValue()
-                            .equalsIgnoreCase(DL.getValue()) ||
-                            getDocumentScannerType(detectedDocType).getValue()
-                                    .equalsIgnoreCase(PPT.getValue()))) {
+                    (detectedDocType.equalsIgnoreCase(DocType.DL.getValue()) ||
+                            detectedDocType.equalsIgnoreCase(DocType.PPT.getValue()))) {
                 handleCrossDocumentDetection(detectedDocType, dataObject);
                 return;
             }
@@ -571,7 +569,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
             }
 
             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-            mNationalIDMap = gson.fromJson(documentObject,
+            mDocumentMap = gson.fromJson(documentObject,
                     new TypeToken<LinkedHashMap<String, Object>>() {
                     }.getType());
 
@@ -684,7 +682,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private void handleErrorResponse(JSONObject dataObject) {
         try {
             String errorCode = null;
-            String errorMessage = null;
 
             // Try to extract error information from the response
             if (dataObject.has("errorInfo")) {
@@ -692,16 +689,13 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 if (errorInfo.has("reasonCode")) {
                     errorCode = errorInfo.getString("reasonCode");
                 }
-                if (errorInfo.has("message")) {
-                    errorMessage = errorInfo.getString("message");
-                }
             }
 
             // If we have a valid IDP error code, use the user-friendly message
             if (errorCode != null && IDVErrorCode.isValidCode(errorCode)) {
                 String userMessage = IDVErrorCode.getUserMessageFromCode(errorCode);
                 if (TextUtils.isEmpty(userMessage))
-                    showErrorDialog(errorMessage);
+                    showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
                 else
                     showErrorDialog(userMessage);
             } else {
@@ -721,9 +715,10 @@ public class NationalIDScanActivity extends AppCompatActivity {
      */
     private void showErrorDialog(String message) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.show(null,
+        errorDialog.showWithOneButton(null,
                 getString(R.string.label_error),
                 message,
+                getString(R.string.label_ok),
                 dialog -> {
                     errorDialog.dismiss();
                     finish();

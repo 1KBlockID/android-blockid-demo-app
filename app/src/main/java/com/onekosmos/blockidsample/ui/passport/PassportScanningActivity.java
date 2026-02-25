@@ -439,7 +439,6 @@ public class PassportScanningActivity extends AppCompatActivity {
     private void handleErrorResponse(JSONObject dataObject) {
         try {
             String errorCode = null;
-            String errorMessage = null;
 
             // Try to extract error information from the response
             if (dataObject.has("errorInfo")) {
@@ -447,16 +446,13 @@ public class PassportScanningActivity extends AppCompatActivity {
                 if (errorInfo.has("reasonCode")) {
                     errorCode = errorInfo.getString("reasonCode");
                 }
-                if (errorInfo.has("message")) {
-                    errorMessage = errorInfo.getString("message");
-                }
             }
 
             // If we have a valid IDP error code, use the user-friendly message
             if (errorCode != null && IDVErrorCode.isValidCode(errorCode)) {
                 String userMessage = IDVErrorCode.getUserMessageFromCode(errorCode);
                 if (TextUtils.isEmpty(userMessage))
-                    showErrorDialog(errorMessage);
+                    showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
                 else
                     showErrorDialog(userMessage);
             } else {
@@ -478,9 +474,10 @@ public class PassportScanningActivity extends AppCompatActivity {
      */
     private void showErrorDialog(String message) {
         ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.show(null,
+        errorDialog.showWithOneButton(null,
                 getString(R.string.label_error),
                 message,
+                getString(R.string.label_ok),
                 dialog -> {
                     errorDialog.dismiss();
                     finish();
