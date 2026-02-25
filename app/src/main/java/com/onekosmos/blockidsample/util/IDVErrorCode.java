@@ -82,7 +82,7 @@ public enum IDVErrorCode {
      * @return User-friendly message
      */
     public static String getUserMessageFromCode(String code) {
-        return fromCode(code).getUserMessage();
+        return fromCode(code).getUserMessage() + "[" + code + "]";
     }
 
     /**
