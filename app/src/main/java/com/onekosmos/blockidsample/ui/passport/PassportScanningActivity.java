@@ -47,7 +47,7 @@ import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.document.DocumentHolder;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
-import com.onekosmos.blockidsample.util.IDPErrorCode;
+import com.onekosmos.blockidsample.util.IDVErrorCode;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONObject;
@@ -453,8 +453,8 @@ public class PassportScanningActivity extends AppCompatActivity {
             }
 
             // If we have a valid IDP error code, use the user-friendly message
-            if (errorCode != null && IDPErrorCode.isValidCode(errorCode)) {
-                String userMessage = IDPErrorCode.getUserMessageFromCode(errorCode);
+            if (errorCode != null && IDVErrorCode.isValidCode(errorCode)) {
+                String userMessage = IDVErrorCode.getUserMessageFromCode(errorCode);
                 if (TextUtils.isEmpty(userMessage))
                     showErrorDialog(errorMessage);
                 else
