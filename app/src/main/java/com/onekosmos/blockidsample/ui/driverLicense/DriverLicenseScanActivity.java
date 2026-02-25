@@ -7,7 +7,6 @@ import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
-import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.PPT;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -524,20 +523,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
 
                 // Get documentType field from document object
                 if (documentObj.has("documentType")) {
-                    String docType = documentObj.getString("documentType");
-
-                    // Map documentType to scanner type
-                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
-                        return DocumentScannerType.DL.getValue();
-                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
-                        return PPT.getValue();
-                    } else {
-                        return IDCARD.getValue();
-                    }
+                    return documentObj.getString("documentType");
+                } else {
+                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
                 }
+            } else {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
             }
         } catch (Exception e) {
-            return null;
+            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
         }
         return null;
     }
@@ -565,7 +559,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         PPT("PASSPORT");
         private final String docType;
 
-        private DocType(String documentType) {
+        DocType(String documentType) {
             this.docType = documentType;
         }
 

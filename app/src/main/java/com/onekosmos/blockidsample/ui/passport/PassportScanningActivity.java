@@ -7,7 +7,6 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
-import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.DL;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
 
 import android.Manifest;
@@ -498,20 +497,15 @@ public class PassportScanningActivity extends AppCompatActivity {
 
                 // Get documentType field from document object
                 if (documentObj.has("documentType")) {
-                    String docType = documentObj.getString("documentType");
-
-                    // Map documentType to scanner type
-                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
-                        return DL.getValue();
-                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
-                        return DocumentScannerType.PPT.getValue();
-                    } else {
-                        return IDCARD.getValue();
-                    }
+                    return documentObj.getString("documentType");
+                } else {
+                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
                 }
+            } else {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
             }
         } catch (Exception e) {
-            return null;
+            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
         }
         return null;
     }

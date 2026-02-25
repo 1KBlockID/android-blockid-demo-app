@@ -443,20 +443,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
 
                 // Get documentType field from document object
                 if (documentObj.has("documentType")) {
-                    String docType = documentObj.getString("documentType");
-
-                    // Map documentType to scanner type
-                    if (DocType.DL.getValue().equalsIgnoreCase(docType)) {
-                        return DL.getValue();
-                    } else if (DocType.PPT.getValue().equalsIgnoreCase(docType)) {
-                        return PPT.getValue();
-                    } else {
-                        return IDCARD.getValue();
-                    }
+                    return documentObj.getString("documentType");
+                } else {
+                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
                 }
+            } else {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
             }
         } catch (Exception e) {
-            return null;
+            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
         }
         return null;
     }
@@ -474,9 +469,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
         String message;
 
         if (detectedType.equalsIgnoreCase(DL.getValue())) {
-            documentName = "Drivers License";
-            title = "Drivers License Identified";
-            message = "We identified that you have scanned a Drivers License. Do you want to register the Drivers License in this application?";
+            documentName = getString(R.string.label_drivers_license);
+            title = getString(R.string.label_drivers_license_identified);
+            message = getString(R.string.label_we_identified_that_you_have_scanned_a_drivers_license_do_you_want_to_register_the_drivers_license_in_this_application);
 
             // Check if DL is already enrolled
             if (isDocumentEnrolled(RegisterDocType.DL.getValue())) {
@@ -484,9 +479,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 return;
             }
         } else if (detectedType.equalsIgnoreCase(PPT.getValue())) {
-            documentName = "Passport";
-            title = "Passport Identified";
-            message = "We identified that you have scanned a Passport. Do you want to register the Passport in this application?";
+            documentName = getString(R.string.label_passport);
+            title = getString(R.string.label_passport_identified);
+            message = getString(R.string.label_we_identified_that_you_have_scanned_a_passport_do_you_want_to_register_the_passport_in_this_application);
 
             // Check if Passport is already enrolled
             if (isDocumentEnrolled(RegisterDocType.PPT.getValue())) {
