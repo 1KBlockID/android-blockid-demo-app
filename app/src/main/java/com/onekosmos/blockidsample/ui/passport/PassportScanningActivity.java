@@ -7,7 +7,6 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.PPT;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
-import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -66,7 +65,7 @@ public class PassportScanningActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mPassportMap;
     private boolean isDeviceHasNfc, isRegistrationInProgress;
-    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_LIVEID_OBJECT = "liveId";
     private static final String K_FACE = "face";
     private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
@@ -230,17 +229,6 @@ public class PassportScanningActivity extends AppCompatActivity {
                 ppScanFailed();
                 return;
             }
-
-            // Detect what document type was actually scanned
-            String detectedDocType = detectActualDocumentType(dataObject);
-
-            // CASE II: User chose PPT but scanned something else (DL or other)
-            if (detectedDocType != null && !getDocumentScannerType(detectedDocType).getValue()
-                    .equalsIgnoreCase(DocumentScannerType.PPT.getValue())) {
-                showWrongDocumentTypeError();
-                return;
-            }
-
 
             pptObject = dataObject.has("document") ?
                     dataObject.getString("document") : null;
@@ -481,78 +469,5 @@ public class PassportScanningActivity extends AppCompatActivity {
                     errorDialog.dismiss();
                     finish();
                 });
-    }
-
-    /**
-     * Detect actual document type from API response
-     *
-     * @param dataObject JSON object from API response
-     * @return Detected document type or null
-     */
-    private String detectActualDocumentType(JSONObject dataObject) {
-        try {
-            // Check if document object exists
-            if (dataObject.has("document")) {
-                JSONObject documentObj = dataObject.getJSONObject("document");
-
-                // Get documentType field from document object
-                if (documentObj.has("documentType")) {
-                    return documentObj.getString("documentType");
-                } else {
-                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
-                }
-            } else {
-                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
-            }
-        } catch (Exception e) {
-            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
-        }
-        return null;
-    }
-
-    /**
-     * Show error when wrong document type is scanned (CASE I & II)
-     * Used when user chooses DL but scans PPT/other, or chooses PPT but scans DL/other
-     */
-    private void showWrongDocumentTypeError() {
-        ErrorDialog errorDialog = new ErrorDialog(this);
-        errorDialog.showWithOneButton(
-                null,
-                getString(R.string.label_error),
-                getString(R.string.label_scan_failed_please_scan_a_valid_document),
-                getString(R.string.label_ok),
-                dialog -> {
-                    errorDialog.dismiss();
-                    finish();
-                }
-        );
-    }
-
-    public enum DocType {
-        DL("DL"),
-        PPT("PASSPORT");
-        private final String docType;
-
-        private DocType(String documentType) {
-            this.docType = documentType;
-        }
-
-        public String getValue() {
-            return this.docType;
-        }
-    }
-
-    /**
-     * Get DocumentScannerType based on document type
-     *
-     * @return string value of text
-     */
-    private DocumentScannerType getDocumentScannerType(String documentType) {
-        if (documentType.equalsIgnoreCase(DocType.DL.getValue()))
-            return DocumentScannerType.DL;
-        else if (documentType.equalsIgnoreCase(DocType.PPT.getValue()))
-            return DocumentScannerType.PPT;
-        else
-            return IDCARD;
     }
 }

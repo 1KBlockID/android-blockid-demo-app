@@ -5,7 +5,7 @@ import androidx.annotation.Keep;
 /**
  * @author Gaurav Rane. Created on 18/02/2026.
  * Copyright © 2026 1Kosmos. All rights reserved.
- * Enum for IDP (Identity Proofing) error codes and their corresponding user-friendly messages
+ * Enum for IDV (Identity Verification) error codes and their corresponding user-friendly messages
  * Used in Document Scanner Activity to handle various document verification errors
  */
 @Keep
@@ -57,10 +57,10 @@ public enum IDVErrorCode {
     }
 
     /**
-     * Get IDPErrorCode from error code string
+     * Get IDVErrorCode from error code string
      *
      * @param code Error code string (e.g., "IDV0001")
-     * @return Corresponding IDPErrorCode enum, or UNKNOWN if not found
+     * @return Corresponding IDVErrorCode enum, or UNKNOWN if not found
      */
     public static IDVErrorCode fromCode(String code) {
         if (code == null || code.isEmpty()) {

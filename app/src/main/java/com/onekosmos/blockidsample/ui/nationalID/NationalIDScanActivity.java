@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -74,7 +75,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mNationalIDMap, mDocumentMap;
     private boolean isRegistrationInProgress, isDeviceHasNfc;
-    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_LIVEID_OBJECT = "liveId";
     private static final String K_FACE = "face";
     private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
@@ -92,6 +93,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
                             finish();
                         }
                     });
+
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -240,20 +242,6 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 return;
             }
 
-            // Detect what document type was actually scanned
-            String detectedDocType = detectActualDocumentType(dataObject);
-
-            // CASE III: Handle cross-document detection for National ID
-            // If DL or Passport detected while scanning National ID
-            if (detectedDocType != null &&
-                    (detectedDocType.equalsIgnoreCase(DocType.DL.getValue()) ||
-                            detectedDocType.equalsIgnoreCase(DocType.PPT.getValue()))) {
-                handleCrossDocumentDetection(detectedDocType, dataObject);
-                return;
-            }
-            // If other document type detected (not DL, not PPT, not IDCARD), continue as normal
-            // The API will handle validation and show appropriate error if needed
-
             idCardObject = dataObject.has("document") ?
                     dataObject.getString("document") : null;
 
@@ -262,6 +250,21 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 nidScanFailed();
                 return;
             }
+
+            // Detect what document type was actually scanned
+            String detectedDocType = detectActualDocumentType(dataObject);
+
+            // CASE III: Handle cross-document detection for National ID
+            // If DL or Passport detected while scanning National ID
+            if (detectedDocType != null &&
+                    (detectedDocType.equalsIgnoreCase(DetectedDocType.DL.getValue()) ||
+                            detectedDocType.equalsIgnoreCase(DetectedDocType.PPT.getValue()))) {
+                handleCrossDocumentDetection(detectedDocType, dataObject);
+                return;
+            }
+
+            // If other document type detected (not DL, not PPT, not IDCARD), continue as normal
+            // The API will handle validation and show appropriate error if needed
 
             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
             mNationalIDMap = gson.fromJson(idCardObject,
@@ -468,7 +471,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
         String title;
         String message;
 
-        if (detectedType.equalsIgnoreCase(DL.getValue())) {
+        if (detectedType.equalsIgnoreCase(DetectedDocType.DL.getValue())) {
             documentName = getString(R.string.label_drivers_license);
             title = getString(R.string.label_drivers_license_identified);
             message = getString(R.string.label_we_identified_that_you_have_scanned_a_drivers_license_do_you_want_to_register_the_drivers_license_in_this_application);
@@ -478,7 +481,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 showDocumentAlreadyEnrolledError(documentName);
                 return;
             }
-        } else if (detectedType.equalsIgnoreCase(PPT.getValue())) {
+        } else if (detectedType.equalsIgnoreCase(DetectedDocType.PPT.getValue())) {
             documentName = getString(R.string.label_passport);
             title = getString(R.string.label_passport_identified);
             message = getString(R.string.label_we_identified_that_you_have_scanned_a_passport_do_you_want_to_register_the_passport_in_this_application);
@@ -850,16 +853,17 @@ public class NationalIDScanActivity extends AppCompatActivity {
         }
     }
 
-    public enum DocType {
+    @Keep
+    private enum DetectedDocType {
         DL("DL"),
         PPT("PASSPORT");
         private final String docType;
 
-        private DocType(String documentType) {
+        DetectedDocType(String documentType) {
             this.docType = documentType;
         }
 
-        public String getValue() {
+        private String getValue() {
             return this.docType;
         }
     }
@@ -870,9 +874,9 @@ public class NationalIDScanActivity extends AppCompatActivity {
      * @return string value of text
      */
     private DocumentScannerType getDocumentScannerType(String documentType) {
-        if (documentType.equalsIgnoreCase(DocType.DL.getValue()))
+        if (documentType.equalsIgnoreCase(DetectedDocType.DL.getValue()))
             return DocumentScannerType.DL;
-        else if (documentType.equalsIgnoreCase(DocType.PPT.getValue()))
+        else if (documentType.equalsIgnoreCase(DetectedDocType.PPT.getValue()))
             return DocumentScannerType.PPT;
         else
             return IDCARD;
