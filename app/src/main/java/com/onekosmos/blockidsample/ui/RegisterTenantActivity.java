@@ -10,7 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -34,9 +35,20 @@ import com.onekosmos.blockidsample.util.ResetSDKMessages;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class RegisterTenantActivity extends AppCompatActivity {
-    private static int RESTORE_REQUEST_CODE = 1001;
     private ConstraintLayout mLayoutAuth;
     private AppCompatButton mBtnRegisterTenant, mBtnRestore, mBtnDeviceAuth;
+
+    private final ActivityResultLauncher<Intent> restoreAccountLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            updateAuthUi();
+                        } else {
+                            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey, 
+                                    AppConstant.defaultTenant,
+                                    ResetSDKMessages.ACCOUNT_RESTORATION_FAILED.getMessage());
+                        }
+                    });
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -128,18 +140,6 @@ public class RegisterTenantActivity extends AppCompatActivity {
 
     private void restoreAccount() {
         Intent restoreIntent = new Intent(this, RestoreAccountActivity.class);
-        startActivityForResult(restoreIntent, RESTORE_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESTORE_REQUEST_CODE && resultCode == RESULT_OK) {
-            updateAuthUi();
-        } else {
-            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey, AppConstant.defaultTenant,
-                    ResetSDKMessages.ACCOUNT_RESTORATION_FAILED.getMessage());
-        }
+        restoreAccountLauncher.launch(restoreIntent);
     }
 }

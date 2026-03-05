@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -115,6 +116,16 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         initView();
         mUID = getIntent().getStringExtra(K_UID);
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isRegistrationInProgress) {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -139,21 +150,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!isRegistrationInProgress)
-            super.onBackPressed();
-    }
-
     /**
      * Initialize UI Object
      */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(v -> onBackPressed());
+        mTxtBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     /**

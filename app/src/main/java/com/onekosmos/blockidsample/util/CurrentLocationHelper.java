@@ -2,28 +2,25 @@ package com.onekosmos.blockidsample.util;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Bundle;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.Task;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -32,12 +29,10 @@ import java.util.Date;
  * Created by 1Kosmos Engineering
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
-public class CurrentLocationHelper implements
-        LocationListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class CurrentLocationHelper {
 
-    private GoogleApiClient mGoogleApiClient;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
     private String TAG = "CurrentLocationHelper";
     private LocationRequest mLocationRequest;
     private static final long INTERVAL = 1000 * 10;
@@ -49,93 +44,91 @@ public class CurrentLocationHelper implements
 
     public CurrentLocationHelper(Activity activity) {
         this.activity = activity;
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    onLocationChanged(location);
+                }
+            }
+        };
     }
 
     public void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(INTERVAL);
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     public boolean isGooglePlayServicesAvailable() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
-        if (ConnectionResult.SUCCESS == status) {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int status = googleApiAvailability.isGooglePlayServicesAvailable(activity);
+        if (status == ConnectionResult.SUCCESS) {
             return true;
         } else {
-            GooglePlayServicesUtil.getErrorDialog(status, activity, 0).show();
+            if (googleApiAvailability.isUserResolvableError(status)) {
+                googleApiAvailability.getErrorDialog(activity, status, 0).show();
+            }
             return false;
         }
     }
 
-    public GoogleApiClient getGoogleApiClient(Context context) {
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        return mGoogleApiClient;
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        startLocationUpdates();
-    }
-
+    /**
+     * Start location updates
+     * Call this method after permissions are granted
+     */
     public void startLocationUpdates() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
-        builder.setAlwaysShow(true);
-        builder.setNeedBle(false);
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi
-                        .checkLocationSettings(mGoogleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+        if (mLocationRequest == null) {
+            createLocationRequest();
+        }
 
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied.
-                        // But could be fixed by showing the user a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            // Ask to turn on GPS automatically
-                            status.startResolutionForResult(activity,
-                                    REQUEST_CHECK_SETTINGS_GPS);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied.
-                        // However, we have no way
-                        // to fix the
-                        // settings so we won't show the dialog.
-                        // finish();
-                        break;
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(activity);
+        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(activity, locationSettingsResponse -> {
+            // Location settings are satisfied, start location updates
+            requestLocationUpdates();
+        });
+
+        task.addOnFailureListener(activity, e -> {
+            // Location settings are not satisfied
+            if (e instanceof com.google.android.gms.common.api.ResolvableApiException) {
+                try {
+                    // Show the dialog by calling startResolutionForResult()
+                    com.google.android.gms.common.api.ResolvableApiException resolvable =
+                            (com.google.android.gms.common.api.ResolvableApiException) e;
+                    resolvable.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS_GPS);
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error
                 }
             }
         });
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    }
+
+    /**
+     * Request location updates from FusedLocationProviderClient
+     */
+    private void requestLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) 
+                != PackageManager.PERMISSION_GRANTED 
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) 
+                != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, 
+                Looper.getMainLooper());
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
+    private void onLocationChanged(Location location) {
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         getLocation();
@@ -150,9 +143,8 @@ public class CurrentLocationHelper implements
     }
 
     public void stopLocationUpdates() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(
-                    mGoogleApiClient, this);
+        if (mFusedLocationClient != null && mLocationCallback != null) {
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
     }
 }

@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
+import androidx.security.crypto.MasterKey;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -26,10 +26,14 @@ public class SharedPreferenceUtil {
     public static void initialize(Context context) {
         if (mSharedPreferences == null) {
             try {
+                MasterKey masterKey = new MasterKey.Builder(context)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build();
+
                 mSharedPreferences = EncryptedSharedPreferences.create(
-                        context.getPackageName(),
-                        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
                         context,
+                        context.getPackageName(),
+                        masterKey,
                         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
             } catch (GeneralSecurityException | IOException e) {

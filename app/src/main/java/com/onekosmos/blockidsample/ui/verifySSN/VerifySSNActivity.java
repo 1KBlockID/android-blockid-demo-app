@@ -27,6 +27,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -113,6 +114,19 @@ public class VerifySSNActivity extends AppCompatActivity {
         String dlDob = returnDataFromEnrolledDocument("dob");
         mBirthDate.setText(changeDateFormat(dlDob, requiredDateFormat, displayDateFormat));
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (mWebLayout.getVisibility() == View.VISIBLE) {
+                    mScrollView.setVisibility(View.VISIBLE);
+                    mWebLayout.setVisibility(View.GONE);
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+
         mConsentCB.setOnClickListener(v -> {
             if (!mConsentCB.isChecked()) {
                 mContinueBtn.setBackgroundColor(getColor(android.R.color.darker_gray));
@@ -123,9 +137,9 @@ public class VerifySSNActivity extends AppCompatActivity {
             }
         });
         mContinueBtn.setOnClickListener(v -> validateAndVerifySSN());
-        mBackBtn.setOnClickListener(v -> onBackPressed());
-        mBackText.setOnClickListener(v -> onBackPressed());
-        mBackTextWebView.setOnClickListener(v -> onBackPressed());
+        mBackBtn.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        mBackText.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        mBackTextWebView.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         mWebShareButton.setOnClickListener(v -> {
             checkStoragePermission();
         });
@@ -133,16 +147,6 @@ public class VerifySSNActivity extends AppCompatActivity {
             mScrollView.setVisibility(View.VISIBLE);
             mWebLayout.setVisibility(View.GONE);
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mWebLayout.getVisibility() == View.VISIBLE) {
-            mScrollView.setVisibility(View.VISIBLE);
-            mWebLayout.setVisibility(View.GONE);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     private void validateAndVerifySSN() {

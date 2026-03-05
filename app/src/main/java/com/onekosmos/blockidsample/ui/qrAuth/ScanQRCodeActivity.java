@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -57,6 +58,14 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
 
         setContentView(R.layout.activity_scan_qrcode);
         initView();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -90,13 +99,6 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
-    @Override
     public void onQRScanResultResponse(String qrCodeData) {
         mQRScannerHelper.stopQRScanning();
         runOnUiThread(() -> onQRCodeScanResponse(qrCodeData));
@@ -115,7 +117,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements IOnQRScanRe
         mProgressBar = findViewById(R.id.progress_bar_register);
 
         AppCompatImageView mImgBack = findViewById(R.id.img_back_scan_qr);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     private void onQRCodeScanResponse(String qrResponse) {
