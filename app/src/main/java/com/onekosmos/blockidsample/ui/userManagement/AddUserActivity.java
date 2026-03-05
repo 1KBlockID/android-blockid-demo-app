@@ -27,6 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,6 +79,16 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private QRScannerHelper mQRScannerHelper;
     private String mMagicLink, mAcrPublicKey, mIAL;
 
+    private final ActivityResultLauncher<IntentSenderRequest> locationSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // User enabled location settings, retry location updates
+                            mCurrentLocationHelper.onLocationSettingsResolved();
+                            setLocation();
+                        }
+                    });
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,6 +105,18 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
+        
+        // Set callback for location settings resolution
+        mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
+            try {
+                IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(
+                        exception.getResolution()).build();
+                locationSettingsLauncher.launch(intentSenderRequest);
+            } catch (Exception e) {
+                // Handle error
+            }
+        });
+        
         initView();
     }
 

@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,6 +75,16 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private boolean mScanQRWithScope = false;
     private String authFactorType;
 
+    private final ActivityResultLauncher<IntentSenderRequest> locationSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // User enabled location settings, retry location updates
+                            mCurrentLocationHelper.onLocationSettingsResolved();
+                            setLocation();
+                        }
+                    });
+
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +101,18 @@ public class AuthenticatorActivity extends AppCompatActivity {
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
+        
+        // Set callback for location settings resolution
+        mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
+            try {
+                IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(
+                        exception.getResolution()).build();
+                locationSettingsLauncher.launch(intentSenderRequest);
+            } catch (Exception e) {
+                // Handle error
+            }
+        });
+        
         if (!AppPermissionUtils.isPermissionGiven(K_LOCATION_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE,
                     K_LOCATION_PERMISSION);

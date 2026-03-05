@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -39,8 +40,16 @@ public class CurrentLocationHelper {
     private static final long FASTEST_INTERVAL = 1000 * 5;
     private Location mCurrentLocation;
     private String mLastUpdateTime;
-    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
+    public final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
     private Activity activity;
+    private LocationSettingsCallback settingsCallback;
+
+    /**
+     * Callback interface for location settings resolution
+     */
+    public interface LocationSettingsCallback {
+        void onLocationSettingsResolutionRequired(ResolvableApiException exception);
+    }
 
     public CurrentLocationHelper(Activity activity) {
         this.activity = activity;
@@ -57,6 +66,14 @@ public class CurrentLocationHelper {
                 }
             }
         };
+    }
+
+    /**
+     * Set callback for location settings resolution
+     * @param callback Callback to handle settings resolution
+     */
+    public void setLocationSettingsCallback(LocationSettingsCallback callback) {
+        this.settingsCallback = callback;
     }
 
     public void createLocationRequest() {
@@ -101,23 +118,37 @@ public class CurrentLocationHelper {
 
         task.addOnFailureListener(activity, e -> {
             // Location settings are not satisfied
-            if (e instanceof com.google.android.gms.common.api.ResolvableApiException) {
-                try {
-                    // Show the dialog by calling startResolutionForResult()
-                    com.google.android.gms.common.api.ResolvableApiException resolvable =
-                            (com.google.android.gms.common.api.ResolvableApiException) e;
-                    resolvable.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS_GPS);
-                } catch (IntentSender.SendIntentException sendEx) {
-                    // Ignore the error
+            if (e instanceof ResolvableApiException) {
+                ResolvableApiException resolvable = (ResolvableApiException) e;
+                if (settingsCallback != null) {
+                    // Notify the callback to handle resolution
+                    settingsCallback.onLocationSettingsResolutionRequired(resolvable);
+                } else {
+                    // Fallback: try to show dialog directly (old behavior)
+                    try {
+                        resolvable.startResolutionForResult(activity, REQUEST_CHECK_SETTINGS_GPS);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error
+                    }
                 }
             }
         });
     }
 
     /**
-     * Request location updates from FusedLocationProviderClient
+     * Call this method after location settings have been resolved successfully
+     * This should be called from the activity's onActivityResult or ActivityResultLauncher callback
      */
-    private void requestLocationUpdates() {
+    public void onLocationSettingsResolved() {
+        // Retry requesting location updates after settings are resolved
+        requestLocationUpdates();
+    }
+
+    /**
+     * Request location updates from FusedLocationProviderClient
+     * Made public so it can be called after settings resolution
+     */
+    public void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) 
                 != PackageManager.PERMISSION_GRANTED 
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) 
