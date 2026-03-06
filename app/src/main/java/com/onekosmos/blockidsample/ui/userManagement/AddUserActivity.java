@@ -105,7 +105,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
-        
+
         // Set callback for location settings resolution
         mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
             try {
@@ -116,7 +116,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 // Handle error
             }
         });
-        
+
         initView();
     }
 
