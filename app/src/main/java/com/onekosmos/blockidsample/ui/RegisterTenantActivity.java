@@ -44,7 +44,7 @@ public class RegisterTenantActivity extends AppCompatActivity {
                         if (result.getResultCode() == RESULT_OK) {
                             updateAuthUi();
                         } else {
-                            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey, 
+                            BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey,
                                     AppConstant.defaultTenant,
                                     ResetSDKMessages.ACCOUNT_RESTORATION_FAILED.getMessage());
                         }
