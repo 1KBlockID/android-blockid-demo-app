@@ -101,7 +101,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
-        
+
         // Set callback for location settings resolution
         mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
             try {
@@ -112,7 +112,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 // Handle error
             }
         });
-        
+
         if (!AppPermissionUtils.isPermissionGiven(K_LOCATION_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE,
                     K_LOCATION_PERMISSION);
@@ -124,7 +124,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) 
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
