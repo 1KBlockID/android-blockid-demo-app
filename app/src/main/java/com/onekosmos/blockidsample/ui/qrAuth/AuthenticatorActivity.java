@@ -62,7 +62,6 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_PIN = "pin";
     private static final String K_FINGERPRINT = "fingerprint";
     private static final String K_NONE = "none";
-    private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
