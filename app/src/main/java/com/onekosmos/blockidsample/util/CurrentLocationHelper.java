@@ -31,16 +31,15 @@ import java.util.Date;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class CurrentLocationHelper {
+    private static final long INTERVAL = 1000 * 10;
+    private static final long FASTEST_INTERVAL = 1000 * 5;
+    private final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
-    private String TAG = "CurrentLocationHelper";
     private LocationRequest mLocationRequest;
-    private static final long INTERVAL = 1000 * 10;
-    private static final long FASTEST_INTERVAL = 1000 * 5;
     private Location mCurrentLocation;
     private String mLastUpdateTime;
-    public final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
     private Activity activity;
     private LocationSettingsCallback settingsCallback;
 
@@ -54,7 +53,7 @@ public class CurrentLocationHelper {
     public CurrentLocationHelper(Activity activity) {
         this.activity = activity;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
-        
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -70,6 +69,7 @@ public class CurrentLocationHelper {
 
     /**
      * Set callback for location settings resolution
+     *
      * @param callback Callback to handle settings resolution
      */
     public void setLocationSettingsCallback(LocationSettingsCallback callback) {
@@ -149,13 +149,13 @@ public class CurrentLocationHelper {
      * Made public so it can be called after settings resolution
      */
     public void requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) 
-                != PackageManager.PERMISSION_GRANTED 
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) 
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, 
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback,
                 Looper.getMainLooper());
     }
 
