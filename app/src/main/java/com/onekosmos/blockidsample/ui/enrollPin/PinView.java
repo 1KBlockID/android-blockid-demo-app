@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.ViewCompat;
 
 import com.onekosmos.blockidsample.R;
 
