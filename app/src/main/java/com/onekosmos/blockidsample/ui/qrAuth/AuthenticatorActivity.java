@@ -136,8 +136,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
         super.onStop();
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }

@@ -13,6 +13,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -140,9 +141,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             mQRScannerHelper.stopQRScanning();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PERMISSION_GRANTED) {
+                PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }

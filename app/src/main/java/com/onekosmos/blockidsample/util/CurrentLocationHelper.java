@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.Task;
 
@@ -80,7 +81,7 @@ public class CurrentLocationHelper {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(INTERVAL);
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
     }
 
     public boolean isGooglePlayServicesAvailable() {
@@ -150,9 +151,10 @@ public class CurrentLocationHelper {
      */
     public void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(activity,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback,
