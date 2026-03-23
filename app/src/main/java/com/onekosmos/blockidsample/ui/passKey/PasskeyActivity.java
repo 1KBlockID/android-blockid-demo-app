@@ -131,7 +131,7 @@ public class PasskeyActivity extends AppCompatActivity {
 
                             PasskeyRequest passkeyRequest = new PasskeyRequest(
                                     AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required username
                                     responseUser.data.username, // Required display name
                                     ""); // Not required
                             BlockIDSDK.getInstance().registerPasskey(PasskeyActivity.this,
@@ -162,7 +162,7 @@ public class PasskeyActivity extends AppCompatActivity {
                                             FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest(
                                     AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
-                                    responseUser.data.dguid, // Required username, dguid is an Unique ID for user
+                                    responseUser.data.username, // Required username
                                     responseUser.data.username, // Required display name
                                     ""); // Not required
                             BlockIDSDK.getInstance().authenticatePasskey(
