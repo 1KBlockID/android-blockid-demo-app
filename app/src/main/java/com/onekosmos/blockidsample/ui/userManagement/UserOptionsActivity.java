@@ -50,7 +50,7 @@ public class UserOptionsActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_user);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         BIDLinkedAccount linkedAccount = null;
         BIDGenericResponse response = BlockIDSDK.getInstance().getLinkedUserList();

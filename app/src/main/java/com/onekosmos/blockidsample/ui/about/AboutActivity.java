@@ -39,7 +39,7 @@ public class AboutActivity extends AppCompatActivity {
      */
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_about);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
         BIDTenant appTenant = BlockIDSDK.getInstance().getAppTenant();

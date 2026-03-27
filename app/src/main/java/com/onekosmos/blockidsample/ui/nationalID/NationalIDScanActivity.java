@@ -7,21 +7,29 @@ import static com.onekosmos.blockid.sdk.document.RegisterDocType.NATIONAL_ID;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_ERROR;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_DOCUMENT_SCAN_TYPE;
 import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity.K_UID;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.DL;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.IDCARD;
+import static com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType.PPT;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -33,16 +41,24 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager.ErrorResponse;
+import com.onekosmos.blockid.sdk.BIDAPIs.userapis.UserAPI;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
+import com.onekosmos.blockid.sdk.document.RegisterDocType;
 import com.onekosmos.blockid.sdk.documentScanner.BIDDocumentDataHolder;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerActivity;
 import com.onekosmos.blockid.sdk.documentScanner.DocumentScannerType;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
+import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
+import com.onekosmos.blockidsample.document.DocumentHolder;
+import com.onekosmos.blockidsample.ui.passport.EPassportChipActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
+import com.onekosmos.blockidsample.util.IDVErrorCode;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
@@ -58,15 +74,26 @@ public class NationalIDScanActivity extends AppCompatActivity {
     private final String[] K_CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private AppCompatImageView mImgBack;
     private AppCompatTextView mTxtBack;
-    private LinkedHashMap<String, Object> mNationalIDMap;
-    private boolean isRegistrationInProgress;
-    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private LinkedHashMap<String, Object> mNationalIDMap, mDocumentMap;
+    private boolean isRegistrationInProgress, isDeviceHasNfc;
+    private static final String K_LIVEID_OBJECT = "liveId";
     private static final String K_FACE = "face";
     private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
     private static final String K_EXPIRED = "EXPIRED";
     private static final String K_ABANDONED = "ABANDONED";
     private String mUID;
+
+    private final ActivityResultLauncher<Intent> ePassportResult =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            setResult(RESULT_OK);
+                            finish();
+                        } else {
+                            finish();
+                        }
+                    });
 
     private final ActivityResultLauncher<Intent> documentSessionResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -111,6 +138,16 @@ public class NationalIDScanActivity extends AppCompatActivity {
         initView();
         mUID = getIntent().getStringExtra(K_UID);
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isRegistrationInProgress) {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this)) {
             AppPermissionUtils.requestPermission(this, K_CAMERA_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -137,21 +174,15 @@ public class NationalIDScanActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!isRegistrationInProgress)
-            super.onBackPressed();
-    }
-
     /**
      * Initialize UI Object
      */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(v -> onBackPressed());
+        mTxtBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     /**
@@ -174,8 +205,8 @@ public class NationalIDScanActivity extends AppCompatActivity {
         try {
             JSONObject dataObject = new JSONObject(data);
 
-            responseStatus = dataObject.has("responseStatus") ?
-                    dataObject.getString("responseStatus") : null;
+            responseStatus = dataObject.has("sessionResult") ?
+                    dataObject.getString("sessionResult") : null;
 
             if (TextUtils.isEmpty(responseStatus) ||
                     responseStatus.equalsIgnoreCase(K_EXPIRED)) {
@@ -204,7 +235,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
             // responseStatus is empty or not success
             if (TextUtils.isEmpty(responseStatus) ||
                     !responseStatus.equalsIgnoreCase("SUCCESS")) {
-                nidScanFailed();
+                handleErrorResponse(dataObject);
                 return;
             }
 
@@ -216,14 +247,29 @@ public class NationalIDScanActivity extends AppCompatActivity {
                 return;
             }
 
-            idCardObject = dataObject.has("idcard_object") ?
-                    dataObject.getString("idcard_object") : null;
+            idCardObject = dataObject.has("document") ?
+                    dataObject.getString("document") : null;
 
             //idcard object is empty
             if (TextUtils.isEmpty(idCardObject)) {
                 nidScanFailed();
                 return;
             }
+
+            // Detect what document type was actually scanned
+            String detectedDocType = detectActualDocumentType(dataObject);
+
+            // CASE III: Handle cross-document detection for National ID
+            // If DL or Passport detected while scanning National ID
+            if (detectedDocType != null &&
+                    (detectedDocType.equalsIgnoreCase(DetectedDocType.DL.getValue()) ||
+                            detectedDocType.equalsIgnoreCase(DetectedDocType.PPT.getValue()))) {
+                handleCrossDocumentDetection(detectedDocType, dataObject);
+                return;
+            }
+
+            // If other document type detected (not DL, not PPT, not IDCARD), continue as normal
+            // The API will handle validation and show appropriate error if needed
 
             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
             mNationalIDMap = gson.fromJson(idCardObject,
@@ -263,7 +309,7 @@ public class NationalIDScanActivity extends AppCompatActivity {
             if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
                 registerNationalID();
             } else {
-                registerDocumentWithLiveID();
+                registerDocumentWithLiveID(mNationalIDMap, NATIONAL_ID.getValue());
             }
         } catch (Exception exception) {
             showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
@@ -282,27 +328,37 @@ public class NationalIDScanActivity extends AppCompatActivity {
     /**
      * Register documents with LiveID
      */
-    private void registerDocumentWithLiveID() {
+    private void registerDocumentWithLiveID(LinkedHashMap<String, Object>
+                                                    documentMap, String detectedDocType) {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.show();
         isRegistrationInProgress = true;
         mImgBack.setClickable(false);
         mTxtBack.setClickable(false);
-        mNationalIDMap.put("category", identity_document.name());
-        mNationalIDMap.put("type", NATIONAL_ID.getValue());
-        mNationalIDMap.put("id", mNationalIDMap.get("id"));
+        DocumentScannerType registerDocType = getDocumentScannerType(detectedDocType);
+        documentMap.put("category", identity_document.name());
+        documentMap.put("type", registerDocType.getValue());
+        documentMap.put("id", documentMap.get("id"));
         Bitmap liveIDBitmap = convertBase64ToBitmap(mLiveIDImageB64);
         String mobileSessionID = BIDDocumentDataHolder.getSessionID();
-        String mobileDocumentID = NATIONAL_ID.getValue().toLowerCase() + "_with_liveid_" +
+        String mobileDocumentID = registerDocType.getValue().toLowerCase() + "_with_liveid_" +
                 UUID.randomUUID().toString();
-        BlockIDSDK.getInstance().registerDocument(this, mNationalIDMap, liveIDBitmap,
+        BlockIDSDK.getInstance().registerDocument(this, documentMap, liveIDBitmap,
                 mLiveIDProofedBy, null, null, mobileSessionID, mobileDocumentID,
                 (status, error) -> {
                     progressDialog.dismiss();
                     isRegistrationInProgress = false;
                     if (status) {
-                        Toast.makeText(this, R.string.label_nid_enrolled_successfully,
-                                Toast.LENGTH_LONG).show();
+                        String message = "";
+                        if (registerDocType.getValue().equalsIgnoreCase(DL.getValue())) {
+                            message = getString(R.string.label_dl_enrolled_successfully);
+                        } else if (registerDocType.getValue().equalsIgnoreCase(PPT.getValue())) {
+                            message = getString(R.string.label_passport_enrolled_successfully);
+                        } else if (registerDocType.getValue().equalsIgnoreCase(IDCARD.getValue())) {
+                            message = getString(R.string.label_nid_enrolled_successfully);
+                        }
+
+                        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                         setResult(RESULT_OK);
                         finish();
                         return;
@@ -379,5 +435,455 @@ public class NationalIDScanActivity extends AppCompatActivity {
                     errorDialog.dismiss();
                     finish();
                 });
+    }
+
+    /**
+     * Detect actual document type from API response
+     *
+     * @param dataObject JSON object from API response
+     * @return Detected document type or null
+     */
+    private String detectActualDocumentType(JSONObject dataObject) {
+        try {
+            // Check if document object exists
+            if (dataObject.has("document")) {
+                JSONObject documentObj = dataObject.getJSONObject("document");
+
+                // Get documentType field from document object
+                if (documentObj.has("documentType")) {
+                    return documentObj.getString("documentType");
+                } else {
+                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+                }
+            } else {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+            }
+        } catch (Exception e) {
+            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+        }
+        return null;
+    }
+
+    /**
+     * Handle cross-document detection for National ID
+     * Shows confirmation dialog when DL or Passport is detected while scanning National ID
+     *
+     * @param detectedType The actual document type detected (DL or PPT)
+     * @param dataObject   The JSON object containing document data
+     */
+    private void handleCrossDocumentDetection(String detectedType, JSONObject dataObject) {
+        String documentName;
+        String title;
+        String message;
+
+        if (detectedType.equalsIgnoreCase(DetectedDocType.DL.getValue())) {
+            documentName = getString(R.string.label_drivers_license);
+            title = getString(R.string.label_drivers_license_identified);
+            message = getString(R.string.label_we_identified_that_you_have_scanned_a_drivers_license_do_you_want_to_register_the_drivers_license_in_this_application);
+
+            // Check if DL is already enrolled
+            if (isDocumentEnrolled(RegisterDocType.DL.getValue())) {
+                showDocumentAlreadyEnrolledError(documentName);
+                return;
+            }
+        } else if (detectedType.equalsIgnoreCase(DetectedDocType.PPT.getValue())) {
+            documentName = getString(R.string.label_passport);
+            title = getString(R.string.label_passport_identified);
+            message = getString(R.string.label_we_identified_that_you_have_scanned_a_passport_do_you_want_to_register_the_passport_in_this_application);
+
+            // Check if Passport is already enrolled
+            if (isDocumentEnrolled(RegisterDocType.PPT.getValue())) {
+                showDocumentAlreadyEnrolledError(documentName);
+                return;
+            }
+        } else {
+            // Unknown document type
+            return;
+        }
+
+        // Show confirmation dialog
+        ErrorDialog confirmDialog = new ErrorDialog(this);
+        confirmDialog.showWithTwoButton(
+                null,
+                title,
+                message,
+                getString(R.string.label_yes),
+                getString(R.string.label_no),
+                (dialog, which) -> {
+                    // NO button - Cancel registration
+                    confirmDialog.dismiss();
+                    finish();
+                },
+                dialog -> {
+                    // YES button - Continue with detected document type
+                    confirmDialog.dismiss();
+                    continueDocumentProcessing(dataObject, detectedType);
+                }
+        );
+    }
+
+    /**
+     * Check if a document type is already enrolled
+     *
+     * @param docType Document type to check
+     * @return true if document is enrolled, false otherwise
+     */
+    private boolean isDocumentEnrolled(String docType) {
+        return BIDDocumentProvider.getInstance().isDocumentEnrolled(
+                docType, BIDDocumentProvider.RegisterDocCategory.identity_document.name());
+    }
+
+    /**
+     * Show error when document is already enrolled
+     *
+     * @param documentName Name of the document (e.g., "Drivers License", "Passport")
+     */
+    private void showDocumentAlreadyEnrolledError(String documentName) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithOneButton(
+                null,
+                getString(R.string.label_error),
+                documentName + " is already enrolled.",
+                getString(R.string.label_ok),
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                }
+        );
+    }
+
+    /**
+     * Continue processing document after user confirmation
+     *
+     * @param dataObject   JSON object containing document data.
+     * @param detectedType String document type detected while scanning.
+     */
+    private void continueDocumentProcessing(JSONObject dataObject, String detectedType) {
+        try {
+            String token = dataObject.has("token") ? dataObject.getString("token") : null;
+
+            // Get document object (now unified as "document" for all types)
+            String documentObject = dataObject.has("document") ?
+                    dataObject.getJSONObject("document").toString() : null;
+
+            if (TextUtils.isEmpty(documentObject)) {
+                nidScanFailed();
+                return;
+            }
+
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            mDocumentMap = gson.fromJson(documentObject,
+                    new TypeToken<LinkedHashMap<String, Object>>() {
+                    }.getType());
+
+            if (mDocumentMap == null) {
+                documentScanFailed(detectedType);
+                return;
+            }
+
+            String proofJWT = mDocumentMap.containsKey("proof_jwt")
+                    ? mDocumentMap.get("proof_jwt") != null
+                    ? Objects.requireNonNull(mDocumentMap.get("proof_jwt")).toString()
+                    : null : null;
+
+            if (TextUtils.isEmpty(proofJWT)) {
+                documentScanFailed(detectedType);
+                return;
+            }
+
+            if (dataObject.has(K_LIVEID_OBJECT)) {
+                JSONObject liveIDObject = dataObject.getJSONObject(K_LIVEID_OBJECT);
+                if (liveIDObject.has(K_FACE)) {
+                    mLiveIDImageB64 = liveIDObject.getString(K_FACE);
+                }
+
+                if (liveIDObject.has(K_PROOFED_BY)) {
+                    mLiveIDProofedBy = liveIDObject.getString(K_PROOFED_BY);
+                }
+            }
+
+            mDocumentMap.put("certificate_token", token);
+            mDocumentMap.put("proof", proofJWT);
+
+            if (getDocumentScannerType(detectedType).getValue().equalsIgnoreCase(DL.getValue())) {
+                verifyDriverLicenseDialog(detectedType);
+            } else if (getDocumentScannerType(detectedType).getValue().equalsIgnoreCase(PPT.getValue())) {
+                isDeviceHasNfc = isDeviceHasNFC();
+                if (isDeviceHasNfc) {
+                    openEPassportChipActivity();
+                } else {
+                    if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                        registerPassport();
+                    } else {
+                        registerDocumentWithLiveID(mDocumentMap, detectedType);
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            showError(new ErrorResponse(K_SOMETHING_WENT_WRONG.getCode(),
+                    K_SOMETHING_WENT_WRONG.getMessage()));
+        }
+    }
+
+    /**
+     * Register Passport
+     */
+    private void registerPassport() {
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.show();
+        isRegistrationInProgress = true;
+        if (mDocumentMap != null) {
+            mDocumentMap.put("category", identity_document.name());
+            mDocumentMap.put("type", RegisterDocType.PPT.getValue());
+            mDocumentMap.put("id", mDocumentMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = RegisterDocType.PPT.getValue().toLowerCase() + "_" +
+                    UUID.randomUUID().toString();
+            BlockIDSDK.getInstance().registerDocument(this, mDocumentMap, null,
+                    mobileSessionID, mobileDocumentID,
+                    (status, error) -> {
+                        progressDialog.dismiss();
+                        isRegistrationInProgress = false;
+                        if (status) {
+                            Toast.makeText(this,
+                                    R.string.label_passport_enrolled_successfully,
+                                    Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
+                            finish();
+                            return;
+                        }
+
+                        showError(error);
+                    });
+        }
+    }
+
+    /**
+     * Start EPassportChipActivity for RFID scanning
+     */
+    private void openEPassportChipActivity() {
+        DocumentHolder.setData(mDocumentMap);
+        Intent intent = new Intent(this, EPassportChipActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        ePassportResult.launch(intent);
+    }
+
+    private boolean isDeviceHasNFC() {
+        NfcManager manager = (NfcManager) getSystemService(Context.NFC_SERVICE);
+        NfcAdapter adapter = manager.getDefaultAdapter();
+        return adapter != null;
+    }
+
+    /**
+     * Handle error response from API when sessionResult is not SUCCESS
+     * Parses errorInfo and reasonCode to show user-friendly messages using IDPErrorCode
+     *
+     * @param dataObject JSON object from API response
+     */
+    private void handleErrorResponse(JSONObject dataObject) {
+        try {
+            String errorCode = null;
+
+            // Try to extract error information from the response
+            if (dataObject.has("errorInfo")) {
+                JSONObject errorInfo = dataObject.getJSONObject("errorInfo");
+                if (errorInfo.has("reasonCode")) {
+                    errorCode = errorInfo.getString("reasonCode");
+                }
+            }
+
+            // If we have a valid IDP error code, use the user-friendly message
+            if (errorCode != null && IDVErrorCode.isValidCode(errorCode)) {
+                String userMessage = IDVErrorCode.getUserMessageFromCode(errorCode);
+                if (TextUtils.isEmpty(userMessage))
+                    showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+                else
+                    showErrorDialog(userMessage);
+            } else {
+                // EDGE CASE: If error code doesn't exist or doesn't match, show generic message
+                showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+            }
+        } catch (Exception e) {
+            // Fallback to generic error
+            showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+        }
+    }
+
+    /**
+     * Show error dialog with custom message and navigate to My Identity on dismiss
+     *
+     * @param message Error message to display
+     */
+    private void showErrorDialog(String message) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithOneButton(null,
+                getString(R.string.label_error),
+                message,
+                getString(R.string.label_ok),
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
+    }
+
+    /**
+     * Show document scanned failed when document (dl, ppt, id object) is empty
+     */
+    private void documentScanFailed(String detectedDocumentType) {
+        String message = "";
+        if (TextUtils.isEmpty(detectedDocumentType)) {
+            nidScanFailed();
+            return;
+        }
+
+        String doctype = getDocumentScannerType(detectedDocumentType).getValue();
+        if (doctype == null) {
+            nidScanFailed();
+            return;
+        }
+
+        if (doctype.equalsIgnoreCase(DL.getValue())) {
+            message = getString(R.string.label_dl_fail_to_scan);
+        } else if (doctype.equalsIgnoreCase(PPT.getValue())) {
+            message = getString(R.string.label_pp_fail_to_scan);
+        } else if (doctype.equalsIgnoreCase(IDCARD.getValue())) {
+            message = getString(R.string.label_nid_fail_to_scan);
+        }
+
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.show(null, getString(R.string.label_error), message,
+                dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
+    }
+
+    /**
+     * Verify Driver License
+     */
+    private void verifyDriverLicenseDialog(String detectedType) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithTwoButton(null,
+                getString(R.string.label_verify_driver_license),
+                getString(R.string.label_do_you_want_to_verify_driver_license),
+                getString(R.string.label_yes),
+                getString(R.string.label_no),
+                (dialogInterface, i) -> {
+                    if (BlockIDSDK.getInstance().isLiveIDRegistered()) {
+                        registerDriverLicense();
+                    } else {
+                        registerDocumentWithLiveID(mDocumentMap, detectedType);
+                    }
+                },
+                dialog -> verifyDriverLicense());
+    }
+
+    private void verifyDriverLicense() {
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_verifying_driver_license));
+        progressDialog.show();
+
+        BlockIDSDK.getInstance().verifyDocument(AppConstant.dvcId, mDocumentMap,
+                new String[]{"dl_verify"}, null, null,
+                (status, documentVerification, error) -> {
+                    progressDialog.dismiss();
+                    if (status) {
+                        //Verification success, call documentRegistration API
+
+                        // - Recommended for future use -
+                        // Update DL dictionary to include array of token received
+                        // from verifyDocument API response.
+
+                        try {
+                            UserAPI.DocuVerifyResult docuVerifyResult = BIDUtil.
+                                    JSONStringToObject(documentVerification,
+                                            UserAPI.DocuVerifyResult.class);
+                            JSONObject jsonObject = new JSONObject(docuVerifyResult.result);
+                            JSONArray certificates = jsonObject.getJSONArray("certifications");
+                            String[] tokens = new String[certificates.length()];
+                            for (int index = 0; index < certificates.length(); index++) {
+                                tokens[index] = certificates.getJSONObject(index).getString("token");
+                            }
+                            mDocumentMap.put("tokens", tokens);
+                        } catch (Exception e) {
+                            // do nothing
+                        }
+                        registerDriverLicense();
+                    } else {
+                        ErrorDialog errorDialog = new ErrorDialog(this);
+                        DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
+                            errorDialog.dismiss();
+                            finish();
+                        };
+                        errorDialog.show(null, getString(R.string.label_error),
+                                error.getMessage() + " (" + error.getCode() + ")",
+                                onDismissListener);
+                    }
+                });
+    }
+
+    /**
+     * Register Driver License
+     */
+    private void registerDriverLicense() {
+        mImgBack.setClickable(false);
+        mTxtBack.setClickable(false);
+        ProgressDialog progressDialog = new ProgressDialog(this,
+                getString(R.string.label_registering_driver_license));
+        progressDialog.show();
+        isRegistrationInProgress = true;
+        if (mDocumentMap != null) {
+            mDocumentMap.put("category", identity_document.name());
+            mDocumentMap.put("type", RegisterDocType.DL.getValue());
+            mDocumentMap.put("id", mDocumentMap.get("id"));
+            String mobileSessionID = BIDDocumentDataHolder.getSessionID();
+            String mobileDocumentID = RegisterDocType.DL.getValue().toLowerCase() + "_" +
+                    UUID.randomUUID().toString();
+            BlockIDSDK.getInstance().registerDocument(this, mDocumentMap,
+                    null, mobileSessionID, mobileDocumentID, (status, error) -> {
+                        progressDialog.dismiss();
+                        isRegistrationInProgress = false;
+                        if (status) {
+                            Toast.makeText(this, R.string.label_dl_enrolled_successfully,
+                                    Toast.LENGTH_LONG).show();
+                            setResult(RESULT_OK);
+                            finish();
+                            return;
+                        }
+
+                        showError(error);
+                    });
+        }
+    }
+
+    @Keep
+    private enum DetectedDocType {
+        DL("DL"),
+        PPT("PASSPORT");
+        private final String docType;
+
+        DetectedDocType(String documentType) {
+            this.docType = documentType;
+        }
+
+        private String getValue() {
+            return this.docType;
+        }
+    }
+
+    /**
+     * Get DocumentScannerType based on document type
+     *
+     * @return string value of text
+     */
+    private DocumentScannerType getDocumentScannerType(String documentType) {
+        if (documentType.equalsIgnoreCase(DetectedDocType.DL.getValue()))
+            return DocumentScannerType.DL;
+        else if (documentType.equalsIgnoreCase(DetectedDocType.PPT.getValue()))
+            return DocumentScannerType.PPT;
+        else
+            return IDCARD;
     }
 }

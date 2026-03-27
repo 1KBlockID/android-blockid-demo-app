@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,7 +29,6 @@ import androidx.core.view.WindowCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
@@ -62,12 +62,10 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private static final String K_PIN = "pin";
     private static final String K_FINGERPRINT = "fingerprint";
     private static final String K_NONE = "none";
-    private static final String K_WEBAUTHN_CHALLENGE = "webauthn_challenge";
     private final String[] K_LOCATION_PERMISSION = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int K_LOCATION_PERMISSION_REQUEST_CODE = 1041;
     private CurrentLocationHelper mCurrentLocationHelper;
-    private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private AppCompatButton mBtnQRScope, mBtnQRPresetData, mBtnAuthenticate;
     private AppCompatEditText mEtPresetData;
@@ -75,6 +73,16 @@ public class AuthenticatorActivity extends AppCompatActivity {
     private RecyclerView mRvUserScope;
     private boolean mScanQRWithScope = false;
     private String authFactorType;
+
+    private final ActivityResultLauncher<IntentSenderRequest> locationSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // User enabled location settings, retry location updates
+                            mCurrentLocationHelper.onLocationSettingsResolved();
+                            setLocation();
+                        }
+                    });
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -92,22 +100,33 @@ public class AuthenticatorActivity extends AppCompatActivity {
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
+
+        // Set callback for location settings resolution
+        mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
+            try {
+                IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(
+                        exception.getResolution()).build();
+                locationSettingsLauncher.launch(intentSenderRequest);
+            } catch (Exception e) {
+                // Handle error
+            }
+        });
+
         if (!AppPermissionUtils.isPermissionGiven(K_LOCATION_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_LOCATION_PERMISSION_REQUEST_CODE,
                     K_LOCATION_PERMISSION);
         else {
-            mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+            mCurrentLocationHelper.startLocationUpdates();
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null && checkSelfPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mGoogleApiClient.connect();
             setLocation();
         }
     }
@@ -117,8 +136,8 @@ public class AuthenticatorActivity extends AppCompatActivity {
         super.onStop();
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
@@ -129,7 +148,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (AppPermissionUtils.isGrantedPermission(this, requestCode, grantResults,
                 K_LOCATION_PERMISSION)) {
-            mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+            mCurrentLocationHelper.startLocationUpdates();
             setLocation();
         }
     }
@@ -156,12 +175,10 @@ public class AuthenticatorActivity extends AppCompatActivity {
     }
 
     private void setLocation() {
-        if (mGoogleApiClient != null) {
-            Location mLocation = mCurrentLocationHelper.getLocation();
-            if (mLocation != null) {
-                mLatitude = mLocation.getLatitude();
-                mLongitude = mLocation.getLongitude();
-            }
+        Location mLocation = mCurrentLocationHelper.getLocation();
+        if (mLocation != null) {
+            mLatitude = mLocation.getLatitude();
+            mLongitude = mLocation.getLongitude();
         }
     }
 

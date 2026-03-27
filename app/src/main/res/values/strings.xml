@@ -206,4 +206,12 @@
     <string name="label_passkey_verification_failed">"Passkey verification failed"</string>
 
     <string name="label_uid">UID</string>
+    <string name="label_scan_failed_please_scan_a_valid_document">Scan Failed. Please scan a valid document.</string>
+    <string name="label_we_couldn_t_complete_the_verification_of_the_document_please_try_again">We couldn\'t complete the verification of the document. Please try again.</string>
+    <string name="label_drivers_license">Drivers License</string>
+    <string name="label_drivers_license_identified">Drivers License Identified</string>
+    <string name="label_we_identified_that_you_have_scanned_a_drivers_license_do_you_want_to_register_the_drivers_license_in_this_application">We identified that you have scanned a Drivers License. Do you want to register the Drivers License in this application?</string>
+    <string name="label_passport">Passport</string>
+    <string name="label_passport_identified">Passport Identified</string>
+    <string name="label_we_identified_that_you_have_scanned_a_passport_do_you_want_to_register_the_passport_in_this_application">We identified that you have scanned a Passport. Do you want to register the Passport in this application?</string>
 </resources>

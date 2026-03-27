@@ -20,6 +20,7 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -53,9 +54,6 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
     private RFIDScannerHelper mRFIDScannerHelper;
     private LinkedHashMap<String, Object> mPassportMap;
     private boolean mIsRegInProgress;
-    private static final String K_LIVEID_OBJECT = "liveid_object";
-    private static final String K_FACE = "face";
-    private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -75,6 +73,16 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
 
         mLiveIDImageB64 = DocumentHolder.INSTANCE.getLiveIDImageBase64();
         mLiveIDProofedBy = DocumentHolder.INSTANCE.getLiveIDProofedBy();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!mIsRegInProgress) {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     @Override
@@ -91,12 +99,6 @@ public class EPassportChipActivity extends AppCompatActivity implements IRFIDSca
                 mRFIDScannerHelper.onNewIntent(tag);
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!mIsRegInProgress)
-            super.onBackPressed();
     }
 
     @Override

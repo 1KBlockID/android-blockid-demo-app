@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
+import com.onekosmos.blockidsample.util.IDVErrorCode;
 import com.onekosmos.blockidsample.util.ProgressDialog;
 
 import org.json.JSONArray;
@@ -63,7 +65,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
     private AppCompatTextView mTxtBack;
     private LinkedHashMap<String, Object> mDriverLicenseMap;
     private boolean isRegistrationInProgress;
-    private static final String K_LIVEID_OBJECT = "liveid_object";
+    private static final String K_LIVEID_OBJECT = "liveId";
     private static final String K_FACE = "face";
     private static final String K_PROOFED_BY = "proofedBy";
     private String mLiveIDImageB64, mLiveIDProofedBy;
@@ -114,6 +116,16 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         initView();
         mUID = getIntent().getStringExtra(K_UID);
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!isRegistrationInProgress) {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+
         if (!AppPermissionUtils.isPermissionGiven(K_CAMERA_PERMISSION, this))
             AppPermissionUtils.requestPermission(this, K_DL_PERMISSION_REQUEST_CODE,
                     K_CAMERA_PERMISSION);
@@ -138,21 +150,15 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!isRegistrationInProgress)
-            super.onBackPressed();
-    }
-
     /**
      * Initialize UI Object
      */
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(v -> onBackPressed());
+        mImgBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(v -> onBackPressed());
+        mTxtBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     /**
@@ -177,8 +183,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         try {
             JSONObject dataObject = new JSONObject(data);
 
-            responseStatus = dataObject.has("responseStatus") ?
-                    dataObject.getString("responseStatus") : null;
+            responseStatus = dataObject.has("sessionResult") ?
+                    dataObject.getString("sessionResult") : null;
 
             if (TextUtils.isEmpty(responseStatus) ||
                     responseStatus.equalsIgnoreCase(K_EXPIRED)) {
@@ -207,7 +213,7 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
             // responseStatus is empty or not success
             if (TextUtils.isEmpty(responseStatus) ||
                     !responseStatus.equalsIgnoreCase("SUCCESS")) {
-                dlScanFailed();
+                handleErrorResponse(dataObject);
                 return;
             }
 
@@ -219,8 +225,8 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
                 return;
             }
 
-            dlObject = dataObject.has("dl_object") ?
-                    dataObject.getString("dl_object") : null;
+            dlObject = dataObject.has("document") ?
+                    dataObject.getString("document") : null;
 
             // dl object is empty
             if (TextUtils.isEmpty(dlObject)) {
@@ -439,6 +445,58 @@ public class DriverLicenseScanActivity extends AppCompatActivity {
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.show(null, getString(R.string.label_error),
                 getString(R.string.label_dl_fail_to_scan), dialog -> {
+                    errorDialog.dismiss();
+                    finish();
+                });
+    }
+
+    /**
+     * Handle error response from API when sessionResult is not SUCCESS
+     * Parses errorInfo and reasonCode to show user-friendly messages using IDPErrorCode
+     *
+     * @param dataObject JSON object from API response
+     */
+    private void handleErrorResponse(JSONObject dataObject) {
+        try {
+            String errorCode = null;
+
+            // Try to extract error information from the response
+            if (dataObject.has("errorInfo")) {
+                JSONObject errorInfo = dataObject.getJSONObject("errorInfo");
+                if (errorInfo.has("reasonCode")) {
+                    errorCode = errorInfo.getString("reasonCode");
+                }
+            }
+
+            // If we have a valid IDP error code, use the user-friendly message
+            if (errorCode != null && IDVErrorCode.isValidCode(errorCode)) {
+                String userMessage = IDVErrorCode.getUserMessageFromCode(errorCode);
+                if (TextUtils.isEmpty(userMessage))
+                    showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+                else
+                    showErrorDialog(userMessage);
+            } else {
+                // EDGE CASE: If error code doesn't exist or doesn't match, show generic message
+                showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+            }
+        } catch (Exception e) {
+            // Fallback to generic error
+            showErrorDialog(getString(R.string.label_we_couldn_t_complete_the_verification_of_the_document_please_try_again));
+        }
+    }
+
+    /**
+     * Show error dialog with custom message and navigate to My Identity on dismiss
+     *
+     * @param message Error message to display
+     */
+    private void showErrorDialog(String message) {
+        ErrorDialog errorDialog = new ErrorDialog(this);
+        errorDialog.showWithOneButton(null,
+                getString(R.string.label_error),
+                message,
+                getString(R.string.label_ok),
+                dialog -> {
                     errorDialog.dismiss();
                     finish();
                 });

@@ -13,6 +13,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -27,6 +28,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +42,6 @@ import androidx.core.view.WindowCompat;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeResponse;
 import com.onekosmos.blockid.sdk.BIDAPIs.publicip.IPProvider;
@@ -67,8 +70,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private static final int K_PERMISSION_REQUEST_CODE = 1007;
     private final String[] K_PERMISSIONS = new String[]{CAMERA, ACCESS_FINE_LOCATION};
     private CurrentLocationHelper mCurrentLocationHelper;
-    @SuppressWarnings("deprecation")
-    private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private LinearLayout mScannerView;
     private BIDScannerView mBIDScannerView;
@@ -78,6 +79,16 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private ProgressBar mProgressBar;
     private QRScannerHelper mQRScannerHelper;
     private String mMagicLink, mAcrPublicKey, mIAL;
+
+    private final ActivityResultLauncher<IntentSenderRequest> locationSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // User enabled location settings, retry location updates
+                            mCurrentLocationHelper.onLocationSettingsResolved();
+                            setLocation();
+                        }
+                    });
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -95,6 +106,18 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
+
+        // Set callback for location settings resolution
+        mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
+            try {
+                IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(
+                        exception.getResolution()).build();
+                locationSettingsLauncher.launch(intentSenderRequest);
+            } catch (Exception e) {
+                // Handle error
+            }
+        });
+
         initView();
     }
 
@@ -106,7 +129,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     K_PERMISSIONS);
         else {
             startQRCodeScanning();
-            mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+            mCurrentLocationHelper.startLocationUpdates();
             setLocation();
         }
     }
@@ -118,9 +141,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             mQRScannerHelper.stopQRScanning();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PERMISSION_GRANTED) {
+                PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
@@ -140,7 +163,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
             if (permissions[index].equals(ACCESS_FINE_LOCATION) && grantResults[index] ==
                     PERMISSION_GRANTED) {
-                mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+                mCurrentLocationHelper.startLocationUpdates();
                 setLocation();
             }
         }
@@ -166,7 +189,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      */
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_add_user);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         mScannerView = findViewById(R.id.scanner_view_add_user);
         mBIDScannerView = findViewById(R.id.bid_scanner_view_add_user);
@@ -205,12 +228,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Get current location and set it
      */
     private void setLocation() {
-        if (mGoogleApiClient != null) {
-            Location location = mCurrentLocationHelper.getLocation();
-            if (location != null) {
-                mLatitude = location.getLatitude();
-                mLongitude = location.getLongitude();
-            }
+        Location location = mCurrentLocationHelper.getLocation();
+        if (location != null) {
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
         }
     }
 
