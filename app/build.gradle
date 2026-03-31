@@ -10,7 +10,7 @@ android {
         minSdk 26
         targetSdk 36
         versionCode 1
-        versionName "1.30.10" + "." + getCurrentTimestampHexValue()
+        versionName "1.30.20" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -107,5 +107,4 @@ dependencies {
 
     // BlockID SDK
     implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.20.69C66091'
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.10.69C634D7'
 }
