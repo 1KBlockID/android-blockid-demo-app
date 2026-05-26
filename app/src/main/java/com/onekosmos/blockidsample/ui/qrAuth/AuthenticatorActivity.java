@@ -368,7 +368,7 @@ public class AuthenticatorActivity extends AppCompatActivity {
                 authenticationPayloadV1.session, mAuthenticationPayloadV1.sessionURL,
                 authenticationPayloadV1.scopes, metaData, authenticationPayloadV1.creds,
                 authenticationPayloadV1.getOrigin(), String.valueOf(latitude),
-                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor,
+                String.valueOf(longitude), BuildConfig.VERSION_NAME, null, authFactor, false,
                 (status, sessionId, error) -> {
                     mBtnAuthenticate.setClickable(true);
                     progressDialog.dismiss();
