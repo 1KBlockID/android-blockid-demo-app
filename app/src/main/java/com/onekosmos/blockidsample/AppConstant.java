@@ -8,8 +8,8 @@ import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
  */
 public class AppConstant {
     public static final String licenseKey = "5809b7b7-886f-4c88-9061-59a2baf485be";
-    public static final String dvcId = "default_config";
-    public static final BIDTenant defaultTenant = new BIDTenant("1Kblockiduat",
+    public static final String dvcId = "default_dvcid";
+    public static final BIDTenant defaultTenant = new BIDTenant("omega-client",
             "default",
-            "https://blockid-uat.1kosmos.net");
+            "https://omega-client.1kosmos.net");
 }
