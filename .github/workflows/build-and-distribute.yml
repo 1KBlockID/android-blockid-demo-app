@@ -1,0 +1,201 @@
+# =============================================================================
+# Android Demo App — Build, Distribute & Tag
+# =============================================================================
+# Builds the BlockID Demo App APK, distributes to Firebase App Distribution,
+# and creates an RC tag for release tracking.
+#
+# TAG FORMAT: demo_app_{version}-{m|r}.rc{NN}
+#   - {version}: from app/build.gradle versionName base (e.g., 1.30.40)
+#   - -m: triggered from master branch
+#   - -r: triggered from release branch
+#   - rc{NN}: auto-incrementing release candidate number (rc01, rc02, ...)
+#
+# TRIGGERS:
+#   - Automatic: Push to 'master' or 'release' branch
+#   - Manual: Run from GitHub Actions UI
+#
+# REQUIRED GITHUB SECRETS:
+#   Signing:
+#     - DEMO_KEYSTORE_BASE64         : base64-encoded .jks keystore file
+#     - DEMO_STORE_PASSWORD          : keystore password
+#     - DEMO_KEY_ALIAS               : key alias inside the keystore
+#     - DEMO_KEY_PASSWORD            : key password
+#
+#   Firebase:
+#     - FIREBASE_DEMO_SERVICE_ACCOUNT_JSON : GCP service account JSON with
+#                                            "Firebase App Distribution Admin" role
+#     - FIREBASE_DEMO_APP_ID               : Firebase App ID for the demo app
+#
+#   Nexus (for SDK dependency resolution):
+#     - NEXUS_USERNAME               : Nexus repository username
+#     - NEXUS_PASSWORD               : Nexus repository password
+#
+#   To base64-encode a keystore on macOS:
+#     base64 -i your_keystore.jks | pbcopy
+# =============================================================================
+
+name: Build & Distribute Demo App
+
+on:
+  push:
+    branches: [master, release, MOB-7243-android-automate-the-mobile-release-process]
+  workflow_dispatch:
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+    name: Demo App
+
+    steps:
+      # --- 1. Checkout the repo with full history for tag detection ---
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # --- 2. Set up Java 17 (required by AGP 9.x) ---
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # --- 3. Set up Android SDK ---
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # --- 4. Cache Gradle dependencies ---
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      # --- 5. Extract version from build.gradle ---
+      - name: Extract app version
+        id: version
+        run: |
+          # Extract the base version (before hex timestamp concatenation)
+          BASE_VERSION=$(grep -oP 'versionName "\K[0-9]+\.[0-9]+\.[0-9]+' app/build.gradle || echo "0.0.0")
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+          echo "Demo App Base Version: $BASE_VERSION"
+
+      # --- 6. Decode signing keystore from base64 secret ---
+      - name: Decode Keystore
+        run: echo "${{ secrets.DEMO_KEYSTORE_BASE64 }}" | base64 --decode > app/android_blockidsample_keystore.jks
+
+      # --- 7. Build the signed release APK ---
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+        env:
+          DEMO_STORE_PASSWORD: ${{ secrets.DEMO_STORE_PASSWORD }}
+          DEMO_KEY_ALIAS: ${{ secrets.DEMO_KEY_ALIAS }}
+          DEMO_KEY_PASSWORD: ${{ secrets.DEMO_KEY_PASSWORD }}
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+
+      # --- 8. Upload APK to Firebase App Distribution ---
+      # Pinned to v1.7.1 (SHA: bd49498) for supply-chain safety
+      - name: Upload APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@bd494989dd4bec0343f78adee87fe66e48279ad6
+        with:
+          appId: ${{ secrets.FIREBASE_DEMO_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_DEMO_SERVICE_ACCOUNT_JSON }}
+          groups: 1k-mobile-android, 1k-qa
+          file: app/build/outputs/apk/release/app-release.apk
+          releaseNotes: |
+            Build: Demo App APK
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+            Version: ${{ steps.version.outputs.base_version }}
+
+      # --- 9. Determine branch suffix ---
+      - name: Determine branch suffix
+        id: branch
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          if [[ "$BRANCH_NAME" == "master" ]]; then
+            echo "suffix=m" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" == "release" ]]; then
+            echo "suffix=r" >> $GITHUB_OUTPUT
+          else
+            echo "suffix=m" >> $GITHUB_OUTPUT
+          fi
+
+      # --- 10. Calculate next RC number ---
+      - name: Calculate RC number
+        id: rc
+        run: |
+          TAG_PREFIX="demo_app_${{ steps.version.outputs.base_version }}-${{ steps.branch.outputs.suffix }}.rc"
+          
+          # Find the latest RC tag matching this prefix
+          LATEST_RC=$(git tag -l "${TAG_PREFIX}*" | sort -V | tail -1)
+          
+          if [ -z "$LATEST_RC" ]; then
+            NEXT_RC="01"
+          else
+            # Extract the RC number and increment
+            CURRENT_RC=$(echo "$LATEST_RC" | grep -oP 'rc\K[0-9]+')
+            NEXT_RC=$(printf "%02d" $((10#$CURRENT_RC + 1)))
+          fi
+          
+          FULL_TAG="${TAG_PREFIX}${NEXT_RC}"
+          echo "tag=$FULL_TAG" >> $GITHUB_OUTPUT
+          echo "rc_number=$NEXT_RC" >> $GITHUB_OUTPUT
+          echo "Next tag: $FULL_TAG"
+
+      # --- 11. Create and push the RC tag ---
+      - name: Create RC tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.rc.outputs.tag }}" -m "Demo App Release Candidate: ${{ steps.rc.outputs.tag }}"
+          git push origin "${{ steps.rc.outputs.tag }}"
+
+      # --- 12. Generate release notes from commits ---
+      - name: Generate release notes
+        id: notes
+        run: |
+          # Find previous tag to generate changelog
+          PREV_TAG=$(git tag -l "demo_app_*" | sort -V | tail -2 | head -1)
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "${{ steps.rc.outputs.tag }}" ]; then
+            NOTES="Initial release candidate"
+          else
+            NOTES=$(git log --pretty=format:"- %s (%h)" "${PREV_TAG}..HEAD" | head -20)
+          fi
+          echo "$NOTES" > /tmp/release_notes.txt
+
+      # --- 13. Upload APK as GitHub artifact ---
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-apk-${{ steps.rc.outputs.tag }}
+          path: app/build/outputs/apk/release/*.apk
+
+      # --- 14. Post build summary ---
+      - name: Post build summary
+        run: |
+          NOTES=$(cat /tmp/release_notes.txt)
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 📱 Demo App Build Summary
+          
+          | Field | Value |
+          |-------|-------|
+          | **App** | BlockID Demo |
+          | **Version** | ${{ steps.version.outputs.base_version }} |
+          | **Tag** | \`${{ steps.rc.outputs.tag }}\` |
+          | **Branch** | ${{ github.ref_name }} |
+          | **Commit** | ${{ github.sha }} |
+          | **Build Number** | ${{ github.run_number }} |
+          | **Author** | ${{ github.actor }} |
+          
+          ### 📥 Download Links
+          - **APK**: Available as GitHub Artifact on this run
+          - **Firebase**: Distributed to groups \`1k-mobile-android\`, \`1k-qa\`
+          
+          ### 📝 Changes since last release
+          ${NOTES}
+          EOF

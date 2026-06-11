@@ -14,12 +14,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            storeFile file('android_blockidsample_keystore.jks')
+            storePassword System.getenv("DEMO_STORE_PASSWORD") ?: ""
+            keyAlias System.getenv("DEMO_KEY_ALIAS") ?: ""
+            keyPassword System.getenv("DEMO_KEY_PASSWORD") ?: ""
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
