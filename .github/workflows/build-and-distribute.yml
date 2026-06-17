@@ -91,9 +91,9 @@ jobs:
           echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
           echo "Demo App Base Version: $BASE_VERSION"
 
-      # --- 6. Decode signing keystore from base64 secret ---
-      - name: Decode Keystore
-        run: echo "${{ secrets.DEMO_KEYSTORE_BASE64 }}" | base64 --decode > app/android_blockidsample_keystore.jks
+      # --- 6. Build signing keystore ---
+      # The keystore is committed to the repo at app/android_blockidsample_keystore.jks
+      # No decode step needed — it's available after checkout
 
       # --- 7. Make gradlew executable ---
       - name: Make gradlew executable
