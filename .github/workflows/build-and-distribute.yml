@@ -100,9 +100,14 @@ jobs:
         run: chmod +x ./gradlew
 
       # --- 8. Build the signed release APK ---
-      # Disable Crashlytics mapping file upload in CI (requires firebase login otherwise)
+      # Authenticate Firebase CLI for Crashlytics mapping upload
+      - name: Set up Firebase credentials
+        run: |
+          echo '${{ secrets.FIREBASE_DEMO_SERVICE_ACCOUNT_JSON }}' > /tmp/firebase-sa.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-sa.json" >> $GITHUB_ENV
+
       - name: Build Release APK
-        run: ./gradlew assembleRelease -PfirebaseCrashlyticsMappingFileUploadEnabled=false
+        run: ./gradlew assembleRelease
         env:
           DEMO_STORE_PASSWORD: ${{ secrets.DEMO_STORE_PASSWORD }}
           DEMO_KEY_ALIAS: ${{ secrets.DEMO_KEY_ALIAS }}
