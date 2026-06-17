@@ -100,8 +100,9 @@ jobs:
         run: chmod +x ./gradlew
 
       # --- 8. Build the signed release APK ---
+      # Disable Crashlytics mapping file upload in CI (requires firebase login otherwise)
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease -PfirebaseCrashlyticsMappingFileUploadEnabled=false
         env:
           DEMO_STORE_PASSWORD: ${{ secrets.DEMO_STORE_PASSWORD }}
           DEMO_KEY_ALIAS: ${{ secrets.DEMO_KEY_ALIAS }}
