@@ -16,7 +16,6 @@
 #
 # REQUIRED GITHUB SECRETS:
 #   Signing:
-#     - DEMO_KEYSTORE_BASE64         : base64-encoded .jks keystore file
 #     - DEMO_STORE_PASSWORD          : keystore password
 #     - DEMO_KEY_ALIAS               : key alias inside the keystore
 #     - DEMO_KEY_PASSWORD            : key password
@@ -30,15 +29,15 @@
 #     - NEXUS_USERNAME               : Nexus repository username
 #     - NEXUS_PASSWORD               : Nexus repository password
 #
-#   To base64-encode a keystore on macOS:
-#     base64 -i your_keystore.jks | pbcopy
+# NOTE: The signing keystore (android_blockidsample_keystore.jks) is committed
+#       to the repo and does not need to be decoded from a secret.
 # =============================================================================
 
 name: Build & Distribute Demo App
 
 on:
   push:
-    branches: [master, release, MOB-7243-android-automate-the-mobile-release-process]
+    branches: [master, release]
   workflow_dispatch:
 
 jobs:
