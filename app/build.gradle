@@ -77,30 +77,15 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.14.0'
-    implementation 'androidx.navigation:navigation-fragment:2.9.8'
-    implementation 'androidx.navigation:navigation-ui:2.9.8'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     // Secure  Shared preference
     implementation 'androidx.security:security-crypto:1.1.0'
-
-    implementation 'androidx.biometric:biometric:1.1.0'
-
-    // RecyclerView
-    implementation "androidx.recyclerview:recyclerview:1.4.0"
 
     // Network Call
     implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
 
     //Location
-    implementation 'com.google.android.gms:play-services-gcm:17.0.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-
-    // LiveID
-    implementation 'com.google.guava:guava:33.6.0-android'
-
-    // kotlin
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform
@@ -110,5 +95,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A26BE44'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A329897'
 }
