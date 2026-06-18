@@ -37,7 +37,7 @@ name: Build & Distribute Demo App
 
 on:
   push:
-    branches: [ master, release ]
+    branches: [ develop, master, release ]
   workflow_dispatch:
 
 jobs:
