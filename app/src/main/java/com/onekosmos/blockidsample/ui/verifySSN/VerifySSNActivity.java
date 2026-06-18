@@ -578,14 +578,9 @@ public class VerifySSNActivity extends AppCompatActivity {
     }
 
     public void checkStoragePermission() {
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
-            if (!AppPermissionUtils.isPermissionGiven(K_STORAGE_PERMISSION, this)) {
-                AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE,
-                        K_STORAGE_PERMISSION);
-            } else {
-                shareMaskedResponse();
-            }
+        if (!AppPermissionUtils.isPermissionGiven(K_STORAGE_PERMISSION, this)) {
+            AppPermissionUtils.requestPermission(this, K_STORAGE_PERMISSION_REQUEST_CODE,
+                    K_STORAGE_PERMISSION);
         } else {
             shareMaskedResponse();
         }

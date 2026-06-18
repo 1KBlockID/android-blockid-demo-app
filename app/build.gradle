@@ -7,7 +7,7 @@ android {
     defaultConfig {
         namespace "com.onekosmos.blockidsample"
         applicationId "com.onekosmos.blockid.poc"
-        minSdk 26
+        minSdk 28
         targetSdk 36
         versionCode 1
         versionName "1.30.40" + "." + getCurrentTimestampHexValue()
@@ -110,5 +110,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A21285E'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A26BE44'
 }
