@@ -6,8 +6,8 @@ dependencyResolutionManagement {
         maven {
             url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
             credentials {
-                username = "developer"
-                password = "q5k#06ZcjSo#"
+                username = System.getenv("NEXUS_USERNAME") ?: ""
+                password = System.getenv("NEXUS_PASSWORD") ?: ""
             }
         }
         maven { url "https://jitpack.io" }

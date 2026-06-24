@@ -7,11 +7,20 @@ android {
     defaultConfig {
         namespace "com.onekosmos.blockidsample"
         applicationId "com.onekosmos.blockid.poc"
-        minSdk 26
+        minSdk 28
         targetSdk 36
         versionCode 1
-        versionName "1.30.30" + "." + getCurrentTimestampHexValue()
+        versionName "1.30.40" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('android_blockidsample_keystore.jks')
+            storePassword System.getenv("DEMO_STORE_PASSWORD") ?: ""
+            keyAlias System.getenv("DEMO_KEY_ALIAS") ?: ""
+            keyPassword System.getenv("DEMO_KEY_PASSWORD") ?: ""
+        }
     }
 
     buildFeatures {
@@ -20,6 +29,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
@@ -44,6 +54,10 @@ android {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE.md'
         exclude 'AndroidManifest.xml'
+        exclude 'META-INF/FastDoubleParser-LICENSE'
+        exclude 'META-INF/FastDoubleParser-NOTICE'
+        exclude 'META-INF/DISCLAIMER'
+        exclude 'META-INF/io.netty.versions.properties'
     }
 }
 
@@ -59,7 +73,7 @@ String getCurrentTimestampHexValue() {
 configurations.configureEach {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.bouncycastle') {
-            details.useTarget 'org.bouncycastle:bcprov-jdk15to18:1.70'
+            details.useVersion '1.84'
         }
     }
 }
@@ -70,41 +84,26 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.navigation:navigation-fragment:2.8.9'
-    implementation 'androidx.navigation:navigation-ui:2.8.9'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.14.0'
 
     // Secure  Shared preference
-    implementation 'androidx.security:security-crypto:1.1.0-alpha03'
-
-    implementation 'androidx.biometric:biometric:1.1.0'
-
-    // RecyclerView
-    implementation "androidx.recyclerview:recyclerview:1.4.0"
+    implementation 'androidx.security:security-crypto:1.1.0'
 
     // Network Call
     implementation 'com.github.amitshekhariitbhu.Fast-Android-Networking:android-networking:1.0.4'
 
     //Location
-    implementation 'com.google.android.gms:play-services-gcm:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:20.0.0'
-
-    // LiveID
-    implementation 'com.google.guava:guava:31.1-android'
-
-    // kotlin
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation platform('com.google.firebase:firebase-bom:34.7.0')
+    implementation platform('com.google.firebase:firebase-bom:34.14.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.30.6A1563EA'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A3BA457'
 }
