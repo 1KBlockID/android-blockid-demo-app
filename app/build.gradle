@@ -65,6 +65,10 @@ configurations.configureEach {
         if (details.requested.group == 'org.bouncycastle') {
             details.useVersion '1.84'
         }
+        // MOB-7221 - Fix Jackson CVEs (transitive via web3j)
+        if (details.requested.group == 'com.fasterxml.jackson.core') {
+            details.useVersion '2.19.2'
+        }
     }
 }
 
@@ -110,5 +114,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.40.6A21285E'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.50.6A4B6058'
 }
