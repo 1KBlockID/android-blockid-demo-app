@@ -6,8 +6,8 @@ dependencyResolutionManagement {
         maven {
             url 'https://artifactory.1kosmos.net/artifactory/maven-releases-local/'
             credentials {
-                username = "mobile-team-read"
-                password = "Vt&72Ke2026#Pw9Rb"
+                username = System.getenv("JFROG_USERNAME") ?: ""
+                password = System.getenv("JFROG_PASSWORD") ?: ""
             }
         }
         maven { url "https://jitpack.io" }
