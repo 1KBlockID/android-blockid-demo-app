@@ -4,10 +4,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url 'https://nexus-1k-nonprod.1kosmos.net/repository/maven-releases/'
+            url 'https://artifactory.1kosmos.net/artifactory/maven-releases-local/'
             credentials {
-                username = System.getenv("NEXUS_USERNAME") ?: ""
-                password = System.getenv("NEXUS_PASSWORD") ?: ""
+                username = "mobile-team-read"
+                password = "Vt&72Ke2026#Pw9Rb"
             }
         }
         maven { url "https://jitpack.io" }
