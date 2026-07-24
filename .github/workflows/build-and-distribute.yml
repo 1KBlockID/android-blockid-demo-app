@@ -25,9 +25,9 @@
 #                                            "Firebase App Distribution Admin" role
 #     - FIREBASE_DEMO_APP_ID               : Firebase App ID for the demo app
 #
-#   Nexus (for SDK dependency resolution):
-#     - NEXUS_USERNAME               : Nexus repository username
-#     - NEXUS_PASSWORD               : Nexus repository password
+#   JFrog (for SDK dependency resolution):
+#     - JFROG_USERNAME               : JFrog repository username
+#     - JFROG_PASSWORD               : JFrog repository password
 #
 # NOTE: The signing keystore (android_blockidsample_keystore.jks) is committed
 #       to the repo and does not need to be decoded from a secret.
@@ -111,8 +111,8 @@ jobs:
           DEMO_STORE_PASSWORD: ${{ secrets.DEMO_STORE_PASSWORD }}
           DEMO_KEY_ALIAS: ${{ secrets.DEMO_KEY_ALIAS }}
           DEMO_KEY_PASSWORD: ${{ secrets.DEMO_KEY_PASSWORD }}
-          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+          JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
 
       # --- 8. Upload APK to Firebase App Distribution ---
       # Pinned to v1.7.1 (SHA: bd49498) for supply-chain safety
