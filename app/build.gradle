@@ -10,7 +10,7 @@ android {
         minSdk 28
         targetSdk 36
         versionCode 1
-        versionName "1.30.50" + "." + getCurrentTimestampHexValue()
+        versionName "1.30.60" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -109,5 +109,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.50.6A5F19FF'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.60.dev.6A69BAD8'
 }
