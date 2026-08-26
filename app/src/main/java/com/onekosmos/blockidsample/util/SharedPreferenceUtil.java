@@ -27,8 +27,8 @@ import javax.crypto.spec.GCMParameterSpec;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class SharedPreferenceUtil {
-    private static SharedPreferenceUtil mSharedPreferenceUtil;
-    private static SharedPreferences mSharedPreferences;
+    private static volatile SharedPreferenceUtil mSharedPreferenceUtil;
+    private static volatile SharedPreferences mSharedPreferences;
 
     private static final String K_KEY_ALIAS = "_androidx_security_master_key_";
     private static final String K_MIGRATION_DONE_KEY = "bid_migration_v2_done";
@@ -50,7 +50,7 @@ public class SharedPreferenceUtil {
      *
      * @param context should be ApplicationContext not Activity
      */
-    public static void initialize(Context context) {
+    public static synchronized void initialize(Context context) {
         if (mSharedPreferences == null) {
             mSharedPreferences = context.getSharedPreferences(
                     newPrefsName(context),
@@ -119,9 +119,11 @@ public class SharedPreferenceUtil {
                     .putBoolean(K_MIGRATION_DONE_KEY, true)
                     .apply();
 
-            // Delete old encrypted prefs file
-            context.getSharedPreferences(legacyPrefsName(context), Context.MODE_PRIVATE)
-                    .edit().clear().apply();
+            // Physically remove the legacy prefs file from shared_prefs/ so no
+            // empty/orphaned file lingers on disk. clear() only wipes the entries
+            // inside the file — deleteSharedPreferences() removes the file itself.
+            // Available since API 24; app minSdk is 28, so this is always safe.
+            deleteLegacyPrefsFile(context);
 
             Log.i("SharedPreferenceUtil", "Migration from EncryptedSharedPreferences complete");
 
@@ -129,6 +131,26 @@ public class SharedPreferenceUtil {
             // Old prefs unreadable (e.g. key lost) — mark done and start fresh
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Physically deletes the legacy prefs file from the app's shared_prefs directory.
+     * <p>
+     * {@code SharedPreferences.edit().clear()} only removes the entries but leaves an
+     * empty file behind. {@link Context#deleteSharedPreferences(String)} (API 24+)
+     * removes the backing file itself so nothing orphaned is left in the cache.
+     *
+     * @param context should be ApplicationContext not Activity
+     */
+    private static void deleteLegacyPrefsFile(Context context) {
+        String legacyName = legacyPrefsName(context);
+        // Clear entries first so any in-memory instance releases its state, then
+        // remove the physical file.
+        context.getSharedPreferences(legacyName, Context.MODE_PRIVATE)
+                .edit().clear().commit();
+        boolean deleted = context.deleteSharedPreferences(legacyName);
+        Log.i("SharedPreferenceUtil", "Legacy prefs file deletion "
+                + (deleted ? "succeeded" : "failed or file already absent") + ": " + legacyName);
     }
 
     private static void ensureKeyExists() throws Exception {
@@ -187,14 +209,7 @@ public class SharedPreferenceUtil {
      * @return Returns true if the new values were successfully written to persistent storage
      */
     public static boolean setString(String key, String value) {
-        if (mSharedPreferences == null || TextUtils.isEmpty(key)) return false;
-        try {
-            return mSharedPreferences.edit().putString(key, encrypt(value)).commit();
-        } catch (Exception e) {
-            Log.w("SharedPreferenceUtil", "encrypt failed for key: " + key + ", " +
-                    "storing plain", e);
-            return mSharedPreferences.edit().putString(key, value).commit();
-        }
+        return putEncrypted(key, value);
     }
 
     /**
@@ -203,12 +218,7 @@ public class SharedPreferenceUtil {
      * @return Returns true if the new values were successfully written to persistent storage
      */
     public static boolean setInt(String key, int val) {
-        if (mSharedPreferences == null || TextUtils.isEmpty(key)) return false;
-        try {
-            return mSharedPreferences.edit().putString(key, encrypt(String.valueOf(val))).commit();
-        } catch (Exception e) {
-            return mSharedPreferences.edit().putInt(key, val).commit();
-        }
+        return putEncrypted(key, String.valueOf(val));
     }
 
     /**
@@ -217,11 +227,70 @@ public class SharedPreferenceUtil {
      * @return Returns true if the new values were successfully written to persistent storage
      */
     public static boolean setBool(String key, boolean val) {
+        return putEncrypted(key, String.valueOf(val));
+    }
+
+    /**
+     * Encrypts and stores a value. This is a security-critical vault, so it fails
+     * closed: if encryption is unavailable (e.g. KeyStore error), the value is NOT
+     * written and {@code false} is returned. Plaintext is never persisted.
+     * <p>
+     * On the first encryption failure it attempts to self-heal by regenerating the
+     * KeyStore key and retrying exactly once, since the most common cause is an
+     * invalidated/corrupted key.
+     *
+     * @param key the preference key; ignored when null/empty
+     * @param val the value to encrypt and store
+     * @return {@code true} if the encrypted value was committed, {@code false} otherwise
+     */
+    private static boolean putEncrypted(String key, String val) {
         if (mSharedPreferences == null || TextUtils.isEmpty(key)) return false;
         try {
-            return mSharedPreferences.edit().putString(key, encrypt(String.valueOf(val))).commit();
+            String encrypted = encrypt(val);
+            return mSharedPreferences.edit().putString(key, encrypted).commit();
+        } catch (Exception firstFailure) {
+            // Encryption most often fails because the KeyStore key was invalidated
+            // (e.g. lock-screen credentials changed) or the alias got corrupted.
+            // Logging alone doesn't recover, so attempt to self-heal: regenerate the
+            // key and retry the encrypt exactly once before giving up.
+            Log.w("SharedPreferenceUtil", "encrypt failed for key: " + key
+                    + "; attempting key recovery", firstFailure);
+            if (regenerateKey()) {
+                try {
+                    String encrypted = encrypt(val);
+                    return mSharedPreferences.edit().putString(key, encrypted).commit();
+                } catch (Exception retryFailure) {
+                    Log.e("SharedPreferenceUtil", "encrypt retry failed for key: " + key
+                            + "; value NOT stored", retryFailure);
+                }
+            }
+            // Fail closed — never fall back to storing plaintext in the vault.
+            return false;
+        }
+    }
+
+    /**
+     * Deletes the existing (likely invalidated/corrupted) KeyStore alias and
+     * generates a fresh AES key. Used as a recovery step when encryption fails.
+     * <p>
+     * Note: any values previously encrypted with the old key become undecryptable
+     * once the key is replaced — this is unavoidable when the key is invalidated,
+     * since the original key material is already gone.
+     *
+     * @return {@code true} if a usable key exists after regeneration
+     */
+    private static boolean regenerateKey() {
+        try {
+            KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+            ks.load(null);
+            if (ks.containsAlias(K_KEY_ALIAS)) {
+                ks.deleteEntry(K_KEY_ALIAS);
+            }
+            ensureKeyExists();
+            return true;
         } catch (Exception e) {
-            return mSharedPreferences.edit().putBoolean(key, val).commit();
+            Log.e("SharedPreferenceUtil", "KeyStore key regeneration failed", e);
+            return false;
         }
     }
 
