@@ -278,6 +278,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                         BlockIDSDK.getInstance().getEnvironmentCurveName(origin.api, (
                                 statusEnv, environment, errorEnv) -> {
                             if (!statusEnv) {
+                                hideProgress();
                                 showError(new ErrorManager.ErrorResponse(errorEnv.getCode(),
                                         errorEnv.getMessage()));
                                 return;
