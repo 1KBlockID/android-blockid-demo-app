@@ -36,10 +36,10 @@ import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanRespo
 import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
-import com.onekosmos.blockidsample.apis.GetSessionAuthRequestApi;
 import com.onekosmos.blockidsample.model.RegisterTenant;
 import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
 import com.onekosmos.blockidsample.ui.qrAuth.AuthenticationPayloadV2;
+import com.onekosmos.blockidsample.ui.qrAuth.GetSessionData;
 import com.onekosmos.blockidsample.ui.restore.RestoreAccountActivity;
 import com.onekosmos.blockidsample.util.AppPermissionUtils;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -212,12 +212,12 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                         return;
                     }
 
-                    GetSessionAuthRequestApi.initialize();
-                    GetSessionAuthRequestApi.getInstance().getSessionAuthRequest(qrResponseB64String, (status, message, error, result) -> runOnUiThread(() -> {
-                        if (status && result != null) {
+                    GetSessionData.getInstance().getSessionData(qrResponseB64String,
+                            (status, response, error) -> runOnUiThread(() -> {
+                        if (status) {
                             try {
                                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                                AuthenticationPayloadV2 payload = gson.fromJson(result,
+                                AuthenticationPayloadV2 payload = gson.fromJson(response,
                                         AuthenticationPayloadV2.class);
 
                                 if (payload.origin != null && payload.origin.tag != null
@@ -227,7 +227,8 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                                             payload.origin.communityName,
                                             payload.origin.url);
                                     isDefaultTenantRegistration = false;
-                                    Toast.makeText(this, "Tenant configured: " + payload.origin.tag,
+                                    Toast.makeText(this, "Tenant configured: " +
+                                                    payload.origin.tag,
                                             Toast.LENGTH_SHORT).show();
                                 }
                             } catch (Exception e) {
@@ -235,7 +236,8 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                                         Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            String errMsg = (error != null) ? error.getMessage() : "Failed to get session data";
+                            String errMsg = (error != null) ? error.getMessage() :
+                                    "Failed to get session data";
                             Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
                         }
                         hideQRScannerAndShowRegister();
@@ -244,8 +246,10 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
             }
             // Base64-encoded JSON tenant data
             else {
-                String qrResponseString = new String(Base64.decode(qrResponseB64String, Base64.NO_WRAP));
-                RegisterTenant registerTenant = new Gson().fromJson(qrResponseString, RegisterTenant.class);
+                String qrResponseString = new String(Base64.decode(qrResponseB64String,
+                        Base64.NO_WRAP));
+                RegisterTenant registerTenant = new Gson().fromJson(qrResponseString,
+                        RegisterTenant.class);
 
                 if (registerTenant != null && registerTenant.getTag() != null
                         && registerTenant.getCommunity() != null
@@ -254,10 +258,12 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                             registerTenant.getCommunity(),
                             registerTenant.getApi());
                     isDefaultTenantRegistration = false;
-                    Toast.makeText(this, "Tenant configured: " + registerTenant.getTag(),
+                    Toast.makeText(this, "Tenant configured: " +
+                                    registerTenant.getTag(),
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Invalid QR code data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Invalid QR code data",
+                            Toast.LENGTH_SHORT).show();
                 }
                 hideQRScannerAndShowRegister();
             }
