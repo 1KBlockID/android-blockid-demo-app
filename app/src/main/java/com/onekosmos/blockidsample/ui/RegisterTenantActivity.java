@@ -214,34 +214,34 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
 
                     GetSessionData.getInstance().getSessionData(qrResponseB64String,
                             (status, response, error) -> runOnUiThread(() -> {
-                        if (status) {
-                            try {
-                                Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-                                AuthenticationPayloadV2 payload = gson.fromJson(response,
-                                        AuthenticationPayloadV2.class);
+                                if (status) {
+                                    try {
+                                        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                                        AuthenticationPayloadV2 payload = gson.fromJson(response,
+                                                AuthenticationPayloadV2.class);
 
-                                if (payload.origin != null && payload.origin.tag != null
-                                        && payload.origin.url != null
-                                        && payload.origin.communityName != null) {
-                                    mScannedTenant = new BIDTenant(payload.origin.tag,
-                                            payload.origin.communityName,
-                                            payload.origin.url);
-                                    isDefaultTenantRegistration = false;
-                                    Toast.makeText(this, "Tenant configured: " +
-                                                    payload.origin.tag,
-                                            Toast.LENGTH_SHORT).show();
+                                        if (payload.origin != null && payload.origin.tag != null
+                                                && payload.origin.url != null
+                                                && payload.origin.communityName != null) {
+                                            mScannedTenant = new BIDTenant(payload.origin.tag,
+                                                    payload.origin.communityName,
+                                                    payload.origin.url);
+                                            isDefaultTenantRegistration = false;
+                                            Toast.makeText(this, "Tenant configured: " +
+                                                            payload.origin.tag,
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    } catch (Exception e) {
+                                        Toast.makeText(this, "Failed to parse session data",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    String errMsg = (error != null) ? error.getMessage() :
+                                            "Failed to get session data";
+                                    Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
                                 }
-                            } catch (Exception e) {
-                                Toast.makeText(this, "Failed to parse session data",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            String errMsg = (error != null) ? error.getMessage() :
-                                    "Failed to get session data";
-                            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
-                        }
-                        hideQRScannerAndShowRegister();
-                    }));
+                                hideQRScannerAndShowRegister();
+                            }));
                 });
             }
             // Base64-encoded JSON tenant data
@@ -297,7 +297,6 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
         mBtnRegisterTenant.setClickable(false);
 
         BIDTenant tenant = isDefaultTenantRegistration ? AppConstant.defaultTenant : mScannedTenant;
-
         BlockIDSDK.getInstance().registerTenant(tenant, (status, error, bidTenant) -> {
             progressDialog.dismiss();
             mBtnRegisterTenant.setClickable(true);
@@ -311,9 +310,8 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                         K_SOMETHING_WENT_WRONG.getMessage());
 
             ErrorDialog errorDialog = new ErrorDialog(this);
-            DialogInterface.OnDismissListener onDismissListener = dialogInterface -> {
-                errorDialog.dismiss();
-            };
+            DialogInterface.OnDismissListener onDismissListener = dialogInterface ->
+                    errorDialog.dismiss();
             if (error.getCode() == ErrorManager.CustomErrors.K_CONNECTION_ERROR.getCode()) {
                 errorDialog.showNoInternetDialog(onDismissListener);
                 return;
@@ -325,11 +323,9 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
                     onDismissListener);
         });
     }
-
     // endregion
 
     // region Device Auth & Restore
-
     private void enrollDeviceAuth() {
         if (!BlockIDSDK.getInstance().isDeviceAuthEnrolled()) {
             String title = getResources().getString(R.string.label_biometric_auth);
@@ -365,6 +361,5 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
         Intent restoreIntent = new Intent(this, RestoreAccountActivity.class);
         restoreAccountLauncher.launch(restoreIntent);
     }
-
     // endregion
 }
