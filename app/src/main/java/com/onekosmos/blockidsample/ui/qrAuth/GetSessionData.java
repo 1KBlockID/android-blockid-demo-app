@@ -41,7 +41,7 @@ public class GetSessionData {
                 });
     }
 
-    interface ISessionResponseCallback {
+    public interface ISessionResponseCallback {
         void onSessionResponse(boolean status, String response, ErrorManager.ErrorResponse error);
     }
 }
