@@ -42,7 +42,7 @@ public class SharedPreferenceUtil {
     // name than the legacy one. Reusing the same name means opening/clearing the
     // new store also opens/clears the legacy file underneath it — which silently
     // wipes any data you just migrated. This was the root cause of the upgrade bug.
-    private static final String K_NEW_PREFS_NAME = "%s.bid_app_vault_v2";
+    private static final String K_NEW_PREFS_NAME = "%s.bid_demo_vault_v2";
 
 
     /**
