@@ -46,7 +46,7 @@ public class SharedPreferenceUtil {
 
 
     /**
-     * Initialising encrypted shared preferences
+     * Initializing encrypted shared preferences
      *
      * @param context should be ApplicationContext not Activity
      */
@@ -59,7 +59,7 @@ public class SharedPreferenceUtil {
             try {
                 ensureKeyExists();
             } catch (Exception e) {
-               e.printStackTrace();
+                e.printStackTrace();
             }
             migrateFromEncryptedSharedPreferences(context); // ← one-time migration
         }
@@ -213,7 +213,7 @@ public class SharedPreferenceUtil {
     }
 
     /**
-     * @param key   The name of the preference to modify.
+     * @param key The name of the preference to modify.
      * @param val The new value for the preference.
      * @return Returns true if the new values were successfully written to persistent storage
      */
@@ -222,7 +222,7 @@ public class SharedPreferenceUtil {
     }
 
     /**
-     * @param key   The name of the preference to modify.
+     * @param key The name of the preference to modify.
      * @param val The new value for the preference.
      * @return Returns true if the new values were successfully written to persistent storage
      */
@@ -354,7 +354,7 @@ public class SharedPreferenceUtil {
     }
 
     /**
-     * Remove keys from {@link SharedPreferences}..
+     * Remove keys from {@link SharedPreferences}.
      *
      * @param keys The name of the key(s) to be removed.
      */
@@ -368,7 +368,7 @@ public class SharedPreferenceUtil {
     }
 
     /**
-     * Remove all keys from {@link SharedPreferences}..
+     * Remove all keys from {@link SharedPreferences}.
      */
     public void clear() {
         if (mSharedPreferences == null) return;
