@@ -31,7 +31,7 @@ public class SharedPreferenceUtil {
     private static volatile SharedPreferences mSharedPreferences;
 
     private static final String K_KEY_ALIAS = "_androidx_security_master_key_";
-    private static final String K_MIGRATION_DONE_KEY = "bid_migration_v2_done";
+    private static final String K_MIGRATION_DONE_KEY = "demo_migration_v2_done";
 
     // The OLD SDK opened EncryptedSharedPreferences with this exact file name.
     // DO NOT CHANGE — this must match whatever was previously passed to
