@@ -275,17 +275,8 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     GetAccessCodeResponse accessCodeResponse = response.getDataObject();
                     if (accessCodeResponse.getAccessCodePayload().getAuthType().
                             equalsIgnoreCase("none")) {
-                        BlockIDSDK.getInstance().getEnvironmentCurveName(origin.api, (
-                                statusEnv, environment, errorEnv) -> {
-                            if (!statusEnv) {
-                                hideProgress();
-                                showError(new ErrorManager.ErrorResponse(errorEnv.getCode(),
-                                        errorEnv.getMessage()));
-                                return;
-                            }
-                            // Get acr public key
-                            getPublicKey(magicLinkDataModel, environment.EC_CURVE_NAME);
-                        });
+                        // Get acr public key
+                        getPublicKey(magicLinkDataModel);
                     } else {
                         String errorMessage = "Auth type " +
                                 accessCodeResponse.getAccessCodePayload().getAuthType()
@@ -300,7 +291,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      *
      * @param magicLinkData {@link MagicLinkData}
      */
-    private void getPublicKey(MagicLinkData magicLinkData, String curveName) {
+    private void getPublicKey(MagicLinkData magicLinkData) {
         String[] splitData = mMagicLink.split("acr");
         AndroidNetworking.get(splitData[0] + "/acr/publickeys")
                 .build()
@@ -308,7 +299,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     @Override
                     public void onResponse(ACRPublicKey response) {
                         mAcrPublicKey = response.publicKey;
-                        generatePayload(magicLinkData.code, curveName);
+                        generatePayload(magicLinkData.code);
                     }
 
                     @Override
@@ -324,7 +315,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Generate WebView payload
      */
     @SuppressLint("HardwareIds")
-    private void generatePayload(String code, String curveName) {
+    private void generatePayload(String code) {
         // Get publicIp Address
         String publicIpAddress = null;
         try {
@@ -354,7 +345,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Encrypt event data using server public key
         String encryptEventData = BlockIDSDK.getInstance().encryptString(eventDataString,
-                mAcrPublicKey, curveName);
+                mAcrPublicKey);
 
         // Generate ACR request
         ACRRequest acrRequest = new ACRRequest();
@@ -369,7 +360,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Encrypt ACR request using server public key
         String encryptedAcrRequest = BlockIDSDK.getInstance().encryptString(acrRequestString,
-                mAcrPublicKey, curveName);
+                mAcrPublicKey);
 
         // Generate ACR Data request
         ACRRequestData acrRequestData = new ACRRequestData();
@@ -383,7 +374,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 acrDataRequestString.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
 
         // Load Request Data in WebView
-        loadWebView(base64AcrDataRequest, curveName);
+        loadWebView(base64AcrDataRequest);
     }
 
     /**
@@ -392,7 +383,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param payload to be load in WebView
      */
     @SuppressLint("SetJavaScriptEnabled")
-    private void loadWebView(String payload, String curveName) {
+    private void loadWebView(String payload) {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -407,7 +398,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     showError(getString(R.string.label_empty_payload));
                 } else {
                     mWebView.setVisibility(View.GONE);
-                    addUser(request.getUrl().getQueryParameter("payload"), curveName);
+                    addUser(request.getUrl().getQueryParameter("payload"));
                 }
                 return true;
             }
@@ -430,14 +421,14 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      *
      * @param payload String payload return from WebView
      */
-    private void addUser(String payload, String curveName) {
+    private void addUser(String payload) {
         showProgress();
         // Base64 decode
         String base64DecodedPayload = new String(Base64.decode(payload, Base64.NO_WRAP));
 
         // Decrypt decoded payload
         String decryptedPayload = BlockIDSDK.getInstance().decryptString(base64DecodedPayload,
-                mAcrPublicKey, curveName);
+                mAcrPublicKey);
 
         // Generate acr response data
         ACRResponseData acrResponseData = BIDUtil.JSONStringToObject(decryptedPayload,
@@ -445,7 +436,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Decrypt data
         String decryptedData = BlockIDSDK.getInstance().decryptString(acrResponseData.data,
-                acrResponseData.publickey, curveName);
+                acrResponseData.publickey);
 
         UserData userData = BIDUtil.JSONStringToObject(decryptedData, UserData.class);
 
