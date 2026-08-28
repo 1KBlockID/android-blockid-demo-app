@@ -27,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.passKey.PasskeyRequest;
 import com.onekosmos.blockid.sdk.passKey.PasskeyResponse;
 import com.onekosmos.blockid.sdk.utils.BIDUtil;
@@ -49,6 +50,15 @@ public class PasskeyActivity extends AppCompatActivity {
             mBtnRegisterPasskeyAndLink, mBtnAuthenticateViaPasskeyAndGetJWT,
             mBtnCopyJwt;
     private ProgressDialog mProgressDialog;
+
+    /**
+     * Returns the currently registered tenant from the SDK.
+     * Falls back to the default tenant if none is registered yet.
+     */
+    private BIDTenant getActiveTenant() {
+        BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
+        return tenant != null ? tenant : AppConstant.defaultTenant;
+    }
 
     /**
      * @noinspection DataFlowIssue
@@ -121,7 +131,7 @@ public class PasskeyActivity extends AppCompatActivity {
             hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_registering_passkey));
-            BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
+            BlockIDSDK.getInstance().fetchUserByUserName(this, getActiveTenant(),
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
@@ -130,7 +140,7 @@ public class PasskeyActivity extends AppCompatActivity {
                                             FetchUserResponse.class);
 
                             PasskeyRequest passkeyRequest = new PasskeyRequest(
-                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    getActiveTenant(), // Required BIDTenant (tenantTag, community, dns)
                                     responseUser.data.username, // Required username
                                     responseUser.data.username, // Required display name
                                     ""); // Not required
@@ -153,7 +163,7 @@ public class PasskeyActivity extends AppCompatActivity {
             hideJWTView();
             String username = mEdittextUsername.getText().toString();
             showProgressDialog(getString(R.string.label_authenticating_passkey));
-            BlockIDSDK.getInstance().fetchUserByUserName(this, AppConstant.defaultTenant,
+            BlockIDSDK.getInstance().fetchUserByUserName(this, getActiveTenant(),
                     username, (status, fetchUserResponse, errorResponse) -> {
                         mProgressDialog.dismiss();
                         if (status) {
@@ -161,7 +171,7 @@ public class PasskeyActivity extends AppCompatActivity {
                                     BIDUtil.JSONStringToObject(fetchUserResponse,
                                             FetchUserResponse.class);
                             PasskeyRequest passkeyRequest = new PasskeyRequest(
-                                    AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                                    getActiveTenant(), // Required BIDTenant (tenantTag, community, dns)
                                     responseUser.data.username, // Required username
                                     responseUser.data.username, // Required display name
                                     ""); // Not required
@@ -206,7 +216,7 @@ public class PasskeyActivity extends AppCompatActivity {
         String passKeyName = Objects.requireNonNull(mEdittextPasskeyName.getText()).toString();
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
-                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                getActiveTenant(), // Required BIDTenant (tenantTag, community, dns)
                 username, // Required username
                 "", // Not required
                 passKeyName); // Optional passkey name
@@ -229,7 +239,7 @@ public class PasskeyActivity extends AppCompatActivity {
                 mEdittextUsername.getText().toString() : "";
 
         PasskeyRequest passkeyRequest = new PasskeyRequest(
-                AppConstant.defaultTenant, // Required BIDTenant (tenantTag, community, dns)
+                getActiveTenant(), // Required BIDTenant (tenantTag, community, dns)
                 username, // Required username
                 "", // Not required
                 ""); // Not required
