@@ -34,6 +34,7 @@ import com.onekosmos.blockid.sdk.cameramodule.BIDScannerView;
 import com.onekosmos.blockid.sdk.cameramodule.QRCodeScanner.QRScannerHelper;
 import com.onekosmos.blockid.sdk.cameramodule.camera.qrCodeModule.IOnQRScanResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.model.RegisterTenant;
@@ -358,7 +359,9 @@ public class RegisterTenantActivity extends AppCompatActivity implements IOnQRSc
     }
 
     private void restoreAccount() {
+        BIDTenant tenant = isDefaultTenantRegistration ? AppConstant.defaultTenant : mScannedTenant;
         Intent restoreIntent = new Intent(this, RestoreAccountActivity.class);
+        restoreIntent.putExtra("scanned_tenant", BIDUtil.objectToJSONString(tenant, true));
         restoreAccountLauncher.launch(restoreIntent);
     }
     // endregion

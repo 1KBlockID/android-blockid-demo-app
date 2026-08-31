@@ -56,7 +56,7 @@ public class PasskeyActivity extends AppCompatActivity {
      * Falls back to the default tenant if none is registered yet.
      */
     private BIDTenant getActiveTenant() {
-        BIDTenant tenant = BlockIDSDK.getInstance().getTenant();
+        BIDTenant tenant = BlockIDSDK.getInstance().getAppTenant();
         return tenant != null ? tenant : AppConstant.defaultTenant;
     }
 
