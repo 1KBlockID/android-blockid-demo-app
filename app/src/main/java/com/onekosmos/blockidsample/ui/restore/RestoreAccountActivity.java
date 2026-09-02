@@ -19,6 +19,8 @@ import androidx.core.view.WindowCompat;
 
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BlockIDSDK;
+import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
+import com.onekosmos.blockid.sdk.utils.BIDUtil;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
 import com.onekosmos.blockidsample.util.ErrorDialog;
@@ -40,6 +42,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
     private AppCompatEditText[] mEtPhrases = new AppCompatEditText[12];
     private TextWatcher[] mTextWatchers = new TextWatcher[12];
     private ProgressDialog mProgressDialog;
+    private BIDTenant tenant;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -52,6 +55,16 @@ public class RestoreAccountActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_restore_account);
         initView();
+
+        String scannedTenant = getIntent().hasExtra("scanned_tenant") ?
+                getIntent().getStringExtra("scanned_tenant") : "";
+        if (TextUtils.isEmpty(scannedTenant)) {
+            tenant = AppConstant.defaultTenant;
+        } else {
+            tenant = BIDUtil.JSONStringToObject(scannedTenant, BIDTenant.class);
+            if (tenant == null) tenant = AppConstant.defaultTenant;
+        }
+
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -172,7 +185,7 @@ public class RestoreAccountActivity extends AppCompatActivity {
     }
 
     private void registerTenant() {
-        BlockIDSDK.getInstance().registerTenant(AppConstant.defaultTenant,
+        BlockIDSDK.getInstance().registerTenant(tenant,
                 (status, error, bidTenant) -> {
                     if (status) {
                         restoreAccount();
