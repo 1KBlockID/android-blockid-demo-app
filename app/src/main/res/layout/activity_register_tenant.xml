@@ -8,83 +8,151 @@
     android:fitsSystemWindows="true"
     tools:context="com.onekosmos.blockidsample.ui.RegisterTenantActivity">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/img_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_120dp"
-        android:contentDescription="@string/app_name"
-        android:elevation="@dimen/dimen_10dp"
-        android:src="@drawable/logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    <!-- Registration Layout (shown by default) -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_auth"
+        android:id="@+id/layout_register"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_100dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/img_logo">
+        android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/txt_title_enable_login"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/img_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_enable_foll_method"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="@dimen/dimen_16sp"
+            android:layout_marginTop="@dimen/dimen_120dp"
+            android:contentDescription="@string/app_name"
+            android:elevation="@dimen/dimen_10dp"
+            android:src="@drawable/logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_auth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_100dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/img_logo">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_title_enable_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_enable_foll_method"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dimen_16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_device_auth"
+                android:layout_width="@dimen/dimen_94dp"
+                android:layout_height="@dimen/dimen_94dp"
+                android:layout_marginTop="@dimen/dimen_30dp"
+                android:background="@color/black"
+                android:padding="@dimen/dimen_4dp"
+                android:text="@string/label_touch_id_face_id"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dimen_16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_title_enable_login" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_device_auth"
-            android:layout_width="@dimen/dimen_94dp"
-            android:layout_height="@dimen/dimen_94dp"
-            android:layout_marginTop="@dimen/dimen_30dp"
+            android:id="@+id/btn_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dimen_24dp"
             android:background="@color/black"
-            android:padding="@dimen/dimen_4dp"
-            android:text="@string/label_touch_id_face_id"
-            android:textAlignment="center"
+            android:paddingHorizontal="@dimen/dimen_20dp"
+            android:text="@string/label_register_default_tenant"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/dimen_16sp"
-            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/btn_restore_account"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_title_enable_login" />
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_restore_account"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dimen_74dp"
+            android:background="@color/black"
+            android:paddingHorizontal="@dimen/dimen_20dp"
+            android:text="@string/label_restore_account"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/dimen_16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/btn_register"
+            app:layout_constraintStart_toStartOf="@+id/btn_register" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/dimen_24dp"
-        android:background="@color/black"
-        android:paddingHorizontal="@dimen/dimen_20dp"
-        android:text="@string/label_register_default_tenant"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/dimen_16sp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_restore_account"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!-- QR Scanner Layout (hidden by default, shown on 5-tap) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_qr_scan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_restore_account"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/dimen_74dp"
-        android:background="@color/black"
-        android:paddingHorizontal="@dimen/dimen_20dp"
-        android:text="@string/label_restore_account"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/dimen_16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btn_register"
-        app:layout_constraintStart_toStartOf="@+id/btn_register" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/img_back_scan_qr"
+            android:layout_width="@dimen/dimen_25dp"
+            android:layout_height="@dimen/dimen_25dp"
+            android:layout_marginStart="@dimen/dimen_10dp"
+            android:layout_marginTop="@dimen/dimen_15dp"
+            android:padding="@dimen/dimen_5dp"
+            android:src="@drawable/icon_backarrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_scan_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_30dp"
+            android:text="@string/label_scan_qr_code"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dimen_28sp"
+            app:layout_constraintTop_toBottomOf="@id/img_back_scan_qr" />
+
+        <LinearLayout
+            android:id="@+id/scanner_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_scan_title">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.onekosmos.blockid.sdk.cameramodule.BIDScannerView
+                    android:id="@+id/bid_scanner_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <RelativeLayout
+                    android:id="@+id/scanner_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/frame_qr_code_scanner"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

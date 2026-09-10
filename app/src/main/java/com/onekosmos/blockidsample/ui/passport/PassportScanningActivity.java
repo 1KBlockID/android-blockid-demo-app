@@ -243,6 +243,14 @@ public class PassportScanningActivity extends AppCompatActivity {
                 return;
             }
 
+            // Detect what document type was actually scanned
+            String detectedDocType = detectActualDocumentType(dataObject);
+
+            if (detectedDocType != null && !detectedDocType.equalsIgnoreCase("PASSPORT")) {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+                return;
+            }
+
             Gson gson = new GsonBuilder().disableHtmlEscaping().create();
             mPassportMap = gson.fromJson(pptObject,
                     new TypeToken<LinkedHashMap<String, Object>>() {
@@ -419,6 +427,33 @@ public class PassportScanningActivity extends AppCompatActivity {
                     errorDialog.dismiss();
                     finish();
                 });
+    }
+
+    /**
+     * Detect actual document type from API response
+     *
+     * @param dataObject JSON object from API response
+     * @return Detected document type or null
+     */
+    private String detectActualDocumentType(JSONObject dataObject) {
+        try {
+            // Check if document object exists
+            if (dataObject.has("document")) {
+                JSONObject documentObj = dataObject.getJSONObject("document");
+
+                // Get documentType field from document object
+                if (documentObj.has("documentType")) {
+                    return documentObj.getString("documentType");
+                } else {
+                    showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+                }
+            } else {
+                showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+            }
+        } catch (Exception e) {
+            showErrorDialog(getString(R.string.label_scan_failed_please_scan_a_valid_document));
+        }
+        return null;
     }
 
     /**

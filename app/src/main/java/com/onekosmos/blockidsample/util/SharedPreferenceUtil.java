@@ -105,11 +105,9 @@ public class SharedPreferenceUtil {
             for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
                 Object value = entry.getValue();
                 if (value instanceof String) {
-                    setString(entry.getKey(), (String) value);
-                } else if (value instanceof Boolean) {
-                    setBool(entry.getKey(), (Boolean) value);
-                } else if (value instanceof Integer) {
-                    setInt(entry.getKey(), (Integer) value);
+                    putEncrypted(entry.getKey(), (String) value);
+                } else {
+                    putEncrypted(entry.getKey(), String.valueOf(value));
                 }
             }
 
@@ -208,7 +206,7 @@ public class SharedPreferenceUtil {
      * @param value The new value for the preference.
      * @return Returns true if the new values were successfully written to persistent storage
      */
-    public static boolean setString(String key, String value) {
+    public boolean setString(String key, String value) {
         return putEncrypted(key, value);
     }
 
@@ -217,7 +215,7 @@ public class SharedPreferenceUtil {
      * @param val The new value for the preference.
      * @return Returns true if the new values were successfully written to persistent storage
      */
-    public static boolean setInt(String key, int val) {
+    public boolean setInt(String key, int val) {
         return putEncrypted(key, String.valueOf(val));
     }
 
@@ -226,7 +224,7 @@ public class SharedPreferenceUtil {
      * @param val The new value for the preference.
      * @return Returns true if the new values were successfully written to persistent storage
      */
-    public static boolean setBool(String key, boolean val) {
+    public boolean setBool(String key, boolean val) {
         return putEncrypted(key, String.valueOf(val));
     }
 
