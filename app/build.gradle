@@ -10,8 +10,17 @@ android {
         minSdk 26
         targetSdk 36
         versionCode 1
-        versionName "1.30.10" + "." + getCurrentTimestampHexValue()
+        versionName "1.30.11" + "." + getCurrentTimestampHexValue()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('android_blockidsample_keystore.jks')
+            storePassword System.getenv("DEMO_STORE_PASSWORD") ?: ""
+            keyAlias System.getenv("DEMO_KEY_ALIAS") ?: ""
+            keyPassword System.getenv("DEMO_KEY_PASSWORD") ?: ""
+        }
     }
 
     buildFeatures {
@@ -20,6 +29,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
@@ -106,5 +116,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // BlockID SDK
-    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.10.69C634D7'
+    implementation 'com.onekosmos.blockid.sdk:blockidsdk:1.30.11.6AA3B53D'
 }
