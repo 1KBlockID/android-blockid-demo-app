@@ -64,8 +64,14 @@ jobs:
           distribution: 'temurin'
 
       # --- 3. Set up Android SDK ---
+      # NOTE: `packages` is overridden to drop the legacy `tools` package that
+      # setup-android@v3 installs by default. Google removed `tools` from the
+      # SDK repository, so newer sdkmanager builds fail with
+      # "Failed to find package 'tools'". platform-tools is all we need.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       # --- 4. Cache Gradle dependencies ---
       - name: Cache Gradle packages
