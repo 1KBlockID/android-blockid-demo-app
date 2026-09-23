@@ -36,6 +36,7 @@ import com.onekosmos.blockid.sdk.authentication.BIDAuthProvider;
 import com.onekosmos.blockid.sdk.authentication.biometric.IBiometricResponseListener;
 import com.onekosmos.blockid.sdk.datamodel.BIDGenericResponse;
 import com.onekosmos.blockid.sdk.datamodel.BIDLinkedAccount;
+import com.onekosmos.blockid.sdk.datamodel.BIDTenant;
 import com.onekosmos.blockid.sdk.document.BIDDocumentProvider;
 import com.onekosmos.blockidsample.AppConstant;
 import com.onekosmos.blockidsample.R;
@@ -452,6 +453,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
     }
 
     private void onResetAppClick() {
+        BIDTenant registeredTenant = BlockIDSDK.getInstance().getAppTenant();
         ErrorDialog errorDialog = new ErrorDialog(this);
         errorDialog.showWithTwoButton(
                 null,
@@ -461,7 +463,7 @@ public class EnrollmentActivity extends AppCompatActivity implements EnrollmentA
                 (dialogInterface, i) -> {
                     errorDialog.dismiss();
                     BlockIDSDK.getInstance().resetSDK(AppConstant.licenseKey,
-                            AppConstant.defaultTenant,
+                            registeredTenant != null ? registeredTenant : AppConstant.defaultTenant,
                             ResetSDKMessages.RESET_APP_OPTION_CLICK.getMessage());
                     Intent intent = new Intent(this, RegisterTenantActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

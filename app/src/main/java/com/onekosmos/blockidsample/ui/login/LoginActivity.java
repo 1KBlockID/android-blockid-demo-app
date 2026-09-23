@@ -6,7 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.view.WindowCompat;
@@ -23,8 +24,15 @@ import com.onekosmos.blockidsample.ui.enrollment.EnrollmentActivity;
  * Copyright © 2021 1Kosmos. All rights reserved.
  */
 public class LoginActivity extends AppCompatActivity {
-    private static final int K_PIN_VERIFICATION_REQUEST_CODE = 1189;
     private AppCompatButton mBtnAppPin, mBtnDeviceAuth;
+
+    private final ActivityResultLauncher<Intent> pinVerificationLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            onLoginSuccess();
+                        }
+                    });
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -37,14 +45,6 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         initView();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == K_PIN_VERIFICATION_REQUEST_CODE && resultCode == RESULT_OK) {
-            onLoginSuccess();
-        }
     }
 
     private void initView() {
@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         if (BlockIDSDK.getInstance().isReady() && BlockIDSDK.getInstance().isPinRegistered()) {
             Intent intent = new Intent(this, PinVerificationActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, K_PIN_VERIFICATION_REQUEST_CODE);
+            pinVerificationLauncher.launch(intent);
         }
     }
 

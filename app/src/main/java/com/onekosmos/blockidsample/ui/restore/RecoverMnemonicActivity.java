@@ -47,10 +47,10 @@ public class RecoverMnemonicActivity extends AppCompatActivity {
 
     private void initView() {
         mImgBack = findViewById(R.id.img_back);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         mTxtBack = findViewById(R.id.txt_back);
-        mTxtBack.setOnClickListener(view -> onBackPressed());
+        mTxtBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         mBtnCopyPhrase = findViewById(R.id.btn_copy_phrases);
         mBtnCopyPhrase.setOnClickListener(view -> {

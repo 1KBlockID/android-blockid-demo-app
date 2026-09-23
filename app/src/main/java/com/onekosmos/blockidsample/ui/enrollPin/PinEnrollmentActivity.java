@@ -17,6 +17,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -56,13 +57,16 @@ public class PinEnrollmentActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_pin_enrollment);
         initView();
-    }
 
-    @Override
-    public void onBackPressed() {
-        if (!onBackPress()) {
-            super.onBackPressed();
-        }
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (!onBackPress()) {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     private void initView() {

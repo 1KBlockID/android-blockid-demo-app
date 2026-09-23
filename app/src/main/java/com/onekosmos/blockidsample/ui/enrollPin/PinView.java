@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.ViewCompat;
 
 import com.onekosmos.blockidsample.R;
 
@@ -216,7 +215,7 @@ public class PinView extends AppCompatEditText {
             width = widthSize;
         } else {
             int boxesWidth = (mPinItemCount - 1) * mPinItemSpacing + mPinItemCount * mPinItemWidth;
-            width = boxesWidth + ViewCompat.getPaddingEnd(this) + ViewCompat.getPaddingStart(this);
+            width = boxesWidth + getPaddingEnd() + getPaddingStart();
             if (mPinItemSpacing == 0) {
                 width -= (mPinItemCount - 1) * mLineWidth;
             }
@@ -507,7 +506,7 @@ public class PinView extends AppCompatEditText {
 
     private void updateItemRectF(int i) {
         float halfLineWidth = ((float) mLineWidth) / 2;
-        float left = getScrollX() + ViewCompat.getPaddingStart(this) + i * (mPinItemSpacing + mPinItemWidth) + halfLineWidth;
+        float left = getScrollX() + getPaddingStart() + i * (mPinItemSpacing + mPinItemWidth) + halfLineWidth;
         if (mPinItemSpacing == 0 && i > 0) {
             left = left - (mLineWidth) * i;
         }

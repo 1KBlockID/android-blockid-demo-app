@@ -13,6 +13,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -27,6 +28,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +42,6 @@ import androidx.core.view.WindowCompat;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.ParsedRequestListener;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.onekosmos.blockid.sdk.BIDAPIs.APIManager.ErrorManager;
 import com.onekosmos.blockid.sdk.BIDAPIs.accessCode.GetAccessCodeResponse;
 import com.onekosmos.blockid.sdk.BIDAPIs.publicip.IPProvider;
@@ -67,8 +70,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private static final int K_PERMISSION_REQUEST_CODE = 1007;
     private final String[] K_PERMISSIONS = new String[]{CAMERA, ACCESS_FINE_LOCATION};
     private CurrentLocationHelper mCurrentLocationHelper;
-    @SuppressWarnings("deprecation")
-    private GoogleApiClient mGoogleApiClient;
     private double mLatitude = 0.0, mLongitude = 0.0;
     private LinearLayout mScannerView;
     private BIDScannerView mBIDScannerView;
@@ -78,6 +79,16 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     private ProgressBar mProgressBar;
     private QRScannerHelper mQRScannerHelper;
     private String mMagicLink, mAcrPublicKey, mIAL;
+
+    private final ActivityResultLauncher<IntentSenderRequest> locationSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            // User enabled location settings, retry location updates
+                            mCurrentLocationHelper.onLocationSettingsResolved();
+                            setLocation();
+                        }
+                    });
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -95,6 +106,18 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             finish();
         }
         mCurrentLocationHelper.createLocationRequest();
+
+        // Set callback for location settings resolution
+        mCurrentLocationHelper.setLocationSettingsCallback(exception -> {
+            try {
+                IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(
+                        exception.getResolution()).build();
+                locationSettingsLauncher.launch(intentSenderRequest);
+            } catch (Exception e) {
+                // Handle error
+            }
+        });
+
         initView();
     }
 
@@ -106,7 +129,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     K_PERMISSIONS);
         else {
             startQRCodeScanning();
-            mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+            mCurrentLocationHelper.startLocationUpdates();
             setLocation();
         }
     }
@@ -118,9 +141,9 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
             mQRScannerHelper.stopQRScanning();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PERMISSION_GRANTED) {
+                PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
             mCurrentLocationHelper.stopLocationUpdates();
         }
     }
@@ -140,7 +163,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
             if (permissions[index].equals(ACCESS_FINE_LOCATION) && grantResults[index] ==
                     PERMISSION_GRANTED) {
-                mGoogleApiClient = mCurrentLocationHelper.getGoogleApiClient(this);
+                mCurrentLocationHelper.startLocationUpdates();
                 setLocation();
             }
         }
@@ -166,7 +189,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      */
     private void initView() {
         AppCompatImageView mImgBack = findViewById(R.id.img_back_add_user);
-        mImgBack.setOnClickListener(view -> onBackPressed());
+        mImgBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         mScannerView = findViewById(R.id.scanner_view_add_user);
         mBIDScannerView = findViewById(R.id.bid_scanner_view_add_user);
@@ -205,12 +228,10 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Get current location and set it
      */
     private void setLocation() {
-        if (mGoogleApiClient != null) {
-            Location location = mCurrentLocationHelper.getLocation();
-            if (location != null) {
-                mLatitude = location.getLatitude();
-                mLongitude = location.getLongitude();
-            }
+        Location location = mCurrentLocationHelper.getLocation();
+        if (location != null) {
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
         }
     }
 
@@ -254,8 +275,17 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     GetAccessCodeResponse accessCodeResponse = response.getDataObject();
                     if (accessCodeResponse.getAccessCodePayload().getAuthType().
                             equalsIgnoreCase("none")) {
-                        // Get acr public key
-                        getPublicKey(magicLinkDataModel);
+                        BlockIDSDK.getInstance().getEnvironmentCurveName(origin.api, (
+                                statusEnv, environment, errorEnv) -> {
+                            if (!statusEnv) {
+                                hideProgress();
+                                showError(new ErrorManager.ErrorResponse(errorEnv.getCode(),
+                                        errorEnv.getMessage()));
+                                return;
+                            }
+                            // Get acr public key
+                            getPublicKey(magicLinkDataModel, environment.EC_CURVE_NAME);
+                        });
                     } else {
                         String errorMessage = "Auth type " +
                                 accessCodeResponse.getAccessCodePayload().getAuthType()
@@ -270,7 +300,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      *
      * @param magicLinkData {@link MagicLinkData}
      */
-    private void getPublicKey(MagicLinkData magicLinkData) {
+    private void getPublicKey(MagicLinkData magicLinkData, String curveName) {
         String[] splitData = mMagicLink.split("acr");
         AndroidNetworking.get(splitData[0] + "/acr/publickeys")
                 .build()
@@ -278,7 +308,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     @Override
                     public void onResponse(ACRPublicKey response) {
                         mAcrPublicKey = response.publicKey;
-                        generatePayload(magicLinkData.code);
+                        generatePayload(magicLinkData.code, curveName);
                     }
 
                     @Override
@@ -294,7 +324,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * Generate WebView payload
      */
     @SuppressLint("HardwareIds")
-    private void generatePayload(String code) {
+    private void generatePayload(String code, String curveName) {
         // Get publicIp Address
         String publicIpAddress = null;
         try {
@@ -324,7 +354,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Encrypt event data using server public key
         String encryptEventData = BlockIDSDK.getInstance().encryptString(eventDataString,
-                mAcrPublicKey);
+                mAcrPublicKey, curveName);
 
         // Generate ACR request
         ACRRequest acrRequest = new ACRRequest();
@@ -339,7 +369,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Encrypt ACR request using server public key
         String encryptedAcrRequest = BlockIDSDK.getInstance().encryptString(acrRequestString,
-                mAcrPublicKey);
+                mAcrPublicKey, curveName);
 
         // Generate ACR Data request
         ACRRequestData acrRequestData = new ACRRequestData();
@@ -353,7 +383,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                 acrDataRequestString.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
 
         // Load Request Data in WebView
-        loadWebView(base64AcrDataRequest);
+        loadWebView(base64AcrDataRequest, curveName);
     }
 
     /**
@@ -362,7 +392,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      * @param payload to be load in WebView
      */
     @SuppressLint("SetJavaScriptEnabled")
-    private void loadWebView(String payload) {
+    private void loadWebView(String payload, String curveName) {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -377,7 +407,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
                     showError(getString(R.string.label_empty_payload));
                 } else {
                     mWebView.setVisibility(View.GONE);
-                    addUser(request.getUrl().getQueryParameter("payload"));
+                    addUser(request.getUrl().getQueryParameter("payload"), curveName);
                 }
                 return true;
             }
@@ -400,14 +430,14 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
      *
      * @param payload String payload return from WebView
      */
-    private void addUser(String payload) {
+    private void addUser(String payload, String curveName) {
         showProgress();
         // Base64 decode
         String base64DecodedPayload = new String(Base64.decode(payload, Base64.NO_WRAP));
 
         // Decrypt decoded payload
         String decryptedPayload = BlockIDSDK.getInstance().decryptString(base64DecodedPayload,
-                mAcrPublicKey);
+                mAcrPublicKey, curveName);
 
         // Generate acr response data
         ACRResponseData acrResponseData = BIDUtil.JSONStringToObject(decryptedPayload,
@@ -415,7 +445,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
 
         // Decrypt data
         String decryptedData = BlockIDSDK.getInstance().decryptString(acrResponseData.data,
-                acrResponseData.publickey);
+                acrResponseData.publickey, curveName);
 
         UserData userData = BIDUtil.JSONStringToObject(decryptedData, UserData.class);
 
@@ -425,8 +455,7 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
         }
 
         // Add user data in SDK
-        BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.scep_hash,
-                userData.scep_privatekey, userData.scep_expiry, userData.origin,
+        BlockIDSDK.getInstance().addPreLinkedUser(userData.userId, userData.origin,
                 userData.account, (status, error) -> {
                     if (!status) {
                         showError(error);
@@ -579,9 +608,6 @@ public class AddUserActivity extends AppCompatActivity implements IOnQRScanRespo
     @Keep
     private static class UserData {
         String userId;
-        String scep_hash;
-        String scep_privatekey;
-        String scep_expiry;
         boolean isLinked;
         BIDOrigin origin;
         BIDAccount account;
